@@ -1,59 +1,60 @@
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
 import { useAsync } from '../hooks/useAsync'
 import { getRecentOrder } from '../services'
 import { formatDate, formatPrice } from '../lib/format'
 import { orderWhatsAppUrl } from '../lib/whatsapp'
-import LogoBadge from '../components/LogoBadge'
-import { ArrowRightIcon, WhatsAppIcon } from '../components/Icons'
+import Container from '../components/ui/Container'
+import Button from '../components/ui/Button'
+import Symbol from '../components/brand/Symbol'
 
+// Legacy success page; Step 3 rebuilds it (adds "Call Dream Kitchen").
 export default function OrderSuccess() {
   useSeo('success')
   const { t, lang } = useI18n()
   const { id } = useParams()
   const { state } = useLocation()
-  const { data: stored, loading } = useAsync(() => (state?.order ? Promise.resolve(state.order) : getRecentOrder(id)), [id])
-  const order = stored
+  const { data: order, loading } = useAsync(() => (state?.order ? Promise.resolve(state.order) : getRecentOrder(id)), [id])
 
   return (
-    <section className="doodle-bg min-h-[60vh] py-10 sm:py-16">
-      <div className="container-dk">
-        <div className="card-cream mx-auto max-w-xl p-6 text-center sm:p-10">
-          <LogoBadge size="md" />
-          <h1 className="mt-4 text-3xl font-bold sm:text-4xl">{t('success.title')}</h1>
-          <p className="mt-5 text-sm font-extrabold tracking-wider text-brown uppercase">{t('success.orderId')}</p>
-          <p className="mt-1 inline-block rounded-2xl border-2 border-dashed border-gold bg-offwhite px-6 py-2 font-display text-4xl font-bold text-deep">{id}</p>
-          <p className="mt-2 text-sm text-brown">{t('success.saveId')}</p>
+    <Container className="py-12 lg:py-16">
+      <div className="mx-auto max-w-[34rem] text-center">
+        <Symbol className="mx-auto h-20 w-auto" />
+        <h1 className="t-h1 mt-5">{t('success.title')}</h1>
+        <p className="mt-6 font-bold text-brown-2">{t('success.orderId')}</p>
+        <p className="t-h2 mt-1 inline-block rounded-control border-2 border-dashed border-brown-2 px-6 py-1">{id}</p>
+        <p className="t-small mt-2 text-brown-2">{t('success.saveId')}</p>
 
-          {!loading && !order && <p className="mt-4 text-brown">{t('success.missing')}</p>}
+        {!loading && !order && <p className="mt-4 text-brown-2">{t('success.missing')}</p>}
 
-          {order && (
-            <>
-              <p className="mt-6 text-lg">{t('success.text')}</p>
-              <dl className="mx-auto mt-6 grid max-w-sm grid-cols-2 gap-2 text-left">
-                <dt className="text-brown">{t('cart.total')}</dt>
-                <dd className="text-right font-extrabold">{formatPrice(order.total)}</dd>
-                <dt className="text-brown">{t('checkout.date')}</dt>
-                <dd className="text-right font-extrabold">{formatDate(order.deliveryDate, lang)}</dd>
-              </dl>
-              <div className="mt-8 rounded-2xl bg-tint/60 p-4">
-                <p className="font-bold">{t('success.notOpened')}</p>
-                <a href={orderWhatsAppUrl(order)} target="_blank" rel="noopener noreferrer" className="btn btn-whatsapp mt-3 w-full">
-                  <WhatsAppIcon /> {t('success.sendAgain')}
-                </a>
-              </div>
-            </>
-          )}
+        {order && (
+          <>
+            <p className="mt-6">{t('success.text')}</p>
+            <dl className="mx-auto mt-6 grid max-w-sm grid-cols-2 gap-2 text-left">
+              <dt className="text-brown-2">{t('cart.total')}</dt>
+              <dd className="t-price text-right">{formatPrice(order.total)}</dd>
+              <dt className="text-brown-2">{t('checkout.date')}</dt>
+              <dd className="text-right font-bold">{formatDate(order.deliveryDate, lang)}</dd>
+            </dl>
+            <div className="mt-8 rounded-card bg-champagne p-5">
+              <p className="font-bold">{t('success.notOpened')}</p>
+              <Button href={orderWhatsAppUrl(order)} variant="whatsapp" fullWidth className="mt-3">
+                {t('success.sendAgain')}
+              </Button>
+            </div>
+          </>
+        )}
 
-          <Link to={`/track?id=${encodeURIComponent(id)}${order ? `&phone=${order.customer.phone}` : ''}`} className="btn btn-primary mt-4 w-full text-lg">
-            {t('success.track')} <ArrowRightIcon className="h-5 w-5" />
-          </Link>
-          <Link to="/shop" className="btn btn-secondary mt-3 w-full">
+        <div className="mt-6 grid gap-3">
+          <Button to={`/track?id=${encodeURIComponent(id)}${order ? `&phone=${order.customer.phone}` : ''}`} size="lg" fullWidth>
+            {t('success.track')}
+          </Button>
+          <Button to="/shop" variant="secondary" fullWidth>
             {t('common.continueShopping')}
-          </Link>
+          </Button>
         </div>
       </div>
-    </section>
+    </Container>
   )
 }

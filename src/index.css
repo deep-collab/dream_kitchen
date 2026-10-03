@@ -1,186 +1,334 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Design tokens (docs/DESIGN.md). Tailwind 4 turns each into a utility and a
+   CSS variable, e.g. bg-ink / var(--color-ink).
+   ========================================================================== */
 @theme {
-  --color-cream: #FBF6EE;
-  --color-offwhite: #FFFDF9;
-  --color-tint: #EBDCCB;
-  --color-mid: #C9A98A;
-  --color-brown: #8B5E3C;
-  --color-dark: #4A2C1D;
-  --color-deep: #2E1A12;
-  --color-gold: #D4A93A;
-  --color-gold-soft: #EBCB7A;
-  --color-blush: #F1C9C1;
-  --color-rose: #A3332D;
-  --color-whatsapp: #1A7A43;
+  /* Brand palette (CLAUDE.md) */
+  --color-ink: #0f0f0f;
+  --color-gold: #c9a227;
+  --color-gold-light: #ebd27a;
+  --color-gold-mid: #d4af37;
+  --color-gold-deep: #b8901e;
+  --color-champagne: #f3e7cf;
+  --color-cream: #fff9ef;
+  --color-brown: #2a1d16;
+  --color-muted: #cdbf9e;
 
-  --font-display: "Playfair Display", "Noto Sans Kannada", Georgia, "Times New Roman", serif;
-  --font-sans: "Nunito", "Noto Sans Kannada", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* Derived UI tints */
+  --color-brown-2: #5c4a3f;
+  --color-line: #e6d7ba;
+  --color-ink-2: #1c1a17;
+  --color-ink-line: #3a3324;
+  --color-whatsapp: #1a7a43;
+  --color-whatsapp-dark: #145f34;
+  --color-error: #a1281e;
+  --color-error-bg: #fbeae4;
+  --color-control-line: #8f7d66; /* 3.8:1 on cream: input/chip boundaries (WCAG 1.4.11) */
 
-  --shadow-soft: 0 1px 2px rgb(74 44 29 / 0.06), 0 8px 24px -8px rgb(74 44 29 / 0.18);
-  --shadow-lift: 0 2px 4px rgb(74 44 29 / 0.08), 0 18px 40px -12px rgb(74 44 29 / 0.28);
+  --font-wordmark: Cinzel, "Trajan Pro", "Times New Roman", Georgia, serif;
+  --font-heading: "Cormorant Garamond", "Noto Serif Kannada", Garamond, "Times New Roman", Georgia, serif;
+  --font-body: Lato, "Noto Sans Kannada", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: var(--font-body);
+
+  /* Type scale: mobile / desktop pairs (see .t-* classes below) */
+  --text-small: 1rem;
+  --text-small--line-height: 1.5;
+  --text-body: 1.125rem;
+  --text-body--line-height: 1.65;
+  --text-lead: 1.25rem;
+  --text-lead--line-height: 1.55;
+  --text-lead-lg: 1.375rem;
+  --text-lead-lg--line-height: 1.55;
+  --text-h3: 1.5rem;
+  --text-h3--line-height: 1.2;
+  --text-h3-lg: 1.75rem;
+  --text-h3-lg--line-height: 1.2;
+  --text-h2: 2rem;
+  --text-h2--line-height: 1.12;
+  --text-h2-lg: 2.75rem;
+  --text-h2-lg--line-height: 1.1;
+  --text-h1: 2.5rem;
+  --text-h1--line-height: 1.08;
+  --text-h1-lg: 3.5rem;
+  --text-h1-lg--line-height: 1.05;
+  --text-button: 1.125rem;
+  --text-button--line-height: 1.2;
+  --text-button-lg: 1.25rem;
+  --text-button-lg--line-height: 1.2;
+  --text-price: 1.25rem;
+  --text-price--line-height: 1.2;
+  --text-price-lg: 1.375rem;
+  --text-price-lg--line-height: 1.2;
+
+  /* Radius by hierarchy */
+  --radius-inline: 6px;
+  --radius-control: 12px;
+  --radius-card: 20px;
+  --radius-overlay: 28px;
+
+  /* Shadows: only two */
+  --shadow-overlay: 0 -12px 48px -12px rgb(0 0 0 / 0.45);
+  --shadow-press: inset 0 1px 0 rgb(255 255 255 / 0.28);
+
+  --ease-out-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+/* Layout constants used by several components */
+:root {
+  --header-h: 64px;
+  --bar-h: 68px;
+  --gutter: 16px;
+  --gold-gradient: linear-gradient(180deg, var(--color-gold-light) 0%, var(--color-gold-mid) 55%, var(--color-gold-deep) 100%);
+  --gold-gradient-btn: linear-gradient(180deg, #e3c766 0%, var(--color-gold-mid) 50%, var(--color-gold) 100%);
+}
+@media (min-width: 640px) {
+  :root { --gutter: 24px; }
+}
+@media (min-width: 768px) {
+  :root { --header-h: 72px; }
+}
+@media (min-width: 1024px) {
+  :root { --gutter: 32px; }
+}
+@media (min-width: 1280px) {
+  :root { --header-h: 80px; }
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
 @layer base {
   html {
+    background: var(--color-ink); /* overscroll areas match header and footer */
     -webkit-text-size-adjust: 100%;
-    scroll-padding-top: 5rem;
+    scroll-padding-top: calc(var(--header-h) + 16px);
+    scrollbar-gutter: stable;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
   }
   body {
-    @apply bg-cream font-sans text-dark antialiased;
-    font-size: 1rem;
-    line-height: 1.6;
-    overflow-x: hidden;
+    margin: 0;
+    background: var(--color-cream);
+    color: var(--color-brown);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
   }
-  html:lang(kn) body {
-    line-height: 1.75;
-  }
+  html:lang(kn) body { line-height: 1.8; }
+
   h1, h2, h3, h4 {
-    @apply font-display text-deep;
-    line-height: 1.2;
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: inherit;
     text-wrap: balance;
-  }
-  h1, h2, h3, h4, .font-display {
     font-variant-numeric: lining-nums;
   }
-  html:lang(kn) h1, html:lang(kn) h2, html:lang(kn) h3 {
-    line-height: 1.45;
-  }
+  p { text-wrap: pretty; }
+
   :focus-visible {
     outline: 3px solid var(--color-gold);
-    outline-offset: 2px;
-    border-radius: 6px;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 3px var(--color-ink);
   }
-  ::selection {
-    background: var(--color-gold-soft);
-    color: var(--color-deep);
-  }
-  input, select, textarea, button {
-    font: inherit;
-  }
+  /* Inputs draw their own ring (see .field-control) */
+  input:focus-visible, textarea:focus-visible, select:focus-visible { outline-offset: 2px; }
+
+  ::selection { background: var(--color-gold-light); color: var(--color-ink); }
+  input, select, textarea, button { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  img, svg { max-width: 100%; }
 }
 
+/* ==========================================================================
+   Typography roles (sizes from DESIGN.md; Kannada scaled for its taller glyphs)
+   ========================================================================== */
 @layer components {
-  .container-dk {
-    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+  .t-h1 { font-family: var(--font-heading); font-weight: 600; font-size: var(--text-h1); line-height: var(--text-h1--line-height); letter-spacing: -0.005em; }
+  .t-h2 { font-family: var(--font-heading); font-weight: 600; font-size: var(--text-h2); line-height: var(--text-h2--line-height); }
+  .t-h3 { font-family: var(--font-heading); font-weight: 600; font-size: var(--text-h3); line-height: var(--text-h3--line-height); }
+  .t-lead { font-size: var(--text-lead); line-height: var(--text-lead--line-height); }
+  .t-small { font-size: var(--text-small); line-height: var(--text-small--line-height); }
+  .t-price { font-family: var(--font-body); font-weight: 700; font-size: var(--text-price); line-height: 1.2; font-variant-numeric: tabular-nums lining-nums; }
+  @media (min-width: 1024px) {
+    .t-h1 { font-size: var(--text-h1-lg); line-height: var(--text-h1-lg--line-height); }
+    .t-h2 { font-size: var(--text-h2-lg); line-height: var(--text-h2-lg--line-height); }
+    .t-h3 { font-size: var(--text-h3-lg); }
+    .t-lead { font-size: var(--text-lead-lg); }
+    .t-price { font-size: var(--text-price-lg); }
+  }
+  :lang(kn) .t-h1, .t-h1:lang(kn) { font-size: calc(var(--text-h1) * 0.8); line-height: 1.35; letter-spacing: 0; }
+  :lang(kn) .t-h2, .t-h2:lang(kn) { font-size: calc(var(--text-h2) * 0.8); line-height: 1.4; }
+  :lang(kn) .t-h3, .t-h3:lang(kn) { font-size: calc(var(--text-h3) * 0.85); line-height: 1.45; }
+  @media (min-width: 1024px) {
+    :lang(kn) .t-h1, .t-h1:lang(kn) { font-size: calc(var(--text-h1-lg) * 0.8); }
+    :lang(kn) .t-h2, .t-h2:lang(kn) { font-size: calc(var(--text-h2-lg) * 0.8); }
+    :lang(kn) .t-h3, .t-h3:lang(kn) { font-size: calc(var(--text-h3-lg) * 0.85); }
   }
 
-  /* Faint hand-drawn doodle wallpaper; content always sits on solid cards above it */
-  .doodle-bg {
-    position: relative;
-    isolation: isolate;
-  }
-  .doodle-bg::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background-image: url("/doodles.svg");
-    background-size: 380px;
-    background-repeat: repeat;
-    opacity: 0.6;
-    pointer-events: none;
-  }
-  .doodle-bg-faint::before {
-    opacity: 0.32;
+  .gold-text {
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
-  .card {
-    @apply rounded-3xl border border-tint bg-offwhite shadow-soft;
-  }
-  .card-cream {
-    @apply rounded-3xl border border-tint bg-cream shadow-soft;
+  .dk-container {
+    width: 100%;
+    max-width: calc(1200px + var(--gutter) * 2);
+    margin-inline: auto;
+    padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right));
   }
 
+  /* Fine gold rule between sections */
+  .rule-gold {
+    height: 1px;
+    border: 0;
+    margin: 0;
+    background: linear-gradient(90deg, transparent, var(--color-gold) 18%, var(--color-gold) 82%, transparent);
+    opacity: 0.7;
+  }
+
+  /* ---------- Buttons (used by <Button>) ---------- */
   .btn {
-    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 py-2.5 text-base font-bold transition duration-200 select-none;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    min-height: 52px;
+    padding: 0.75rem 1.4rem;
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-control);
+    font-family: var(--font-body);
+    font-size: var(--text-button);
+    line-height: var(--text-button--line-height);
+    font-weight: 700;
+    text-align: center;
+    text-decoration: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.12s ease, filter 0.18s ease;
   }
-  .btn:active {
-    transform: translateY(1px) scale(0.99);
-  }
-  .btn[disabled] {
-    @apply cursor-not-allowed opacity-55;
-  }
-  .btn-primary {
-    @apply bg-dark text-cream shadow-soft hover:bg-deep;
-  }
-  .btn-secondary {
-    @apply border-2 border-dark bg-offwhite text-dark hover:bg-tint;
-  }
-  .btn-gold {
-    @apply bg-gold text-deep shadow-soft hover:bg-gold-soft;
-  }
-  .btn-whatsapp {
-    @apply bg-whatsapp text-white shadow-soft hover:brightness-110;
-  }
-  .btn-sm {
-    @apply min-h-11 px-4 py-2 text-[0.95rem];
-  }
+  .btn svg { width: 1.3em; height: 1.3em; flex: none; }
+  .btn:active:not([aria-disabled="true"]):not(:disabled) { transform: scale(0.98); }
+  .btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+  .btn-lg { min-height: 60px; padding: 0.9rem 1.75rem; font-size: var(--text-button-lg); }
+  .btn-block { display: flex; width: 100%; }
 
-  .eyebrow {
-    @apply inline-flex items-center gap-2 text-sm font-extrabold tracking-[0.14em] text-brown uppercase;
-  }
-  html:lang(kn) .eyebrow {
-    letter-spacing: 0.02em;
-  }
+  /* Primary on light: black with gold label */
+  .btn-primary { background: var(--color-ink); color: var(--color-gold-light); }
+  .btn-primary:hover { background: #262320; }
+  /* Primary on dark: gold with black label */
+  .on-dark .btn-primary, .btn-primary.btn-on-dark { background: var(--gold-gradient-btn); color: var(--color-ink); box-shadow: var(--shadow-press); }
+  .on-dark .btn-primary:hover, .btn-primary.btn-on-dark:hover { filter: brightness(1.06); }
 
+  /* Secondary: outline */
+  .btn-secondary { background: transparent; border-color: var(--color-brown); color: var(--color-brown); }
+  .btn-secondary:hover { background: var(--color-champagne); }
+  .on-dark .btn-secondary, .btn-secondary.btn-on-dark { border-color: var(--color-gold); color: var(--color-cream); }
+  .on-dark .btn-secondary:hover, .btn-secondary.btn-on-dark:hover { background: rgb(201 162 39 / 0.12); }
+
+  /* Call: outline with phone icon. Gold on dark, ink on light */
+  .btn-call { background: var(--color-cream); border-color: var(--color-ink); color: var(--color-ink); }
+  .btn-call:hover { background: var(--color-champagne); }
+  .btn-call svg { color: var(--color-ink); }
+  .on-dark .btn-call, .btn-call.btn-on-dark { background: transparent; border-color: var(--color-gold); color: var(--color-cream); }
+  .on-dark .btn-call svg, .btn-call.btn-on-dark svg { color: var(--color-gold); }
+  .on-dark .btn-call:hover, .btn-call.btn-on-dark:hover { background: rgb(201 162 39 / 0.12); }
+
+  .btn-whatsapp { background: var(--color-whatsapp); color: #fff; }
+  .btn-whatsapp:hover { background: var(--color-whatsapp-dark); }
+
+  /* ---------- Form controls ---------- */
+  .field-control {
+    display: block;
+    width: 100%;
+    min-height: 52px;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--color-control-line);
+    border-radius: var(--radius-control);
+    background: #fffdf8;
+    color: var(--color-brown);
+    font-size: var(--text-body);
+    line-height: 1.4;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .field-control::placeholder { color: #7a6a5c; opacity: 1; }
+  .field-control:hover { border-color: var(--color-brown-2); }
+  .field-control:focus-visible { border-color: var(--color-ink); }
+  .field-control[aria-invalid="true"] { border-color: var(--color-error); background: #fff8f5; }
+  textarea.field-control { min-height: 7rem; resize: vertical; }
+  select.field-control { appearance: none; padding-right: 2.75rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232A1D16' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.9rem center; background-size: 1.25rem; }
+
+  /* ---------- Chip ---------- */
   .chip {
-    @apply inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-tint bg-offwhite px-4 text-[0.95rem] font-bold text-dark transition hover:border-mid;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    min-height: 48px;
+    padding: 0.5rem 1.1rem;
+    border: 1.5px solid var(--color-control-line);
+    border-radius: 9999px;
+    background: #fffdf8;
+    color: var(--color-brown);
+    font-size: var(--text-small);
+    font-weight: 700;
+    line-height: 1.2;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
-  .chip[aria-pressed="true"] {
-    @apply border-dark bg-dark text-cream;
-  }
+  .chip:hover { border-color: var(--color-brown-2); }
+  .chip[aria-pressed="true"], .chip[aria-checked="true"] { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-cream); }
+  .chip svg { width: 1.1em; height: 1.1em; }
 
-  .tag {
-    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-extrabold;
-  }
-  .tag-bestseller { @apply bg-gold-soft text-deep; }
-  .tag-eggless { @apply bg-[#DCE8C8] text-[#2F4A1A]; }
-  .tag-new { @apply bg-blush text-[#6A2420]; }
-  .tag-soldout { @apply bg-dark text-cream; }
+  /* ---------- Card surface on light pages ---------- */
+  .card { background: var(--color-cream); border: 1px solid var(--color-line); border-radius: var(--radius-card); }
+  .bg-champagne .card, .card-on-champagne { background: #fffcf5; }
 
-  .input {
-    @apply block min-h-12 w-full rounded-2xl border-2 border-tint bg-offwhite px-4 py-3 text-base text-deep placeholder:text-[#8A6B53] transition outline-none focus:border-brown focus:ring-4 focus:ring-gold/25;
+  .link {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+    text-decoration-color: currentColor;
   }
-  .input[aria-invalid="true"] {
-    @apply border-rose bg-[#FFF6F4];
-  }
-
-  .link-underline {
-    @apply underline decoration-mid decoration-2 underline-offset-4 hover:decoration-brown;
-  }
+  .link:hover { text-decoration-thickness: 2px; }
 }
 
-/* Gentle entrance animations — only when the visitor hasn't asked for reduced motion */
-@media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
-  }
-  .reveal.is-visible {
-    opacity: 1;
-    transform: none;
-  }
-  .float-slow {
-    animation: dk-float 7s ease-in-out infinite;
-  }
-  .pop {
-    animation: dk-pop 0.35s ease;
-  }
-}
-@keyframes dk-float {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(1deg); }
-}
+/* ==========================================================================
+   Motion (tap feedback only; the signature motion is the loader + hero)
+   ========================================================================== */
 @keyframes dk-pop {
   0% { transform: scale(1); }
-  40% { transform: scale(1.12); }
+  40% { transform: scale(1.18); }
   100% { transform: scale(1); }
+}
+@keyframes dk-drift {
+  0% { transform: translate3d(0, 0, 0) rotate(-8deg); }
+  50% { transform: translate3d(-3%, 2.5%, 0) rotate(-4deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(-8deg); }
+}
+@keyframes dk-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.7); }
+  50% { opacity: 0.9; transform: scale(1); }
+}
+/* Hero: slow watermark drift + sparkles (GPU transforms/opacity only). Static under reduced motion. */
+.dk-drift { transform: rotate(-8deg); transform-origin: 50% 50%; }
+.dk-sparkle { opacity: 0.55; }
+@media (prefers-reduced-motion: no-preference) {
+  .pop { animation: dk-pop 0.35s ease; }
+  .dk-drift { animation: dk-drift 48s ease-in-out infinite; will-change: transform; }
+  .dk-sparkle { animation: dk-twinkle var(--dur, 6s) ease-in-out var(--delay, 0s) infinite; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }

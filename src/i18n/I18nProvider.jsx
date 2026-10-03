@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import en from './en.json'
 import kn from './kn.json'
+import { loadKannadaFonts } from '../config/fonts'
 
 const dictionaries = { en, kn }
 const STORAGE_KEY = 'dk_lang'
@@ -24,19 +25,9 @@ function readStoredLang() {
   }
 }
 
-export function I18nProvider({ children }) {
-  const [lang, setLangState] = useState(readStoredLang)
-
-  useEffect(() => {
-    document.documentElement.lang = lang === 'kn' ? 'kn' : 'en'
-    try {
-      localStorage.setItem(STORAGE_KEY, lang)
-    } catch {
-      /* storage unavailable: choice lasts for this visit only */
-    }
-  }, [lang])
-
-  // t('a.b', {x}) -> string (falls back to English, then the key itself)
+// t('a.b', {x}) -> string (falls back to English, then the key itself)
+// pick({en, kn}) -> the text for the given language
+function useTranslator(lang, setLang) {
   const t = useCallback(
     (key, vars) => {
       const value = lookup(dictionaries[lang], key) ?? lookup(en, key) ?? key
@@ -44,11 +35,36 @@ export function I18nProvider({ children }) {
     },
     [lang],
   )
-
-  // pick({en, kn}) -> the text for the current language
   const pick = useCallback((field) => (field && typeof field === 'object' ? field[lang] || field.en : field), [lang])
+  return useMemo(() => ({ lang, setLang, t, pick }), [lang, setLang, t, pick])
+}
 
-  const value = useMemo(() => ({ lang, setLang: setLangState, t, pick }), [lang, t, pick])
+export function I18nProvider({ children }) {
+  const [lang, setLangState] = useState(readStoredLang)
+
+  useEffect(() => {
+    document.documentElement.lang = lang === 'kn' ? 'kn' : 'en'
+    // Kannada fonts are only fetched once someone actually reads in Kannada
+    if (lang === 'kn') loadKannadaFonts()
+    try {
+      localStorage.setItem(STORAGE_KEY, lang)
+    } catch {
+      /* storage unavailable: choice lasts for this visit only */
+    }
+  }, [lang])
+
+  const value = useTranslator(lang, setLangState)
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
+}
+
+/**
+ * Renders a subtree in a fixed language without changing the site language
+ * (used by /styleguide to show English and Kannada side by side).
+ * Also put lang="kn" on the wrapping element so Kannada typography applies.
+ */
+export function I18nScope({ lang, children }) {
+  const parent = useContext(I18nContext)
+  const value = useTranslator(lang, parent.setLang)
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }
 

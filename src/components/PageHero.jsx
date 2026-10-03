@@ -1,15 +1,19 @@
-// Page header band: faint doodles behind a solid cream card
-export default function PageHero({ eyebrow, title, subtitle, children }) {
+import Container from './ui/Container'
+
+// Page title band on champagne with a gold rule beneath. No eyebrow label.
+export default function PageHero({ title, subtitle, children }) {
   return (
-    <section className="doodle-bg border-b border-tint py-8 sm:py-12">
-      <div className="container-dk">
-        <div className="card-cream mx-auto max-w-3xl px-5 py-7 text-center sm:px-10 sm:py-10">
-          {eyebrow && <p className="eyebrow">{eyebrow}</p>}
-          <h1 className="mt-1 text-3xl font-bold sm:text-5xl">{title}</h1>
-          {subtitle && <p className="mx-auto mt-3 max-w-xl text-lg text-brown">{subtitle}</p>}
-          {children}
-        </div>
-      </div>
-    </section>
+    <>
+      <section className="bg-champagne py-10 lg:py-14">
+        <Container>
+          <div className="max-w-[44rem]">
+            <h1 className="t-h1">{title}</h1>
+            {subtitle && <p className="t-lead mt-3 text-brown-2">{subtitle}</p>}
+            {children}
+          </div>
+        </Container>
+      </section>
+      <hr className="rule-gold" />
+    </>
   )
 }

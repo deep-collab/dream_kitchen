@@ -1,23 +1,27 @@
 {
   "brand": {
     "name": "Dream Kitchen",
-    "tagline": "Handmade chocolates & brownies",
-    "logoAlt": "Dream Kitchen — Handmade Chocolates logo"
+    "tagline": "Turning your cravings into sweet memories.",
+    "lockupLabel": "Dream Kitchen, Handmade Chocolates",
+    "homeLink": "Dream Kitchen, home page"
   },
   "nav": {
     "home": "Home",
     "shop": "Shop",
-    "about": "Our Story",
-    "gallery": "Gallery",
+    "classes": "Classes",
+    "story": "Our Story",
     "track": "Track Order",
-    "faq": "FAQ",
     "contact": "Contact",
+    "gallery": "Gallery",
+    "faq": "FAQ",
     "cart": "Cart",
     "menu": "Menu",
-    "closeMenu": "Close menu",
     "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "skip": "Skip to main content",
-    "language": "Choose language"
+    "language": "Language",
+    "main": "Main",
+    "more": "More"
   },
   "common": {
     "addToCart": "Add",
@@ -36,15 +40,13 @@
     "remove": "Remove",
     "required": "required",
     "optional": "optional",
-    "sampleNote": "Sample illustration — real photos coming soon",
     "cartWithCount": "Cart, {count} items",
     "itemsCount": "{count} items",
-    "itemsCountOne": "1 item"
+    "itemsCountOne": "1 item",
+    "close": "Close"
   },
   "tags": {
-    "bestseller": "Best seller",
-    "eggless": "Eggless",
-    "new": "New"
+    "bestseller": "Best seller"
   },
   "weight": {
     "g": "{g} g",
@@ -54,60 +56,69 @@
     "approx": "approx."
   },
   "seo": {
-    "home": { "title": "Dream Kitchen — Handmade Chocolates & Brownies in Karnataka", "desc": "Handmade chocolates, fudgy brownies, truffles and gift hampers made with pure ingredients by Hema. Order on WhatsApp, delivered all over Karnataka." },
-    "shop": { "title": "Shop Chocolates, Brownies & Hampers | Dream Kitchen", "desc": "Browse handmade chocolate bars, brownies, truffles, gift hampers and custom boxes. Eggless options available." },
-    "about": { "title": "Our Story | Dream Kitchen", "desc": "How Hema turned Rs 2,500 and a student's dream into Dream Kitchen, a home chocolate kitchen in Karnataka." },
-    "gallery": { "title": "Gallery | Dream Kitchen", "desc": "A peek at our handmade chocolates, brownies, truffles and gift hampers." },
-    "contact": { "title": "Contact & Enquiries | Dream Kitchen", "desc": "Ask about bulk orders, return gifts, wedding favours and custom boxes. We reply on WhatsApp." },
-    "faq": { "title": "FAQ | Dream Kitchen", "desc": "Ordering, delivery, payment, shelf life and eggless options — your questions answered." },
-    "track": { "title": "Track Your Order | Dream Kitchen", "desc": "Check the status of your Dream Kitchen order with your order ID and phone number." },
-    "cart": { "title": "Your Cart | Dream Kitchen", "desc": "Review your Dream Kitchen order." },
-    "checkout": { "title": "Checkout | Dream Kitchen", "desc": "Enter delivery details and send your order on WhatsApp." },
-    "success": { "title": "Order placed | Dream Kitchen", "desc": "Thank you for your order." },
-    "notFound": { "title": "Page not found | Dream Kitchen", "desc": "This page has melted away." }
+    "home": {
+      "title": "Dream Kitchen | Handmade chocolates, brownie tubs and delight boxes",
+      "desc": "Handmade chocolates, loaded brownie tubs, delight boxes and cookies by Hema, made fresh to order. Pre-book on WhatsApp or call +91 95357 06956. Delivered across Karnataka."
+    },
+    "shop": {
+      "title": "Menu | Dream Kitchen",
+      "desc": "Loaded brownie tubs, delight boxes, cookies and handmade chocolates, made fresh to order."
+    },
+    "about": {
+      "title": "Our story | Dream Kitchen",
+      "desc": "How Hema built Dream Kitchen from ₹2,500 and a love for chocolate."
+    },
+    "gallery": {
+      "title": "Gallery | Dream Kitchen",
+      "desc": "A look inside Dream Kitchen."
+    },
+    "contact": {
+      "title": "Contact | Dream Kitchen",
+      "desc": "Call or WhatsApp Dream Kitchen on +91 95357 06956."
+    },
+    "faq": {
+      "title": "FAQ | Dream Kitchen",
+      "desc": "Pre-booking, delivery, payment and ordering questions, answered."
+    },
+    "track": {
+      "title": "Track Your Order | Dream Kitchen",
+      "desc": "Check the status of your Dream Kitchen order with your order ID and phone number."
+    },
+    "cart": {
+      "title": "Your Cart | Dream Kitchen",
+      "desc": "Review your Dream Kitchen order."
+    },
+    "checkout": {
+      "title": "Checkout | Dream Kitchen",
+      "desc": "Enter delivery details and send your order on WhatsApp."
+    },
+    "success": {
+      "title": "Order placed | Dream Kitchen",
+      "desc": "Thank you for your order."
+    },
+    "notFound": {
+      "title": "Page not found | Dream Kitchen",
+      "desc": "This page has melted away."
+    },
+    "classes": {
+      "title": "Chocolate classes | Dream Kitchen",
+      "desc": "Chocolate making classes with Hema from Dream Kitchen."
+    },
+    "styleguide": {
+      "title": "Styleguide | Dream Kitchen",
+      "desc": "Internal component reference."
+    }
   },
   "home": {
-    "hero": {
-      "eyebrow": "Homemade in Karnataka",
-      "title": "Little boxes of handmade happiness",
-      "subtitle": "Chocolates, fudgy brownies and truffles made in small batches with pure ingredients — wrapped with love by Hema.",
-      "shopNow": "Shop Now",
-      "exploreMenu": "Explore Menu",
-      "artAlt": "Illustration of chocolates, truffles, a brownie and a gift box"
+    "fresh": {
+      "title": "Made fresh, just for you",
+      "text": "Every tub, box and bar is made after you order. Pre-book a few days ahead and Hema will make yours fresh.",
+      "cta": "See the menu"
     },
-    "trust": {
-      "title": "Why people love us",
-      "pure": { "title": "Pure ingredients", "text": "Real cocoa butter, no compound, no preservatives." },
-      "handmade": { "title": "Handmade at home", "text": "Small batches, made fresh for your order." },
-      "eggless": { "title": "Eggless options", "text": "Look for the eggless tag on our menu." },
-      "delivery": { "title": "Across Karnataka", "text": "Flat ₹{charge} delivery to your doorstep." }
-    },
-    "bestsellers": { "eyebrow": "Most loved", "title": "Our best sellers", "subtitle": "The treats our Instagram family keeps coming back for." },
-    "categories": { "eyebrow": "The menu", "title": "Shop by category", "items": "{count} treats" },
-    "story": {
-      "eyebrow": "Our story",
-      "title": "From ₹2,500 and a dream",
-      "text": "Hema started Dream Kitchen as a student with just ₹2,500 and a lot of love for chocolate. Order by order, Instagram friends became family, and the little kitchen has grown into a ₹50,000 business — still handmade, still in small batches.",
-      "cta": "Read our story",
-      "stat1": "Started with",
-      "stat2": "Grown to",
-      "stat3": "Made by hand"
-    },
-    "how": {
-      "eyebrow": "Easy ordering",
-      "title": "How to order",
-      "s1": { "title": "Pick your treats", "text": "Add chocolates, brownies or hampers to your cart." },
-      "s2": { "title": "Send on WhatsApp", "text": "Your full order is filled in for you. Just tap send." },
-      "s3": { "title": "Pay by UPI", "text": "Hema confirms and shares UPI details on WhatsApp." },
-      "s4": { "title": "Enjoy!", "text": "Freshly made and delivered across Karnataka." }
-    },
-    "instagram": {
-      "eyebrow": "Follow along",
-      "title": "Join us on Instagram",
-      "text": "New flavours, behind-the-scenes and festive specials — follow {handle}.",
-      "cta": "Follow on Instagram"
-    },
-    "cta": { "title": "Planning a celebration?", "text": "Return gifts, weddings, corporate boxes — tell us what you need.", "button": "Send an enquiry" }
+    "talk": {
+      "title": "Prefer to talk?",
+      "text": "Call or WhatsApp Hema and she will take your order herself. No typing needed."
+    }
   },
   "shop": {
     "title": "Our menu",
@@ -221,19 +232,11 @@
     "current": "Current status"
   },
   "about": {
-    "eyebrow": "Our story",
-    "title": "Made by hand, from the heart",
-    "p1": "Dream Kitchen began in a tiny home kitchen in Karnataka. Hema was still a student when she spent her savings — just ₹2,500 — on cocoa, moulds and a few gift boxes.",
-    "p2": "Her first boxes went to friends, and soon Instagram found her too. Today Dream Kitchen has grown to a ₹50,000 business, and every single piece is still made by Hema's hands.",
-    "p3": "We use pure ingredients: real cocoa butter chocolate, fresh butter and good nuts. No compound chocolate, no shortcuts. Just the kind of treats we'd give our own family.",
-    "values": {
-      "title": "What we believe in",
-      "v1": { "title": "Pure, always", "text": "Real chocolate and honest ingredients — nothing we wouldn't eat ourselves." },
-      "v2": { "title": "Small batches", "text": "Made fresh for your order, never sitting on a shelf." },
-      "v3": { "title": "Made with love", "text": "Packed by hand, with a little note if you'd like one." }
-    },
-    "founderAlt": "Dream Kitchen logo on a dark brown badge",
-    "cta": "Taste the story"
+    "title": "Our story",
+    "p1": "Dream Kitchen is Hema’s home kitchen in Karnataka. She started as a student with ₹2,500 and grew it, order by order, into a loved home brand.",
+    "p2": "Everything is handmade and made fresh to order: chocolates, loaded brownie tubs, delight boxes and cookies. Hema also teaches chocolate classes.",
+    "p3": "Her full story is coming to this page soon.",
+    "cta": "See the menu"
   },
   "gallery": {
     "title": "Gallery",
@@ -265,26 +268,35 @@
     },
     "reach": "Reach us",
     "whatsapp": "WhatsApp",
-    "email": "Email",
     "instagram": "Instagram",
-    "location": "Location",
-    "locationText": "Home kitchen in Karnataka · delivery all over Karnataka",
-    "hours": "Hours",
-    "hoursText": "We reply on WhatsApp, 10 am to 8 pm"
+    "location": "Delivery",
+    "hours": "Call hours",
+    "deliveryText": "Across Karnataka"
   },
   "faq": {
     "title": "Questions & answers",
     "subtitle": "Can't find your answer? Message us on WhatsApp.",
     "items": [
-      { "q": "How do I place an order?", "a": "Add treats to your cart, fill in your delivery details and tap \"Place order on WhatsApp\". WhatsApp opens with your full order ready — just press send. Hema will reply to confirm." },
-      { "q": "How do I pay?", "a": "We don't take payments on the website. After Hema confirms your order on WhatsApp, she will share UPI details. Your order is prepared once payment is received." },
-      { "q": "Where do you deliver and how much does it cost?", "a": "We deliver all over Karnataka for a flat ₹{charge}. Pincodes starting with 56, 57, 58 or 59 are accepted." },
-      { "q": "How early should I order?", "a": "Small orders can be delivered from the next day. For more than {threshold} pieces in total, please choose a delivery date at least {days} days ahead so everything is made fresh." },
-      { "q": "Do you have eggless options?", "a": "Yes! Look for the \"Eggless\" tag. Our chocolates and truffles are eggless, and we have eggless brownies too." },
-      { "q": "How long do the treats stay fresh?", "a": "Our treats have a shelf life of {shelfLife}. Store them in a cool, dry place away from sunlight. In hot weather, keep brownies in the fridge and bring them to room temperature before eating." },
-      { "q": "Can I add a message or customise a box?", "a": "Of course. Use the note field at checkout for a gift-box message, or pick our Build-Your-Own Box. For bigger custom orders, send an enquiry." },
-      { "q": "Are you FSSAI registered?", "a": "Yes. Our FSSAI licence number is {fssai}." },
-      { "q": "Can I cancel or change my order?", "a": "Message us on WhatsApp as soon as possible. Since everything is made fresh, changes are possible until preparation starts." }
+      {
+        "q": "How do I place an order?",
+        "a": "Add treats to your cart, fill in your delivery details and tap \"Place order on WhatsApp\". WhatsApp opens with your full order ready — just press send. Hema will reply to confirm."
+      },
+      {
+        "q": "How early should I order?",
+        "a": "Dream Kitchen is pre-booking only. Every order is dispatched after {days} business days (Monday to Saturday), so everything is made fresh for you."
+      },
+      {
+        "q": "How do I pay?",
+        "a": "We don't take payments on the website. After Hema confirms your order on WhatsApp, she will share UPI details. Your order is prepared once payment is received."
+      },
+      {
+        "q": "Where do you deliver and how much does it cost?",
+        "a": "We deliver all over Karnataka for a flat ₹{charge}. Pincodes starting with 56, 57, 58 or 59 are accepted."
+      },
+      {
+        "q": "Can I cancel or change my order?",
+        "a": "Message us on WhatsApp as soon as possible. Since everything is made fresh, changes are possible until preparation starts."
+      }
     ]
   },
   "notFound": {
@@ -294,21 +306,120 @@
     "shop": "Visit the shop"
   },
   "footer": {
-    "about": "Handmade chocolates, brownies and truffles made with pure ingredients in a home kitchen in Karnataka.",
+    "talk": "Talk to us",
     "explore": "Explore",
-    "help": "Help",
-    "contact": "Contact",
-    "fssai": "FSSAI Lic. No. {fssai}",
-    "rights": "© {year} Dream Kitchen. All rights reserved.",
-    "madeWith": "Made with love in Karnataka",
-    "follow": "Follow us"
+    "whatsapp": "WhatsApp us",
+    "instagram": "Instagram",
+    "fssai": "FSSAI licence no. {fssai}",
+    "rights": "© {year} Dream Kitchen",
+    "prebook": "Pre-booking only. Delivered across Karnataka."
   },
   "mobileBar": {
-    "cart": "Cart",
+    "label": "Quick contact and cart",
+    "call": "Call",
     "whatsapp": "WhatsApp",
-    "empty": "Empty"
+    "cart": "Cart"
   },
   "wa": {
-    "general": "Hi Dream Kitchen! I have a question."
+    "general": "Hi Dream Kitchen"
+  },
+  "header": {
+    "call": "Call"
+  },
+  "notice": {
+    "prebook": "Pre-booking only. Orders are dispatched after {days} business days."
+  },
+  "mobileMenu": {
+    "title": "Menu",
+    "callUs": "Call Dream Kitchen",
+    "chat": "Chat on WhatsApp"
+  },
+  "hours": {
+    "label": "Call hours",
+    "range": "{opens} – {closes}, {days}",
+    "days": {
+      "monSat": "Monday to Saturday"
+    },
+    "time": {
+      "morning": "{h} am",
+      "noon": "12 noon",
+      "afternoon": "{h} pm",
+      "evening": "{h} pm",
+      "night": "{h} pm"
+    }
+  },
+  "hero": {
+    "support": "Handmade chocolates, loaded brownie tubs and delight boxes, made fresh to order.",
+    "orderNow": "Order now",
+    "callToOrder": "Call to order"
+  },
+  "classes": {
+    "title": "Chocolate classes",
+    "text": "Class dates and booking will appear here soon. To ask about a class now, call or WhatsApp Hema."
+  },
+  "styleguide": {
+    "title": "Styleguide",
+    "intro": "Every component in English and Kannada, for QA. Development builds only, never indexed.",
+    "sections": {
+      "colours": "Colours",
+      "type": "Type",
+      "brand": "Brand",
+      "buttons": "Buttons",
+      "controls": "Choices",
+      "fields": "Form fields",
+      "display": "Badges and notices",
+      "overlay": "Sheet",
+      "icons": "Icons"
+    },
+    "onLight": "On cream",
+    "onDark": "On black",
+    "buttons": {
+      "primary": "Order now",
+      "secondary": "See the menu",
+      "call": "Call to order",
+      "whatsapp": "Chat on WhatsApp",
+      "disabled": "Not available"
+    },
+    "sizeLegend": "Size",
+    "sizes": {
+      "s250": "250 g",
+      "s500": "500 g",
+      "s750": "750 g"
+    },
+    "flavourLegend": "Flavour",
+    "flavours": {
+      "chocolate": "Chocolate",
+      "strawberry": "Strawberry",
+      "mango": "Mango",
+      "butterscotch": "Butterscotch"
+    },
+    "nameToggle": "Name on box (+₹100)",
+    "nameToggleDesc": "Hema writes a name on the lid",
+    "on": "On",
+    "off": "Off",
+    "name": "Name on the box",
+    "nameHint": "Up to 20 letters",
+    "phone": "Phone number",
+    "phoneError": "Enter a 10-digit mobile number, like 98765 43210.",
+    "note": "Note to Hema",
+    "time": "Best time to call",
+    "times": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "badges": {
+      "signature": "Signature",
+      "top": "Top selling",
+      "soldOut": "Sold out"
+    },
+    "headingTitle": "Brownie tubs",
+    "headingLead": "A tub filled with delicious fudgy brownies, creamy spreads, premium toppings & pure happiness in every bite!",
+    "sheetOpen": "Open the sample sheet",
+    "sheetTitle": "Ferrero Rocher Nutella",
+    "sheetBody": "This is how the customise sheet opens. Drag the top strip down, press Esc or tap Close.",
+    "sheetAdd": "Add to cart ₹549",
+    "sheetCall": "Prefer to talk? Call {phone}",
+    "typeSample": "Turning your cravings into sweet memories."
   }
 }

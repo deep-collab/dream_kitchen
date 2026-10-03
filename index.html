@@ -3,43 +3,286 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Dream Kitchen — Handmade Chocolates & Brownies, Karnataka</title>
-    <meta name="description" content="Handmade chocolates, fudgy brownies, truffles and gift hampers made with pure ingredients by Hema at Dream Kitchen. Delivered all over Karnataka." />
-    <meta name="theme-color" content="#4A2C1D" />
-    <link rel="icon" href="/favicon.ico" sizes="any" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <title>Dream Kitchen | Handmade chocolates, brownie tubs and delight boxes</title>
+    <meta name="description" content="Handmade chocolates, loaded brownie tubs, delight boxes and cookies by Hema at Dream Kitchen, made fresh to order. Pre-book on WhatsApp or call +91 95357 06956. Delivered across Karnataka." />
+    <meta name="theme-color" content="#0F0F0F" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon-180.png" />
+    <link rel="manifest" href="/site.webmanifest" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Dream Kitchen" />
-    <meta property="og:title" content="Dream Kitchen — Handmade Chocolates & Brownies" />
-    <meta property="og:description" content="Handmade chocolates, brownies, truffles and gift hampers with pure ingredients. Order on WhatsApp, delivered across Karnataka." />
-    <meta property="og:image" content="/og-image.jpg" />
+    <meta property="og:title" content="Dream Kitchen | Handmade chocolates" />
+    <meta property="og:description" content="Turning your cravings into sweet memories. Handmade chocolates, loaded brownie tubs and delight boxes, made fresh to order." />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
 
+    <!-- Fonts: non-blocking so the loading screen paints before anything else arrives -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Nunito:wght@400;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href="{{dk:fonts-en}}" onload="this.onload=null;this.rel='stylesheet'" />
+    <noscript><link rel="stylesheet" href="{{dk:fonts-en}}" /></noscript>
+
+    <script>
+      // Runs before first paint: language (and Kannada fonts only when needed),
+      // and whether the loading screen plays (once per browser session).
+      (function () {
+        var h = document.documentElement
+        try {
+          if (localStorage.getItem('dk_lang') === 'kn') {
+            h.lang = 'kn'
+            var k = document.createElement('link')
+            k.id = '{{dk:kn-link-id}}'
+            k.rel = 'stylesheet'
+            k.href = '{{dk:fonts-kn}}'
+            document.head.appendChild(k)
+          }
+        } catch (e) {}
+        var show = true
+        try {
+          if (sessionStorage.getItem('dk_intro_seen')) show = false
+          else sessionStorage.setItem('dk_intro_seen', '1')
+        } catch (e) {}
+        // A very slow first byte leaves no room for a calm intro inside the 2.5 s cap.
+        if (performance.now() > 1300) show = false
+        if (show) {
+          h.classList.add('dk-intro-on', 'dk-intro-hold')
+          if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) h.classList.add('dk-intro-rm')
+        }
+      })()
+    </script>
+
+    <style>
+      /* Same layer order as Tailwind, so utilities can still adjust these rules */
+      @layer theme, base, components, utilities;
+      @layer components {
+        /* Brand lockup + tagline: shared by the loading screen and the React hero/footer,
+           defined once here so the loader can hand its lockup to the hero exactly. */
+        .dk-lockup { --lk: 40px; display: flex; flex-direction: column; align-items: center; text-align: center; color: #d4af37; }
+        @media (min-width: 768px) { .dk-lockup--hero { --lk: 52px; } }
+        @media (min-width: 1024px) { .dk-lockup--hero { --lk: 54px; } }
+        .dk-lockup--sm { --lk: 26px; }
+        .dk-lockup__symbol { display: block; width: calc(var(--lk) * 2.55); height: auto; aspect-ratio: 220.3 / 213; overflow: visible; }
+        .dk-lockup__name, .dk-lockup__sub { display: block; margin: 0; font-family: Cinzel, "Trajan Pro", "Times New Roman", Georgia, serif; font-weight: 600; text-transform: uppercase; }
+        .dk-lockup__name { margin-top: calc(var(--lk) * 0.3); font-size: var(--lk); line-height: 1.02; letter-spacing: 0.035em; padding-left: 0.035em; }
+        .dk-lockup__name span { display: block; background: linear-gradient(180deg, #ebd27a 0%, #d4af37 55%, #b8901e 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .dk-lockup__sub { margin-top: calc(var(--lk) * 0.26); font-size: calc(var(--lk) * 0.33); line-height: 1.45; letter-spacing: 0.24em; padding-left: 0.24em; color: #d4af37; }
+        .dk-lockup__sub span { display: block; }
+        .dk-lockup__sub .dk-lockup__ruled { display: flex; align-items: center; justify-content: center; gap: 0.7em; }
+        .dk-lockup__ruled::before, .dk-lockup__ruled::after { content: ""; width: 2.4em; height: 1px; background: currentColor; opacity: 0.75; }
+        .dk-tagline { margin: 0 auto; max-width: 15em; padding-bottom: 0.08em; font-family: "Cormorant Garamond", Garamond, "Times New Roman", Georgia, serif; font-style: italic; font-weight: 600; font-size: 26px; line-height: 1.22; text-wrap: balance; text-align: center; background: linear-gradient(180deg, #ebd27a 0%, #d4af37 60%, #c9a227 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        @media (min-width: 1024px) { .dk-tagline { font-size: 32px; max-width: none; } }
+        .dk-tagline:lang(kn) { font-family: "Noto Serif Kannada", "Cormorant Garamond", Georgia, serif; font-style: normal; font-size: 21px; line-height: 1.55; max-width: 17em; }
+        @media (min-width: 1024px) { .dk-tagline:lang(kn) { font-size: 26px; max-width: none; } }
+        .dk-tagline.dk-tagline--footer { font-size: 22px; max-width: 16em; }
+        .dk-tagline.dk-tagline--footer:lang(kn) { font-size: 18px; }
+        @media (min-width: 1024px) { .dk-tagline.dk-tagline--footer { margin-left: 0; text-align: left; } }
+
+        /* Loading screen. Only shown when the <head> script added .dk-intro-on (needs JS). */
+        #dk-intro { display: none; }
+        .dk-intro-on #dk-intro { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: #0f0f0f; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .dk-intro-hold [data-dk-hero] { visibility: hidden; }
+        .dk-intro__stage { display: flex; flex-direction: column; align-items: center; gap: 26px; }
+        @media (min-width: 1024px) { .dk-intro__stage { gap: 24px; } }
+        .dk-intro__draw { fill: url(#dk-gold); fill-opacity: 0; stroke: url(#dk-gold); stroke-width: 1.3; stroke-linejoin: round; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+        .dk-intro__word, .dk-intro__tag { opacity: 0; transform: translateY(8px); transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        #dk-intro.is-playing .dk-intro__draw { animation: dk-draw 0.8s cubic-bezier(0.45, 0, 0.25, 1) forwards, dk-fill 0.42s 0.6s ease forwards; }
+        #dk-intro.show-word .dk-intro__word, #dk-intro.show-tag .dk-intro__tag { opacity: 1; transform: none; }
+        #dk-intro.is-static .dk-intro__draw { fill-opacity: 1; stroke: none; }
+        #dk-intro.is-static .dk-intro__word, #dk-intro.is-static .dk-intro__tag { opacity: 1; transform: none; transition: none; }
+        @keyframes dk-draw { to { stroke-dashoffset: 0; } }
+        @keyframes dk-fill { to { fill-opacity: 1; stroke-opacity: 0; } }
+        .dk-intro__stage p { margin: 0; }
+      }
+    </style>
 
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
         "name": "Dream Kitchen",
-        "description": "Home-based handmade chocolates and brownies made with pure ingredients.",
-        "image": "/logo.png",
-        "logo": "/logo.png",
+        "description": "Home-based handmade chocolates, loaded brownie tubs, delight boxes and cookies, made fresh to order.",
+        "telephone": "+91 9535706956",
+        "image": "/og-image.png",
+        "logo": "/icon-512.png",
         "founder": { "@type": "Person", "name": "Hema" },
         "address": { "@type": "PostalAddress", "addressRegion": "Karnataka", "addressCountry": "IN" },
         "areaServed": { "@type": "State", "name": "Karnataka" },
-        "priceRange": "₹99 – ₹1,499",
-        "servesCuisine": "Chocolates, Brownies, Desserts",
-        "sameAs": ["https://www.instagram.com/dreamkitchen_01_homemade/"]
+        "sameAs": ["https://instagram.com/dreamkitchen_01_homemade"]
       }
     </script>
   </head>
   <body>
+    {{dk:sprite}}
+
+    <div id="dk-intro" aria-hidden="true">
+      <div class="dk-intro__stage">
+        <div class="dk-lockup dk-lockup--hero" id="dk-intro-lockup">
+          <svg class="dk-lockup__symbol" viewBox="{{dk:viewBox}}" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="dk-shine" x1="0" y1="0" x2="1" y2="1" gradientTransform="translate(-1 -1)">
+                <stop offset="0.38" stop-color="#fff6d8" stop-opacity="0" />
+                <stop offset="0.5" stop-color="#fff6d8" stop-opacity="0.8" />
+                <stop offset="0.62" stop-color="#fff6d8" stop-opacity="0" />
+                <animateTransform id="dk-shine-anim" attributeName="gradientTransform" type="translate" from="-1 -1" to="1 1" dur="0.6s" begin="indefinite" fill="freeze" />
+              </linearGradient>
+            </defs>
+            <use href="#dk-symbol" class="dk-intro__draw" />
+            <use href="#dk-symbol" fill="url(#dk-shine)" />
+          </svg>
+          <p class="dk-lockup__name dk-intro__word"><span>Dream</span><span>Kitchen</span></p>
+          <p class="dk-lockup__sub dk-intro__word"><span class="dk-lockup__ruled">Handmade</span><span>Chocolates</span></p>
+        </div>
+        <p class="dk-tagline dk-intro__tag" id="dk-intro-tag" data-kn="{{dk:tagline-kn}}">{{dk:tagline-en}}</p>
+      </div>
+    </div>
+
     <div id="root"></div>
+
+    <script>
+      // Loading screen: about 1.8 s, hard cap 2.5 s, tap or any key skips,
+      // static 0.5 s under reduced motion. On the home page the lockup glides into
+      // the hero's lockup; elsewhere the black curtain lifts.
+      (function () {
+        var html = document.documentElement
+        var intro = document.getElementById('dk-intro')
+        if (!intro) return
+        if (!html.classList.contains('dk-intro-on')) return intro.remove()
+
+        var reduce = html.classList.contains('dk-intro-rm')
+        var lockup = document.getElementById('dk-intro-lockup')
+        var tag = document.getElementById('dk-intro-tag')
+        if (html.lang === 'kn') {
+          tag.textContent = tag.getAttribute('data-kn')
+          tag.setAttribute('lang', 'kn')
+        }
+
+        var CAP = 2500 // ms since navigation start: the loader is gone by then, always
+        var EXIT = 450
+        var start = performance.now()
+        var timers = []
+        var exiting = false
+        var finished = false
+        var later = function (fn, ms) { timers.push(setTimeout(fn, ms)) }
+        var block = function (e) { e.preventDefault() }
+        var onKey = function () { exit(true) }
+
+        window.addEventListener('wheel', block, { passive: false })
+        window.addEventListener('touchmove', block, { passive: false })
+        intro.addEventListener('pointerdown', function () { exit(true) })
+        document.addEventListener('keydown', onKey)
+        var capTimer = setTimeout(finish, Math.max(0, CAP - start))
+
+        function finish() {
+          if (finished) return
+          finished = true
+          timers.forEach(clearTimeout)
+          clearTimeout(capTimer)
+          window.removeEventListener('wheel', block)
+          window.removeEventListener('touchmove', block)
+          document.removeEventListener('keydown', onKey)
+          intro.remove()
+          html.classList.remove('dk-intro-on', 'dk-intro-hold', 'dk-intro-rm')
+          window.__dkIntroDone = true
+          window.dispatchEvent(new Event('dk:intro-done'))
+        }
+
+        function visibleRect(selector) {
+          var el = document.querySelector(selector)
+          if (!el) return null
+          var r = el.getBoundingClientRect()
+          return r.width > 0 && r.bottom > 0 && r.top < window.innerHeight ? r : null
+        }
+
+        function glide(el, to, ms) {
+          var from = el.getBoundingClientRect()
+          var dx = to.left + to.width / 2 - (from.left + from.width / 2)
+          var dy = to.top + to.height / 2 - (from.top + from.height / 2)
+          el.style.transformOrigin = '50% 50%'
+          el.style.transition = 'transform ' + ms + 'ms cubic-bezier(0.65, 0, 0.25, 1), opacity 0.3s ease'
+          el.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + to.width / from.width + ',' + to.height / from.height + ')'
+        }
+
+        function exit(fast) {
+          if (exiting) return
+          exiting = true
+          timers.forEach(clearTimeout)
+          var ms = Math.min(fast ? 260 : EXIT, Math.max(0, CAP - performance.now() - 40))
+          var heroLockup = !fast && !reduce && visibleRect('[data-dk-hero="lockup"]')
+
+          if (reduce) {
+            ms = 0
+          } else if (heroLockup) {
+            intro.classList.add('show-word', 'show-tag')
+            var heroTag = visibleRect('[data-dk-hero="tagline"]')
+            glide(lockup, heroLockup, ms)
+            if (heroTag) glide(tag, heroTag, ms)
+            intro.style.transition = 'background-color ' + ms + 'ms ease'
+            intro.style.backgroundColor = 'rgba(15, 15, 15, 0)'
+          } else if (fast) {
+            html.classList.remove('dk-intro-hold')
+            intro.style.transition = 'opacity ' + ms + 'ms ease'
+            intro.style.opacity = '0'
+          } else {
+            html.classList.remove('dk-intro-hold')
+            intro.style.transition = 'transform ' + ms + 'ms cubic-bezier(0.7, 0, 0.2, 1)'
+            intro.style.transform = 'translateY(-100%)'
+          }
+          later(finish, ms + 30)
+        }
+
+        // Leave as soon as the timeline is done and React has painted the page,
+        // but never wait past the cap.
+        function tryExit() {
+          if (window.__dkReady) return exit(false)
+          var wait = CAP - performance.now() - EXIT - 40
+          if (wait <= 0) return exit(false)
+          var go = function () {
+            window.removeEventListener('dk:ready', go)
+            exit(false)
+          }
+          window.addEventListener('dk:ready', go)
+          later(go, wait)
+        }
+
+        function cinzelLoaded() {
+          var ok = false
+          try {
+            document.fonts.forEach(function (f) {
+              if (/Cinzel/.test(f.family) && f.status === 'loaded') ok = true
+            })
+          } catch (e) {
+            ok = true
+          }
+          return ok
+        }
+
+        if (reduce) {
+          intro.classList.add('is-static')
+          later(function () { exit(false) }, 500)
+          return
+        }
+
+        intro.classList.add('is-playing')
+        later(function () {
+          var shine = document.getElementById('dk-shine-anim')
+          if (shine && shine.beginElement) shine.beginElement()
+        }, 880)
+        // The wordmark waits (briefly) for Cinzel so it never swaps font mid-reveal.
+        later(function poll() {
+          if (cinzelLoaded() || performance.now() - start >= 1100) {
+            intro.classList.add('show-word')
+            later(function () { intro.classList.add('show-tag') }, 200)
+          } else {
+            later(poll, 40)
+          }
+        }, 750)
+        later(tryExit, 1350)
+      })()
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

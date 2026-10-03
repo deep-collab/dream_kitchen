@@ -10,10 +10,11 @@ import { maxDeliveryDate, minDeliveryDate } from '../lib/orderRules'
 import { isValidPhone, isValidPincode } from '../lib/validation'
 import { orderWhatsAppUrl } from '../lib/whatsapp'
 import PageHero from '../components/PageHero'
-import Field from '../components/Field'
+import Container from '../components/ui/Container'
+import Button from '../components/ui/Button'
+import TextField, { PhoneField } from '../components/ui/TextField'
 import OrderSummary from '../components/OrderSummary'
-import { BulkNotice } from './Cart'
-import { WhatsAppIcon } from '../components/Icons'
+import { PrebookNotice } from './Cart'
 
 const FIELDS = ['name', 'phone', 'address', 'pincode', 'date']
 
@@ -48,9 +49,9 @@ export default function Checkout() {
   if (!items.length) {
     return (
       <PageHero title={t('checkout.title')} subtitle={t('checkout.emptyCart')}>
-        <Link to="/shop" className="btn btn-primary mt-6">
+        <Button to="/shop" className="mt-6">
           {t('cart.emptyCta')}
-        </Link>
+        </Button>
       </PageHero>
     )
   }
@@ -95,44 +96,32 @@ export default function Checkout() {
   return (
     <>
       <PageHero title={t('checkout.title')} subtitle={t('checkout.subtitle')} />
-      <div className="container-dk grid gap-6 py-8 sm:py-10 lg:grid-cols-[1.4fr_1fr] lg:items-start">
-        <form ref={formRef} onSubmit={onSubmit} noValidate className="card space-y-5 p-5 sm:p-8">
-          <BulkNotice pieces={pieces} />
+      <Container className="grid gap-8 py-10 lg:grid-cols-[1.4fr_1fr] lg:items-start lg:py-14">
+        <form ref={formRef} onSubmit={onSubmit} noValidate className="space-y-6">
+          <PrebookNotice pieces={pieces} />
           {errorCount > 0 && (
-            <p role="alert" className="rounded-2xl bg-[#FFF0EE] p-3 font-bold text-rose">
+            <p role="alert" className="rounded-card border border-error bg-error-bg p-4 font-bold text-error">
               {t('checkout.fixErrors')}
             </p>
           )}
-          <Field id="co-name" label={t('checkout.name')} error={show('name')}>
-            <input className="input" type="text" autoComplete="name" value={form.name} onChange={set('name')} onBlur={blur('name')} />
-          </Field>
-          <Field id="co-phone" label={t('checkout.phone')} hint={t('checkout.phoneHint')} error={show('phone')}>
-            <input className="input" type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="98765 43210" value={form.phone} onChange={set('phone')} onBlur={blur('phone')} />
-          </Field>
-          <Field id="co-address" label={t('checkout.address')} hint={t('checkout.addressHint')} error={show('address')}>
-            <textarea className="input min-h-28" rows={3} autoComplete="street-address" value={form.address} onChange={set('address')} onBlur={blur('address')} />
-          </Field>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field id="co-pincode" label={t('checkout.pincode')} hint={t('checkout.pincodeHint')} error={show('pincode')}>
-              <input className="input" type="text" inputMode="numeric" maxLength={6} autoComplete="postal-code" placeholder="560001" value={form.pincode} onChange={set('pincode')} onBlur={blur('pincode')} />
-            </Field>
-            <Field id="co-date" label={t('checkout.date')} hint={t('checkout.dateHint', { date: formatDate(minDate, lang) })} error={show('date')}>
-              <input className="input" type="date" min={minDate} max={maxDate} value={form.date} onChange={set('date')} onBlur={blur('date')} />
-            </Field>
+          <TextField id="co-name" label={t('checkout.name')} autoComplete="name" value={form.name} onChange={set('name')} onBlur={blur('name')} error={show('name')} />
+          <PhoneField id="co-phone" label={t('checkout.phone')} hint={t('checkout.phoneHint')} value={form.phone} onChange={set('phone')} onBlur={blur('phone')} error={show('phone')} />
+          <TextField id="co-address" as="textarea" rows={3} autoComplete="street-address" label={t('checkout.address')} hint={t('checkout.addressHint')} value={form.address} onChange={set('address')} onBlur={blur('address')} error={show('address')} />
+          <div className="grid gap-6 sm:grid-cols-2">
+            <TextField id="co-pincode" inputMode="numeric" maxLength={6} autoComplete="postal-code" placeholder="560001" label={t('checkout.pincode')} hint={t('checkout.pincodeHint')} value={form.pincode} onChange={set('pincode')} onBlur={blur('pincode')} error={show('pincode')} />
+            <TextField id="co-date" type="date" min={minDate} max={maxDate} label={t('checkout.date')} hint={t('checkout.dateHint', { date: formatDate(minDate, lang) })} value={form.date} onChange={set('date')} onBlur={blur('date')} error={show('date')} />
           </div>
-          <Field id="co-note" label={t('checkout.note')} optional>
-            <textarea className="input min-h-24" rows={2} maxLength={300} placeholder={t('checkout.notePlaceholder')} value={form.note} onChange={set('note')} />
-          </Field>
-          <button type="submit" disabled={busy} className="btn btn-whatsapp w-full text-lg">
-            <WhatsAppIcon /> {busy ? t('checkout.submitting') : t('checkout.submit')}
-          </button>
-          <p className="text-center text-sm text-brown">{t('cart.noPayment')}</p>
+          <TextField id="co-note" as="textarea" rows={2} maxLength={300} optional label={t('checkout.note')} placeholder={t('checkout.notePlaceholder')} value={form.note} onChange={set('note')} />
+          <Button type="submit" variant="whatsapp" size="lg" fullWidth disabled={busy}>
+            {busy ? t('checkout.submitting') : t('checkout.submit')}
+          </Button>
+          <p className="t-small text-brown-2">{t('cart.noPayment')}</p>
         </form>
 
-        <div className="lg:sticky lg:top-24">
+        <div className="lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
           <OrderSummary items={items} pieces={pieces} subtotal={subtotal} showItems />
         </div>
-      </div>
+      </Container>
     </>
   )
 }

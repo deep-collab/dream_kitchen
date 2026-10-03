@@ -155,7 +155,7 @@ Cards on light surfaces use a 1px `line` border and no shadow.
 ```
 Mobile (<768), 64px, black, 1px gold rule below
 ┌─────────────────────────────────────────────┐
-│ [sym] DREAM     [ಕನ್ನಡ] [📞 Call] [≡ Menu]  │
+│ [sym] DREAM     [ಕನ್ನಡ] [📞 Call] [≡]       │
 │       KITCHEN                               │
 └─────────────────────────────────────────────┘
  Cart lives in the bottom bar on mobile.
@@ -323,6 +323,6 @@ Mobile (360)                          Desktop (1280)
 5. **Identical cards everywhere.** The first draft of the shop sketch used a 2-column grid of identical cards. Changed to list rows on mobile (easier for older users, longer names fit), with the best-seller group and the bars combo given their own shapes. The home sections in Step 4 will each get a distinct form: tiles, a spotlight, a band and a story.
 6. **Fade-in on every section.** Deleted the `Reveal` component.
 7. **Extra tell found in review: centred everything.** The hero is centred because it echoes the printed stacked logo, but body sections will use left-aligned reading layouts on desktop.
-8. **Extra tell found in review: an icon-only "hamburger".** The mobile menu button shows the word "Menu" beside the icon, per "icons always paired with words". The desktop cart shows "Cart". The mobile header cart is not needed because the bottom bar has a labelled Cart.
+8. **Extra tell found in review: an icon-only "hamburger".** From 768px the menu button shows the word "Menu" beside the icon, and the cart shows "Cart". Below 768px there is no room beside the always-visible Call button at 360px (measured), so the menu button is icon-only with an accessible name. That is the one documented exception. The mobile header cart is not needed because the bottom bar has a labelled Cart.
 9. **Extra tell found in review: gradient gold everywhere.** The first draft had gold-gradient section headings on cream. That fails contrast and cheapens the gold. Now the gradient lives only in the symbol, wordmark, tagline and the primary button on black.
 10. **The hero's "trust badge" row was dropped.** Four icon badges under the hero is a template staple and none of the claims were hers.

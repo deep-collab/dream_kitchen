@@ -3,13 +3,17 @@ import { useI18n } from '../i18n/I18nProvider'
 import en from '../i18n/en.json'
 import { useSeo } from '../hooks/useSeo'
 import { createEnquiry } from '../services'
-import { site, waLink } from '../config/site'
+import { site, telLink, waLink } from '../config/site'
 import { isValidPhone } from '../lib/validation'
 import { enquiryMessage } from '../lib/whatsapp'
+import { formatCallHours } from '../lib/hours'
 import PageHero from '../components/PageHero'
-import Field from '../components/Field'
-import { ClockIcon, InstagramIcon, MailIcon, PinIcon, WhatsAppIcon } from '../components/Icons'
+import Container from '../components/ui/Container'
+import Button from '../components/ui/Button'
+import TextField, { PhoneField } from '../components/ui/TextField'
+import { ClockIcon, InstagramIcon, PhoneIcon, PinIcon, WhatsAppIcon } from '../components/icons'
 
+// Step 4 rebuilds this page (call-back form, voice message). Enquiry form kept working meanwhile.
 const TYPES = ['general', 'bulk', 'custom', 'wedding', 'return']
 
 export default function Contact() {
@@ -50,75 +54,79 @@ export default function Contact() {
   }
 
   const reach = [
-    [WhatsAppIcon, t('contact.whatsapp'), `+91 ${site.whatsapp}`, waLink(t('wa.general'))],
-    [MailIcon, t('contact.email'), site.email, `mailto:${site.email}`],
-    [InstagramIcon, t('contact.instagram'), site.social.instagramHandle, site.social.instagram],
-    [PinIcon, t('contact.location'), t('contact.locationText')],
-    [ClockIcon, t('contact.hours'), t('contact.hoursText')],
+    [PhoneIcon, t('mobileBar.call'), site.phone.display, telLink],
+    [WhatsAppIcon, t('contact.whatsapp'), site.phone.display, waLink(t('wa.general'))],
+    [InstagramIcon, t('contact.instagram'), site.instagram.handle, site.instagram.url],
+    [ClockIcon, t('contact.hours'), formatCallHours(t)],
+    [PinIcon, t('contact.location'), t('contact.deliveryText')],
   ]
 
   return (
     <>
       <PageHero title={t('contact.title')} subtitle={t('contact.subtitle')} />
-      <div className="container-dk grid gap-6 py-8 sm:py-10 lg:grid-cols-[1.3fr_1fr] lg:items-start">
-        <form onSubmit={onSubmit} noValidate className="card space-y-5 p-5 sm:p-8">
-          <h2 className="text-2xl font-bold">{t('contact.formTitle')}</h2>
+      <Container className="grid gap-10 py-12 lg:grid-cols-[1.3fr_1fr] lg:items-start lg:py-16">
+        <form onSubmit={onSubmit} noValidate className="space-y-6">
+          <h2 className="t-h2">{t('contact.formTitle')}</h2>
           {sent && (
-            <p role="status" className="rounded-2xl bg-[#E5F2E3] p-3 font-bold text-[#1F4D25]">
+            <p role="status" className="rounded-card border border-line bg-champagne p-4 font-bold">
               {t('contact.sent')}
             </p>
           )}
-          <div className="grid gap-5 sm:grid-cols-2">
-            <Field id="en-name" label={t('contact.name')} error={show('name')}>
-              <input className="input" autoComplete="name" value={form.name} onChange={set('name')} />
-            </Field>
-            <Field id="en-phone" label={t('contact.phone')} error={show('phone')}>
-              <input className="input" type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="98765 43210" value={form.phone} onChange={set('phone')} />
-            </Field>
+          <div className="grid gap-6 sm:grid-cols-2">
+            <TextField id="en-name" label={t('contact.name')} autoComplete="name" value={form.name} onChange={set('name')} error={show('name')} />
+            <PhoneField id="en-phone" label={t('contact.phone')} value={form.phone} onChange={set('phone')} error={show('phone')} />
           </div>
-          <Field id="en-type" label={t('contact.type')}>
-            <select className="input" value={form.type} onChange={set('type')}>
-              {TYPES.map((k) => (
-                <option key={k} value={k}>
-                  {t(`contact.types.${k}`)}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field id="en-message" label={t('contact.message')} error={show('message')}>
-            <textarea className="input min-h-32" rows={4} maxLength={800} placeholder={t('contact.messagePlaceholder')} value={form.message} onChange={set('message')} />
-          </Field>
-          <button type="submit" className="btn btn-whatsapp w-full text-lg">
-            <WhatsAppIcon /> {t('contact.submit')}
-          </button>
+          <TextField id="en-type" as="select" label={t('contact.type')} value={form.type} onChange={set('type')}>
+            {TYPES.map((k) => (
+              <option key={k} value={k}>
+                {t(`contact.types.${k}`)}
+              </option>
+            ))}
+          </TextField>
+          <TextField
+            id="en-message"
+            as="textarea"
+            rows={4}
+            maxLength={800}
+            label={t('contact.message')}
+            placeholder={t('contact.messagePlaceholder')}
+            value={form.message}
+            onChange={set('message')}
+            error={show('message')}
+          />
+          <Button type="submit" variant="whatsapp" size="lg" fullWidth icon={WhatsAppIcon}>
+            {t('contact.submit')}
+          </Button>
         </form>
 
-        <aside className="card-cream p-5 sm:p-6" aria-labelledby="reach-title">
-          <h2 id="reach-title" className="text-2xl font-bold">
+        <aside aria-labelledby="reach-title" className="rounded-card bg-champagne p-6">
+          <h2 id="reach-title" className="t-h3">
             {t('contact.reach')}
           </h2>
-          <ul className="mt-4 space-y-3">
+          <ul className="mt-4 space-y-4">
             {reach.map(([Icon, label, value, href]) => (
               <li key={label} className="flex gap-3">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-tint text-dark">
-                  <Icon className="h-5 w-5" />
-                </span>
+                <Icon className="mt-1 h-6 w-6 shrink-0" />
                 <div className="min-w-0">
-                  <p className="text-sm font-bold text-brown">{label}</p>
+                  <p className="t-small text-brown-2">{label}</p>
                   {href ? (
-                    <a className="link-underline font-bold break-words text-deep" href={href} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
+                    <a
+                      className="link inline-flex min-h-12 items-center font-bold break-all"
+                      href={href}
+                      target={href.startsWith('http') ? '_blank' : undefined}
+                      rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    >
                       {value}
                     </a>
                   ) : (
-                    <p className="font-bold text-deep">{value}</p>
+                    <p className="font-bold">{value}</p>
                   )}
                 </div>
               </li>
             ))}
           </ul>
         </aside>
-      </div>
+      </Container>
     </>
   )
 }
-
