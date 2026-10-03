@@ -1,251 +1,417 @@
-/* ==========================================================================
-   SAMPLE DATA — invented products, prices and descriptions for the demo.
-   Replace with Hema's real menu (Phase 2 moves this into Supabase).
-   Images are illustrated SVG placeholders in /public/products.
-   ========================================================================== */
+/*
+  Hema's menu: 35 products, prices and words exactly as she gave them
+  (BUILD_BRIEF.md, "Menu"; spelling fixed only). Shaped like the Stage B
+  Supabase table `products` (optionGroups become `product_option_groups` +
+  `product_option_choices`). Brand names stay English in both languages.
+  Never invent items, prices, badges or claims here.
+*/
 
-export const categories = [
-  {
-    id: 'chocolates',
-    name: { en: 'Handmade Chocolates', kn: 'ಕೈಯಾರೆ ಮಾಡಿದ ಚಾಕೊಲೇಟ್‌ಗಳು' },
-    blurb: { en: 'Bars, slabs and bites, tempered by hand.', kn: 'ಕೈಯಿಂದಲೇ ತಯಾರಿಸಿದ ಬಾರ್‌ಗಳು, ಸ್ಲ್ಯಾಬ್‌ಗಳು ಮತ್ತು ಬೈಟ್ಸ್.' },
-    image: '/products/placeholder.svg',
-  },
-  {
-    id: 'brownies',
-    name: { en: 'Brownies', kn: 'ಬ್ರೌನಿಗಳು' },
-    blurb: { en: 'Fudgy, gooey and baked fresh to order.', kn: 'ಆರ್ಡರ್ ಬಂದ ಮೇಲೆಯೇ ಬೇಕ್ ಮಾಡುವ ಮೃದುವಾದ ಬ್ರೌನಿಗಳು.' },
-    image: '/products/placeholder.svg',
-  },
-  {
-    id: 'truffles',
-    name: { en: 'Truffles', kn: 'ಟ್ರಫಲ್‌ಗಳು' },
-    blurb: { en: 'Silky centres in little gift boxes.', kn: 'ಪುಟ್ಟ ಉಡುಗೊರೆ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ಮೃದುವಾದ ಟ್ರಫಲ್‌ಗಳು.' },
-    image: '/products/placeholder.svg',
-  },
-  {
-    id: 'hampers',
-    name: { en: 'Gift Hampers', kn: 'ಉಡುಗೊರೆ ಹ್ಯಾಂಪರ್‌ಗಳು' },
-    blurb: { en: 'Ready-to-gift baskets for every celebration.', kn: 'ಪ್ರತಿ ಸಂಭ್ರಮಕ್ಕೂ ಸಿದ್ಧವಾದ ಉಡುಗೊರೆ ಬುಟ್ಟಿಗಳು.' },
-    image: '/products/placeholder.svg',
-  },
-  {
-    id: 'custom',
-    name: { en: 'Custom Boxes', kn: 'ನಿಮ್ಮಿಷ್ಟದ ಬಾಕ್ಸ್‌ಗಳು' },
-    blurb: { en: 'Pick your favourites, add a name or a message.', kn: 'ನಿಮಗಿಷ್ಟವಾದದ್ದನ್ನು ಆರಿಸಿ, ಹೆಸರು ಅಥವಾ ಸಂದೇಶ ಸೇರಿಸಿ.' },
-    image: '/products/placeholder.svg',
-  },
-]
+/** @typedef {{ en: string, kn: string }} I18nText */
 
+/**
+ * @typedef {Object} OptionChoice
+ * @property {string} id
+ * @property {I18nText} label
+ * @property {number} [price]      size choices: the full price for that size
+ * @property {number} [grams]      size choices
+ * @property {number} [priceDelta] flavour choices: extra cost (always 0 on her menu)
+ */
+
+/**
+ * @typedef {Object} OptionGroup
+ * @property {'size'|'flavour'} id
+ * @property {'single'} type
+ * @property {boolean} required
+ * @property {OptionChoice[]} choices
+ */
+
+/**
+ * @typedef {Object} Product
+ * @property {string} id
+ * @property {string} slug
+ * @property {string} categoryId
+ * @property {string} sectionId
+ * @property {number} sort
+ * @property {I18nText} name
+ * @property {I18nText|null} description   her words only; null when she gave none
+ * @property {I18nText[]} [includes]       what is inside (Assorted Cookie Dip Box)
+ * @property {Array<'signature'|'top-selling'>} badges
+ * @property {string} image                illustration key (see components/art)
+ * @property {boolean} active
+ * @property {boolean} soldOut
+ * @property {boolean} nameCustomisation
+ * @property {number} nameCustomisationPrice
+ * @property {number} [price]              fixed-price items
+ * @property {number} [grams]              fixed-price items with a stated weight
+ * @property {number} [pricePerKg]         Classic Favourites: her per-kg rate
+ * @property {OptionGroup[]} optionGroups
+ */
+
+const g = (grams) => ({ en: grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`, kn: grams >= 1000 ? `${grams / 1000} ಕೆ.ಜಿ` : `${grams} ಗ್ರಾಂ` })
+
+/** Size group from [grams, price] pairs, in the order she lists them */
+const sizes = (...pairs) => ({
+  id: 'size',
+  type: 'single',
+  required: true,
+  choices: pairs.map(([grams, price]) => ({ id: grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`, label: g(grams), price, grams })),
+})
+
+/** Flavour group (no extra cost on any of her flavours) */
+const flavours = (...list) => ({
+  id: 'flavour',
+  type: 'single',
+  required: true,
+  choices: list.map(([id, en, kn]) => ({ id, label: { en, kn }, priceDelta: 0 })),
+})
+
+const base = { badges: [], active: true, soldOut: false, nameCustomisationPrice: 100, description: null, optionGroups: [] }
+
+/** @type {Product[]} */
 export const products = [
+  /* ---------------- Brownie Tubs ---------------- */
   {
-    id: 'p01',
-    slug: 'classic-dark-chocolate-bar',
-    category: 'chocolates',
-    name: { en: 'Classic 70% Dark Chocolate Bar', kn: 'ಕ್ಲಾಸಿಕ್ 70% ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್ ಬಾರ್' },
+    ...base,
+    id: 'ferrero-rocher-nutella-tub',
+    slug: 'ferrero-rocher-nutella-tub',
+    categoryId: 'brownie-tubs',
+    sectionId: 'brownie-tubs',
+    sort: 1,
+    name: { en: 'Ferrero Rocher Nutella', kn: 'Ferrero Rocher Nutella' },
     description: {
-      en: 'Rich, smooth and not too bitter. Made with pure cocoa butter and no compound chocolate.',
-      kn: 'ಹದವಾದ ಕಹಿಯೊಂದಿಗೆ ಮೃದುವಾದ, ಸಮೃದ್ಧ ರುಚಿ. ಶುದ್ಧ ಕೋಕೋ ಬಟರ್‌ನಿಂದ ಮಾಡಿದ್ದು, ಕಾಂಪೌಂಡ್ ಚಾಕೊಲೇಟ್ ಇಲ್ಲ.',
+      en: 'Our signature indulgence! Rich fudgy brownies layered with creamy Nutella & topped with luxurious Ferrero Rocher.',
+      kn: 'ನಮ್ಮ ಸಿಗ್ನೇಚರ್ ಸವಿ! ಕ್ರೀಮಿ Nutella ಪದರಗಳಿರುವ ಸಮೃದ್ಧ ಫಡ್ಜಿ ಬ್ರೌನಿಗಳು, ಮೇಲೆ ಐಷಾರಾಮಿ Ferrero Rocher.',
     },
-    weight: { g: 100 },
-    price: 199,
-    tags: ['bestseller', 'eggless'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    badges: ['signature'],
+    image: 'tub',
+    nameCustomisation: true,
+    optionGroups: [sizes([250, 549], [500, 999], [750, 1499])],
   },
   {
-    id: 'p02',
-    slug: 'almond-rocher-bites',
-    category: 'chocolates',
-    name: { en: 'Roasted Almond Rocher Bites', kn: 'ಹುರಿದ ಬಾದಾಮಿ ರೋಶೆ ಬೈಟ್ಸ್' },
+    ...base,
+    id: 'lotus-biscoff-bliss-tub',
+    slug: 'lotus-biscoff-bliss-tub',
+    categoryId: 'brownie-tubs',
+    sectionId: 'brownie-tubs',
+    sort: 2,
+    name: { en: 'Lotus Biscoff Bliss', kn: 'Lotus Biscoff ಬ್ಲಿಸ್' },
     description: {
-      en: 'Crunchy roasted almonds wrapped in milk chocolate and crispy wafer. 12 pieces.',
-      kn: 'ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್ ಮತ್ತು ಗರಿಗರಿ ವೇಫರ್‌ನಲ್ಲಿ ಸುತ್ತಿದ ಹುರಿದ ಬಾದಾಮಿ. 12 ತುಂಡುಗಳು.',
+      en: 'Fudgy chocolate brownies layered with smooth Biscoff spread & crunchy Lotus Biscoff biscuits.',
+      kn: 'ಮೃದುವಾದ Biscoff ಸ್ಪ್ರೆಡ್ ಮತ್ತು ಕುರುಕಲು Lotus Biscoff ಬಿಸ್ಕತ್ತುಗಳ ಪದರಗಳಿರುವ ಫಡ್ಜಿ ಚಾಕೊಲೇಟ್ ಬ್ರೌನಿಗಳು.',
     },
-    weight: { g: 150 },
-    price: 349,
-    tags: ['bestseller', 'eggless'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    image: 'tub',
+    nameCustomisation: true,
+    optionGroups: [sizes([250, 449], [500, 799], [750, 1149])],
   },
   {
-    id: 'p03',
-    slug: 'fruit-and-nut-slab',
-    category: 'chocolates',
-    name: { en: 'Fruit & Nut Chocolate Slab', kn: 'ಫ್ರೂಟ್ ಅಂಡ್ ನಟ್ ಚಾಕೊಲೇಟ್ ಸ್ಲ್ಯಾಬ್' },
+    ...base,
+    id: 'red-velvet-white-chocolate-tub',
+    slug: 'red-velvet-white-chocolate-tub',
+    categoryId: 'brownie-tubs',
+    sectionId: 'brownie-tubs',
+    sort: 3,
+    name: { en: 'Red Velvet White Chocolate', kn: 'ರೆಡ್ ವೆಲ್ವೆಟ್ ವೈಟ್ ಚಾಕೊಲೇಟ್' },
     description: {
-      en: 'Milk chocolate loaded with cashews, raisins, almonds and pistachios. Break and share.',
-      kn: 'ಗೋಡಂಬಿ, ಒಣದ್ರಾಕ್ಷಿ, ಬಾದಾಮಿ ಮತ್ತು ಪಿಸ್ತಾ ತುಂಬಿದ ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್. ಮುರಿದು ಹಂಚಿಕೊಳ್ಳಿ.',
+      en: 'Soft red velvet brownies paired with silky white chocolate ganache for a rich & elegant treat.',
+      kn: 'ಮೃದುವಾದ ರೆಡ್ ವೆಲ್ವೆಟ್ ಬ್ರೌನಿಗಳ ಜೊತೆ ನಯವಾದ ವೈಟ್ ಚಾಕೊಲೇಟ್ ಗನಾಶ್, ಸಮೃದ್ಧ ಮತ್ತು ಸೊಗಸಾದ ಸವಿ.',
     },
-    weight: { g: 200 },
-    price: 299,
-    tags: ['eggless'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    image: 'tub',
+    nameCustomisation: true,
+    optionGroups: [sizes([250, 449], [500, 799], [750, 1149])],
   },
   {
-    id: 'p04',
-    slug: 'personalised-name-bar',
-    category: 'custom',
-    name: { en: 'Personalised Name Bar', kn: 'ಹೆಸರಿನ ವಿಶೇಷ ಚಾಕೊಲೇಟ್ ಬಾರ್' },
+    ...base,
+    id: 'oreo-overload-tub',
+    slug: 'oreo-overload-tub',
+    categoryId: 'brownie-tubs',
+    sectionId: 'brownie-tubs',
+    sort: 4,
+    name: { en: 'Oreo Overload', kn: 'Oreo ಓವರ್‌ಲೋಡ್' },
     description: {
-      en: 'A chocolate bar with a custom wrapper carrying their name. Perfect for birthdays and return gifts.',
-      kn: 'ಅವರ ಹೆಸರಿರುವ ವಿಶೇಷ ಕವರ್‌ನ ಚಾಕೊಲೇಟ್ ಬಾರ್. ಹುಟ್ಟುಹಬ್ಬ ಮತ್ತು ರಿಟರ್ನ್ ಗಿಫ್ಟ್‌ಗೆ ಸೂಕ್ತ.',
+      en: 'Rich fudgy brownies loaded with Oreo chunks, chocolate drizzle & creamy goodness in every spoonful.',
+      kn: 'Oreo ತುಂಡುಗಳು, ಚಾಕೊಲೇಟ್ ಡ್ರಿಜಲ್ ಮತ್ತು ಪ್ರತಿ ಚಮಚದಲ್ಲೂ ಕ್ರೀಮಿ ರುಚಿ ತುಂಬಿದ ಸಮೃದ್ಧ ಫಡ್ಜಿ ಬ್ರೌನಿಗಳು.',
     },
-    weight: { g: 80 },
-    price: 249,
-    tags: ['new', 'eggless'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    image: 'tub',
+    nameCustomisation: true,
+    optionGroups: [sizes([250, 399], [500, 699], [750, 999])],
   },
   {
-    id: 'p05',
-    slug: 'fudgy-walnut-brownie',
-    category: 'brownies',
-    name: { en: 'Fudgy Walnut Brownie', kn: 'ಫಡ್ಜಿ ವಾಲ್‌ನಟ್ ಬ್ರೌನಿ' },
+    ...base,
+    id: 'nutty-caramel-crunch-tub',
+    slug: 'nutty-caramel-crunch-tub',
+    categoryId: 'brownie-tubs',
+    sectionId: 'brownie-tubs',
+    sort: 5,
+    name: { en: 'Nutty Caramel Crunch', kn: 'ನಟ್ಟಿ ಕ್ಯಾರಮೆಲ್ ಕ್ರಂಚ್' },
     description: {
-      en: 'Our signature brownie: crackly top, gooey centre and toasted walnuts in every bite.',
-      kn: 'ನಮ್ಮ ವಿಶೇಷ ಬ್ರೌನಿ: ಮೇಲೆ ಗರಿಗರಿ, ಒಳಗೆ ಮೃದು, ಪ್ರತಿ ತುತ್ತಿನಲ್ಲೂ ಹುರಿದ ವಾಲ್‌ನಟ್.',
+      en: 'Decadent fudgy brownies topped with buttery caramel & crunchy roasted nuts — the perfect sweet & nutty combination!',
+      kn: 'ಬೆಣ್ಣೆಯಂತಹ ಕ್ಯಾರಮೆಲ್ ಮತ್ತು ಕುರುಕಲು ಹುರಿದ ಬೀಜಗಳಿಂದ ಅಲಂಕರಿಸಿದ ಸಮೃದ್ಧ ಫಡ್ಜಿ ಬ್ರೌನಿಗಳು. ಸಿಹಿ ಮತ್ತು ಬೀಜಗಳ ಅದ್ಭುತ ಜೋಡಿ!',
     },
-    weight: { pcs: 1, g: 80 },
-    price: 99,
-    tags: ['bestseller'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    image: 'tub',
+    nameCustomisation: true,
+    optionGroups: [sizes([250, 429], [500, 749], [750, 1049])],
+  },
+
+  /* ---------------- Delight Boxes ---------------- */
+  {
+    ...base,
+    id: 'dreamy-biscoff-delight',
+    slug: 'dreamy-biscoff-delight',
+    categoryId: 'delight-boxes',
+    sectionId: 'dreamy-biscoff',
+    sort: 1,
+    name: { en: 'Dreamy Biscoff Delight', kn: 'ಡ್ರೀಮಿ Biscoff ಡಿಲೈಟ್' },
+    description: { en: 'Perfect for personal cravings & gifting!', kn: 'ನಿಮ್ಮ ಸ್ವಂತ ಬಯಕೆಗೂ ಉಡುಗೊರೆಗೂ ಸೂಕ್ತ!' },
+    image: 'delight-box',
+    nameCustomisation: true,
+    price: 550,
+    grams: 250,
+    optionGroups: [
+      flavours(['chocolate', 'Chocolate', 'ಚಾಕೊಲೇಟ್'], ['strawberry', 'Strawberry', 'ಸ್ಟ್ರಾಬೆರಿ'], ['mango', 'Mango', 'ಮಾವು'], ['butterscotch', 'Butterscotch', 'ಬಟರ್‌ಸ್ಕಾಚ್']),
+    ],
   },
   {
-    id: 'p06',
-    slug: 'eggless-double-chocolate-brownie',
-    category: 'brownies',
-    name: { en: 'Eggless Double Chocolate Brownie', kn: 'ಮೊಟ್ಟೆರಹಿತ ಡಬಲ್ ಚಾಕೊಲೇಟ್ ಬ್ರೌನಿ' },
-    description: {
-      en: 'Dark chocolate brownie with melty chocolate chips. 100% eggless, just as fudgy.',
-      kn: 'ಕರಗುವ ಚಾಕೊಲೇಟ್ ಚಿಪ್ಸ್ ಇರುವ ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್ ಬ್ರೌನಿ. ಸಂಪೂರ್ಣ ಮೊಟ್ಟೆರಹಿತ, ಅಷ್ಟೇ ಮೃದು.',
-    },
-    weight: { pcs: 1, g: 80 },
-    price: 119,
-    tags: ['eggless'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    ...base,
+    id: 'red-velvet-delight',
+    slug: 'red-velvet-delight',
+    categoryId: 'delight-boxes',
+    sectionId: 'premium-delight',
+    sort: 2,
+    name: { en: 'Red Velvet Delight', kn: 'ರೆಡ್ ವೆಲ್ವೆಟ್ ಡಿಲೈಟ್' },
+    description: { en: 'Rich, creamy & indulgent!', kn: 'ಸಮೃದ್ಧ, ಕ್ರೀಮಿ ಮತ್ತು ಮನಸೆಳೆಯುವ ಸವಿ!' },
+    image: 'delight-box',
+    nameCustomisation: true,
+    price: 950,
+    grams: 250,
   },
   {
-    id: 'p07',
-    slug: 'nutella-swirl-brownie',
-    category: 'brownies',
-    name: { en: 'Hazelnut Swirl Brownie', kn: 'ಹೇಜಲ್‌ನಟ್ ಸ್ವಿರ್ಲ್ ಬ್ರೌನಿ' },
-    description: {
-      en: 'A fudgy brownie with a thick ribbon of hazelnut chocolate spread swirled on top.',
-      kn: 'ಮೇಲೆ ದಪ್ಪನೆಯ ಹೇಜಲ್‌ನಟ್ ಚಾಕೊಲೇಟ್ ಸ್ಪ್ರೆಡ್ ಸುರುಳಿ ಇರುವ ಮೃದುವಾದ ಬ್ರೌನಿ.',
-    },
-    weight: { pcs: 1, g: 90 },
-    price: 139,
-    tags: ['new'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    ...base,
+    id: 'pista-delight',
+    slug: 'pista-delight',
+    categoryId: 'delight-boxes',
+    sectionId: 'premium-delight',
+    sort: 3,
+    name: { en: 'Pista Delight', kn: 'ಪಿಸ್ತಾ ಡಿಲೈಟ್' },
+    description: { en: 'Nutty, smooth & luxurious!', kn: 'ಪಿಸ್ತಾದ ಸವಿ, ನಯ ಮತ್ತು ಐಷಾರಾಮಿ!' },
+    image: 'delight-box',
+    nameCustomisation: true,
+    price: 950,
+    grams: 250,
   },
   {
-    id: 'p08',
-    slug: 'assorted-brownie-box-of-6',
-    category: 'brownies',
-    name: { en: 'Assorted Brownie Box of 6', kn: '6 ಬಗೆಯ ಬ್ರೌನಿ ಬಾಕ್ಸ್' },
+    ...base,
+    id: 'chocolate-delight',
+    slug: 'chocolate-delight',
+    categoryId: 'delight-boxes',
+    sectionId: 'best-sellers',
+    sort: 4,
+    name: { en: 'Chocolate Delight', kn: 'ಚಾಕೊಲೇಟ್ ಡಿಲೈಟ್' },
     description: {
-      en: 'Six brownies in one gift box: walnut, double chocolate, hazelnut swirl and classic fudge.',
-      kn: 'ಒಂದೇ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ಆರು ಬ್ರೌನಿಗಳು: ವಾಲ್‌ನಟ್, ಡಬಲ್ ಚಾಕೊಲೇಟ್, ಹೇಜಲ್‌ನಟ್ ಸ್ವಿರ್ಲ್ ಮತ್ತು ಕ್ಲಾಸಿಕ್ ಫಡ್ಜ್.',
+      en: 'Fudgy brownie layers with Lotus Biscoff, a rich dark chocolate layer, topped with pista & white chocolate.',
+      kn: 'Lotus Biscoff ಜೊತೆ ಫಡ್ಜಿ ಬ್ರೌನಿ ಪದರಗಳು, ಸಮೃದ್ಧ ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್ ಪದರ, ಮೇಲೆ ಪಿಸ್ತಾ ಮತ್ತು ವೈಟ್ ಚಾಕೊಲೇಟ್.',
     },
-    weight: { pcs: 6, g: 480 },
-    price: 599,
-    tags: ['bestseller'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    image: 'delight-box',
+    nameCustomisation: true,
+    optionGroups: [sizes([500, 950], [700, 1100])],
   },
   {
-    id: 'p09',
-    slug: 'dark-chocolate-truffles-9',
-    category: 'truffles',
-    name: { en: 'Dark Chocolate Truffles, Box of 9', kn: 'ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್ ಟ್ರಫಲ್ಸ್, 9ರ ಬಾಕ್ಸ್' },
-    description: {
-      en: 'Velvety ganache truffles dusted with cocoa and finished with a touch of gold.',
-      kn: 'ಕೋಕೋ ಪುಡಿ ಉದುರಿಸಿ, ಚಿನ್ನದ ಬಣ್ಣದ ಅಲಂಕಾರ ಮಾಡಿದ ಮೃದುವಾದ ಗನಾಶ್ ಟ್ರಫಲ್‌ಗಳು.',
-    },
-    weight: { pcs: 9, g: 135 },
-    price: 449,
-    tags: ['bestseller', 'eggless'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    ...base,
+    id: 'strawberry-red-velvet-delight',
+    slug: 'strawberry-red-velvet-delight',
+    categoryId: 'delight-boxes',
+    sectionId: 'best-sellers',
+    sort: 5,
+    name: { en: 'Strawberry Red Velvet Delight', kn: 'ಸ್ಟ್ರಾಬೆರಿ ರೆಡ್ ವೆಲ್ವೆಟ್ ಡಿಲೈಟ್' },
+    image: 'delight-box',
+    nameCustomisation: true,
+    optionGroups: [sizes([500, 950], [700, 1100])],
   },
   {
-    id: 'p10',
-    slug: 'filter-coffee-truffles-6',
-    category: 'truffles',
-    name: { en: 'Filter Coffee Truffles, Box of 6', kn: 'ಫಿಲ್ಟರ್ ಕಾಫಿ ಟ್ರಫಲ್ಸ್, 6ರ ಬಾಕ್ಸ್' },
-    description: {
-      en: 'Our tribute to Karnataka mornings: chocolate ganache with a strong filter-coffee kick.',
-      kn: 'ಕರ್ನಾಟಕದ ಬೆಳಗಿನ ಕಾಫಿಗೆ ನಮ್ಮ ನಮನ: ಘಮಘಮಿಸುವ ಫಿಲ್ಟರ್ ಕಾಫಿ ಸ್ವಾದದ ಚಾಕೊಲೇಟ್ ಗನಾಶ್.',
-    },
-    weight: { pcs: 6, g: 90 },
-    price: 329,
-    tags: ['new', 'eggless'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    ...base,
+    id: 'mango-delight',
+    slug: 'mango-delight',
+    categoryId: 'delight-boxes',
+    sectionId: 'best-sellers',
+    sort: 6,
+    name: { en: 'Mango Delight', kn: 'ಮಾವಿನ ಡಿಲೈಟ್' },
+    image: 'delight-box',
+    nameCustomisation: true,
+    optionGroups: [sizes([500, 950], [700, 1100])],
   },
   {
-    id: 'p11',
-    slug: 'rose-pistachio-truffles-6',
-    category: 'truffles',
-    name: { en: 'Rose & Pistachio Truffles, Box of 6', kn: 'ಗುಲಾಬಿ ಮತ್ತು ಪಿಸ್ತಾ ಟ್ರಫಲ್ಸ್, 6ರ ಬಾಕ್ಸ್' },
-    description: {
-      en: 'Delicate rose-scented ganache rolled in crushed pistachio and dried rose petals.',
-      kn: 'ಪುಡಿಮಾಡಿದ ಪಿಸ್ತಾ ಮತ್ತು ಒಣ ಗುಲಾಬಿ ದಳಗಳಲ್ಲಿ ಹೊರಳಿಸಿದ, ಗುಲಾಬಿ ಘಮದ ಗನಾಶ್.',
-    },
-    weight: { pcs: 6, g: 90 },
-    price: 379,
-    tags: ['eggless'],
-    image: '/products/placeholder.svg',
-    soldOut: true,
+    ...base,
+    id: 'butterscotch-delight',
+    slug: 'butterscotch-delight',
+    categoryId: 'delight-boxes',
+    sectionId: 'best-sellers',
+    sort: 7,
+    name: { en: 'Butterscotch Delight', kn: 'ಬಟರ್‌ಸ್ಕಾಚ್ ಡಿಲೈಟ್' },
+    image: 'delight-box',
+    nameCustomisation: true,
+    optionGroups: [sizes([500, 950], [700, 1100])],
   },
   {
-    id: 'p12',
-    slug: 'little-joy-hamper',
-    category: 'hampers',
-    name: { en: 'Little Joy Hamper', kn: 'ಲಿಟಲ್ ಜಾಯ್ ಹ್ಯಾಂಪರ್' },
-    description: {
-      en: 'A cute basket with a dark chocolate bar, 4 truffles and 2 brownies, tied with a ribbon.',
-      kn: 'ಒಂದು ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್ ಬಾರ್, 4 ಟ್ರಫಲ್ ಮತ್ತು 2 ಬ್ರೌನಿಗಳಿರುವ, ರಿಬ್ಬನ್ ಕಟ್ಟಿದ ಮುದ್ದಾದ ಬುಟ್ಟಿ.',
-    },
-    weight: { g: 450, approx: true },
-    price: 899,
-    tags: [],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    ...base,
+    id: 'red-velvet-premium-delight',
+    slug: 'red-velvet-premium-delight',
+    categoryId: 'delight-boxes',
+    sectionId: 'best-sellers',
+    sort: 8,
+    name: { en: 'Red Velvet Premium Delight', kn: 'ರೆಡ್ ವೆಲ್ವೆಟ್ ಪ್ರೀಮಿಯಂ ಡಿಲೈಟ್' },
+    image: 'delight-box',
+    nameCustomisation: true,
+    optionGroups: [sizes([500, 1800], [700, 2100])],
   },
   {
-    id: 'p13',
-    slug: 'grand-celebration-hamper',
-    category: 'hampers',
-    name: { en: 'Grand Celebration Hamper', kn: 'ಗ್ರ್ಯಾಂಡ್ ಸೆಲೆಬ್ರೇಶನ್ ಹ್ಯಾಂಪರ್' },
+    ...base,
+    id: 'pista-premium-delight',
+    slug: 'pista-premium-delight',
+    categoryId: 'delight-boxes',
+    sectionId: 'best-sellers',
+    sort: 9,
+    name: { en: 'Pista Premium Delight', kn: 'ಪಿಸ್ತಾ ಪ್ರೀಮಿಯಂ ಡಿಲೈಟ್' },
+    image: 'delight-box',
+    nameCustomisation: true,
+    optionGroups: [sizes([500, 1800], [700, 2400])],
+  },
+
+  /* ---------------- Cookies ---------------- */
+  {
+    ...base,
+    id: 'assorted-cookie-dip-box',
+    slug: 'assorted-cookie-dip-box',
+    categoryId: 'cookies',
+    sectionId: 'cookies',
+    sort: 1,
+    name: { en: 'Assorted Cookie Dip Box', kn: 'ಅಸಾರ್ಟೆಡ್ ಕುಕೀ ಡಿಪ್ ಬಾಕ್ಸ್' },
     description: {
-      en: 'Our biggest hamper: bars, a box of 9 truffles, 4 brownies and rocher bites, with a handwritten card.',
-      kn: 'ನಮ್ಮ ಅತಿ ದೊಡ್ಡ ಹ್ಯಾಂಪರ್: ಚಾಕೊಲೇಟ್ ಬಾರ್‌ಗಳು, 9 ಟ್ರಫಲ್ ಬಾಕ್ಸ್, 4 ಬ್ರೌನಿ ಮತ್ತು ರೋಶೆ ಬೈಟ್ಸ್, ಜೊತೆಗೆ ಕೈಬರಹದ ಕಾರ್ಡ್.',
+      en: 'A delightful mix of handcrafted cookies paired with rich chocolate and Nutella dips. Packed in a premium reusable tin box. Perfect for gifting, celebrations, tea-time treats, and chocolate lovers.',
+      kn: 'ಸಮೃದ್ಧ ಚಾಕೊಲೇಟ್ ಮತ್ತು Nutella ಡಿಪ್‌ಗಳ ಜೊತೆ ಕೈಯಾರೆ ಮಾಡಿದ ಬಗೆಬಗೆಯ ಕುಕೀಸ್. ಮರುಬಳಕೆ ಮಾಡಬಹುದಾದ ಪ್ರೀಮಿಯಂ ಟಿನ್ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ಪ್ಯಾಕ್ ಮಾಡಲಾಗುತ್ತದೆ. ಉಡುಗೊರೆ, ಸಂಭ್ರಮ, ಚಹಾ ಸಮಯ ಮತ್ತು ಚಾಕೊಲೇಟ್ ಪ್ರಿಯರಿಗೆ ಸೂಕ್ತ.',
     },
-    weight: { g: 1100, approx: true },
-    price: 1499,
-    tags: ['bestseller'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    includes: [
+      { en: 'Chocolate cookies', kn: 'ಚಾಕೊಲೇಟ್ ಕುಕೀಸ್' },
+      { en: 'Red velvet cookies', kn: 'ರೆಡ್ ವೆಲ್ವೆಟ್ ಕುಕೀಸ್' },
+      { en: 'Pista cookies', kn: 'ಪಿಸ್ತಾ ಕುಕೀಸ್' },
+      { en: 'Chocolate chip cookies', kn: 'ಚಾಕೊಲೇಟ್ ಚಿಪ್ ಕುಕೀಸ್' },
+      { en: 'Chocolate dip', kn: 'ಚಾಕೊಲೇಟ್ ಡಿಪ್' },
+      { en: 'Nutella dip', kn: 'Nutella ಡಿಪ್' },
+    ],
+    image: 'cookie-dip-tin',
+    nameCustomisation: true,
+    optionGroups: [sizes([250, 349], [500, 599], [750, 849])],
   },
   {
-    id: 'p14',
-    slug: 'build-your-own-box-12',
-    category: 'custom',
-    name: { en: 'Build-Your-Own Box of 12', kn: 'ನೀವೇ ಆರಿಸುವ 12ರ ಬಾಕ್ಸ್' },
+    ...base,
+    id: 'cookie-pie-tin',
+    slug: 'cookie-pie-tin',
+    categoryId: 'cookies',
+    sectionId: 'cookies',
+    sort: 2,
+    name: { en: 'Cookie Pie Tin', kn: 'ಕುಕೀ ಪೈ ಟಿನ್' },
     description: {
-      en: 'Choose any 12 truffles and bites. Tell us your picks and a gift message in the order note.',
-      kn: 'ಯಾವುದೇ 12 ಟ್ರಫಲ್ ಅಥವಾ ಬೈಟ್ಸ್ ಆರಿಸಿ. ನಿಮ್ಮ ಆಯ್ಕೆ ಮತ್ತು ಉಡುಗೊರೆ ಸಂದೇಶವನ್ನು ಆರ್ಡರ್ ನೋಟ್‌ನಲ್ಲಿ ಬರೆಯಿರಿ.',
+      en: 'A rich assortment of freshly baked, soft, gooey cookie pie.',
+      kn: 'ತಾಜಾವಾಗಿ ಬೇಕ್ ಮಾಡಿದ, ಮೃದುವಾದ, ಗೂಯಿ ಕುಕೀ ಪೈಯ ಸಮೃದ್ಧ ಸಂಗ್ರಹ.',
     },
-    weight: { pcs: 12, g: 200, approx: true },
-    price: 699,
-    tags: ['new', 'eggless'],
-    image: '/products/placeholder.svg',
-    soldOut: false,
+    image: 'cookie-pie-tin',
+    nameCustomisation: true,
+    optionGroups: [sizes([500, 950], [750, 1100])],
   },
+  {
+    ...base,
+    id: 'cookie-pie-box',
+    slug: 'cookie-pie-box',
+    categoryId: 'cookies',
+    sectionId: 'cookies',
+    sort: 3,
+    name: { en: 'Cookie Pie Box', kn: 'ಕುಕೀ ಪೈ ಬಾಕ್ಸ್' },
+    description: { en: 'Single serving (1 box).', kn: 'ಒಬ್ಬರಿಗೆ ಸಾಕಾಗುವಷ್ಟು (1 ಬಾಕ್ಸ್).' },
+    image: 'cookie-pie-box',
+    nameCustomisation: false,
+    price: 250,
+  },
+
+  /* ---------------- Chocolates: Colour Blast Bars ---------------- */
+  {
+    ...base,
+    id: 'colour-blast-bar',
+    slug: 'colour-blast-bar',
+    categoryId: 'chocolates',
+    sectionId: 'colour-blast',
+    sort: 1,
+    name: { en: 'Colour Blast Bar', kn: 'ಕಲರ್ ಬ್ಲಾಸ್ಟ್ ಬಾರ್' },
+    image: 'colour-blast',
+    nameCustomisation: false,
+    price: 150,
+    optionGroups: [
+      flavours(
+        ['marble-chocolate', 'Marble Chocolate', 'ಮಾರ್ಬಲ್ ಚಾಕೊಲೇಟ್'],
+        ['almond', 'Almond', 'ಬಾದಾಮಿ'],
+        ['dates', 'Dates', 'ಖರ್ಜೂರ'],
+        ['roasted-almonds', 'Roasted Almonds', 'ಹುರಿದ ಬಾದಾಮಿ'],
+        ['waffle', 'Waffle', 'ವಾಫಲ್'],
+        ['raisin', 'Raisin', 'ಒಣದ್ರಾಕ್ಷಿ'],
+        ['coffee', 'Coffee', 'ಕಾಫಿ'],
+        ['ferrero-rocher', 'Ferrero Rocher', 'Ferrero Rocher'],
+        ['coconut', 'Coconut', 'ತೆಂಗಿನಕಾಯಿ'],
+      ),
+    ],
+  },
+
+  /* ---------------- Chocolates: Chocolate Bars ---------------- */
+  ...[
+    ['dark-chocolate-bar', 'Dark Chocolate', 'ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್', 150],
+    ['milk-chocolate-bar', 'Milk Chocolate', 'ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್', 150],
+    ['white-chocolate-bar', 'White Chocolate', 'ವೈಟ್ ಚಾಕೊಲೇಟ್', 200],
+    ['strawberry-dark-chocolate-bar', 'Strawberry Dark Chocolate', 'ಸ್ಟ್ರಾಬೆರಿ ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್', 200],
+    ['orange-milk-chocolate-bar', 'Orange Milk Chocolate', 'ಆರೆಂಜ್ ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್', 200],
+    ['cranberry-white-chocolate-bar', 'Cranberry White Chocolate', 'ಕ್ರ್ಯಾನ್‌ಬೆರಿ ವೈಟ್ ಚಾಕೊಲೇಟ್', 250],
+    ['hazelnut-dark-chocolate-bar', 'Hazelnut Dark Chocolate', 'ಹ್ಯಾಜಲ್‌ನಟ್ ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್', 250],
+    ['almond-milk-chocolate-bar', 'Almond Milk Chocolate', 'ಬಾದಾಮಿ ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್', 250],
+    ['walnut-white-chocolate-bar', 'Walnut White Chocolate', 'ವಾಲ್‌ನಟ್ ವೈಟ್ ಚಾಕೊಲೇಟ್', 300],
+    ['coconut-bar', 'Coconut Bar', 'ತೆಂಗಿನಕಾಯಿ ಬಾರ್', 280],
+  ].map(([id, en, kn, price], i) => ({
+    ...base,
+    id,
+    slug: id,
+    categoryId: 'chocolates',
+    sectionId: 'chocolate-bars',
+    sort: i + 1,
+    name: { en, kn },
+    image: 'bar',
+    nameCustomisation: false,
+    price,
+  })),
+
+  /* ---------------- Chocolates: Classic Favourites (sold by weight) ---------------- */
+  ...[
+    ['classic-dark-chocolate', 'Dark Chocolate', 'ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್', 1100, [275, 550, 1100], null, []],
+    ['classic-milk-chocolate', 'Milk Chocolate', 'ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್', 1100, [275, 550, 1100], null, []],
+    ['classic-white-chocolate', 'White Chocolate', 'ವೈಟ್ ಚಾಕೊಲೇಟ್', 1400, [350, 700, 1400], null, []],
+    ['classic-caramel-delight', 'Caramel Delight', 'ಕ್ಯಾರಮೆಲ್ ಡಿಲೈಟ್', 1000, [250, 500, 1000], null, []],
+    [
+      'classic-favourite-assortment',
+      'Classic Favourite Assortment',
+      'ಕ್ಲಾಸಿಕ್ ಫೇವರಿಟ್ ಅಸಾರ್ಟ್‌ಮೆಂಟ್',
+      1400,
+      [350, 700, 1400],
+      { en: '92 pieces per kg.', kn: 'ಪ್ರತಿ ಕೆ.ಜಿಗೆ 92 ತುಂಡುಗಳು.' },
+      [],
+    ],
+    ['classic-dry-fruits', 'Dry Fruits', 'ಡ್ರೈ ಫ್ರೂಟ್ಸ್', 1300, [325, 650, 1300], null, []],
+    ['classic-triple-layer-chocolate', 'Triple Layer Chocolate', 'ಟ್ರಿಪಲ್ ಲೇಯರ್ ಚಾಕೊಲೇಟ್', 1300, [325, 650, 1300], null, ['top-selling']],
+  ].map(([id, en, kn, perKg, [p250, p500, p1000], description, badges], i) => ({
+    ...base,
+    id,
+    slug: id,
+    categoryId: 'chocolates',
+    sectionId: 'classic-favourites',
+    sort: i + 1,
+    name: { en, kn },
+    description,
+    badges,
+    image: 'assortment',
+    nameCustomisation: false,
+    pricePerKg: perKg,
+    optionGroups: [sizes([250, p250], [500, p500], [1000, p1000])],
+  })),
 ]

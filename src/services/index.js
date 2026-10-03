@@ -1,9 +1,11 @@
 /*
   Data layer. Every component gets data ONLY through these functions.
-  Phase 1: local sample data + browser storage.
-  Phase 2: swap the bodies for Supabase calls; keep the same names and return shapes.
+  Stage A: local data files (src/data) + browser storage.
+  Stage B: swap the bodies for Supabase calls; keep the same names and return shapes.
 */
-import { categories, products } from '../data/products'
+import { categories, occasions } from '../data/categories'
+import { products } from '../data/products'
+import { combos } from '../data/combos'
 import { mockOrders } from '../data/mockOrders'
 import { site } from '../config/site'
 import { addDays, toISODate } from '../lib/format'
@@ -29,31 +31,47 @@ const writeJSON = (key, value) => {
   }
 }
 
-/* ---------- products ---------- */
-export async function getCategories() {
-  return categories
+/* ---------- menu ---------- */
+const byId = (list) => Object.fromEntries(list.map((x) => [x.id, x]))
+
+// Dev-only test fixture: Playwright sets window.__dkTestSoldOut = ['product-id', ...]
+// to photograph the sold-out state. Production builds drop this branch entirely.
+function withFixtures(list) {
+  if (!import.meta.env.DEV || typeof window === 'undefined' || !Array.isArray(window.__dkTestSoldOut)) return list
+  return list.map((p) => (window.__dkTestSoldOut.includes(p.id) ? { ...p, soldOut: true } : p))
 }
 
-export async function getProducts({ category, search, sort, bestSellers } = {}) {
-  let list = products.slice()
-  if (category && category !== 'all') list = list.filter((p) => p.category === category)
-  if (bestSellers) list = list.filter((p) => p.tags.includes('bestseller'))
-  if (search) {
-    const q = search.trim().toLowerCase()
-    list = list.filter((p) =>
-      [p.name.en, p.name.kn, p.description.en, p.description.kn, ...p.tags].some((s) => s.toLowerCase().includes(q)),
-    )
-  }
-  if (sort === 'price-asc') list.sort((a, b) => a.price - b.price)
-  if (sort === 'price-desc') list.sort((a, b) => b.price - a.price)
-  if (sort === 'name') list.sort((a, b) => a.name.en.localeCompare(b.name.en))
-  // sold-out items always go last
-  list.sort((a, b) => Number(a.soldOut) - Number(b.soldOut))
+const activeProducts = () => withFixtures(products.filter((p) => p.active).sort((a, b) => a.sort - b.sort))
+
+export async function getCategories() {
+  return [...categories].sort((a, b) => a.sort - b.sort)
+}
+
+export async function getOccasions() {
+  return occasions
+}
+
+/** Whole menu in one call: categories, products, combos, occasions and a product lookup. */
+export async function getMenu() {
+  const list = activeProducts()
+  return { categories: await getCategories(), products: list, productsById: byId(list), combos: combos.filter((c) => c.active), occasions }
+}
+
+/** Search matches English and Kannada product names (case-insensitive). */
+export async function getProducts({ categoryId, search } = {}) {
+  let list = activeProducts()
+  if (categoryId) list = list.filter((p) => p.categoryId === categoryId)
+  const q = (search || '').trim().toLowerCase()
+  if (q) list = list.filter((p) => p.name.en.toLowerCase().includes(q) || p.name.kn.toLowerCase().includes(q))
   return list
 }
 
 export async function getProduct(slug) {
-  return products.find((p) => p.slug === slug) || null
+  return activeProducts().find((p) => p.slug === slug) || null
+}
+
+export async function getCombos() {
+  return combos.filter((c) => c.active)
 }
 
 /* ---------- orders ---------- */
