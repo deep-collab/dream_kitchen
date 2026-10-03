@@ -1,114 +1,122 @@
-import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
-import { useCart } from '../context/CartProvider'
 import { useSeo } from '../hooks/useSeo'
-import { useAsync } from '../hooks/useAsync'
-import { getCategories, getProduct, getProducts } from '../services'
-import { site } from '../config/site'
-import { formatPrice, formatWeight } from '../lib/format'
-import QuantityStepper from '../components/ui/QuantityStepper'
+import { useMenu } from '../context/MenuProvider'
+import { useCart } from '../context/CartProvider'
 import Container from '../components/ui/Container'
-import Button from '../components/ui/Button'
-import ProductCard from '../components/ProductCard'
-import ProductTags from '../components/ProductTags'
+import Badge from '../components/ui/Badge'
+import { useToast } from '../components/ui/Toast'
+import ProductCard, { BADGE_KEYS } from '../components/shop/ProductCard'
+import { ProductDetails, useAddedToast } from '../components/shop/ShopSheets'
+import ProductArt from '../components/art/ProductArt'
+import { AddBar, CustomiseFields, useCustomise } from '../components/shop/Customise'
 import NotFound from './NotFound'
-import { ArrowLeftIcon, CheckIcon, PlusIcon, TruckIcon } from '../components/icons'
 
-// Legacy product page over sample data. Step 2 rebuilds it with the customise UI.
+// /product/:slug: deep-linkable, with the same choices as the sheet, inline.
 export default function Product() {
   const { slug } = useParams()
-  const { data, loading } = useAsync(async () => {
-    const product = await getProduct(slug)
-    if (!product) return { product: null }
-    const [cats, related] = await Promise.all([getCategories(), getProducts({ category: product.category })])
-    return { product, category: cats.find((c) => c.id === product.category), related: related.filter((p) => p.id !== product.id).slice(0, 4) }
-  }, [slug])
-
-  if (loading) return <div className="min-h-[50vh]" />
-  if (!data?.product) return <NotFound />
-  return <ProductView key={slug} {...data} />
+  const menu = useMenu()
+  if (!menu) return <div className="min-h-[60vh]" />
+  const product = menu.products.find((p) => p.slug === slug)
+  if (!product) return <NotFound />
+  return <ProductView key={slug} product={product} menu={menu} />
 }
 
-function ProductView({ product, category, related }) {
+function ProductView({ product, menu }) {
   const { t, pick } = useI18n()
-  const { add } = useCart()
-  const navigate = useNavigate()
-  const [qty, setQty] = useState(1)
-  const [added, setAdded] = useState(false)
+  const cart = useCart()
+  const toast = useToast()
+  const added = useAddedToast()
+  const c = useCustomise(product)
+  const category = menu.categories.find((x) => x.id === product.categoryId)
+  const section = category.sections.find((s) => s.id === product.sectionId)
   const name = pick(product.name)
-  useSeo('product', { title: `${name} | ${t('brand.name')}`, desc: pick(product.description) })
+  const more = menu.products.filter((p) => p.categoryId === product.categoryId && p.id !== product.id).slice(0, 3)
+
+  useSeo('product', {
+    title: t('product.metaTitle', { name, category: pick(category.name) }),
+    desc: product.description ? pick(product.description) : t('product.metaDesc', { name, category: pick(category.name) }),
+  })
 
   const onAdd = () => {
-    add(product, qty)
-    setAdded(true)
-    setTimeout(() => setAdded(false), 1500)
+    const line = c.submit()
+    if (!line) return
+    cart.add(line)
+    added(false)
+  }
+
+  const share = async () => {
+    const url = window.location.href
+    try {
+      if (navigator.share) await navigator.share({ title: name, url })
+      else {
+        await navigator.clipboard.writeText(url)
+        toast.show({ message: t('product.copied') })
+      }
+    } catch {
+      /* the person closed the share sheet */
+    }
   }
 
   return (
     <>
       <Container className="py-8 lg:py-12">
-        <Link to="/shop" className="mb-6 inline-flex min-h-12 items-center gap-2 rounded-control font-bold hover:underline">
-          <ArrowLeftIcon className="h-5 w-5" /> {t('common.backToShop')}
-        </Link>
-        <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-          <figure className="overflow-hidden rounded-card bg-ink">
-            <img src={product.image} alt={name} width="400" height="400" className="aspect-square w-full object-cover" />
-          </figure>
+        <nav aria-label={t('product.breadcrumb')} className="t-small">
+          <ol className="flex flex-wrap items-center gap-x-2 text-brown-2">
+            <li>
+              <Link to="/shop" className="inline-flex min-h-12 min-w-12 items-center underline underline-offset-4 hover:text-brown">
+                {t('nav.shop')}
+              </Link>
+            </li>
+            <li aria-hidden="true">/</li>
+            <li>
+              <Link to={`/shop#${category.slug}`} className="inline-flex min-h-12 min-w-12 items-center underline underline-offset-4 hover:text-brown">
+                {pick(category.name)}
+              </Link>
+            </li>
+          </ol>
+        </nav>
+
+        <div className="mt-4 grid gap-8 lg:grid-cols-[1fr_1.05fr] lg:gap-14">
+          <div className="lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:self-start">
+            <ProductArt kind={product.image} variant={product.sort} rounded="rounded-card" className="mx-auto w-full max-w-md lg:max-w-none" />
+          </div>
 
           <div>
-            <ProductTags product={product} />
-            {category && (
-              <p className="t-small mt-3 text-brown-2">
-                {t('product.category')}:{' '}
-                <Link className="link inline-flex min-h-12 items-center" to={`/shop?category=${category.id}`}>
-                  {pick(category.name)}
-                </Link>
-              </p>
-            )}
+            {section?.name && <p className="font-bold text-brown-2">{pick(section.name)}</p>}
+            <div className="flex flex-wrap gap-2">
+              {product.badges.map((b) => (
+                <Badge key={b} className="mt-2">
+                  {t(BADGE_KEYS[b])}
+                </Badge>
+              ))}
+            </div>
             <h1 className="t-h1 mt-2">{name}</h1>
-            <p className="mt-1 text-brown-2">{formatWeight(product.weight, t)}</p>
-            <p className="t-price mt-4">{formatPrice(product.price)}</p>
-            <p className="mt-4">{pick(product.description)}</p>
+            <div className="mt-4">
+              <ProductDetails product={product} large />
+            </div>
 
-            {!product.soldOut && (
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <QuantityStepper value={qty} onChange={setQty} />
-                <Button onClick={onAdd} icon={added ? CheckIcon : PlusIcon} className={`flex-1 ${added ? 'pop' : ''}`}>
-                  {added ? t('common.added') : t('common.addToCartFull')}
-                </Button>
-                <Button
-                  variant="secondary"
-                  fullWidth
-                  onClick={() => {
-                    add(product, qty)
-                    navigate('/cart')
-                  }}
-                >
-                  {t('product.buyNow')}
-                </Button>
-              </div>
-            )}
-
-            <p className="mt-8 flex gap-3 border-t border-line pt-6">
-              <TruckIcon className="mt-0.5 h-6 w-6 shrink-0" />
-              <span>
-                <span className="block font-bold">{t('product.delivery')}</span>
-                <span className="text-brown-2">{t('product.deliveryText', { charge: site.delivery.charge })}</span>
-              </span>
-            </p>
+            <div className="mt-10 border-t border-line pt-8">
+              <CustomiseFields c={c} />
+            </div>
+            <div className="sticky bottom-[calc(var(--bar-h)+env(safe-area-inset-bottom))] z-20 -mx-[var(--gutter)] mt-8 border-t border-line bg-cream px-[var(--gutter)] pt-3 md:static md:mx-0 md:rounded-card md:border md:bg-champagne md:p-5">
+              <AddBar c={c} onAdd={onAdd} />
+            </div>
+            <button type="button" onClick={share} className="link mt-4 inline-flex min-h-12 items-center font-bold">
+              {t('product.share')}
+            </button>
           </div>
         </div>
       </Container>
 
-      {related.length > 0 && (
-        <section className="bg-champagne py-12 lg:py-16" aria-labelledby="related-title">
+      {more.length > 0 && (
+        <section aria-labelledby="more-title" className="border-t border-line bg-champagne py-12 lg:py-16">
           <Container>
-            <h2 id="related-title" className="t-h2 mb-8">
-              {t('product.related')}
+            <h2 id="more-title" className="t-h2 mb-8">
+              {t('product.more', { category: pick(category.name) })}
             </h2>
-            <ul className="grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
-              {related.map((p) => (
+            <ul className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+              {more.map((p) => (
                 <li key={p.id}>
                   <ProductCard product={p} />
                 </li>

@@ -10,7 +10,7 @@ import CartCount from './CartCount'
 // Hidden while a sheet or the menu is open. Layout pads the page so it never covers content.
 export default function MobileBar() {
   const { t } = useI18n()
-  const { pieces } = useCart()
+  const { count: pieces } = useCart()
   const hidden = useAnyOverlayOpen()
   const item =
     'flex h-full flex-col items-center justify-center gap-1 px-1 text-center text-base leading-tight font-bold text-cream transition-colors active:bg-white/10'

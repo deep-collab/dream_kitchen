@@ -24,14 +24,8 @@
     "more": "More"
   },
   "common": {
-    "addToCart": "Add",
-    "addToCartFull": "Add to cart",
-    "added": "Added!",
-    "soldOut": "Sold out",
-    "viewAll": "View all",
     "whatsapp": "WhatsApp",
     "chatWhatsapp": "Chat on WhatsApp",
-    "backToShop": "Back to shop",
     "continueShopping": "Continue shopping",
     "loading": "Loading…",
     "decrease": "Decrease quantity",
@@ -41,19 +35,7 @@
     "required": "required",
     "optional": "optional",
     "cartWithCount": "Cart, {count} items",
-    "itemsCount": "{count} items",
-    "itemsCountOne": "1 item",
     "close": "Close"
-  },
-  "tags": {
-    "bestseller": "Best seller"
-  },
-  "weight": {
-    "g": "{g} g",
-    "kg": "{kg} kg",
-    "pcs": "{pcs} pcs",
-    "pcsOne": "1 piece",
-    "approx": "approx."
   },
   "seo": {
     "home": {
@@ -111,8 +93,8 @@
   },
   "home": {
     "fresh": {
-      "title": "Made fresh, just for you",
-      "text": "Every tub, box and bar is made after you order. Pre-book a few days ahead and Hema will make yours fresh.",
+      "title": "Our menu",
+      "text": "Brownie tubs, delight boxes, cookies and chocolates. Everything is made fresh after you order.",
       "cta": "See the menu"
     },
     "talk": {
@@ -122,48 +104,61 @@
   },
   "shop": {
     "title": "Our menu",
-    "subtitle": "Everything is handmade to order. Tap Add to fill your box.",
-    "all": "All",
-    "search": "Search treats",
-    "searchPlaceholder": "Search brownies, truffles…",
-    "sort": "Sort by",
-    "sortFeatured": "Featured",
-    "sortPriceLow": "Price: low to high",
-    "sortPriceHigh": "Price: high to low",
-    "sortName": "Name: A to Z",
-    "results": "{count} treats",
-    "resultsOne": "1 treat",
-    "empty": "No treats match that search. Try another word?",
-    "clear": "Clear filters",
-    "categories": "Categories"
+    "subtitle": "Everything is made fresh after you order. Tap any item to choose a size, add a name on the box, and more.",
+    "search": "Search the menu",
+    "searchPlaceholder": "Try “Nutella”, “mango” or “bar”",
+    "results": "{count} items for “{query}”",
+    "resultsOne": "1 item for “{query}”",
+    "empty": "Nothing on the menu matches that. Try another word, or call or WhatsApp Hema and she will help you choose.",
+    "categories": "Menu categories",
+    "clearSearch": "Clear search",
+    "choose": "Choose",
+    "from": "from {price}",
+    "sizesList": "{list} or {last}",
+    "flavourCount": "{count} flavours",
+    "highlights": "{list}.",
+    "whatYouGet": "What you get",
+    "soldOut": "Sold out",
+    "soldOutHelp": "Sold out for now. Call or WhatsApp to ask when it is back."
   },
   "product": {
-    "notFound": "We couldn't find that treat.",
-    "shelfLife": "Shelf life",
-    "storage": "Storage",
-    "storageText": "Keep in a cool, dry place away from sunlight. Refrigerate brownies in hot weather.",
-    "delivery": "Delivery",
-    "deliveryText": "Flat ₹{charge} anywhere in Karnataka.",
-    "category": "Category",
-    "buyNow": "Buy now",
-    "related": "You may also like",
-    "soldOutText": "This treat is sold out right now. Message us on WhatsApp to pre-order.",
-    "askWhatsapp": "Ask on WhatsApp",
-    "askMessage": "Hi Dream Kitchen! I'd like to know more about: {name}"
+    "breadcrumb": "Breadcrumb",
+    "metaTitle": "{name} | {category} | Dream Kitchen",
+    "metaDesc": "{name} from Dream Kitchen’s {category}, made fresh to order. Pre-book online or call +91 95357 06956.",
+    "share": "Share this item",
+    "copied": "Link copied",
+    "more": "More {category}"
   },
   "cart": {
     "title": "Your cart",
-    "empty": "Your cart is empty — let's fix that!",
     "emptyCta": "Browse the menu",
     "subtotal": "Subtotal",
     "delivery": "Delivery",
     "total": "Total",
-    "pieces": "Total pieces",
-    "checkout": "Proceed to checkout",
+    "checkout": "Continue to checkout",
     "summary": "Order summary",
-    "bulkNotice": "You have {count} pieces — lovely! Orders of more than {threshold} pieces need at least {days} days' notice, so Hema can make everything fresh.",
     "noPayment": "No online payment. Hema will confirm on WhatsApp and share UPI details.",
-    "removed": "Removed from cart"
+    "removed": "Removed {name}",
+    "countLine": "{count} items",
+    "added": "Added to cart",
+    "updated": "Cart updated",
+    "view": "View cart",
+    "undo": "Undo",
+    "edit": "Edit",
+    "each": "{price} each",
+    "qtyFor": "Quantity of {name}",
+    "size": "Size",
+    "nameOnBox": "Name on box",
+    "note": "Note",
+    "bars": "Bars",
+    "deliveryKarnataka": "Delivery (Karnataka)",
+    "prebook": "Orders are dispatched after {days} business days.",
+    "addMore": "Add more items",
+    "callTitle": "Call to order instead",
+    "callText": "Would you rather talk? Call Hema and she will take your order on the phone.",
+    "emptyTitle": "Your cart is empty",
+    "emptyText": "Brownie tubs, delight boxes, cookies and chocolates, all made fresh for you. Have a look, or call and order on the phone.",
+    "countLineOne": "1 item"
   },
   "checkout": {
     "title": "Delivery details",
@@ -369,7 +364,8 @@
       "fields": "Form fields",
       "display": "Badges and notices",
       "overlay": "Sheet",
-      "icons": "Icons"
+      "icons": "Icons",
+      "art": "Illustrations"
     },
     "onLight": "On cream",
     "onDark": "On black",
@@ -421,5 +417,53 @@
     "sheetAdd": "Add to cart ₹549",
     "sheetCall": "Prefer to talk? Call {phone}",
     "typeSample": "Turning your cravings into sweet memories."
+  },
+  "badges": {
+    "signature": "Signature",
+    "topSelling": "Top selling"
+  },
+  "customise": {
+    "size": "Choose a size",
+    "weight": "Choose a weight",
+    "perKg": "{price} per kg",
+    "weighs": "{grams}g",
+    "flavour": "Flavour",
+    "flavourHint": "Choose one. No extra cost.",
+    "flavourError": "Choose a flavour",
+    "nameToggle": "Add a name on the box (+{price})",
+    "on": "On",
+    "off": "Off",
+    "nameLabel": "Name on the box",
+    "count": "{count}/{max} letters",
+    "namePreview": "Name on box:",
+    "nameEmpty": "Type a name to add it. The extra charge only applies once a name is typed.",
+    "occasion": "Occasion",
+    "occasionHint": "Tap one if it is for something special. Tap again to clear.",
+    "note": "Note to Hema",
+    "notePlaceholder": "For example: less sweet, or deliver after 5 pm",
+    "includes": "Inside the box",
+    "total": "Total",
+    "totalFor": "{qty} × {unit}",
+    "includesName": "(includes name on box {price})",
+    "add": "Add to cart {price}",
+    "save": "Update cart {price}",
+    "call": "Prefer to talk? Call {phone}",
+    "sheetHelp": "Choose your options, then use the Add to cart button at the bottom."
+  },
+  "combo": {
+    "cardText": "Mix any of our {count} chocolate bars. The same bar twice or three times is fine.",
+    "choose": "Choose {count} bars",
+    "intro": "Pick any {count} bars for {price}. Repeats are fine.",
+    "trayCount": "{picked} of {total} bars picked",
+    "trayFull": "All 3 bars picked",
+    "slot": "Bar {n}",
+    "add": "Add",
+    "inTray": "(×{count} in your box)",
+    "separately": "Bought separately",
+    "comboPrice": "Combo price",
+    "save": "You save {amount}",
+    "cheaperHint": "These 3 bars cost {amount} bought separately, which is less than the {price} combo.",
+    "addIndividually": "Add these individually for {amount}",
+    "pickMore": "Pick {count} more to continue."
   }
 }

@@ -17,7 +17,7 @@ import CartCount from './CartCount'
 // WhatsApp buttons within thumb reach at the bottom.
 export default function MobileMenu({ open, onClose }) {
   const { t } = useI18n()
-  const { pieces } = useCart()
+  const { count: pieces } = useCart()
   const [mounted, shown] = usePresence(open, 260)
   const panelRef = useRef(null)
   const closeRef = useRef(null)

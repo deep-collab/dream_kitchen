@@ -14,7 +14,7 @@ import CartCount from './CartCount'
 // Phones: wordmark · language · Call · Menu (the cart lives in the bottom bar).
 export default function Header() {
   const { t } = useI18n()
-  const { pieces } = useCart()
+  const { count: pieces } = useCart()
   const { pathname } = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -86,11 +86,11 @@ export default function Header() {
             onClick={() => setMenuOpen(true)}
             aria-expanded={menuOpen}
             aria-haspopup="dialog"
-            className="-mr-1 inline-flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-control px-2 font-bold text-cream transition-colors hover:bg-white/10 md:px-3 xl:hidden"
+            className="-mr-1 inline-flex min-h-12 min-w-12 flex-col items-center justify-center rounded-control px-1.5 font-bold text-cream transition-colors hover:bg-white/10 md:flex-row md:gap-2 md:px-3 xl:hidden"
           >
-            <MenuIcon className="h-7 w-7" />
-            {/* Phones: icon only (no room at 360px); the accessible name stays */}
-            <span className="sr-only md:not-sr-only">{t('nav.menu')}</span>
+            <MenuIcon className="h-6 w-6 md:h-7 md:w-7" />
+            {/* Phones: small word under the icon so the Call button keeps its room */}
+            <span className="text-[0.8125rem] leading-none md:text-base">{t('nav.menu')}</span>
           </button>
         </div>
       </div>

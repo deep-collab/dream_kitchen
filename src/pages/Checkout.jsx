@@ -9,6 +9,7 @@ import { formatDate } from '../lib/format'
 import { maxDeliveryDate, minDeliveryDate } from '../lib/orderRules'
 import { isValidPhone, isValidPincode } from '../lib/validation'
 import { orderWhatsAppUrl } from '../lib/whatsapp'
+import { lineTextEn } from '../lib/lineText'
 import PageHero from '../components/PageHero'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
@@ -33,7 +34,8 @@ function validate(form, minDate, maxDate, t, lang) {
 export default function Checkout() {
   useSeo('checkout')
   const { t, lang } = useI18n()
-  const { items, pieces, subtotal, clear } = useCart()
+  const { lines, count, subtotal, clear } = useCart()
+  const pieces = count
   const navigate = useNavigate()
   const formRef = useRef(null)
   const [form, setForm] = useState({ name: '', phone: '', address: '', pincode: '', date: '', note: '' })
@@ -46,7 +48,7 @@ export default function Checkout() {
   const errors = useMemo(() => validate(form, minDate, maxDate, t, lang), [form, minDate, maxDate, t, lang])
   const show = (k) => (touched[k] || submitted ? errors[k] : undefined)
 
-  if (!items.length) {
+  if (!lines.length) {
     return (
       <PageHero title={t('checkout.title')} subtitle={t('checkout.emptyCart')}>
         <Button to="/shop" className="mt-6">
@@ -72,7 +74,7 @@ export default function Checkout() {
     setBusy(true)
     try {
       const order = await createOrder({
-        items: items.map((i) => ({ productId: i.productId, name: i.name.en, unitPrice: i.price, qty: i.qty })),
+        items: lines.map((l) => ({ productId: l.productId || l.comboId, name: lineTextEn(l), unitPrice: l.unitPrice, qty: l.qty })),
         customer: { name: form.name, phone: form.phone, address: form.address, pincode: form.pincode },
         deliveryDate: form.date,
         note: form.note,
@@ -98,7 +100,7 @@ export default function Checkout() {
       <PageHero title={t('checkout.title')} subtitle={t('checkout.subtitle')} />
       <Container className="grid gap-8 py-10 lg:grid-cols-[1.4fr_1fr] lg:items-start lg:py-14">
         <form ref={formRef} onSubmit={onSubmit} noValidate className="space-y-6">
-          <PrebookNotice pieces={pieces} />
+          <PrebookNotice />
           {errorCount > 0 && (
             <p role="alert" className="rounded-card border border-error bg-error-bg p-4 font-bold text-error">
               {t('checkout.fixErrors')}
@@ -119,7 +121,7 @@ export default function Checkout() {
         </form>
 
         <div className="lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
-          <OrderSummary items={items} pieces={pieces} subtotal={subtotal} showItems />
+          <OrderSummary lines={lines} count={count} subtotal={subtotal} />
         </div>
       </Container>
     </>

@@ -1,53 +1,58 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { addLine, CART_STORAGE_KEY, LEGACY_CART_KEYS, parseStoredCart, removeLine, restoreLine, serialiseCart, setLineQty, updateLine } from '../lib/cart'
+import { cartCount, cartSubtotal } from '../lib/pricing'
 
-const STORAGE_KEY = 'dk_cart'
-const MAX_QTY = 99
 const CartContext = createContext(null)
 
+// Cart schema v2 in localStorage. Old sample carts (v1) are dropped silently.
 function readCart() {
   try {
-    const v = JSON.parse(localStorage.getItem(STORAGE_KEY))
-    return Array.isArray(v) ? v.filter((i) => i && i.productId && i.qty > 0) : []
+    LEGACY_CART_KEYS.forEach((k) => localStorage.removeItem(k))
+    return parseStoredCart(localStorage.getItem(CART_STORAGE_KEY))
   } catch {
     return []
   }
 }
 
-const clampQty = (q) => Math.max(1, Math.min(MAX_QTY, Math.round(q) || 1))
-
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(readCart)
+  const [lines, setLines] = useState(readCart)
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+      localStorage.setItem(CART_STORAGE_KEY, serialiseCart(lines))
     } catch {
-      /* ignore */
+      /* storage full or blocked: the cart still works for this visit */
     }
-  }, [items])
+  }, [lines])
 
-  const add = useCallback((product, qty = 1) => {
-    setItems((prev) => {
-      const found = prev.find((i) => i.productId === product.id)
-      if (found) return prev.map((i) => (i.productId === product.id ? { ...i, qty: clampQty(i.qty + qty) } : i))
-      return [
-        ...prev,
-        { productId: product.id, slug: product.slug, name: product.name, price: product.price, image: product.image, qty: clampQty(qty) },
-      ]
+  // Keep several open tabs in step
+  useEffect(() => {
+    const onStorage = (e) => e.key === CART_STORAGE_KEY && setLines(parseStoredCart(e.newValue))
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
+
+  const add = useCallback((line) => setLines((prev) => addLine(prev, line)), [])
+  const update = useCallback((id, line) => setLines((prev) => updateLine(prev, id, line)), [])
+  const setQty = useCallback((id, qty) => setLines((prev) => setLineQty(prev, id, qty)), [])
+  const clear = useCallback(() => setLines([]), [])
+  /** Removes a line and returns an undo function */
+  const remove = useCallback((id) => {
+    let removed = null
+    let index = -1
+    setLines((prev) => {
+      const r = removeLine(prev, id)
+      removed = r.removed
+      index = r.index
+      return r.lines
     })
+    return () => removed && setLines((prev) => restoreLine(prev, removed, index))
   }, [])
-  const setQty = useCallback((productId, qty) => {
-    setItems((prev) => prev.map((i) => (i.productId === productId ? { ...i, qty: clampQty(qty) } : i)))
-  }, [])
-  const remove = useCallback((productId) => setItems((prev) => prev.filter((i) => i.productId !== productId)), [])
-  const clear = useCallback(() => setItems([]), [])
 
-  const value = useMemo(() => {
-    const pieces = items.reduce((s, i) => s + i.qty, 0)
-    const subtotal = items.reduce((s, i) => s + i.qty * i.price, 0)
-    return { items, pieces, subtotal, add, setQty, remove, clear, maxQty: MAX_QTY }
-  }, [items, add, setQty, remove, clear])
-
+  const value = useMemo(
+    () => ({ lines, count: cartCount(lines), subtotal: cartSubtotal(lines), add, update, setQty, remove, clear }),
+    [lines, add, update, setQty, remove, clear],
+  )
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
 

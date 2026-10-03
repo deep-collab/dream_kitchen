@@ -4,12 +4,18 @@ import { formatCallHours } from '../lib/hours'
 import Hero from '../components/home/Hero'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
+import { Link } from 'react-router-dom'
+import { useMenu } from '../context/MenuProvider'
+import ProductArt from '../components/art/ProductArt'
+
+const CATEGORY_ART = { 'brownie-tubs': 'tub', 'delight-boxes': 'delight-box', cookies: 'cookie-dip-tin', chocolates: 'assortment' }
 
 // Step 1: hero is final. The sections below are deliberately simple placeholders with
 // true content only; Step 4 builds the full home page (tiles, best sellers, spotlight…).
 export default function Home() {
   useSeo('home')
-  const { t } = useI18n()
+  const { t, pick } = useI18n()
+  const menu = useMenu()
   return (
     <>
       <Hero />
@@ -21,10 +27,20 @@ export default function Home() {
               {t('home.fresh.title')}
             </h2>
             <p className="t-lead mt-4 text-brown-2">{t('home.fresh.text')}</p>
-            <Button to="/shop" className="mt-8">
-              {t('home.fresh.cta')}
-            </Button>
           </div>
+          <ul className="mt-8 grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
+            {(menu?.categories || []).map((c, i) => (
+              <li key={c.id}>
+                <Link to={`/shop#${c.slug}`} className="group block rounded-card border border-line bg-[#fffcf5] p-2 transition-shadow hover:shadow-[0_6px_24px_-12px_rgb(42_29_22/0.35)]">
+                  <ProductArt kind={CATEGORY_ART[c.id]} variant={i} className="w-full" />
+                  <span className="flex min-h-12 items-center px-2 pt-2 text-[1.125rem] leading-snug font-bold group-hover:underline">{pick(c.name)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Button to="/shop" className="mt-8">
+            {t('home.fresh.cta')}
+          </Button>
         </Container>
       </section>
 

@@ -3,7 +3,8 @@ import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
 import { useAsync } from '../hooks/useAsync'
 import { getRecentOrder } from '../services'
-import { formatDate, formatPrice } from '../lib/format'
+import { formatDate } from '../lib/format'
+import { formatINR } from '../lib/pricing'
 import { orderWhatsAppUrl } from '../lib/whatsapp'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
@@ -33,7 +34,7 @@ export default function OrderSuccess() {
             <p className="mt-6">{t('success.text')}</p>
             <dl className="mx-auto mt-6 grid max-w-sm grid-cols-2 gap-2 text-left">
               <dt className="text-brown-2">{t('cart.total')}</dt>
-              <dd className="t-price text-right">{formatPrice(order.total)}</dd>
+              <dd className="t-price text-right">{formatINR(order.total)}</dd>
               <dt className="text-brown-2">{t('checkout.date')}</dt>
               <dd className="text-right font-bold">{formatDate(order.deliveryDate, lang)}</dd>
             </dl>

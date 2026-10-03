@@ -6,6 +6,7 @@ import Header from './Header'
 import NoticeStrip from './NoticeStrip'
 import Footer from './Footer'
 import MobileBar from './MobileBar'
+import CartAnnouncer from './CartAnnouncer'
 
 // Shell for every page. #dk-app is made inert while a sheet or the menu is open.
 export default function Layout() {
@@ -33,6 +34,7 @@ export default function Layout() {
       </main>
       <Footer />
       <MobileBar />
+      <CartAnnouncer />
     </div>
   )
 }

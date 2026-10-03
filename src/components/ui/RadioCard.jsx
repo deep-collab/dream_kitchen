@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import { formatPrice } from '../../lib/format'
+import { formatINR } from '../../lib/pricing'
 
 /**
  * Large tappable choice showing a label and its price (sizes and weights).
@@ -20,7 +20,7 @@ export function RadioCard({ name, value, checked, onChange, label, price, detail
           <span className="block leading-snug font-bold">{label}</span>
           {detail && <span className="t-small block text-brown-2">{detail}</span>}
         </span>
-        {price != null && <span className="t-price shrink-0">{formatPrice(price)}</span>}
+        {price != null && <span className="t-price shrink-0">{formatINR(price)}</span>}
       </span>
     </label>
   )

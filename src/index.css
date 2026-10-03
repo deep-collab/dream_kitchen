@@ -104,7 +104,10 @@
     background: var(--color-ink); /* overscroll areas match header and footer */
     -webkit-text-size-adjust: 100%;
     scroll-padding-top: calc(var(--header-h) + 16px);
-    scrollbar-gutter: stable;
+  }
+  /* Mouse users: reserve the scrollbar so sheets locking the page never shift it sideways */
+  @media (pointer: fine) and (min-width: 768px) {
+    html { scrollbar-gutter: stable; }
   }
   @media (prefers-reduced-motion: no-preference) {
     html { scroll-behavior: smooth; }
@@ -284,7 +287,7 @@
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   }
   .chip:hover { border-color: var(--color-brown-2); }
-  .chip[aria-pressed="true"], .chip[aria-checked="true"] { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-cream); }
+  .chip[aria-pressed="true"], .chip[aria-checked="true"], .chip.is-selected { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-cream); }
   .chip svg { width: 1.1em; height: 1.1em; }
 
   /* ---------- Card surface on light pages ---------- */
@@ -313,6 +316,10 @@
   50% { transform: translate3d(-3%, 2.5%, 0) rotate(-4deg); }
   100% { transform: translate3d(0, 0, 0) rotate(-8deg); }
 }
+@keyframes dk-toast-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
 @keyframes dk-twinkle {
   0%, 100% { opacity: 0.15; transform: scale(0.7); }
   50% { opacity: 0.9; transform: scale(1); }
@@ -322,6 +329,7 @@
 .dk-sparkle { opacity: 0.55; }
 @media (prefers-reduced-motion: no-preference) {
   .pop { animation: dk-pop 0.35s ease; }
+  .dk-toast { animation: dk-toast-in 0.25s var(--ease-out-soft); }
   .dk-drift { animation: dk-drift 48s ease-in-out infinite; will-change: transform; }
   .dk-sparkle { animation: dk-twinkle var(--dur, 6s) ease-in-out var(--delay, 0s) infinite; }
 }

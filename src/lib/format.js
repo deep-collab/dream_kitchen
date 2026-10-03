@@ -1,7 +1,5 @@
 const inr = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 })
 
-// ₹1,499 style, Indian digit grouping (1,00,000)
-export const formatPrice = (amount) => `₹${inr.format(amount)}`
 // "Rs 1,499" for WhatsApp text (plain characters, safe in every phone)
 export const formatRs = (amount) => `Rs ${inr.format(amount)}`
 
@@ -31,14 +29,3 @@ export function formatDate(iso, lang = 'en') {
   })
 }
 
-// Builds "100 g", "6 pcs · 480 g", "approx. 1.1 kg" using i18n strings
-export function formatWeight(weight, t) {
-  if (!weight) return ''
-  const parts = []
-  if (weight.pcs) parts.push(weight.pcs === 1 ? t('weight.pcsOne') : t('weight.pcs', { pcs: weight.pcs }))
-  if (weight.g) {
-    const mass = weight.g >= 1000 ? t('weight.kg', { kg: weight.g / 1000 }) : t('weight.g', { g: weight.g })
-    parts.push(weight.approx ? `${t('weight.approx')} ${mass}` : mass)
-  }
-  return parts.join(' · ')
-}

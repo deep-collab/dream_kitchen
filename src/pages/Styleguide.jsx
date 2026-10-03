@@ -18,6 +18,7 @@ import Sheet from '../components/ui/Sheet'
 import LanguageToggle from '../components/ui/LanguageToggle'
 import Wordmark from '../components/brand/Wordmark'
 import * as Icons from '../components/icons'
+import ProductArt, { ART_KINDS } from '../components/art/ProductArt'
 
 // Dev-only QA page (see App.jsx). Shows every component in English and Kannada.
 const SWATCHES = [
@@ -240,6 +241,17 @@ export default function Styleguide() {
           <Wordmark variant="stacked" size="sm" />
           <Wordmark variant="stacked" />
         </div>
+      </Section>
+
+      <Section title={t('styleguide.sections.art')}>
+        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {ART_KINDS.map((kind, i) => (
+            <li key={kind}>
+              <ProductArt kind={kind} variant={i} rounded="rounded-card" className="w-full" />
+              <span className="t-small mt-1 block text-brown-2">{kind}</span>
+            </li>
+          ))}
+        </ul>
       </Section>
 
       <Section title={t('styleguide.sections.icons')}>
