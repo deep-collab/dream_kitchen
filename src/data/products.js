@@ -9,31 +9,31 @@ export const categories = [
     id: 'chocolates',
     name: { en: 'Handmade Chocolates', kn: 'ಕೈಯಾರೆ ಮಾಡಿದ ಚಾಕೊಲೇಟ್‌ಗಳು' },
     blurb: { en: 'Bars, slabs and bites, tempered by hand.', kn: 'ಕೈಯಿಂದಲೇ ತಯಾರಿಸಿದ ಬಾರ್‌ಗಳು, ಸ್ಲ್ಯಾಬ್‌ಗಳು ಮತ್ತು ಬೈಟ್ಸ್.' },
-    image: '/products/dark-bar.svg',
+    image: '/products/placeholder.svg',
   },
   {
     id: 'brownies',
     name: { en: 'Brownies', kn: 'ಬ್ರೌನಿಗಳು' },
     blurb: { en: 'Fudgy, gooey and baked fresh to order.', kn: 'ಆರ್ಡರ್ ಬಂದ ಮೇಲೆಯೇ ಬೇಕ್ ಮಾಡುವ ಮೃದುವಾದ ಬ್ರೌನಿಗಳು.' },
-    image: '/products/walnut-brownie.svg',
+    image: '/products/placeholder.svg',
   },
   {
     id: 'truffles',
     name: { en: 'Truffles', kn: 'ಟ್ರಫಲ್‌ಗಳು' },
     blurb: { en: 'Silky centres in little gift boxes.', kn: 'ಪುಟ್ಟ ಉಡುಗೊರೆ ಬಾಕ್ಸ್‌ನಲ್ಲಿ ಮೃದುವಾದ ಟ್ರಫಲ್‌ಗಳು.' },
-    image: '/products/dark-truffles.svg',
+    image: '/products/placeholder.svg',
   },
   {
     id: 'hampers',
     name: { en: 'Gift Hampers', kn: 'ಉಡುಗೊರೆ ಹ್ಯಾಂಪರ್‌ಗಳು' },
     blurb: { en: 'Ready-to-gift baskets for every celebration.', kn: 'ಪ್ರತಿ ಸಂಭ್ರಮಕ್ಕೂ ಸಿದ್ಧವಾದ ಉಡುಗೊರೆ ಬುಟ್ಟಿಗಳು.' },
-    image: '/products/grand-hamper.svg',
+    image: '/products/placeholder.svg',
   },
   {
     id: 'custom',
     name: { en: 'Custom Boxes', kn: 'ನಿಮ್ಮಿಷ್ಟದ ಬಾಕ್ಸ್‌ಗಳು' },
     blurb: { en: 'Pick your favourites, add a name or a message.', kn: 'ನಿಮಗಿಷ್ಟವಾದದ್ದನ್ನು ಆರಿಸಿ, ಹೆಸರು ಅಥವಾ ಸಂದೇಶ ಸೇರಿಸಿ.' },
-    image: '/products/custom-box.svg',
+    image: '/products/placeholder.svg',
   },
 ]
 
@@ -50,7 +50,7 @@ export const products = [
     weight: { g: 100 },
     price: 199,
     tags: ['bestseller', 'eggless'],
-    image: '/products/dark-bar.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -65,7 +65,7 @@ export const products = [
     weight: { g: 150 },
     price: 349,
     tags: ['bestseller', 'eggless'],
-    image: '/products/rocher.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -80,7 +80,7 @@ export const products = [
     weight: { g: 200 },
     price: 299,
     tags: ['eggless'],
-    image: '/products/fruit-nut.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -95,7 +95,7 @@ export const products = [
     weight: { g: 80 },
     price: 249,
     tags: ['new', 'eggless'],
-    image: '/products/name-bar.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -110,7 +110,7 @@ export const products = [
     weight: { pcs: 1, g: 80 },
     price: 99,
     tags: ['bestseller'],
-    image: '/products/walnut-brownie.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -125,7 +125,7 @@ export const products = [
     weight: { pcs: 1, g: 80 },
     price: 119,
     tags: ['eggless'],
-    image: '/products/eggless-brownie.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -140,7 +140,7 @@ export const products = [
     weight: { pcs: 1, g: 90 },
     price: 139,
     tags: ['new'],
-    image: '/products/swirl-brownie.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -155,7 +155,7 @@ export const products = [
     weight: { pcs: 6, g: 480 },
     price: 599,
     tags: ['bestseller'],
-    image: '/products/brownie-box.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -170,7 +170,7 @@ export const products = [
     weight: { pcs: 9, g: 135 },
     price: 449,
     tags: ['bestseller', 'eggless'],
-    image: '/products/dark-truffles.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -185,7 +185,7 @@ export const products = [
     weight: { pcs: 6, g: 90 },
     price: 329,
     tags: ['new', 'eggless'],
-    image: '/products/coffee-truffles.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -200,7 +200,7 @@ export const products = [
     weight: { pcs: 6, g: 90 },
     price: 379,
     tags: ['eggless'],
-    image: '/products/rose-truffles.svg',
+    image: '/products/placeholder.svg',
     soldOut: true,
   },
   {
@@ -215,7 +215,7 @@ export const products = [
     weight: { g: 450, approx: true },
     price: 899,
     tags: [],
-    image: '/products/little-hamper.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -230,7 +230,7 @@ export const products = [
     weight: { g: 1100, approx: true },
     price: 1499,
     tags: ['bestseller'],
-    image: '/products/grand-hamper.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
   {
@@ -245,7 +245,7 @@ export const products = [
     weight: { pcs: 12, g: 200, approx: true },
     price: 699,
     tags: ['new', 'eggless'],
-    image: '/products/custom-box.svg',
+    image: '/products/placeholder.svg',
     soldOut: false,
   },
 ]
