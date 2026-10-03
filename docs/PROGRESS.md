@@ -47,18 +47,48 @@ Round 1 issues, all fixed:
 Final run: 0 sideways scroll, 0 clipped Kannada/English text in buttons, chips, tabs or the sheet footer, 0 targets under 48px. Keyboard: focus stays in the sheet for 40 Tabs, Esc closes it, focus returns to the card. Phone: swipe down and tap outside both close the sheet, and the bottom bar hides while it's open. Deep links highlight the right tab.
 
 Known and accepted for now:
-- Cart lines snapshot price and labels when added. If Hema changes a price, carts already open keep the old price until re-added. Stage B re-prices on the server when an order is placed.
-- The old checkout (Step 3 rebuilds it) still uses the old date rule; it now reads the v2 cart and sends each line's choices in English.
+- Cart lines snapshot price and labels when added. If Hema changes a price, carts already open keep the old price until re-added. Stage B re-prices on the server when an order is placed. (Resolved in Step 3: src/lib/reprice.js.)
+- The old checkout (Step 3 rebuilds it) still uses the old date rule; it now reads the v2 cart and sends each line's choices in English. (Resolved in Step 3.)
 - All Kannada (menu names, descriptions, UI) needs Hema's proofreading.
 
 ## Step 3: Checkout and ordering
-- [ ] 2-business-day dispatch rule (Mon–Sat), date picker with disabled dates + explanation
-- [ ] Karnataka pincode validation, checkout fields, payment note
-- [ ] Order ID DK-0001, itemised English WhatsApp message to 919535706956, success page
-- [ ] "Don't want to type?" call card, call-back form, voice message button
-- [ ] Track Order (Received → Confirmed → Preparing → Dispatched → Delivered)
-- [ ] Remove old bulk-order rule from site.js / orderRules.js
-- [ ] Re-validate cart line prices against the menu at checkout
+- [x] A. Price re-check: src/lib/reprice.js (changed price updated and flagged "Was ₹999, now ₹1,099"; removed, inactive, sold-out or changed choices flagged unavailable). CartProvider serves checked lines; cart and checkout show "Some prices have been updated" and block checkout until unavailable lines are removed (one tap, with Undo). Closes the Step 2 "known and accepted" item.
+- [x] B. Dispatch dates: src/lib/dates.js, always Indian time (Asia/Kolkata). Config in site.ordering: businessDays Mon–Sat, closedDates [], dispatchAfterBusinessDays 2, orderCutoffHour null (hook, tested, unused), dateChoices 10, maxDaysAhead 90
+- [x] C. Checkout rebuilt: call card at the top, your details, delivery address (address, area or city, Karnataka pincode), date chips (next 10 allowed dates, Earliest marked, Pick another date with min = earliest), pre-booking line, note (200), summary, payment line, Remember my details (on by default). Inline errors on blur and submit, focus to the first problem, polite announcement, aria-invalid/aria-describedby. Phone sticky bar: Call + "Send order on WhatsApp ₹<total>". Empty cart redirects to /cart with a message.
+- [x] D. Interim order ID DK-YYMMDD-XXXX (src/lib/orderId.js, CLAUDE.md note); src/lib/order.js builds the record; services.createOrder saves it on the phone; src/lib/whatsappMessage.js builds the English plain-text message; WhatsApp opens synchronously in the tap (src/lib/openWhatsApp.js)
+- [x] E. Order success /order/:id: big ID + Copy, "ready in WhatsApp" message (or "One more step" when the browser blocked the tab), fallback box (Open WhatsApp again, Copy order details, Call), 3 next steps, order details, Track this order, Continue shopping. Cart emptied once, only after the order is saved and the page loaded; refresh still shows the order.
+- [x] F. CallbackForm (phone, optional name, Morning/Afternoon/Evening) + VoiceMessageButton + CallOptions card, used in checkout, cart and the empty search state
+- [x] G. Track Order: ID + phone (prefilled from the URL), StatusTracker Received → Confirmed → Preparing → Dispatched → Delivered, not-found message with Call and WhatsApp; only services.getOrderStatus changes in Stage B
+- [x] H. Old checkout, old date rule (bulkThreshold), mockOrders, lib/whatsapp.js, lib/format.js, lib/orderRules.js and OrderSummary removed. All strings in en.json and kn.json; check-i18n now also checks runtime keys, en/kn parity, placeholders and emoji
+- [x] QA: 211 tests, build clean, screenshots docs/screenshots/step3 (360/390/768/1280 × EN/KN), whatsapp-samples.txt, critique + fixes below
+- [x] Committed locally (not pushed)
+
+### Step 3 self-critique log
+QA script: `node scripts/qa-step3.mjs` (dev server on port 5173; "now" is frozen with Playwright's clock, WhatsApp is stubbed so nothing leaves the machine). Report: docs/screenshots/step3/qa-report.json. Tests: `npm test`. Strings: `node scripts/check-i18n.mjs`.
+
+Bug found while testing (fixed): `Button` with variant "whatsapp" or "call" silently rendered its default link even when it was a submit button. The call-back form's "Send request" and the desktop "Send order on WhatsApp" would have opened a plain chat instead of submitting. It also affected the existing Contact enquiry form. The default link now applies only to plain buttons.
+
+Round 1 issues, all fixed:
+1. The top call card filled the whole first phone screen before the form began. Dropped its extra paragraph (the buttons say it all); the form starts one scroll sooner.
+2. The "Earliest" tag sat on top of the weekday text. Chips got top room and the tag is centred on the chip's edge.
+3. Kannada chips broke after the comma ("ಸೋಮ," / "12 ಅಕ್ಟೋಬರ್"). Chips now always show the weekday above the date, in both languages.
+4. Desktop: the summary column scrolled away, leaving half the screen blank beside the date and note sections. It is now sticky (and scrolls inside itself if a big order makes it taller than the screen).
+5. When a browser blocked the WhatsApp tab, the page still said "Your order is ready in WhatsApp". It now says "One more step: send your order on WhatsApp" and puts the Open WhatsApp box first.
+6. The "Was ₹999, now ₹1,099" pill was invisible on the champagne summary and unevenly spaced. Now an info-icon line with the old price struck through.
+7. Track Order at tablet width: three columns squeezed the hint and split the example ID across lines. Now two fields with the button below; the example ID uses non-breaking hyphens.
+8. Autofilled "+91 98450 12345" showed beside the fixed "+91" ("+91 +91 …"). Valid numbers are tidied to "98450 12345" on blur (checkout, call-back, track).
+9. After the empty-checkout redirect the notice repeated "Your cart is empty". It now explains the rule: checkout needs at least 1 item.
+10. QA capture fixes: full-page shots hide the fixed bars and scroll to the top first (they drew the bar and header mid-page), and every shot waits for the web fonts.
+
+Round 2 issue, fixed: on tablets the five Kannada step names ran into each other in the horizontal tracker. It stays vertical until 1024px.
+
+Final run: 0 sideways scroll, 0 clipped text, 0 targets under 48px across all screens and both languages. 88 link checks: every Call link is tel:+919535706956, every WhatsApp link wa.me/919535706956, and all 16 WhatsApp tabs opened during the run went to 919535706956. An empty submit focuses the name field, marks 5 fields aria-invalid plus the date group, and announces "Please fix 6 things. First: Enter your name." A sold-out item blocks sending and moves focus to the notice. Friday → chips start Monday 12 Oct; 11:30 pm IST Saturday on a phone set to Auckland (already Sunday there) → chips start Tuesday 13 Oct. Typing a Sunday in "Pick another date" says "We are closed on that day". The success page survives a refresh and the cart is empty afterwards.
+
+Known and accepted for now:
+- Stage A orders live only on the customer's phone, so Track Order shows "Received" for orders placed on this phone and the not-found message elsewhere. Stage B: Supabase RPC.
+- The native date input shows the browser's own date format (mm/dd/yyyy on an English-US desktop, dd/mm/yyyy on Indian phones).
+- The JS bundle grew by about 50 KB (new pages and strings in both languages). Step 5 can lazy-load kn.json and the checkout.
+- All new Kannada needs Hema's proofreading.
 
 ## Step 4: Classes, home, other pages, Kannada
 - [ ] Classes page + booking (CL-0001) + success + certification note

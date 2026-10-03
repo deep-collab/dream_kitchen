@@ -294,6 +294,8 @@ Mobile (360)                          Desktop (1280)
 
 **Overlay:** `Sheet` (bottom sheet below 768, side panel at 768 and up). Includes `role="dialog"`, `aria-modal`, focus trap, Esc to close, focus return, scroll lock, swipe-down to close, and hides the mobile bar. The `useModal` hook is shared with `MobileMenu`.
 
+**Ordering (Step 3):** `CallOptions` (Call, Request a call back, Send a voice message, call hours), `CallbackForm`, `VoiceMessageButton`, `DateChips` (radio chips, weekday over date, Earliest tag, Pick another date), `CheckoutBar` (phones: Call + Send order on WhatsApp, replaces the bottom bar on /checkout), `CartNotices`, `LineStatus`, `SummaryLines`, `StatusTracker` (numbered because it is a real sequence; vertical below 1024px)
+
 **Icons:** lucide-react at 1.75 stroke through `components/icons.jsx`, plus custom `WhatsAppIcon` and `InstagramIcon` glyphs. No emoji.
 
 **Dev:** the `/styleguide` route (dev builds only, `noindex`, not in the sitemap)
