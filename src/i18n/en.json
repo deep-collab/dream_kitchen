@@ -72,11 +72,11 @@
     },
     "checkout": {
       "title": "Checkout | Dream Kitchen",
-      "desc": "Enter delivery details and send your order on WhatsApp."
+      "desc": "Enter your delivery details, pick a date and send your order on WhatsApp."
     },
     "success": {
-      "title": "Order placed | Dream Kitchen",
-      "desc": "Thank you for your order."
+      "title": "Your order | Dream Kitchen",
+      "desc": "Your Dream Kitchen order is ready to send on WhatsApp."
     },
     "notFound": {
       "title": "Page not found | Dream Kitchen",
@@ -152,79 +152,183 @@
     "note": "Note",
     "bars": "Bars",
     "deliveryKarnataka": "Delivery (Karnataka)",
-    "prebook": "Orders are dispatched after {days} business days.",
     "addMore": "Add more items",
     "callTitle": "Call to order instead",
     "callText": "Would you rather talk? Call Hema and she will take your order on the phone.",
     "emptyTitle": "Your cart is empty",
     "emptyText": "Brownie tubs, delight boxes, cookies and chocolates, all made fresh for you. Have a look, or call and order on the phone.",
-    "countLineOne": "1 item"
+    "countLineOne": "1 item",
+    "pricesUpdated": "Some prices have been updated",
+    "pricesUpdatedText": "Hema has changed some prices since you added these items. The new prices are shown below and will be used for your order.",
+    "priceWas": "Was {old}",
+    "priceNow": "now {new}",
+    "unavailableTitleOne": "1 item can’t be ordered right now",
+    "unavailableTitle": "{count} items can’t be ordered right now",
+    "unavailableText": "Remove it to continue. To ask when it’s back, call or WhatsApp Hema.",
+    "unavailableTextMany": "Remove them to continue. To ask when they’re back, call or WhatsApp Hema.",
+    "removeUnavailableOne": "Remove the unavailable item",
+    "removeUnavailable": "Remove {count} unavailable items",
+    "unavailable": {
+      "removed": "No longer on the menu",
+      "soldOut": "Sold out for now",
+      "changed": "A choice you made is no longer offered. Remove this and add it again."
+    },
+    "checkoutBlocked": "Remove the unavailable items above to continue.",
+    "checkoutEmpty": "Checkout needs at least 1 item. Add something sweet first, or call and order on the phone."
   },
   "checkout": {
-    "title": "Delivery details",
-    "subtitle": "Fill this in and we'll open WhatsApp with your order ready to send.",
-    "name": "Full name",
-    "phone": "Phone number",
-    "phoneHint": "10-digit mobile number",
-    "address": "Delivery address",
-    "addressHint": "House, street, area, city",
-    "pincode": "Pincode",
-    "pincodeHint": "We deliver all over Karnataka",
-    "date": "Delivery date",
-    "dateHint": "Earliest: {date}",
-    "note": "Note",
-    "notePlaceholder": "e.g. Message on the gift box: Happy Birthday Amma!",
-    "submit": "Place order on WhatsApp",
-    "submitting": "Placing order…",
-    "fixErrors": "Please fix the highlighted fields.",
-    "errors": {
-      "name": "Please enter your name.",
-      "phone": "Enter a valid 10-digit Indian mobile number.",
-      "address": "Please enter your full address.",
-      "pincode": "Enter a 6-digit Karnataka pincode (starts with 56, 57, 58 or 59).",
-      "date": "Please choose a delivery date.",
-      "dateTooSoon": "Please pick {date} or later.",
-      "dateTooFar": "Please choose a date within the next {days} days."
+    "title": "Checkout",
+    "subtitle": "Tell us where to deliver, pick a date, and send your order to Hema on WhatsApp.",
+    "sections": {
+      "details": "Your details",
+      "address": "Delivery address",
+      "date": "Preferred date",
+      "note": "Note for Hema",
+      "summary": "Order summary",
+      "payment": "Payment"
     },
-    "emptyCart": "Your cart is empty. Add something sweet first!"
+    "name": "Your name",
+    "phone": "Mobile number",
+    "phoneHint": "Hema will confirm your order on WhatsApp on this number.",
+    "address": "Address",
+    "addressHint": "House or flat number, street and a landmark",
+    "area": "Area or city",
+    "areaHint": "For example: Jayanagar, Bengaluru",
+    "pincode": "Pincode",
+    "pincodeHint": "We deliver within Karnataka.",
+    "dateLegend": "Choose a date",
+    "dateHint": "The earliest date is {date}. We are closed on Sundays.",
+    "earliest": "Earliest",
+    "otherDate": "Pick another date",
+    "otherDateLabel": "Your date",
+    "otherDateHint": "Any day from {date}, except Sundays.",
+    "prebook": "Pre-booking only. Orders are dispatched after {days} business days. Hema will confirm the exact delivery date on WhatsApp.",
+    "noteLabel": "Anything Hema should know?",
+    "noteHint": "For example: please call before delivering.",
+    "noteCount": "{count} of {max} letters",
+    "itemsOne": "1 item",
+    "items": "{count} items",
+    "changeItems": "Change items",
+    "payment": "No payment now. Hema will confirm your order on WhatsApp and share UPI details.",
+    "remember": "Remember my details on this phone",
+    "rememberHint": "Your name, number and address stay only on this phone, ready for next time.",
+    "submit": "Send order on WhatsApp {price}",
+    "checkingPrices": "Checking today’s prices…",
+    "call": "Call",
+    "fixOne": "Please fix 1 thing: {first}",
+    "fixMany": "Please fix {count} things. First: {first}",
+    "errors": {
+      "name": {
+        "required": "Enter your name."
+      },
+      "phone": {
+        "required": "Enter your mobile number so Hema can confirm your order.",
+        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
+      },
+      "address": {
+        "required": "Enter your address: house or flat number, street and a landmark.",
+        "short": "Add a little more to your address: house or flat number, street and a landmark."
+      },
+      "area": {
+        "required": "Enter your area or city."
+      },
+      "pincode": {
+        "required": "Enter your 6-digit pincode.",
+        "format": "A pincode has 6 digits, like 560001.",
+        "outside": "We deliver within Karnataka only. Pincodes start with 56, 57, 58 or 59."
+      },
+      "date": {
+        "required": "Choose a date for your order.",
+        "invalid": "That date isn’t valid. Choose one of the dates above.",
+        "tooSoon": "That date is too soon. The earliest is {date}.",
+        "closed": "We are closed on that day. Please choose another date.",
+        "tooFar": "Choose a date within the next {days} days."
+      },
+      "note": {
+        "long": "Please keep your note to {max} letters."
+      }
+    }
   },
   "success": {
-    "title": "Thank you! Your order is placed",
+    "title": "Your order is ready in WhatsApp",
+    "lead": "Tap Send to confirm it with Hema.",
     "orderId": "Your order ID",
-    "text": "WhatsApp should have opened with your order. Please press send so Hema receives it. She'll confirm and share UPI details there.",
-    "notOpened": "WhatsApp didn't open?",
-    "sendAgain": "Send order on WhatsApp",
-    "track": "Track your order",
-    "saveId": "Save this ID to track your order later.",
-    "missing": "We couldn't find this order on this device."
+    "copy": "Copy",
+    "copyLabel": "Copy order ID {id}",
+    "copied": "Order ID copied",
+    "saveId": "Keep this ID to track your order.",
+    "fallbackTitle": "WhatsApp didn’t open?",
+    "fallbackText": "Open it again, or copy your order and paste it into WhatsApp. You can also call and we’ll take it on the phone.",
+    "openAgain": "Open WhatsApp again",
+    "copyDetails": "Copy order details",
+    "detailsCopied": "Order details copied. Paste them into WhatsApp.",
+    "copyFailed": "This phone did not allow copying. Please use Open WhatsApp again.",
+    "nextTitle": "What happens next",
+    "steps": {
+      "confirm": {
+        "title": "Hema confirms on WhatsApp",
+        "text": "She checks your order and replies to your message."
+      },
+      "pay": {
+        "title": "You pay by UPI",
+        "text": "She shares the UPI details. Nothing is paid on this website."
+      },
+      "dispatch": {
+        "title": "Dispatched after {days} business days",
+        "text": "Your order is made fresh, then sent to you. Hema confirms the delivery date."
+      }
+    },
+    "yourOrder": "Your order",
+    "preferredDate": "Preferred date",
+    "deliverTo": "Deliver to",
+    "track": "Track this order",
+    "missingTitle": "We couldn’t find this order on this phone",
+    "missingText": "If you placed it on another phone, look there. For help, call or WhatsApp Dream Kitchen.",
+    "blockedTitle": "One more step: send your order on WhatsApp",
+    "blockedLead": "WhatsApp did not open by itself. Tap the green button below to send your order to Hema."
   },
   "track": {
     "title": "Track your order",
-    "subtitle": "Enter your order ID and the phone number you used.",
+    "subtitle": "Enter your order ID and the mobile number you ordered with.",
     "orderId": "Order ID",
-    "orderIdPlaceholder": "DK-0001",
-    "phone": "Phone number",
+    "orderIdHint": "It starts with DK, like DK‑261007‑7Q4M. You’ll find it in your WhatsApp order.",
+    "phone": "Mobile number",
     "submit": "Check status",
-    "notFound": "We couldn't find an order with that ID and phone number. Please check and try again.",
-    "invalid": "Please enter an order ID like DK-0001 and a 10-digit phone number.",
+    "checking": "Checking…",
+    "errors": {
+      "orderId": {
+        "required": "Enter your order ID.",
+        "invalid": "Order IDs look like DK‑261007‑7Q4M. Please check and try again."
+      },
+      "phone": {
+        "required": "Enter the mobile number you ordered with.",
+        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
+      }
+    },
     "statusFor": "Order {id}",
-    "deliveryOn": "Delivery date: {date}",
-    "demo": "Demo: try DK-0101 or DK-0102 with phone 9876543210.",
+    "placedOn": "Placed on {date}",
+    "preferred": "Preferred date: {date}",
+    "progress": "Order progress",
+    "current": "Current status: {status}",
+    "stepDone": "done",
+    "stepNow": "current step",
+    "stepNext": "not yet",
     "steps": {
       "received": "Received",
       "confirmed": "Confirmed",
       "preparing": "Preparing",
-      "out_for_delivery": "Out for delivery",
+      "dispatched": "Dispatched",
       "delivered": "Delivered"
     },
     "stepText": {
-      "received": "We've got your order!",
-      "confirmed": "Payment confirmed — thank you!",
-      "preparing": "Hema is making your treats.",
-      "out_for_delivery": "Your box is on its way.",
+      "received": "Your order has reached Dream Kitchen.",
+      "confirmed": "Hema has confirmed your order and payment.",
+      "preparing": "Your treats are being made fresh.",
+      "dispatched": "Your order is on its way.",
       "delivered": "Delivered. Enjoy every bite!"
     },
-    "current": "Current status"
+    "receivedHelp": "Hema will confirm your order on WhatsApp. For updates, call or WhatsApp Dream Kitchen.",
+    "notFound": "We couldn’t find this order on this phone. For updates, call or WhatsApp Dream Kitchen."
   },
   "about": {
     "title": "Our story",
@@ -274,7 +378,7 @@
     "items": [
       {
         "q": "How do I place an order?",
-        "a": "Add treats to your cart, fill in your delivery details and tap \"Place order on WhatsApp\". WhatsApp opens with your full order ready — just press send. Hema will reply to confirm."
+        "a": "Add treats to your cart, fill in your delivery details, pick a date and tap \"Send order on WhatsApp\". WhatsApp opens with your full order ready. Just press send, and Hema will reply to confirm. Prefer not to type? Call us and we’ll take your order on the phone."
       },
       {
         "q": "How early should I order?",
@@ -465,5 +569,72 @@
     "cheaperHint": "These 3 bars cost {amount} bought separately, which is less than the {price} combo.",
     "addIndividually": "Add these individually for {amount}",
     "pickMore": "Pick {count} more to continue."
+  },
+  "dates": {
+    "weekdays": [
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat"
+    ],
+    "months": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "format": "{weekday}, {day} {month}",
+    "formatYear": "{weekday}, {day} {month} {year}"
+  },
+  "callOptions": {
+    "checkoutTitle": "Don’t want to type? Call us and we’ll take your order.",
+    "searchTitle": "Can’t find it? Talk to Hema",
+    "call": "Call Dream Kitchen",
+    "requestCallback": "Request a call back",
+    "voice": "Send a voice message",
+    "voiceHelp": "Tap the mic in WhatsApp to send a voice message."
+  },
+  "callback": {
+    "title": "Request a call back",
+    "intro": "Leave your number and Hema will call you. That’s all you need to type.",
+    "phone": "Your mobile number",
+    "name": "Your name",
+    "time": "Best time to call",
+    "times": {
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "when": {
+      "morning": "in the morning",
+      "afternoon": "in the afternoon",
+      "evening": "in the evening"
+    },
+    "timeHint": "Tap one if you like. Tap again to clear.",
+    "submit": "Send request on WhatsApp",
+    "doneTitle": "Your request is ready in WhatsApp",
+    "doneText": "Tap Send in WhatsApp. Hema will call you on {phone}.",
+    "doneTextWhen": "Tap Send in WhatsApp. Hema will call you on {phone} {when}.",
+    "notOpened": "WhatsApp didn’t open?",
+    "openAgain": "Open WhatsApp again",
+    "callNow": "Or call now",
+    "done": "Done",
+    "errors": {
+      "phone": {
+        "required": "Enter your mobile number so Hema can call you back.",
+        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
+      }
+    }
   }
 }

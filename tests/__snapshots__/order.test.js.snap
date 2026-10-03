@@ -1,0 +1,45 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`orderMessage > snapshots of all three samples > combo 1`] = `
+"New order: DK-261005-7Q4M
+Name: Asha Rao | Phone: +91 98450 12345
+Items:
+1) Chocolate Bars combo – 3 bars × 1 – ₹699
+   Bars: Walnut White Chocolate, Coconut Bar, Coconut Bar
+2) Triple Layer Chocolate (Classic Favourites) – 1kg × 1 – ₹1,300
+3) Colour Blast Bar × 3 – ₹450
+   Flavour: Coffee
+Subtotal: ₹2,449 | Delivery: ₹50 | Total: ₹2,499
+Preferred date: Wed, 7 Oct 2026
+Address: 12, 3rd Cross, Jayanagar 4th Block, Bengaluru, Pincode 560011
+Please confirm my order and share UPI details."
+`;
+
+exports[`orderMessage > snapshots of all three samples > name-occasion-note 1`] = `
+"New order: DK-261005-7Q4M
+Name: Asha Rao | Phone: +91 98450 12345
+Items:
+1) Ferrero Rocher Nutella (Brownie Tub) – 500g × 1 – ₹1,099
+   Name on box: Asha (+₹100)
+   Occasion: Birthday
+   Note: Less sweet please
+2) Dreamy Biscoff Delight (Delight Box) – 250g × 2 – ₹1,300
+   Flavour: Mango
+   Name on box: Ravi (+₹100 each)
+Subtotal: ₹2,399 | Delivery: ₹50 | Total: ₹2,449
+Preferred date: Wed, 7 Oct 2026
+Address: 12, 3rd Cross, Jayanagar 4th Block, Bengaluru, Pincode 560011
+Note for Hema: Please call before delivering. Gate code 4512.
+Please confirm my order and share UPI details."
+`;
+
+exports[`orderMessage > snapshots of all three samples > simple 1`] = `
+"New order: DK-261005-7Q4M
+Name: Asha Rao | Phone: +91 98450 12345
+Items:
+1) Oreo Overload (Brownie Tub) – 250g × 1 – ₹399
+Subtotal: ₹399 | Delivery: ₹50 | Total: ₹449
+Preferred date: Wed, 7 Oct 2026
+Address: 12, 3rd Cross, Jayanagar 4th Block, Bengaluru, Pincode 560011
+Please confirm my order and share UPI details."
+`;

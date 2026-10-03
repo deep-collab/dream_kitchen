@@ -11,6 +11,8 @@
  * @property {string} id
  * @property {I18nText|null} name   null = the category has a single, untitled section
  * @property {I18nText|null} intro
+ * @property {I18nText|null} itemLabel  what one item is called in the WhatsApp order, e.g.
+ *                                      "Ferrero Rocher Nutella (Brownie Tub)". null = the name says it.
  */
 
 /**
@@ -55,7 +57,7 @@ export const categories = [
       { en: 'Perfect for midnight cravings', kn: 'ಮಧ್ಯರಾತ್ರಿಯ ಬಯಕೆಗಳಿಗೆ ಸೂಕ್ತ' },
     ],
     slogan: { en: 'One Spoon. One Bite. And You’ll Want More!', kn: 'ಒಂದು ಚಮಚ. ಒಂದು ತುತ್ತು. ಮತ್ತೆ ಮತ್ತೆ ಬೇಕೆನಿಸುತ್ತದೆ!' },
-    sections: [{ id: 'brownie-tubs', name: null, intro: null }],
+    sections: [{ id: 'brownie-tubs', name: null, intro: null, itemLabel: { en: 'Brownie Tub', kn: 'ಬ್ರೌನಿ ಟಬ್' } }],
   },
   {
     id: 'delight-boxes',
@@ -69,16 +71,19 @@ export const categories = [
         id: 'dreamy-biscoff',
         name: { en: 'Dreamy Biscoff Delight', kn: 'ಡ್ರೀಮಿ Biscoff ಡಿಲೈಟ್' },
         intro: null, // her line "Perfect for personal cravings & gifting!" lives on the product
+        itemLabel: { en: 'Delight Box', kn: 'ಡಿಲೈಟ್ ಬಾಕ್ಸ್' },
       },
       {
         id: 'premium-delight',
         name: { en: 'Premium Delight Box (250g)', kn: 'ಪ್ರೀಮಿಯಂ ಡಿಲೈಟ್ ಬಾಕ್ಸ್ (250 ಗ್ರಾಂ)' },
         intro: null,
+        itemLabel: { en: 'Premium Delight Box', kn: 'ಪ್ರೀಮಿಯಂ ಡಿಲೈಟ್ ಬಾಕ್ಸ್' },
       },
       {
         id: 'best-sellers',
         name: { en: 'Our best sellers', kn: 'ನಮ್ಮ ಹೆಚ್ಚು ಮಾರಾಟವಾಗುವವು' },
         intro: null,
+        itemLabel: { en: 'Delight Box', kn: 'ಡಿಲೈಟ್ ಬಾಕ್ಸ್' },
       },
     ],
   },
@@ -88,7 +93,7 @@ export const categories = [
     sort: 3,
     name: { en: 'Cookies', kn: 'ಕುಕೀಸ್' },
     intro: null,
-    sections: [{ id: 'cookies', name: null, intro: null }],
+    sections: [{ id: 'cookies', name: null, intro: null, itemLabel: null }],
   },
   {
     id: 'chocolates',
@@ -97,9 +102,9 @@ export const categories = [
     name: { en: 'Chocolates', kn: 'ಚಾಕೊಲೇಟ್‌ಗಳು' },
     intro: null,
     sections: [
-      { id: 'colour-blast', name: { en: 'Colour Blast Bars', kn: 'ಕಲರ್ ಬ್ಲಾಸ್ಟ್ ಬಾರ್‌ಗಳು' }, intro: null },
-      { id: 'chocolate-bars', name: { en: 'Chocolate Bars', kn: 'ಚಾಕೊಲೇಟ್ ಬಾರ್‌ಗಳು' }, intro: null },
-      { id: 'classic-favourites', name: { en: 'Classic Favourites', kn: 'ಕ್ಲಾಸಿಕ್ ಫೇವರಿಟ್ಸ್' }, intro: null },
+      { id: 'colour-blast', name: { en: 'Colour Blast Bars', kn: 'ಕಲರ್ ಬ್ಲಾಸ್ಟ್ ಬಾರ್‌ಗಳು' }, intro: null, itemLabel: null },
+      { id: 'chocolate-bars', name: { en: 'Chocolate Bars', kn: 'ಚಾಕೊಲೇಟ್ ಬಾರ್‌ಗಳು' }, intro: null, itemLabel: { en: 'Chocolate Bar', kn: 'ಚಾಕೊಲೇಟ್ ಬಾರ್' } },
+      { id: 'classic-favourites', name: { en: 'Classic Favourites', kn: 'ಕ್ಲಾಸಿಕ್ ಫೇವರಿಟ್ಸ್' }, intro: null, itemLabel: { en: 'Classic Favourites', kn: 'ಕ್ಲಾಸಿಕ್ ಫೇವರಿಟ್ಸ್' } },
     ],
   },
 ]

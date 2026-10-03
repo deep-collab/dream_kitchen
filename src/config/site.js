@@ -20,29 +20,25 @@ export const site = {
   // Call hours, 24-hour clock. PLACEHOLDER until Hema confirms.
   hours: { opens: 10, closes: 20, days: 'monSat' },
 
-  // Pre-booking: dispatch after N business days (Mon–Sat)
+  // Pre-booking rules (src/lib/dates.js). Dates are always worked out in Indian time,
+  // whatever time zone the customer's phone is set to.
   ordering: {
-    dispatchBusinessDays: 2,
-    businessDays: [1, 2, 3, 4, 5, 6], // 0 = Sunday
+    timeZone: 'Asia/Kolkata',
+    businessDays: [1, 2, 3, 4, 5, 6], // Monday to Saturday (0 = Sunday)
+    closedDates: [], // Hema's holidays as 'YYYY-MM-DD', e.g. '2026-11-01'. Skipped like Sundays.
+    dispatchAfterBusinessDays: 2, // earliest date = this many business days after today
+    orderCutoffHour: null, // hook only, unused for now: e.g. 18 = orders after 6 pm count from tomorrow
+    dateChoices: 10, // date chips shown at checkout
+    maxDaysAhead: 90, // furthest preferred date, in calendar days
   },
 
   delivery: {
-    charge: 50, // PLACEHOLDER
+    charge: 50, // PLACEHOLDER: flat charge across Karnataka
     pincodePattern: /^5[6-9]\d{4}$/, // Karnataka pincodes start with 56, 57, 58 or 59
   },
 
   fssai: '', // PLACEHOLDER: 14-digit licence, shown in the footer once filled
   shelfLife: '', // PLACEHOLDER
-
-  // LEGACY (old sample checkout, replaced in Step 3). Do not build on these.
-  order: {
-    minPieces: 1,
-    bulkThreshold: 6,
-    bulkMinDaysAhead: 2,
-    standardMinDaysAhead: 1,
-    maxDaysAhead: 60,
-    idPrefix: 'DK-',
-  },
 }
 
 export const telLink = `tel:${site.phone.tel}`

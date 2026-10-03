@@ -9,7 +9,8 @@ import { PhoneIcon, WhatsAppIcon } from '../icons'
  *   tone:    'dark' when sitting on black (or wrap the area in .on-dark)
  *   size:    md | lg
  * Renders <Link> for `to`, <a> for `href`, otherwise <button>.
- * `call` defaults to tel:+919535706956 and `whatsapp` to the general chat link.
+ * `call` defaults to tel:+919535706956 and `whatsapp` to the general chat link, unless
+ * the button submits a form or has an onClick.
  */
 export default function Button({
   variant = 'primary',
@@ -47,9 +48,12 @@ export default function Button({
     )
   }
 
+  // call / whatsapp default to their links only when the button has no other job
+  // (a submit button or one with onClick stays a <button>)
   let link = href
-  if (!link && variant === 'call') link = telLink
-  if (!link && variant === 'whatsapp') link = waLink(t('wa.general'))
+  const plain = type === 'button' && !props.onClick
+  if (!link && plain && variant === 'call') link = telLink
+  if (!link && plain && variant === 'whatsapp') link = waLink(t('wa.general'))
   if (link) {
     const external = /^https?:/.test(link)
     return (

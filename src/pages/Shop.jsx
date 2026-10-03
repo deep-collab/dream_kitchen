@@ -4,7 +4,7 @@ import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
 import { useMenu } from '../context/MenuProvider'
 import Container from '../components/ui/Container'
-import Button from '../components/ui/Button'
+import CallOptions from '../components/contact/CallOptions'
 import ProductCard from '../components/shop/ProductCard'
 import ComboCard from '../components/shop/ComboCard'
 import { CheckIcon, CloseIcon, SearchIcon } from '../components/icons'
@@ -279,13 +279,7 @@ function SearchResults({ results, query }) {
           {count === 1 ? t('shop.resultsOne', { query: query.trim() }) : t('shop.results', { count, query: query.trim() })}
         </h2>
         {count === 0 ? (
-          <div className="mt-6 max-w-[36rem] rounded-card border border-line bg-champagne p-6">
-            <p className="t-lead">{t('shop.empty')}</p>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              <Button variant="call">{t('mobileMenu.callUs')}</Button>
-              <Button variant="whatsapp">{t('mobileMenu.chat')}</Button>
-            </div>
-          </div>
+          <CallOptions variant="feature" as="h3" className="mt-6 max-w-[40rem]" title={t('callOptions.searchTitle')} text={t('shop.empty')} />
         ) : (
           <ul className="mt-6 grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
             {results.combos.map((cb) => (

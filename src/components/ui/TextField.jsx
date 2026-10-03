@@ -62,5 +62,5 @@ export default function TextField({ id, label, hint, error, optional = false, as
 
 // 10-digit Indian mobile: number keypad, phone autofill, +91 shown as a fixed prefix.
 export function PhoneField(props) {
-  return <TextField type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={14} placeholder="98765 43210" prefix="+91" {...props} />
+  return <TextField type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={16} placeholder="98765 43210" prefix="+91" {...props} />
 }

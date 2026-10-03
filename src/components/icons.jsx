@@ -5,34 +5,40 @@ import {
   ArrowLeft,
   BookOpen,
   CalendarClock,
+  CalendarDays,
   Check,
   ChefHat,
   ChevronDown,
   CircleAlert,
   CircleHelp,
   Clock,
+  Copy,
   Egg,
   Gift,
   Hand,
   Heart,
   House,
   Images,
+  Info,
   Languages,
   Leaf,
   Mail,
   MapPin,
   Menu,
   MessagesSquare,
+  Mic,
   Minus,
   Package,
   PackageSearch,
   Phone,
+  PhoneIncoming,
   Plus,
   Search,
   ShoppingBag,
   Store,
   Trash2,
   Truck,
+  Wallet,
   X,
 } from 'lucide-react'
 
@@ -76,6 +82,12 @@ export const ChefIcon = make(ChefHat)
 export const TruckIcon = make(Truck)
 export const ArrowLeftIcon = make(ArrowLeft)
 export const AlertIcon = make(CircleAlert)
+export const MicIcon = make(Mic)
+export const CopyIcon = make(Copy)
+export const CallbackIcon = make(PhoneIncoming)
+export const DateIcon = make(CalendarDays)
+export const InfoIcon = make(Info)
+export const WalletIcon = make(Wallet)
 
 // WhatsApp mark, drawn as a clean filled glyph (speech bubble + handset)
 export function WhatsAppIcon({ className = 'h-6 w-6', ...props }) {

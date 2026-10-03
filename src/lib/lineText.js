@@ -14,11 +14,14 @@ export function lineChoices(line, { t, pick }) {
   return out
 }
 
-/** One-line English description (order messages always go to Hema in English). */
-export function lineTextEn(line) {
-  if (line.kind === 'combo') return `${line.name.en}: ${line.pickNames.map((n) => n.en).join(', ')}`
-  const s = line.selection
-  const bits = [line.labels.size?.en, line.labels.flavour?.en, s.nameOn ? `Name on box: "${s.name}"` : null, line.labels.occasion?.en, s.note ? `Note: ${s.note}` : null].filter(Boolean)
-  const section = line.sectionName?.en ? ` (${line.sectionName.en})` : ''
-  return `${line.name.en}${section}${bits.length ? `, ${bits.join(', ')}` : ''}`
+/** The same for an item of a saved order (src/lib/order.js), for the success page. */
+export function orderItemChoices(item, { t, pick }) {
+  if (item.kind === 'combo') return [{ key: 'bars', label: t('cart.bars'), value: item.bars.map((n) => pick(n)).join(', ') }]
+  const out = []
+  if (item.size) out.push({ key: 'size', label: t('cart.size'), value: pick(item.size) })
+  if (item.flavour) out.push({ key: 'flavour', label: t('customise.flavour'), value: pick(item.flavour) })
+  if (item.nameOnBox) out.push({ key: 'name', label: t('cart.nameOnBox'), value: `“${item.nameOnBox}”` })
+  if (item.occasion) out.push({ key: 'occasion', label: t('customise.occasion'), value: pick(item.occasion) })
+  if (item.note) out.push({ key: 'note', label: t('cart.note'), value: item.note })
+  return out
 }

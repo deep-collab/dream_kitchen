@@ -13,15 +13,15 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <I18nProvider>
-        <CartProvider>
-          <MenuProvider>
+        <MenuProvider>
+          <CartProvider>
             <ToastProvider>
               <ShopSheetsProvider>
                 <App />
               </ShopSheetsProvider>
             </ToastProvider>
-          </MenuProvider>
-        </CartProvider>
+          </CartProvider>
+        </MenuProvider>
       </I18nProvider>
     </BrowserRouter>
   </StrictMode>,

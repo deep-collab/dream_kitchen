@@ -9,7 +9,7 @@ export default function NoticeStrip() {
     <div className="border-b border-ink-line bg-ink text-muted">
       <p className="dk-container t-small flex items-center justify-center gap-2.5 py-2.5 text-center">
         <CalendarIcon className="h-5 w-5 shrink-0 text-gold" />
-        <span>{t('notice.prebook', { days: site.ordering.dispatchBusinessDays })}</span>
+        <span>{t('notice.prebook', { days: site.ordering.dispatchAfterBusinessDays })}</span>
       </p>
     </div>
   )

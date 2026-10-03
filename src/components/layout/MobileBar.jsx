@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
 import { useCart } from '../../context/CartProvider'
 import { useAnyOverlayOpen } from '../../hooks/useModal'
@@ -8,10 +8,13 @@ import CartCount from './CartCount'
 
 // Phones only (<768px): three equal labelled buttons, always within thumb reach.
 // Hidden while a sheet or the menu is open. Layout pads the page so it never covers content.
+// Checkout shows its own bar instead (Call + "Send order on WhatsApp ₹…").
 export default function MobileBar() {
   const { t } = useI18n()
   const { count: pieces } = useCart()
   const hidden = useAnyOverlayOpen()
+  const { pathname } = useLocation()
+  if (pathname === '/checkout') return null
   const item =
     'flex h-full flex-col items-center justify-center gap-1 px-1 text-center text-base leading-tight font-bold text-cream transition-colors active:bg-white/10'
 

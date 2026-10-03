@@ -10,6 +10,7 @@
  * @property {string} categoryId
  * @property {string} sectionId
  * @property {{en:string,kn:string}} name
+ * @property {{en:string,kn:string}} itemLabel  what the combo is called in the WhatsApp order
  * @property {number} pick                how many items the customer chooses
  * @property {number} price
  * @property {string[]} eligibleProductIds
@@ -25,6 +26,7 @@ export const combos = [
     categoryId: 'chocolates',
     sectionId: 'chocolate-bars',
     name: { en: 'Pick any 3 bars for ₹699', kn: 'ಯಾವುದೇ 3 ಬಾರ್‌ಗಳು ₹699ಕ್ಕೆ' },
+    itemLabel: { en: 'Chocolate Bars combo', kn: 'ಚಾಕೊಲೇಟ್ ಬಾರ್ ಕಾಂಬೊ' },
     pick: 3,
     price: 699,
     eligibleProductIds: [

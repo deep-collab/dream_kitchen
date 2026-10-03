@@ -47,14 +47,15 @@
  * @property {OptionGroup[]} optionGroups
  */
 
-const g = (grams) => ({ en: grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`, kn: grams >= 1000 ? `${grams / 1000} ಕೆ.ಜಿ` : `${grams} ಗ್ರಾಂ` })
+/** 250 -> { en: '250g', kn: '250 ಗ್ರಾಂ' }, 1000 -> 1kg. Also labels fixed-weight items in orders. */
+export const weightLabel = (grams) => ({ en: grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`, kn: grams >= 1000 ? `${grams / 1000} ಕೆ.ಜಿ` : `${grams} ಗ್ರಾಂ` })
 
 /** Size group from [grams, price] pairs, in the order she lists them */
 const sizes = (...pairs) => ({
   id: 'size',
   type: 'single',
   required: true,
-  choices: pairs.map(([grams, price]) => ({ id: grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`, label: g(grams), price, grams })),
+  choices: pairs.map(([grams, price]) => ({ id: grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`, label: weightLabel(grams), price, grams })),
 })
 
 /** Flavour group (no extra cost on any of her flavours) */

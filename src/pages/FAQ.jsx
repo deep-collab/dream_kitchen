@@ -10,7 +10,7 @@ export default function FAQ() {
   useSeo('faq')
   const { t } = useI18n()
   const items = t('faq.items')
-  const vars = { charge: site.delivery.charge, days: site.ordering.dispatchBusinessDays }
+  const vars = { charge: site.delivery.charge, days: site.ordering.dispatchAfterBusinessDays }
   const fill = (s) => s.replace(/\{(\w+)\}/g, (m, k) => (vars[k] != null ? vars[k] : m))
 
   return (

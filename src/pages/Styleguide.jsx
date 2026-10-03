@@ -156,7 +156,7 @@ function Demo() {
           <Badge tone="soft">{s('badges.soldOut')}</Badge>
         </div>
         <Notice className="mt-6 max-w-xl">
-          <p>{t('notice.prebook', { days: site.ordering.dispatchBusinessDays })}</p>
+          <p>{t('notice.prebook', { days: site.ordering.dispatchAfterBusinessDays })}</p>
         </Notice>
         <hr className="rule-gold mt-8" />
       </Section>

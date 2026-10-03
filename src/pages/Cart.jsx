@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useCart } from '../context/CartProvider'
 import { useMenu } from '../context/MenuProvider'
@@ -7,7 +7,6 @@ import { site } from '../config/site'
 import { formatINR, lineTotal } from '../lib/pricing'
 import { lineChoices } from '../lib/lineText'
 import { MAX_QTY } from '../lib/cart'
-import { formatCallHours } from '../lib/hours'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
 import QuantityStepper from '../components/ui/QuantityStepper'
@@ -15,14 +14,17 @@ import Notice from '../components/ui/Notice'
 import { useToast } from '../components/ui/Toast'
 import ProductArt from '../components/art/ProductArt'
 import { useShopSheets } from '../components/shop/ShopSheets'
-import { CartIcon, TrashIcon } from '../components/icons'
+import CallOptions from '../components/contact/CallOptions'
+import CartNotices from '../components/order/CartNotices'
+import LineStatus from '../components/order/LineStatus'
+import { CartIcon, InfoIcon, TrashIcon } from '../components/icons'
 
-/** Pre-booking reminder shown in the cart (and, until Step 3, the old checkout) */
-export function PrebookNotice() {
+/** Pre-booking reminder in the cart summary (the brief asks for it in cart and checkout too) */
+function PrebookNotice() {
   const { t } = useI18n()
   return (
     <Notice>
-      <p>{t('cart.prebook', { days: site.ordering.dispatchBusinessDays })}</p>
+      <p>{t('notice.prebook', { days: site.ordering.dispatchAfterBusinessDays })}</p>
     </Notice>
   )
 }
@@ -30,8 +32,9 @@ export function PrebookNotice() {
 export default function Cart() {
   useSeo('cart')
   const { t } = useI18n()
-  const { lines, count, subtotal } = useCart()
+  const { lines, count, subtotal, unavailableIds } = useCart()
   const delivery = lines.length ? site.delivery.charge : 0
+  const blocked = unavailableIds.length > 0
 
   return (
     <>
@@ -48,6 +51,7 @@ export default function Cart() {
       ) : (
         <Container className="grid gap-10 py-10 lg:grid-cols-[1.6fr_1fr] lg:items-start lg:py-14">
           <div>
+            <CartNotices className="mb-6" />
             <ul className="divide-y divide-line border-y border-line">
               {lines.map((line) => (
                 <CartLine key={line.id} line={line} />
@@ -82,12 +86,23 @@ export default function Cart() {
               <div className="mt-5">
                 <PrebookNotice />
               </div>
-              <Button to="/checkout" size="lg" fullWidth className="mt-5">
-                {t('cart.checkout')}
-              </Button>
+              {blocked ? (
+                <>
+                  <Button size="lg" fullWidth className="mt-5" disabled aria-describedby="cart-blocked">
+                    {t('cart.checkout')}
+                  </Button>
+                  <p id="cart-blocked" className="t-small mt-3 font-bold text-error">
+                    {t('cart.checkoutBlocked')}
+                  </p>
+                </>
+              ) : (
+                <Button to="/checkout" size="lg" fullWidth className="mt-5">
+                  {t('cart.checkout')}
+                </Button>
+              )}
               <p className="t-small mt-3 text-brown-2">{t('cart.noPayment')}</p>
             </div>
-            <CallCard />
+            <CallOptions title={t('cart.callTitle')} text={t('cart.callText')} />
           </aside>
         </Container>
       )}
@@ -105,7 +120,7 @@ function CartLine({ line }) {
   const choices = lineChoices(line, { t, pick })
   const product = line.kind === 'product' ? menu?.productsById[line.productId] : null
   const combo = line.kind === 'combo' ? menu?.combos.find((c) => c.id === line.comboId) : null
-  const canEdit = Boolean(product || combo)
+  const canEdit = Boolean(product || combo) && !line.unavailable
 
   const onRemove = () => {
     const undo = cart.remove(line.id)
@@ -114,13 +129,13 @@ function CartLine({ line }) {
 
   return (
     <li className="flex gap-4 py-5">
-      <ProductArt kind={line.image} className="h-20 w-20 shrink-0 sm:h-24 sm:w-24" />
+      <ProductArt kind={line.image} className={`h-20 w-20 shrink-0 sm:h-24 sm:w-24 ${line.unavailable ? 'grayscale' : ''}`} />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
           <div className="min-w-0">
             {line.sectionName && line.sectionName.en !== line.name.en && <p className="t-small text-brown-2">{pick(line.sectionName)}</p>}
             <h2 className="font-body text-[1.125rem] leading-snug font-bold">
-              {line.kind === 'product' && product ? (
+              {line.kind === 'product' && product && !line.unavailable ? (
                 <Link to={`/product/${line.slug}`} className="inline-flex min-h-12 items-center hover:underline">
                   {name}
                 </Link>
@@ -143,10 +158,14 @@ function CartLine({ line }) {
           </dl>
         )}
 
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <QuantityStepper value={line.qty} max={MAX_QTY} onChange={(q) => (q < 1 ? onRemove() : cart.setQty(line.id, q))} label={t('cart.qtyFor', { name })} />
-          <p className="t-price">{formatINR(lineTotal(line))}</p>
-        </div>
+        <LineStatus line={line} className="mt-3" />
+
+        {!line.unavailable && (
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <QuantityStepper value={line.qty} max={MAX_QTY} onChange={(q) => (q < 1 ? onRemove() : cart.setQty(line.id, q))} label={t('cart.qtyFor', { name })} />
+            <p className="t-price">{formatINR(lineTotal(line))}</p>
+          </div>
+        )}
         <div className="mt-2 flex flex-wrap gap-2">
           {canEdit && (
             <button
@@ -163,7 +182,9 @@ function CartLine({ line }) {
           <button
             type="button"
             onClick={onRemove}
-            className="inline-flex min-h-12 items-center gap-1.5 rounded-control px-3 font-bold text-brown-2 hover:bg-champagne hover:text-error"
+            className={`inline-flex min-h-12 items-center gap-1.5 rounded-control px-3 font-bold ${
+              line.unavailable ? 'border-[1.5px] border-brown text-brown hover:bg-champagne' : 'text-brown-2 hover:bg-champagne hover:text-error'
+            }`}
           >
             <TrashIcon className="h-5 w-5" />
             <span>
@@ -177,27 +198,17 @@ function CartLine({ line }) {
   )
 }
 
-function CallCard() {
-  const { t } = useI18n()
-  return (
-    <div className="rounded-card border border-line p-5 sm:p-6">
-      <h2 className="t-h3">{t('cart.callTitle')}</h2>
-      <p className="mt-2 text-brown-2">{t('cart.callText')}</p>
-      <Button variant="call" fullWidth className="mt-4">
-        {t('mobileMenu.callUs')}
-      </Button>
-      <p className="t-small mt-2 text-brown-2">
-        {t('hours.label')}: {formatCallHours(t)}
-      </p>
-    </div>
-  )
-}
-
 function EmptyCart() {
   const { t } = useI18n()
+  const { state } = useLocation()
   return (
     <Container className="py-12 lg:py-16">
       <div className="max-w-[36rem]">
+        {state?.notice === 'checkoutEmpty' && (
+          <Notice icon={InfoIcon} className="mb-8">
+            <p role="status">{t('cart.checkoutEmpty')}</p>
+          </Notice>
+        )}
         <CartIcon className="h-12 w-12 text-brown-2" />
         <h2 className="t-h2 mt-4">{t('cart.emptyTitle')}</h2>
         <p className="t-lead mt-3 text-brown-2">{t('cart.emptyText')}</p>

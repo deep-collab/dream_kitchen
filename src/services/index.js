@@ -6,14 +6,15 @@
 import { categories, occasions } from '../data/categories'
 import { products } from '../data/products'
 import { combos } from '../data/combos'
-import { mockOrders } from '../data/mockOrders'
-import { site } from '../config/site'
-import { addDays, toISODate } from '../lib/format'
-import { normaliseOrderId, normalisePhone } from '../lib/validation'
+import { normalisePhone } from '../lib/validation'
+import { normaliseOrderId } from '../lib/orderId'
 
-const ORDERS_KEY = 'dk_orders'
-const SEQ_KEY = 'dk_order_seq'
+const ORDERS_KEY = 'dk_orders_v2'
+const LEGACY_ORDERS_KEY = 'dk_orders' // the old sample checkout: read for Track Order only
+const LEGACY_SEQ_KEY = 'dk_order_seq'
+const CALLBACKS_KEY = 'dk_callbacks'
 const ENQUIRIES_KEY = 'dk_enquiries'
+const KEEP = 30
 
 const readJSON = (key, fallback) => {
   try {
@@ -22,6 +23,11 @@ const readJSON = (key, fallback) => {
   } catch {
     return fallback
   }
+}
+/** A stored list; anything unreadable counts as empty */
+const readList = (key) => {
+  const v = readJSON(key, [])
+  return Array.isArray(v) ? v.filter((x) => x && typeof x === 'object') : []
 }
 const writeJSON = (key, value) => {
   try {
@@ -75,66 +81,66 @@ export async function getCombos() {
 }
 
 /* ---------- orders ---------- */
-function nextOrderId() {
-  const seq = Number(readJSON(SEQ_KEY, 0)) + 1
-  writeJSON(SEQ_KEY, seq)
-  return `${site.order.idPrefix}${String(seq).padStart(4, '0')}`
+
+/**
+ * Saves an order built by lib/order.js (it already carries its ID, see lib/orderId.js)
+ * and returns the ID. Stage A: kept on this phone only, for the success page and
+ * Track Order. Stage B: also inserts into Supabase `orders` + `order_items` and
+ * switches to the database's ID sequence (CLAUDE.md, "Order IDs").
+ */
+export async function createOrder(order) {
+  const saved = readList(ORDERS_KEY).filter((o) => o.id !== order.id)
+  writeJSON(ORDERS_KEY, [order, ...saved].slice(0, KEEP))
+  try {
+    localStorage.removeItem(LEGACY_SEQ_KEY)
+  } catch {
+    /* storage blocked */
+  }
+  return order.id
+}
+
+/** An order placed on this phone, for the success page (null if not found). */
+export async function getSavedOrder(id) {
+  return readList(ORDERS_KEY).find((o) => o.id === normaliseOrderId(id)) || null
 }
 
 /**
- * input: { items:[{productId,name,unitPrice,qty}], customer:{name,phone,address,pincode},
- *          deliveryDate:'YYYY-MM-DD', note, lang }
- * returns the saved order (clean, bot-friendly shape).
+ * Status for Track Order. Needs the ID and the phone number together and returns
+ * only what the tracker shows, so it can never list anyone's orders.
+ * Stage A: orders saved on this phone (status "received"). Stage B: swap the body
+ * for a Supabase RPC, e.g. supabase.rpc('get_order_status', { order_id, phone }).
+ * Returns { id, status, placedAt, preferredDate } or null.
  */
-export async function createOrder(input) {
-  const items = input.items.map((it) => ({
-    productId: it.productId,
-    name: it.name,
-    unitPrice: it.unitPrice,
-    qty: it.qty,
-    lineTotal: it.unitPrice * it.qty,
-  }))
-  const pieces = items.reduce((s, it) => s + it.qty, 0)
-  const subtotal = items.reduce((s, it) => s + it.lineTotal, 0)
-  const deliveryCharge = site.delivery.charge
-  const order = {
-    id: nextOrderId(),
-    createdAt: new Date().toISOString(),
-    status: 'received',
-    channel: 'whatsapp',
-    lang: input.lang || 'en',
-    items,
-    pieces,
-    subtotal,
-    deliveryCharge,
-    total: subtotal + deliveryCharge,
-    customer: {
-      name: input.customer.name.trim(),
-      phone: normalisePhone(input.customer.phone),
-      address: input.customer.address.trim(),
-      pincode: input.customer.pincode.trim(),
-    },
-    deliveryDate: input.deliveryDate,
-    note: (input.note || '').trim(),
-  }
-  writeJSON(ORDERS_KEY, [order, ...readJSON(ORDERS_KEY, [])].slice(0, 50))
-  return order
-}
-
-// Orders placed from this browser (used by the success page)
-export async function getRecentOrder(id) {
-  return readJSON(ORDERS_KEY, []).find((o) => o.id === id) || null
-}
-
-// Returns only what the tracker needs. Phase 2: Supabase RPC that checks id + phone together.
 export async function getOrderStatus(orderId, phone) {
   const id = normaliseOrderId(orderId)
   const ph = normalisePhone(phone)
-  const local = readJSON(ORDERS_KEY, []).find((o) => o.id === id && o.customer.phone === ph)
-  if (local) return { id: local.id, status: local.status, deliveryDate: local.deliveryDate }
-  const mock = mockOrders.find((o) => o.id === id && o.phone === ph)
-  if (mock) return { id: mock.id, status: mock.status, deliveryDate: mock.deliveryDate || toISODate(addDays(new Date(), mock.daysFromNow)) }
+  const order = readList(ORDERS_KEY).find((o) => o.id === id && o.customer?.phone === ph)
+  if (order) return { id: order.id, status: order.status, placedAt: order.createdAt, preferredDate: order.preferredDate }
+  const legacy = readList(LEGACY_ORDERS_KEY).find((o) => o.id === id && o.customer?.phone === ph)
+  if (legacy) return { id: legacy.id, status: 'received', placedAt: legacy.createdAt, preferredDate: legacy.deliveryDate || null }
   return null
+}
+
+/* ---------- call-backs ---------- */
+
+/**
+ * input: { phone, name, time: 'morning'|'afternoon'|'evening'|null, lang }
+ * Stage A: kept on this phone (the request itself goes out on WhatsApp).
+ * Stage B: also inserted into Supabase `callbacks` for the admin panel.
+ * Returns the saved call-back.
+ */
+export async function createCallback(input) {
+  const callback = {
+    id: `CB-${Date.now().toString(36).toUpperCase()}`,
+    createdAt: new Date().toISOString(),
+    phone: normalisePhone(input.phone),
+    name: String(input.name || '').trim(),
+    time: input.time || null,
+    lang: input.lang || 'en',
+    status: 'new',
+  }
+  writeJSON(CALLBACKS_KEY, [callback, ...readList(CALLBACKS_KEY)].slice(0, KEEP))
+  return callback
 }
 
 /* ---------- enquiries ---------- */
@@ -147,6 +153,6 @@ export async function createEnquiry(input) {
     type: input.type,
     message: input.message.trim(),
   }
-  writeJSON(ENQUIRIES_KEY, [enquiry, ...readJSON(ENQUIRIES_KEY, [])].slice(0, 50))
+  writeJSON(ENQUIRIES_KEY, [enquiry, ...readList(ENQUIRIES_KEY)].slice(0, 50))
   return enquiry
 }
