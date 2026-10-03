@@ -1,0 +1,35 @@
+{
+  "overflow": [],
+  "smallTargets": [],
+  "links": [
+    "360-en: 5 tel links, 3 wa.me links",
+    "360-kn: 5 tel links, 3 wa.me links",
+    "390-en: 5 tel links, 3 wa.me links",
+    "390-kn: 5 tel links, 3 wa.me links",
+    "768-en: 5 tel links, 3 wa.me links",
+    "768-kn: 5 tel links, 3 wa.me links",
+    "1280-en: 5 tel links, 3 wa.me links",
+    "1280-kn: 5 tel links, 3 wa.me links"
+  ],
+  "loader": [
+    "360-en: loader removed ~1875ms after navigation start (wall clock)",
+    "360-kn: loader removed ~1867ms after navigation start (wall clock)",
+    "390-en: loader removed ~1867ms after navigation start (wall clock)",
+    "390-kn: loader removed ~1862ms after navigation start (wall clock)",
+    "768-en: loader removed ~1859ms after navigation start (wall clock)",
+    "768-kn: loader removed ~1873ms after navigation start (wall clock)",
+    "1280-en: loader removed ~1861ms after navigation start (wall clock)",
+    "1280-kn: loader removed ~1866ms after navigation start (wall clock)",
+    "first visit shows loader=true; reload in same session shows loader=false",
+    "tap to skip: gone ~713ms after navigation (tapped at ~300ms)",
+    "reduced motion: gone ~563ms after navigation",
+    "JS delayed 4 s: loader removed at performance.now()=2497ms"
+  ],
+  "focus": [
+    "first 25 Tab stops all show the focus ring"
+  ],
+  "notes": [
+    "sheet 390-en: focus inside=true, bottom bar transform=none",
+    "sheet 390-en: closed by Esc=true"
+  ]
+}
