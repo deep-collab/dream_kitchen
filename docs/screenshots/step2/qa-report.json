@@ -1,0 +1,25 @@
+{
+  "overflow": [],
+  "textOverflow": [],
+  "smallTargets": [],
+  "keyboard": [
+    "focus stayed inside the sheet for 40 Tabs: true",
+    "Esc closed it: true",
+    "focus returned to the card: true"
+  ],
+  "swipe": [
+    "bottom bar translate while sheet open: 0px 100%",
+    "swipe down closed the sheet: true",
+    "tap outside closed the sheet: true"
+  ],
+  "notes": [
+    "360-en: deep link #chocolates highlights tab \"Chocolates\"",
+    "360-kn: deep link #chocolates highlights tab \"ಚಾಕೊಲೇಟ್‌ಗಳು\"",
+    "390-en: deep link #chocolates highlights tab \"Chocolates\"",
+    "390-kn: deep link #chocolates highlights tab \"ಚಾಕೊಲೇಟ್‌ಗಳು\"",
+    "768-en: deep link #chocolates highlights tab \"Chocolates\"",
+    "768-kn: deep link #chocolates highlights tab \"ಚಾಕೊಲೇಟ್‌ಗಳು\"",
+    "1280-en: deep link #chocolates highlights tab \"Chocolates\"",
+    "1280-kn: deep link #chocolates highlights tab \"ಚಾಕೊಲೇಟ್‌ಗಳು\""
+  ]
+}

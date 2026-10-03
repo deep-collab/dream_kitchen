@@ -16,14 +16,40 @@ Read this first in every session. Source of truth: CLAUDE.md (PART 1 of BUILD_BR
 - [x] Committed locally (not pushed)
 
 ## Step 2: Menu, shop, customise, cart
-- [ ] Data files shaped like Supabase tables (categories, products with option groups + per-size prices, combos, settings); her full menu with Kannada
-- [ ] Remove old SAMPLE products, mockOrders kept until Step 3
-- [ ] Shop page: sticky category tabs, subsections, search
-- [ ] Product detail (deep link) using the same customise UI
-- [ ] Customise sheet: sizes, flavours, name customisation (+₹100, per-product flag), occasions, note, quantity, live total, call line
-- [ ] Bars combo builder (3 slots, ₹699, savings/cheaper-individually hint)
-- [ ] Cart with editable option lines
-- [ ] Gold line-art placeholder tiles per product type
+- [x] Carry-over: phone menu button shows "Menu" / "ಮೆನು" under the icon (48px, Call fully visible, no overflow at 360px)
+- [x] Data files shaped like Supabase tables: src/data/categories.js, products.js (35 products), combos.js (bars-pick-3), JSDoc shapes; her words only, Kannada for every name and description
+- [x] Old SAMPLE products removed everywhere (mockOrders kept until Step 3)
+- [x] src/lib/pricing.js + src/lib/cart.js (pure), Vitest: tests/pricing.test.js, 132 tests incl. all 68 menu prices
+- [x] Gold line-art illustrations (8 kinds) in components/art/ProductArt.jsx
+- [x] Shop: sticky category tabs with scroll-spy and #deep links, sections, What you get panel, search (EN + KN) with empty state, list cards on phones / grid from 640px, spotlight cards (Signature, Top selling), wide cards for single-item sections, combo card, sold-out state
+- [x] Product page /product/:slug: breadcrumb, inline customise, share link, More from this category, title + meta
+- [x] Customise sheet: sizes (radio cards), flavour (required chips + inline error), name on box (+₹100 only when on and typed, 20 max, live preview), occasion, note (120), quantity 1–20, live total (aria-live), call line, toast with View cart
+- [x] Bars combo builder: 3-slot tray, repeats, savings, cheaper-individually hint with "Add these individually", one cart line
+- [x] Cart (schema v2, old v1 dropped): readable choices, Edit (reopens prefilled sheet), Remove with Undo, merge identical lines, summary with delivery and pre-booking note, call card, empty state
+- [x] QA: screenshots docs/screenshots/step2 (360/390/768/1280 × EN/KN), critique + fixes below
+
+### Step 2 self-critique log
+QA script: `node scripts/qa-step2.mjs` (dev server on port 5173). i18n check: `node scripts/check-i18n.mjs`. Tests: `npm test`.
+
+Round 1 issues, all fixed:
+1. Opening /shop#delight-boxes stopped about 470px short. The offset used the tab bar's current position (not yet stuck). It now uses header height + tab height.
+2. A dark ~15px strip down the right edge on phones (the reserved scrollbar gutter showing the black page background). The gutter is now reserved only for mouse users on wider screens.
+3. Desktop: single-product sections (Colour Blast, Dreamy Biscoff) left one tall square card in a 3-column grid. They now get a wide horizontal card, and grid art is 4:3.
+4. Product names on cards and cart lines were thin Cormorant at 18px. They're now Lato bold (Cormorant kept for headings).
+5. The cart repeated "Dreamy Biscoff Delight" (section name = product name). The section line is now skipped when identical.
+6. The Dreamy Biscoff section intro repeated the product's own line. The section copy was removed (her line stays on the product).
+7. The combo tray took about 230px on phones and hid the comparison. Slots are compact on phones (art from 640px).
+8. Tap targets: cart line name links (22px tall) and the breadcrumb "Shop" (35px wide). Both now 48px.
+9. Screen-reader names read "Add : Dark Chocolate" (stray space). Hidden suffixes are now nested in the visible label ("Add Dark Chocolate").
+10. "1 items" fixed with a singular string. Two rupee formatters merged into formatINR.
+11. Tub illustration: the spoon sat on the Ferrero ball like a honey dipper. Moved to the other side.
+
+Final run: 0 sideways scroll, 0 clipped Kannada/English text in buttons, chips, tabs or the sheet footer, 0 targets under 48px. Keyboard: focus stays in the sheet for 40 Tabs, Esc closes it, focus returns to the card. Phone: swipe down and tap outside both close the sheet, and the bottom bar hides while it's open. Deep links highlight the right tab.
+
+Known and accepted for now:
+- Cart lines snapshot price and labels when added. If Hema changes a price, carts already open keep the old price until re-added. Stage B re-prices on the server when an order is placed.
+- The old checkout (Step 3 rebuilds it) still uses the old date rule; it now reads the v2 cart and sends each line's choices in English.
+- All Kannada (menu names, descriptions, UI) needs Hema's proofreading.
 
 ## Step 3: Checkout and ordering
 - [ ] 2-business-day dispatch rule (Mon–Sat), date picker with disabled dates + explanation
@@ -32,6 +58,7 @@ Read this first in every session. Source of truth: CLAUDE.md (PART 1 of BUILD_BR
 - [ ] "Don't want to type?" call card, call-back form, voice message button
 - [ ] Track Order (Received → Confirmed → Preparing → Dispatched → Delivered)
 - [ ] Remove old bulk-order rule from site.js / orderRules.js
+- [ ] Re-validate cart line prices against the menu at checkout
 
 ## Step 4: Classes, home, other pages, Kannada
 - [ ] Classes page + booking (CL-0001) + success + certification note
