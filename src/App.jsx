@@ -10,6 +10,7 @@ import OrderSuccess from './pages/OrderSuccess'
 import Track from './pages/Track'
 import About from './pages/About'
 import Classes from './pages/Classes'
+import ClassBooked from './pages/ClassBooked'
 import Gallery from './pages/Gallery'
 import Contact from './pages/Contact'
 import FAQ from './pages/FAQ'
@@ -31,6 +32,7 @@ export default function App() {
         <Route path="order/:id" element={<OrderSuccess />} />
         <Route path="track" element={<Track />} />
         <Route path="classes" element={<Classes />} />
+        <Route path="classes/booked/:id" element={<ClassBooked />} />
         <Route path="our-story" element={<About />} />
         <Route path="about" element={<Navigate to="/our-story" replace />} />
         <Route path="gallery" element={<Gallery />} />

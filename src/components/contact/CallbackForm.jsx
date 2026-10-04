@@ -9,7 +9,7 @@ import { CALLBACK_TIMES, callbackWhatsAppUrl } from '../../lib/whatsappMessage'
 import Button from '../ui/Button'
 import Chip from '../ui/Chip'
 import TextField, { PhoneField } from '../ui/TextField'
-import { CheckIcon } from '../icons'
+import { CheckIcon, InfoIcon } from '../icons'
 
 /**
  * "Request a call back": phone (required), name (optional), a time chip (optional).
@@ -47,9 +47,36 @@ export default function CallbackForm({ onDone }) {
     }
     const request = { phone, name, time }
     const url = callbackWhatsAppUrl(request)
-    openWhatsApp(url) // first, inside the tap, so the browser allows it
+    const opened = openWhatsApp(url) // first, inside the tap, so the browser allows it
     createCallback({ ...request, lang })
-    setSent({ phone: formatPhone(phone), time, url })
+    setSent({ phone: formatPhone(phone), time, url, opened })
+  }
+
+  // The browser blocked the WhatsApp tab: nothing has happened yet, so say so and
+  // make "Open WhatsApp" the next step (never "ready in WhatsApp")
+  if (sent && !sent.opened) {
+    return (
+      <div>
+        <h3 ref={doneRef} tabIndex={-1} className="t-h3 flex items-start gap-2.5 outline-none">
+          <InfoIcon className="mt-1 h-7 w-7 shrink-0" />
+          <span>{t('callback.blockedTitle')}</span>
+        </h3>
+        <p className="t-lead mt-3">{t('callback.blockedText')}</p>
+        <div className="mt-6 grid gap-3">
+          <Button variant="whatsapp" size="lg" href={sent.url} fullWidth>
+            {t('callback.openWhatsApp')}
+          </Button>
+          <Button variant="call" fullWidth>
+            {t('callOptions.call')}
+          </Button>
+        </div>
+        {onDone && (
+          <Button variant="secondary" fullWidth className="mt-5" onClick={onDone}>
+            {t('common.close')}
+          </Button>
+        )}
+      </div>
+    )
   }
 
   if (sent) {

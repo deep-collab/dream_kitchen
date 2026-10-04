@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import en from './en.json'
 import kn from './kn.json'
 import { loadKannadaFonts } from '../config/fonts'
+import { site } from '../config/site'
 
 const dictionaries = { en, kn }
 const STORAGE_KEY = 'dk_lang'
@@ -11,9 +12,13 @@ function lookup(dict, key) {
   return key.split('.').reduce((node, part) => (node == null ? undefined : node[part]), dict)
 }
 
+// Filled into any string without being passed, so the number lives only in site.js
+const GLOBAL_VARS = { phone: site.phone.display }
+
 function interpolate(value, vars) {
-  if (typeof value !== 'string' || !vars) return value
-  return value.replace(/\{(\w+)\}/g, (m, name) => (vars[name] != null ? String(vars[name]) : m))
+  if (typeof value !== 'string') return value
+  const all = { ...GLOBAL_VARS, ...vars }
+  return value.replace(/\{(\w+)\}/g, (m, name) => (all[name] != null ? String(all[name]) : m))
 }
 
 function readStoredLang() {

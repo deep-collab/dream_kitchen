@@ -69,8 +69,29 @@ export const callbackWhatsAppUrl = (callback) => waLink(callbackMessage(callback
 export const VOICE_GREETING = 'Hi Dream Kitchen'
 export const voiceMessageUrl = () => waLink(VOICE_GREETING)
 
-/* ---------- Contact page enquiry (Step 4 rebuilds the Contact page) ---------- */
+/* ---------- class booking ---------- */
 
-export function enquiryMessage(enquiry, typeLabel) {
-  return [`New enquiry: ${typeLabel}`, `Name: ${enquiry.name}`, `Phone: ${formatPhone(enquiry.phone)}`, '', enquiry.message].join('\n')
+/** 11 -> "11 am", 16 -> "4 pm", 12 -> "12 noon" */
+export const englishHour = (h) => (h === 12 ? '12 noon' : `${h % 12 || 12} ${h < 12 ? 'am' : 'pm'}`)
+/** 180 -> "3 hours", 90 -> "1 hour 30 minutes" */
+export function englishDuration(minutes) {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  return [h && `${h} hour${h === 1 ? '' : 's'}`, m && `${m} minutes`].filter(Boolean).join(' ')
 }
+
+/** A class booking as Hema receives it (lib/classes.js buildBooking). */
+export function bookingMessage(b) {
+  const ages = b.ages ? `, ages ${b.ages.min}–${b.ages.max}` : ''
+  const mode = b.mode === 'online' ? 'live online' : 'in person'
+  return [
+    `New class booking: ${b.id}`,
+    `Class: ${b.className.en}${ages} (${mode}, ${englishDuration(b.durationMinutes)})`,
+    `Batch: ${formatDay(b.date, en.dates, { year: true })}, ${englishHour(b.startHour)}`,
+    `People: ${b.people} × ${formatINR(b.pricePerPerson)} = ${formatINR(b.total)}`,
+    `Name: ${oneLine(b.customer.name)} | Phone: ${formatPhone(b.customer.phone)}`,
+    'Please confirm my seats and share the payment details.',
+  ].join('\n')
+}
+
+export const bookingWhatsAppUrl = (booking) => waLink(bookingMessage(booking))

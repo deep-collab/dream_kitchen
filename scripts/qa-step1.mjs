@@ -3,6 +3,7 @@
 //   node scripts/qa-step1.mjs [outDir]
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { chromium } from 'playwright'
+import { site } from '../src/config/site.js'
 
 const PROD = 'http://localhost:4173'
 const DEV = 'http://localhost:5173'
@@ -114,8 +115,8 @@ async function main() {
         })
         if (r.overflow) report.overflow.push(`${tag} ${route}`)
         r.small.forEach((s) => report.smallTargets.push(`${tag} ${route}: ${s}`))
-        const badTel = r.tel.filter((h) => h !== 'tel:+919535706956')
-        const badWa = r.wa.filter((h) => h !== 'https://wa.me/919535706956')
+        const badTel = r.tel.filter((h) => h !== `tel:${site.phone.tel}`)
+        const badWa = r.wa.filter((h) => h !== `https://wa.me/${site.whatsapp}`)
         if (route === '/') report.links.push(`${tag}: ${r.tel.length} tel links, ${r.wa.length} wa.me links`)
         if (badTel.length || badWa.length) report.links.push(`${tag} ${route}: BAD ${[...badTel, ...badWa].join(', ')}`)
       }

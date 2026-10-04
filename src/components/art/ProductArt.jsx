@@ -150,6 +150,24 @@ const ART = {
       <path d="M109 98 v16 M101 106 h16" opacity=".6" />
     </>
   ),
+  // Chocolate classes: a mixing bowl of melted chocolate, a whisk, and a mould tray in front
+  class: (
+    <>
+      <ellipse cx="74" cy="64" rx="42" ry="10.5" />
+      <path d="M32 64 Q35 108 74 111 Q113 108 116 64" />
+      <path d="M41 67 q8.25 5 16.5 0 t16.5 0 t16.5 0 t16.5 0" opacity=".85" />
+      <path d="M50 72 v7 q2 4 4 0 v-5 M86 72 v10 q2 4 4 0 v-8" opacity=".7" />
+      <path d="M58 111 L54 119 H94 L90 111" opacity=".75" />
+      <path d="M100 60 L127 22" />
+      <rect x="123" y="9" width="9" height="20" rx="4.5" transform="rotate(35 127.5 19)" />
+      <path d="M100 60 q-19 7 -12 22 q11 2 12 -22" />
+      <path d="M100 60 q-9 11 -2 23 q9 -5 2 -23" opacity=".8" />
+      <rect x="34" y="124" width="92" height="20" rx="5" />
+      <circle cx="52" cy="134" r="5.5" />
+      <path d="M74.5 130.5 q2.5 -3 5 0 q2.5 -3 5 0 q0 4 -5 8 q-5 -4 -5 -8Z" />
+      <rect x="102.5" y="128.5" width="11" height="11" rx="2.5" />
+    </>
+  ),
 }
 
 const SPARKLE_SPOTS = [
@@ -173,7 +191,7 @@ function Sparkle({ x, y, s = 1 }) {
 export const ART_KINDS = Object.keys(ART)
 
 /**
- * kind: tub | delight-box | cookie-dip-tin | cookie-pie-tin | cookie-pie-box | bar | colour-blast | assortment
+ * kind: tub | delight-box | cookie-dip-tin | cookie-pie-tin | cookie-pie-box | bar | colour-blast | assortment | class
  * label: pass a description when the image is meaningful on its own; omit when the
  *        product name sits right beside it (then the tile is decorative).
  */

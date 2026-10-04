@@ -19,6 +19,11 @@ export default function NotFound() {
             {t('notFound.shop')}
           </Button>
         </div>
+        <p className="mt-10 text-brown-2">{t('notFound.help')}</p>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <Button variant="call">{t('callOptions.call')}</Button>
+          <Button variant="whatsapp">{t('mobileMenu.chat')}</Button>
+        </div>
       </div>
     </Container>
   )

@@ -3,6 +3,7 @@
 // carry the meaning, so every icon is aria-hidden.
 import {
   ArrowLeft,
+  Award,
   BookOpen,
   CalendarClock,
   CalendarDays,
@@ -35,9 +36,12 @@ import {
   Plus,
   Search,
   ShoppingBag,
+  Smile,
   Store,
   Trash2,
   Truck,
+  Users,
+  Video,
   Wallet,
   X,
 } from 'lucide-react'
@@ -88,6 +92,10 @@ export const CallbackIcon = make(PhoneIncoming)
 export const DateIcon = make(CalendarDays)
 export const InfoIcon = make(Info)
 export const WalletIcon = make(Wallet)
+export const UsersIcon = make(Users)
+export const OnlineIcon = make(Video)
+export const AwardIcon = make(Award)
+export const KidsIcon = make(Smile)
 
 // WhatsApp mark, drawn as a clean filled glyph (speech bubble + handset)
 export function WhatsAppIcon({ className = 'h-6 w-6', ...props }) {

@@ -29,6 +29,17 @@ const runtime = [
   ...['required', 'invalid', 'tooSoon', 'closed', 'tooFar'].map((c) => `checkout.errors.date.${c}`),
   'checkout.errors.note.long',
   'dates.weekdays', 'dates.months', 'dates.format', 'dates.formatYear',
+  // useSeo(page) reads seo.<page>.title / .desc
+  ...['home', 'shop', 'about', 'gallery', 'contact', 'faq', 'track', 'cart', 'checkout', 'success', 'notFound', 'classes', 'classBooked', 'styleguide'].flatMap((p) => [`seo.${p}.title`, `seo.${p}.desc`]),
+  // Step 4: classes, booking, story
+  'classes.mode.inPerson', 'classes.mode.online', 'classes.location.inPerson', 'classes.location.online',
+  'classes.full', 'classes.seatsLeft', 'classes.seatsLeftOne', 'classes.hours', 'classes.minutes',
+  ...['pick', 'send', 'confirm'].flatMap((k) => [`classes.how.${k}.title`, `classes.how.${k}.text`]),
+  ...['start', 'fresh', 'teach'].flatMap((k) => [`about.${k}.title`, `about.${k}.text`]),
+  // booking: every code returned by lib/classes.js bookingErrors()
+  'booking.errors.name.required', 'booking.errors.phone.required', 'booking.errors.phone.invalid',
+  ...['required', 'gone', 'full'].map((c) => `booking.errors.batch.${c}`),
+  ...['invalid', 'tooMany'].map((c) => `booking.errors.people.${c}`),
 ]
 runtime.forEach((k) => keys.add(k))
 keys.delete('a.b') // example in a code comment
@@ -67,5 +78,21 @@ for (const [label, list] of [['only in en.json', onlyEn], ['only in kn.json', on
 const emoji = Object.entries({ ...en, ...Object.fromEntries(Object.entries(kn).map(([k, v]) => [`kn:${k}`, v])) }).filter(([, v]) => /(?![©®™])\p{Extended_Pictographic}/u.test(v)) // © is not an emoji
 problems += emoji.length
 console.log(`emoji: ${emoji.length}`, emoji.map(([k]) => k).join(' '))
+
+// Unused strings: nobody should proofread text the site never shows. A key counts as
+// used when code reads it or one of its parents (t('faq.items') covers every item).
+// vite.config.js reads a few for index.html.
+for (const m of readFileSync('vite.config.js', 'utf8').matchAll(/\ben\.([a-zA-Z0-9_.]+)/g)) keys.add(m[1])
+// Keys kept in data (nav items: key: 'nav.shop') and built from templates (`styleguide.sizes.${k}`)
+const mentioned = new Set(keys)
+for (const f of files) {
+  const src = readFileSync(f, 'utf8')
+  for (const m of src.matchAll(/['"`]([a-zA-Z][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_]+)+)['"`]/g)) mentioned.add(m[1])
+  for (const m of src.matchAll(/`([a-zA-Z][a-zA-Z0-9_.]*)\.\$\{/g)) mentioned.add(m[1])
+}
+const used = (k) => [...mentioned].some((u) => k === u || k.startsWith(`${u}.`))
+const unused = Object.keys(en).filter((k) => !k.endsWith('.length') && !used(k))
+problems += unused.length
+console.log(`unused: ${unused.length}`, unused.join(' '))
 
 process.exit(problems ? 1 : 0)

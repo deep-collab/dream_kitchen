@@ -30,19 +30,25 @@ export function cleanAddress(value) {
 export const CHECKOUT_FIELDS = ['name', 'phone', 'address', 'area', 'pincode', 'date', 'note']
 
 /**
+ * The "Area or city" field, from site.ordering.areaField: 'required' | 'optional' | 'off'.
+ * Anything else (a typo in config) counts as 'required', so an address is never cut short.
+ */
+export const areaFieldMode = (rules = site.ordering) => (['optional', 'off'].includes(rules.areaField) ? rules.areaField : 'required')
+
+/**
  * Checkout form -> { field: reasonCode } for every field that needs fixing (empty = fine).
  * form: { name, phone, address, area, pincode, date, note }
  */
-export function checkoutErrors(form, now = new Date()) {
+export function checkoutErrors(form, now = new Date(), rules = site.ordering) {
   const name = oneLine(form.name)
   const address = cleanAddress(form.address)
   const errors = {
     name: name.length < 2 ? 'required' : null,
     phone: phoneError(form.phone),
     address: !address ? 'required' : address.length < 10 ? 'short' : null,
-    area: oneLine(form.area) ? null : 'required',
+    area: areaFieldMode(rules) === 'required' && !oneLine(form.area) ? 'required' : null,
     pincode: pincodeError(form.pincode),
-    date: preferredDateError(form.date, now),
+    date: preferredDateError(form.date, now, rules),
     note: oneLine(form.note).length > NOTE_MAX ? 'long' : null,
   }
   return Object.fromEntries(Object.entries(errors).filter(([, v]) => v))
@@ -86,7 +92,7 @@ export function orderItems(lines, menu) {
  * The full order record.
  * { id, now, lines (checked), menu, form, lang } -> order
  */
-export function buildOrder({ id, now = new Date(), lines, menu, form, lang = 'en' }) {
+export function buildOrder({ id, now = new Date(), lines, menu, form, lang = 'en', rules = site.ordering }) {
   const items = orderItems(lines, menu)
   const subtotal = items.reduce((sum, it) => sum + it.lineTotal, 0)
   const deliveryCharge = items.length ? site.delivery.charge : 0
@@ -100,7 +106,7 @@ export function buildOrder({ id, now = new Date(), lines, menu, form, lang = 'en
       name: oneLine(form.name).slice(0, NAME_MAX),
       phone: normalisePhone(form.phone),
       address: cleanAddress(form.address).slice(0, ADDRESS_MAX),
-      area: oneLine(form.area).slice(0, AREA_MAX),
+      area: areaFieldMode(rules) === 'off' ? '' : oneLine(form.area).slice(0, AREA_MAX),
       pincode: normalisePincode(form.pincode),
     },
     preferredDate: form.date,

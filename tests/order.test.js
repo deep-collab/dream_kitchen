@@ -5,6 +5,7 @@ import { repriceCart } from '../src/lib/reprice.js'
 import { buildOrder, checkoutErrors, cleanAddress, ORDER_STEPS } from '../src/lib/order.js'
 import { byId, ctx, form, menu, NOW, orderFrom, SAMPLES } from './fixtures/sampleOrders.js'
 import { ID_ALPHABET, isValidOrderId, makeOrderId, normaliseOrderId, ORDER_ID_PATTERN, orderIdError } from '../src/lib/orderId.js'
+import { zonedNow } from '../src/lib/dates.js'
 import { formatPhone, isValidPhone, isValidPincode, normalisePhone, phoneError, pincodeError } from '../src/lib/validation.js'
 import { callbackMessage, callbackWhatsAppUrl, orderMessage, orderWhatsAppUrl, voiceMessageUrl } from '../src/lib/whatsappMessage.js'
 
@@ -82,11 +83,12 @@ describe('orderMessage', () => {
 })
 
 describe('WhatsApp links', () => {
-  it('every link goes to 919535706956 and every call link to tel:+919535706956', () => {
-    expect(site.whatsapp).toBe('919535706956')
-    expect(telLink).toBe('tel:+919535706956')
-    expect(orderWhatsAppUrl(SAMPLES.simple())).toMatch(/^https:\/\/wa\.me\/919535706956\?text=/)
-    expect(callbackWhatsAppUrl({ phone: '9845012345' })).toMatch(/^https:\/\/wa\.me\/919535706956\?text=/)
+  // The number itself is checked in tests/config.test.js; here: every link uses it
+  const chat = `https://wa.me/${site.whatsapp}`
+  it('every WhatsApp link goes to the number in config and every call link to its tel: form', () => {
+    expect(telLink).toBe(`tel:${site.phone.tel}`)
+    expect(orderWhatsAppUrl(SAMPLES.simple()).startsWith(`${chat}?text=`)).toBe(true)
+    expect(callbackWhatsAppUrl({ phone: '9845012345' }).startsWith(`${chat}?text=`)).toBe(true)
   })
 
   it('encodes the message so it survives the URL intact', () => {
@@ -106,14 +108,14 @@ describe('WhatsApp links', () => {
   })
 
   it('voice message opens the chat with exactly "Hi Dream Kitchen"', () => {
-    expect(voiceMessageUrl()).toBe('https://wa.me/919535706956?text=Hi%20Dream%20Kitchen')
+    expect(voiceMessageUrl()).toBe(`${chat}?text=Hi%20Dream%20Kitchen`)
   })
 
   it('call-back message', () => {
     expect(callbackMessage({ phone: '09845012345', name: 'Asha', time: 'morning' })).toBe('Hi Dream Kitchen, please call me back on +91 98450 12345 (Asha) in the morning.')
     expect(callbackMessage({ phone: '9845012345', name: '  ', time: null })).toBe('Hi Dream Kitchen, please call me back on +91 98450 12345.')
     expect(callbackMessage({ phone: '9845012345', time: 'evening' })).toBe('Hi Dream Kitchen, please call me back on +91 98450 12345 in the evening.')
-    expect(waLink('')).toBe('https://wa.me/919535706956')
+    expect(waLink('')).toBe(chat)
   })
 })
 
@@ -190,6 +192,26 @@ describe('order ID', () => {
     const seen = new Set()
     for (let b = 0; b < 256; b++) seen.add(makeOrderId(NOW, bytes(b, b, b, b)).at(-1))
     expect(seen.size).toBe(32)
+  })
+
+  it('carries the day the order is placed (Indian time), never the preferred date', () => {
+    // The sample: placed Monday 5 Oct, delivery wanted Wednesday 7 Oct -> DK-261005-…
+    const order = SAMPLES.simple()
+    expect(order.preferredDate).toBe('2026-10-07')
+    expect(order.id).toBe('DK-261005-7Q4M')
+    expect(orderMessage(order).split('\n')[0]).toBe('New order: DK-261005-7Q4M')
+    // As checkout does it: one moment `at` makes both the ID and the order
+    for (const at of ['2026-10-05T10:00:00+05:30', '2026-10-05T23:59:00+05:30', '2026-10-05T18:45:00Z', '2026-10-31T19:00:00Z']) {
+      const when = new Date(at)
+      const id = makeOrderId(when)
+      const placed = buildOrder({ id, now: when, lines: [], menu, form: form() })
+      expect(id.slice(3, 9)).toBe(zonedNow(when).date.slice(2).replaceAll('-', ''))
+      expect(placed.id).toBe(id)
+    }
+    // 18:45 UTC on 5 Oct is already 00:15 on 6 Oct in India
+    expect(makeOrderId(new Date('2026-10-05T18:45:00Z')).slice(0, 10)).toBe('DK-261006-')
+    // 19:00 UTC on 31 Oct is 00:30 on 1 Nov in India: the month rolls over too
+    expect(makeOrderId(new Date('2026-10-31T19:00:00Z')).slice(0, 10)).toBe('DK-261101-')
   })
 
   it('two orders on the same day almost never share an ID', () => {

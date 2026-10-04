@@ -8,7 +8,7 @@ import { createOrder } from '../services'
 import { site } from '../config/site'
 import { dateChoices, earliestDate, formatDay, latestDate } from '../lib/dates'
 import { forgetDetails, loadDetails, markCartForClearing, saveDetails } from '../lib/deviceStore'
-import { ADDRESS_MAX, AREA_MAX, buildOrder, CHECKOUT_FIELDS, checkoutErrors, NAME_MAX, NOTE_MAX } from '../lib/order'
+import { ADDRESS_MAX, AREA_MAX, areaFieldMode, buildOrder, CHECKOUT_FIELDS, checkoutErrors, NAME_MAX, NOTE_MAX } from '../lib/order'
 import { makeOrderId } from '../lib/orderId'
 import { openWhatsApp } from '../lib/openWhatsApp'
 import { formatINR } from '../lib/pricing'
@@ -56,6 +56,7 @@ export default function Checkout() {
   const [submitted, setSubmitted] = useState(false)
   const [announcement, setAnnouncement] = useState('')
   const sending = useRef(false)
+  const areaMode = areaFieldMode() // site.ordering.areaField
 
   // Worked out on every render, so a page left open past midnight moves on with the day
   const now = new Date()
@@ -190,19 +191,22 @@ export default function Checkout() {
                   onBlur={blur('address')}
                   error={shown('address')}
                 />
-                <div className="grid gap-6 sm:grid-cols-[minmax(0,1fr)_14rem]">
-                  <TextField
-                    id="co-area"
-                    label={t('checkout.area')}
-                    hint={t('checkout.areaHint')}
-                    autoComplete="address-level2"
-                    maxLength={AREA_MAX}
-                    required
-                    value={form.area}
-                    onChange={set('area')}
-                    onBlur={blur('area')}
-                    error={shown('area')}
-                  />
+                <div className={`grid gap-6 ${areaMode === 'off' ? 'sm:grid-cols-[14rem]' : 'sm:grid-cols-[minmax(0,1fr)_14rem]'}`}>
+                  {areaMode !== 'off' && (
+                    <TextField
+                      id="co-area"
+                      label={t('checkout.area')}
+                      hint={t('checkout.areaHint')}
+                      autoComplete="address-level2"
+                      maxLength={AREA_MAX}
+                      required={areaMode === 'required'}
+                      optional={areaMode === 'optional'}
+                      value={form.area}
+                      onChange={set('area')}
+                      onBlur={blur('area')}
+                      error={shown('area')}
+                    />
+                  )}
                   <TextField
                     id="co-pincode"
                     label={t('checkout.pincode')}

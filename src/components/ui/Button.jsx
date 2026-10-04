@@ -9,7 +9,7 @@ import { PhoneIcon, WhatsAppIcon } from '../icons'
  *   tone:    'dark' when sitting on black (or wrap the area in .on-dark)
  *   size:    md | lg
  * Renders <Link> for `to`, <a> for `href`, otherwise <button>.
- * `call` defaults to tel:+919535706956 and `whatsapp` to the general chat link, unless
+ * `call` defaults to the tel: link from config and `whatsapp` to the general chat link, unless
  * the button submits a form or has an onClick.
  */
 export default function Button({

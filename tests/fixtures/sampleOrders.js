@@ -9,12 +9,16 @@ import { combos } from '../../src/data/combos.js'
 import { addLine, makeComboLine, makeProductLine } from '../../src/lib/cart.js'
 import { repriceCart } from '../../src/lib/reprice.js'
 import { buildOrder } from '../../src/lib/order.js'
+import { makeOrderId } from '../../src/lib/orderId.js'
 
 export const byId = Object.fromEntries(products.map((p) => [p.id, p]))
 export const sections = categories.flatMap((c) => c.sections)
 export const menu = { productsById: byId, combos, sections }
 export const ctx = { sections, occasions }
 export const NOW = new Date('2026-10-05T10:00:00+05:30') // Monday in India: earliest date Wed 7 Oct
+// The sample ID is made by the real generator at NOW, with fixed random bytes, so it
+// carries the order date (5 Oct, DK-261005-…), not the preferred date (7 Oct).
+export const SAMPLE_ID = makeOrderId(NOW, () => Uint8Array.from([5, 22, 2, 19])) // DK-261005-7Q4M
 
 export const form = (over = {}) => ({
   name: 'Asha Rao',
@@ -28,7 +32,7 @@ export const form = (over = {}) => ({
 })
 
 /** build: [['product', id, selection, qty] | ['combo', picks, qty]] */
-export function orderFrom(build, formOver = {}, id = 'DK-261005-7Q4M') {
+export function orderFrom(build, formOver = {}, id = SAMPLE_ID) {
   let lines = []
   for (const [kind, ...args] of build) {
     lines = addLine(lines, kind === 'combo' ? makeComboLine(combos[0], args[0], args[1], byId) : makeProductLine(byId[args[0]], args[1], args[2], ctx))

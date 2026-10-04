@@ -4,11 +4,12 @@ import { formatINR } from '../../lib/pricing'
 /**
  * Large tappable choice showing a label and its price (sizes and weights).
  * A real radio input sits underneath, so arrow keys and screen readers work natively.
+ * disabled: shown faded and skipped by arrow keys (e.g. a class date that is full).
  */
-export function RadioCard({ name, value, checked, onChange, label, price, detail }) {
+export function RadioCard({ name, value, checked, onChange, label, price, detail, disabled = false }) {
   return (
-    <label className="relative block cursor-pointer">
-      <input type="radio" name={name} value={value} checked={checked} onChange={() => onChange(value)} className="peer sr-only" />
+    <label className={`relative block ${disabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}>
+      <input type="radio" name={name} value={value} checked={checked} disabled={disabled} onChange={() => onChange(value)} className="peer sr-only" />
       <span className="flex min-h-16 items-center gap-3 rounded-control border-[1.5px] border-control-line bg-[#fffdf8] px-4 py-3 transition-colors peer-checked:border-ink peer-checked:bg-champagne peer-checked:shadow-[inset_0_0_0_1px_var(--color-ink)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-gold peer-focus-visible:shadow-[0_0_0_3px_var(--color-ink)] hover:border-brown-2">
         <span
           aria-hidden="true"

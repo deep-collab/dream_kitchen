@@ -6,6 +6,10 @@
 import { categories, occasions } from '../data/categories'
 import { products } from '../data/products'
 import { combos } from '../data/combos'
+import { classes } from '../data/classes'
+import { reviews } from '../data/reviews'
+import { upcomingBatches } from '../lib/classes'
+import { normaliseBookingId } from '../lib/bookingId'
 import { normalisePhone } from '../lib/validation'
 import { normaliseOrderId } from '../lib/orderId'
 
@@ -13,7 +17,7 @@ const ORDERS_KEY = 'dk_orders_v2'
 const LEGACY_ORDERS_KEY = 'dk_orders' // the old sample checkout: read for Track Order only
 const LEGACY_SEQ_KEY = 'dk_order_seq'
 const CALLBACKS_KEY = 'dk_callbacks'
-const ENQUIRIES_KEY = 'dk_enquiries'
+const BOOKINGS_KEY = 'dk_class_bookings'
 const KEEP = 30
 
 const readJSON = (key, fallback) => {
@@ -143,16 +147,44 @@ export async function createCallback(input) {
   return callback
 }
 
-/* ---------- enquiries ---------- */
-export async function createEnquiry(input) {
-  const enquiry = {
-    id: `ENQ-${Date.now().toString(36).toUpperCase()}`,
-    createdAt: new Date().toISOString(),
-    name: input.name.trim(),
-    phone: normalisePhone(input.phone),
-    type: input.type,
-    message: input.message.trim(),
-  }
-  writeJSON(ENQUIRIES_KEY, [enquiry, ...readList(ENQUIRIES_KEY)].slice(0, 50))
-  return enquiry
+/* ---------- classes ---------- */
+
+/**
+ * Active classes, each with its upcoming batches.
+ * Stage A: batches come from each class's weekly slot (lib/classes.js).
+ * Stage B: read `classes` + `class_batches` (date, time, seats left) instead.
+ */
+export async function getClasses({ now = new Date() } = {}) {
+  return classes
+    .filter((c) => c.active)
+    .sort((a, b) => a.sort - b.sort)
+    .map((c) => ({ ...c, batches: upcomingBatches(c, now) }))
+}
+
+/**
+ * Saves a booking built by lib/classes.js (it already carries its ID, see
+ * lib/bookingId.js). Stage A: kept on this phone only, for the success page.
+ * Stage B: also inserts into Supabase `class_bookings` and takes the seats.
+ */
+export async function createClassBooking(booking) {
+  const saved = readList(BOOKINGS_KEY).filter((b) => b.id !== booking.id)
+  writeJSON(BOOKINGS_KEY, [booking, ...saved].slice(0, KEEP))
+  return booking.id
+}
+
+/** A booking made on this phone, for its success page (null if not found). */
+export async function getSavedBooking(id) {
+  return readList(BOOKINGS_KEY).find((b) => b.id === normaliseBookingId(id)) || null
+}
+
+/* ---------- reviews and gallery ---------- */
+
+/** Real reviews only (src/data/reviews.js). The home section is hidden while this is empty. */
+export async function getReviews() {
+  return reviews.filter((r) => r.approved)
+}
+
+/** Gallery photos. None until Hema uploads them (Stage B: Supabase Storage + a `gallery` table). */
+export async function getGalleryPhotos() {
+  return []
 }

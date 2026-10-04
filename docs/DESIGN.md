@@ -296,6 +296,8 @@ Mobile (360)                          Desktop (1280)
 
 **Ordering (Step 3):** `CallOptions` (Call, Request a call back, Send a voice message, call hours), `CallbackForm`, `VoiceMessageButton`, `DateChips` (radio chips, weekday over date, Earliest tag, Pick another date), `CheckoutBar` (phones: Call + Send order on WhatsApp, replaces the bottom bar on /checkout), `CartNotices`, `LineStatus`, `SummaryLines`, `StatusTracker` (numbered because it is a real sequence; vertical below 1024px)
 
+**Classes and home (Step 4):** `ClassCard` (art column from 768px; facts, price per person, what you'll learn, upcoming dates with seats left, location line, Book a seat), `BookingSheet` (date radio cards → people stepper → name → phone; sticky total + "Send booking on WhatsApp ₹…" + call line), `CertificationNote` (becomes the certificate photo once `site.classes.certificateImage` is set), home sections in `components/home/HomeSections.jsx`. Each home section has its own shape (DESIGN §6, tell 5): category tiles; best sellers as two black spotlight cards plus a grid; a black Brownie Tub band with her "What you get" list and slogan; a combo teaser whose three-bar tray opens the builder directly; a compact class list; the story beside the symbol; reviews only when real ones exist; a black call band (Call, WhatsApp, call back, voice message); an Instagram strip. Cream and champagne alternate, separated by gold rules; the two black bands carry gold borders.
+
 **Icons:** lucide-react at 1.75 stroke through `components/icons.jsx`, plus custom `WhatsAppIcon` and `InstagramIcon` glyphs. No emoji.
 
 **Dev:** the `/styleguide` route (dev builds only, `noindex`, not in the sitemap)

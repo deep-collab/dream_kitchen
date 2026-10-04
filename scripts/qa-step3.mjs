@@ -4,6 +4,7 @@
 // "Now" is frozen with Playwright's clock so the dates in the screenshots are stable.
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { chromium } from 'playwright'
+import { site } from '../src/config/site.js'
 
 const BASE = 'http://localhost:5173'
 const OUT = process.argv[2] || 'docs/screenshots/step3'
@@ -93,7 +94,7 @@ async function audit(page, label) {
   // Every call and WhatsApp link on the page
   const links = await page.evaluate(() => [...document.querySelectorAll('a[href^="tel:"], a[href*="wa.me"]')].map((a) => a.getAttribute('href')))
   for (const href of links) {
-    const ok = href.startsWith('tel:') ? href === 'tel:+919535706956' : href.startsWith('https://wa.me/919535706956')
+    const ok = href.startsWith('tel:') ? href === `tel:${site.phone.tel}` : href.startsWith(`https://wa.me/${site.whatsapp}`)
     if (!ok) report.links.push(`${label}: BAD ${href}`)
   }
   report.links.push(`${label}: ${links.length} call/WhatsApp links checked`)
@@ -358,7 +359,7 @@ async function main() {
   }
 
   // WhatsApp URLs actually opened during the run
-  const bad = report.whatsapp.filter((u) => !u.startsWith('https://wa.me/919535706956'))
+  const bad = report.whatsapp.filter((u) => !u.startsWith(`https://wa.me/${site.whatsapp}`))
   report.whatsapp = [`${report.whatsapp.length} WhatsApp tabs opened, ${bad.length} to a wrong number`, ...bad]
 
   await browser.close()
