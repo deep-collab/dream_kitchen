@@ -1,6 +1,6 @@
 import { useI18n } from '../../i18n/I18nProvider'
 
-const LANGS = [
+export const LANGS = [
   { code: 'en', label: 'English', short: 'EN' },
   { code: 'kn', label: 'ಕನ್ನಡ', short: 'ಕನ್ನಡ' },
 ]
@@ -9,9 +9,11 @@ const LANGS = [
  * English / ಕನ್ನಡ switch for black surfaces.
  *   segmented: both options visible, current one filled (header from 768px, mobile menu)
  *   compact:   one button naming the other language (phone header, where space is tight)
+ * While Kannada is being fetched (first switch only) its button shows aria-busy.
  */
 export default function LanguageToggle({ variant = 'segmented', size = 'md', className = '' }) {
-  const { lang, setLang, t } = useI18n()
+  const { lang, setLang, t, pendingLang } = useI18n()
+  const busy = (code) => (pendingLang === code ? { 'aria-busy': true } : {})
 
   if (variant === 'compact') {
     const other = LANGS.find((l) => l.code !== lang)
@@ -19,7 +21,8 @@ export default function LanguageToggle({ variant = 'segmented', size = 'md', cla
       <button
         type="button"
         onClick={() => setLang(other.code)}
-        className={`inline-flex min-h-12 min-w-12 items-center justify-center rounded-control px-2 font-bold text-cream transition-colors hover:bg-white/10 ${className}`}
+        {...busy(other.code)}
+        className={`inline-flex min-h-12 min-w-12 items-center justify-center rounded-control px-2 font-bold text-cream transition-colors hover:bg-white/10 aria-busy:animate-pulse ${className}`}
       >
         <span className="sr-only">{t('nav.language')}: </span>
         <span lang={other.code} className="border-b border-gold/70 pb-px">
@@ -41,7 +44,8 @@ export default function LanguageToggle({ variant = 'segmented', size = 'md', cla
             lang={l.code}
             aria-pressed={active}
             onClick={() => setLang(l.code)}
-            className={`min-h-12 rounded-full font-bold transition-colors ${big ? 'min-w-28 px-5 text-[1.125rem]' : 'min-w-12 px-3.5 text-base'} ${
+            {...busy(l.code)}
+            className={`min-h-12 rounded-full font-bold transition-colors aria-busy:animate-pulse ${big ? 'min-w-28 px-5 text-[1.125rem]' : 'min-w-12 px-3.5 text-base'} ${
               active ? 'bg-gold-mid text-ink' : 'text-cream hover:bg-white/10'
             }`}
           >

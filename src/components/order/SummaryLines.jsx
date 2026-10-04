@@ -6,6 +6,7 @@ import ProductArt from '../art/ProductArt'
 import { useToast } from '../ui/Toast'
 import LineStatus from './LineStatus'
 import { TrashIcon } from '../icons'
+import 'virtual:dk-strings/customise'
 
 /**
  * Checkout's compact list of cart lines: every choice, quantity × price, line

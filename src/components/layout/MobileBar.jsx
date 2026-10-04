@@ -4,7 +4,7 @@ import { useCart } from '../../context/CartProvider'
 import { useAnyOverlayOpen } from '../../hooks/useModal'
 import { telLink, waLink } from '../../config/site'
 import { CartIcon, PhoneIcon, WhatsAppIcon } from '../icons'
-import CartCount from './CartCount'
+import CartCount, { CartItemsSr } from './CartCount'
 
 // Phones only (<768px): three equal labelled buttons, always within thumb reach.
 // Hidden while a sheet or the menu is open. Layout pads the page so it never covers content.
@@ -39,12 +39,15 @@ export default function MobileBar() {
           </a>
         </li>
         <li>
-          <Link to="/cart" className={item} aria-label={t('common.cartWithCount', { count: pieces })}>
+          <Link to="/cart" className={item}>
             <span className="relative">
               <CartIcon className="h-6 w-6 text-gold" />
               <CartCount count={pieces} className="absolute -top-2 left-4 h-5 min-w-5 px-1 text-[0.8125rem]" />
             </span>
-            <span aria-hidden="true">{t('mobileBar.cart')}</span>
+            <span>
+              {t('mobileBar.cart')}
+              <CartItemsSr count={pieces} t={t} />
+            </span>
           </Link>
         </li>
       </ul>

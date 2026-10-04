@@ -1,10 +1,12 @@
 import { useI18n } from '../../i18n/I18nProvider'
 import { site } from '../../config/site'
 import { AwardIcon } from '../icons'
+import Photo from '../ui/Photo'
+import 'virtual:dk-strings/classes'
 
 /**
  * "Hema is completing her chocolatier certification. Certificate coming soon."
- * Once site.classes.certificateImage is set (a photo in public/), the photo
+ * Once site.classes.certificateImage is set ({ src, width, height, srcSet }), the photo
  * replaces the note with no other change.
  */
 export default function CertificationNote({ className = '' }) {
@@ -14,7 +16,7 @@ export default function CertificationNote({ className = '' }) {
   if (image) {
     return (
       <figure className={`card overflow-hidden ${className}`}>
-        <img src={image} alt={t('classes.cert.alt')} loading="lazy" decoding="async" className="block h-auto w-full bg-champagne" />
+        <Photo photo={image} alt={t('classes.cert.alt')} sizes="(min-width: 768px) 46rem, 100vw" className="block w-full bg-champagne" />
         <figcaption className="t-small p-4 text-brown-2">{t('classes.cert.title')}</figcaption>
       </figure>
     )

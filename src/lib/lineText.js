@@ -1,3 +1,5 @@
+import 'virtual:dk-strings/customise'
+
 /**
  * Readable choices for a cart line: [{ key, label, value }], in the current language.
  * pick({en,kn}) and t(key) come from useI18n().

@@ -6,13 +6,15 @@ import { site } from '../config/site'
 import PageHero from '../components/PageHero'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
+import Photo from '../components/ui/Photo'
 import { InstagramIcon } from '../components/icons'
+import 'virtual:dk-strings/gallery'
 
 /**
  * Real photos arrive with the admin panel (Stage B: services.getGalleryPhotos).
  * Until then the page says so plainly and points to Instagram. Illustrations are
  * never passed off as photos.
- * photo: { id, src, alt: {en, kn}, width, height }
+ * photo: { id, src, srcSet: [{ src, width }], alt: {en, kn}, width, height } (see components/ui/Photo)
  */
 export default function Gallery() {
   useSeo('gallery')
@@ -27,7 +29,7 @@ export default function Gallery() {
           <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
             {photos.map((p) => (
               <li key={p.id}>
-                <img src={p.src} alt={pick(p.alt)} width={p.width} height={p.height} loading="lazy" decoding="async" className="block aspect-square h-auto w-full rounded-card object-cover" />
+                <Photo photo={p} alt={pick(p.alt)} sizes="(min-width: 1024px) 33vw, 50vw" className="block aspect-square w-full rounded-card object-cover" />
               </li>
             ))}
           </ul>

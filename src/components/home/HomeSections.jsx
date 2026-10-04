@@ -4,7 +4,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { useMenu } from '../../context/MenuProvider'
 import { useAsync } from '../../hooks/useAsync'
 import { getClasses, getReviews } from '../../services'
-import { site } from '../../config/site'
+import { hasCallHours, site } from '../../config/site'
 import { formatCallHours } from '../../lib/hours'
 import { formatINR, fromPrice } from '../../lib/pricing'
 import Container from '../ui/Container'
@@ -19,6 +19,11 @@ import CallbackForm from '../contact/CallbackForm'
 import VoiceMessageButton from '../contact/VoiceMessageButton'
 import { batchText, durationText, modeText } from '../classes/classText'
 import { AwardIcon, CallbackIcon, ClockIcon, InstagramIcon } from '../icons'
+import 'virtual:dk-strings/callback'
+import 'virtual:dk-strings/classes'
+import 'virtual:dk-strings/combo'
+import 'virtual:dk-strings/home'
+import 'virtual:dk-strings/shop'
 
 const CATEGORY_ART = { 'brownie-tubs': 'tub', 'delight-boxes': 'delight-box', cookies: 'cookie-dip-tin', chocolates: 'assortment' }
 const Diamond = () => <span aria-hidden="true" className="mt-[0.7em] h-1.5 w-1.5 shrink-0 rotate-45 bg-gold" />
@@ -252,12 +257,14 @@ export function TalkBand() {
             {t('home.talk.title')}
           </h2>
           <p className="t-lead mt-3 text-muted">{t('home.talk.text')}</p>
-          <p className="mt-4 flex items-start gap-3 text-muted">
-            <ClockIcon className="mt-0.5 h-6 w-6 shrink-0 text-gold" />
-            <span>
-              {t('hours.label')}: {formatCallHours(t)}
-            </span>
-          </p>
+          {hasCallHours() && (
+            <p className="mt-4 flex items-start gap-3 text-muted">
+              <ClockIcon className="mt-0.5 h-6 w-6 shrink-0 text-gold" />
+              <span>
+                {t('hours.label')}: {formatCallHours(t)}
+              </span>
+            </p>
+          )}
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <Button variant="call" size="lg" fullWidth className="sm:col-span-2">

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
-import { site, telLink, waLink } from '../../config/site'
+import { hasCallHours, site, telLink, waLink } from '../../config/site'
 import { formatCallHours } from '../../lib/hours'
 import Wordmark from '../brand/Wordmark'
 import { ClockIcon, InstagramIcon, PhoneIcon, WhatsAppIcon } from '../icons'
@@ -46,13 +46,15 @@ export default function Footer() {
               </a>
             </li>
           </ul>
-          <p className="mt-3 flex gap-3">
-            <ClockIcon className="mt-0.5 h-6 w-6 shrink-0 text-gold" />
-            <span>
-              <span className="block font-bold text-cream">{t('hours.label')}</span>
-              {formatCallHours(t)}
-            </span>
-          </p>
+          {hasCallHours() && (
+            <p className="mt-3 flex gap-3">
+              <ClockIcon className="mt-0.5 h-6 w-6 shrink-0 text-gold" />
+              <span>
+                <span className="block font-bold text-cream">{t('hours.label')}</span>
+                {formatCallHours(t)}
+              </span>
+            </p>
+          )}
         </div>
 
         <nav aria-label={t('footer.explore')}>

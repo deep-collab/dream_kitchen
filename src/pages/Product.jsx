@@ -7,16 +7,19 @@ import Container from '../components/ui/Container'
 import Badge from '../components/ui/Badge'
 import { useToast } from '../components/ui/Toast'
 import ProductCard, { BADGE_KEYS } from '../components/shop/ProductCard'
-import { ProductDetails, useAddedToast } from '../components/shop/ShopSheets'
+import { useAddedToast } from '../components/shop/ShopSheets'
+import { ProductDetails } from '../components/shop/ShopSheetBodies'
 import ProductArt from '../components/art/ProductArt'
 import { AddBar, CustomiseFields, useCustomise } from '../components/shop/Customise'
 import NotFound from './NotFound'
+import 'virtual:dk-strings/product'
 
 // /product/:slug: deep-linkable, with the same choices as the sheet, inline.
 export default function Product() {
   const { slug } = useParams()
   const menu = useMenu()
-  if (!menu) return <div className="min-h-[60vh]" />
+  // Full screen while the menu loads, so the footer never starts in view and then jumps
+  if (!menu) return <div aria-busy="true" className="min-h-dvh" />
   const product = menu.products.find((p) => p.slug === slug)
   if (!product) return <NotFound />
   return <ProductView key={slug} product={product} menu={menu} />

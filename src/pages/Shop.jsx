@@ -8,6 +8,7 @@ import CallOptions from '../components/contact/CallOptions'
 import ProductCard from '../components/shop/ProductCard'
 import ComboCard from '../components/shop/ComboCard'
 import { CheckIcon, CloseIcon, SearchIcon } from '../components/icons'
+import 'virtual:dk-strings/shop'
 
 const SPOTLIGHT = (p) => p.badges.includes('signature') || p.badges.includes('top-selling')
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -40,10 +41,12 @@ export default function Shop() {
   const q = query.trim().toLowerCase()
   const results = useMemo(() => {
     if (!menu || !q) return null
-    const products = menu.products.filter((p) => p.name.en.toLowerCase().includes(q) || p.name.kn.toLowerCase().includes(q))
-    const combos = menu.combos.filter((c) => c.name.en.toLowerCase().includes(q) || c.name.kn.toLowerCase().includes(q))
+    // English names always match; in Kannada the Kannada names match too
+    const matches = (name) => name.en.toLowerCase().includes(q) || pick(name).toLowerCase().includes(q)
+    const products = menu.products.filter((p) => matches(p.name))
+    const combos = menu.combos.filter((c) => matches(c.name))
     return { products, combos, count: products.length + combos.length }
-  }, [menu, q])
+  }, [menu, q, pick])
 
   const onSearch = (value) => {
     setQuery(value)
@@ -177,7 +180,7 @@ export default function Shop() {
       )}
 
       {!menu ? (
-        <div className="min-h-[60vh]" />
+        <div aria-busy="true" className="min-h-dvh" />
       ) : q ? (
         <SearchResults results={results} query={query} />
       ) : (

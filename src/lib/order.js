@@ -6,7 +6,7 @@
   `orders` + `order_items`.
 */
 import { site } from '../config/site'
-import { weightLabel } from '../data/products'
+import { weightLabel } from './weights'
 import { preferredDateError } from './dates'
 import { normalisePhone, normalisePincode, oneLine, phoneError, pincodeError } from './validation'
 
@@ -89,13 +89,24 @@ export function orderItems(lines, menu) {
 }
 
 /**
+ * Delivery charge for a cart of `itemCount` lines: 0 for an empty cart, the flat charge from
+ * config, or null while Hema hasn't confirmed it (site.delivery.charge empty). null means
+ * "to be confirmed on WhatsApp": nothing is added to the total, and every screen says so.
+ */
+export function deliveryChargeFor(itemCount, delivery = site.delivery) {
+  if (!itemCount) return 0
+  return Number.isFinite(delivery.charge) ? delivery.charge : null
+}
+
+/**
  * The full order record.
  * { id, now, lines (checked), menu, form, lang } -> order
+ * deliveryCharge is null when the charge is still to be confirmed (total = subtotal then).
  */
-export function buildOrder({ id, now = new Date(), lines, menu, form, lang = 'en', rules = site.ordering }) {
+export function buildOrder({ id, now = new Date(), lines, menu, form, lang = 'en', rules = site.ordering, delivery = site.delivery }) {
   const items = orderItems(lines, menu)
   const subtotal = items.reduce((sum, it) => sum + it.lineTotal, 0)
-  const deliveryCharge = items.length ? site.delivery.charge : 0
+  const deliveryCharge = deliveryChargeFor(items.length, delivery)
   return {
     id,
     createdAt: now.toISOString(),
@@ -114,6 +125,6 @@ export function buildOrder({ id, now = new Date(), lines, menu, form, lang = 'en
     items,
     subtotal,
     deliveryCharge,
-    total: subtotal + deliveryCharge,
+    total: subtotal + (deliveryCharge ?? 0),
   }
 }

@@ -15,10 +15,12 @@ import { formatINR } from '../lib/pricing'
 import { formatPhone } from '../lib/validation'
 import { orderMessage, orderWhatsAppUrl } from '../lib/whatsappMessage'
 import Container from '../components/ui/Container'
+import TotalRows from '../components/order/TotalRows'
 import Button from '../components/ui/Button'
 import { useToast } from '../components/ui/Toast'
 import Symbol from '../components/brand/Symbol'
 import { CopyIcon } from '../components/icons'
+import 'virtual:dk-strings/success'
 
 export default function OrderSuccess() {
   useSeo('success')
@@ -38,7 +40,7 @@ export default function OrderSuccess() {
     if (order && consumeCartClearing(order.id)) clear()
   }, [order, clear])
 
-  if (loading) return <Container className="min-h-[50vh] py-16" aria-busy="true" />
+  if (loading) return <Container className="min-h-dvh py-16" aria-busy="true" />
   if (!order) return <Missing id={id} />
   // The browser blocked the WhatsApp tab: say so, and put "Open WhatsApp" first
   const blocked = state?.opened === false
@@ -203,20 +205,7 @@ function OrderDetails({ order }) {
           )
         })}
       </ul>
-      <dl className="mt-4 space-y-2">
-        <div className="flex justify-between gap-4">
-          <dt className="text-brown-2">{t('cart.subtotal')}</dt>
-          <dd className="font-bold tabular-nums">{formatINR(order.subtotal)}</dd>
-        </div>
-        <div className="flex justify-between gap-4">
-          <dt className="text-brown-2">{t('cart.deliveryKarnataka')}</dt>
-          <dd className="font-bold tabular-nums">{formatINR(order.deliveryCharge)}</dd>
-        </div>
-        <div className="flex items-baseline justify-between gap-4 border-t border-line pt-3">
-          <dt className="font-bold">{t('cart.total')}</dt>
-          <dd className="t-price">{formatINR(order.total)}</dd>
-        </div>
-      </dl>
+      <TotalRows subtotal={order.subtotal} delivery={order.deliveryCharge} className="mt-4" />
     </section>
   )
 }

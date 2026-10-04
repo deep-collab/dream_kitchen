@@ -31,13 +31,17 @@ export const form = (over = {}) => ({
   ...over,
 })
 
+// The samples use a confirmed ₹50 charge (the agreed message format). Config leaves the
+// charge empty until Hema confirms it; tests/order.test.js covers that case separately.
+export const SAMPLE_DELIVERY = { charge: 50 }
+
 /** build: [['product', id, selection, qty] | ['combo', picks, qty]] */
-export function orderFrom(build, formOver = {}, id = SAMPLE_ID) {
+export function orderFrom(build, formOver = {}, id = SAMPLE_ID, delivery = SAMPLE_DELIVERY) {
   let lines = []
   for (const [kind, ...args] of build) {
     lines = addLine(lines, kind === 'combo' ? makeComboLine(combos[0], args[0], args[1], byId) : makeProductLine(byId[args[0]], args[1], args[2], ctx))
   }
-  return buildOrder({ id, now: NOW, lines: repriceCart(lines, menu).lines, menu, form: form(formOver), lang: 'en' })
+  return buildOrder({ id, now: NOW, lines: repriceCart(lines, menu).lines, menu, form: form(formOver), lang: 'en', delivery })
 }
 
 export const SAMPLES = {

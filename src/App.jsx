@@ -1,20 +1,25 @@
 import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { classesEnabled } from './config/site'
+import { pages } from './routes'
 import Layout from './components/layout/Layout'
-import Home from './pages/Home'
-import Shop from './pages/Shop'
-import Product from './pages/Product'
-import Cart from './pages/Cart'
-import Checkout from './pages/Checkout'
-import OrderSuccess from './pages/OrderSuccess'
-import Track from './pages/Track'
-import About from './pages/About'
-import Classes from './pages/Classes'
-import ClassBooked from './pages/ClassBooked'
-import Gallery from './pages/Gallery'
-import Contact from './pages/Contact'
-import FAQ from './pages/FAQ'
-import NotFound from './pages/NotFound'
+
+// Every page loads on demand (src/routes.js). Layout shows the header and footer at once
+// and holds a Suspense boundary for the page itself.
+const Home = lazy(pages.Home)
+const Shop = lazy(pages.Shop)
+const Product = lazy(pages.Product)
+const Cart = lazy(pages.Cart)
+const Checkout = lazy(pages.Checkout)
+const OrderSuccess = lazy(pages.OrderSuccess)
+const Track = lazy(pages.Track)
+const About = lazy(pages.About)
+const Classes = lazy(pages.Classes)
+const ClassBooked = lazy(pages.ClassBooked)
+const Gallery = lazy(pages.Gallery)
+const Contact = lazy(pages.Contact)
+const FAQ = lazy(pages.FAQ)
+const NotFound = lazy(pages.NotFound)
 
 // Dev-only component reference for QA. The import sits behind import.meta.env.DEV, so
 // production builds drop it entirely (and it is never in the sitemap).
@@ -31,8 +36,9 @@ export default function App() {
         <Route path="checkout" element={<Checkout />} />
         <Route path="order/:id" element={<OrderSuccess />} />
         <Route path="track" element={<Track />} />
-        <Route path="classes" element={<Classes />} />
-        <Route path="classes/booked/:id" element={<ClassBooked />} />
+        {/* While classes are switched off (site.classes.enabled) these addresses are a normal 404 */}
+        {classesEnabled() && <Route path="classes" element={<Classes />} />}
+        {classesEnabled() && <Route path="classes/booked/:id" element={<ClassBooked />} />}
         <Route path="our-story" element={<About />} />
         <Route path="about" element={<Navigate to="/our-story" replace />} />
         <Route path="gallery" element={<Gallery />} />

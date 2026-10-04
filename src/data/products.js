@@ -5,6 +5,8 @@
   `product_option_choices`). Brand names stay English in both languages.
   Never invent items, prices, badges or claims here.
 */
+import { weightLabel } from '../lib/weights.js'
+
 
 /** @typedef {{ en: string, kn: string }} I18nText */
 
@@ -47,8 +49,8 @@
  * @property {OptionGroup[]} optionGroups
  */
 
-/** 250 -> { en: '250g', kn: '250 ಗ್ರಾಂ' }, 1000 -> 1kg. Also labels fixed-weight items in orders. */
-export const weightLabel = (grams) => ({ en: grams >= 1000 ? `${grams / 1000}kg` : `${grams}g`, kn: grams >= 1000 ? `${grams / 1000} ಕೆ.ಜಿ` : `${grams} ಗ್ರಾಂ` })
+// weightLabel lives in src/lib/weights.js (so order code needn't load the whole menu)
+export { weightLabel }
 
 /** Size group from [grams, price] pairs, in the order she lists them */
 const sizes = (...pairs) => ({
@@ -63,7 +65,7 @@ const flavours = (...list) => ({
   id: 'flavour',
   type: 'single',
   required: true,
-  choices: list.map(([id, en, kn]) => ({ id, label: { en, kn }, priceDelta: 0 })),
+  choices: list.map(([id, label]) => ({ id, label, priceDelta: 0 })),
 })
 
 const base = { badges: [], active: true, soldOut: false, nameCustomisationPrice: 100, description: null, optionGroups: [] }
@@ -168,7 +170,7 @@ export const products = [
     price: 550,
     grams: 250,
     optionGroups: [
-      flavours(['chocolate', 'Chocolate', 'ಚಾಕೊಲೇಟ್'], ['strawberry', 'Strawberry', 'ಸ್ಟ್ರಾಬೆರಿ'], ['mango', 'Mango', 'ಮಾವು'], ['butterscotch', 'Butterscotch', 'ಬಟರ್‌ಸ್ಕಾಚ್']),
+      flavours(['chocolate', { en: 'Chocolate', kn: 'ಚಾಕೊಲೇಟ್' }], ['strawberry', { en: 'Strawberry', kn: 'ಸ್ಟ್ರಾಬೆರಿ' }], ['mango', { en: 'Mango', kn: 'ಮಾವು' }], ['butterscotch', { en: 'Butterscotch', kn: 'ಬಟರ್‌ಸ್ಕಾಚ್' }]),
     ],
   },
   {
@@ -345,39 +347,39 @@ export const products = [
     price: 150,
     optionGroups: [
       flavours(
-        ['marble-chocolate', 'Marble Chocolate', 'ಮಾರ್ಬಲ್ ಚಾಕೊಲೇಟ್'],
-        ['almond', 'Almond', 'ಬಾದಾಮಿ'],
-        ['dates', 'Dates', 'ಖರ್ಜೂರ'],
-        ['roasted-almonds', 'Roasted Almonds', 'ಹುರಿದ ಬಾದಾಮಿ'],
-        ['waffle', 'Waffle', 'ವಾಫಲ್'],
-        ['raisin', 'Raisin', 'ಒಣದ್ರಾಕ್ಷಿ'],
-        ['coffee', 'Coffee', 'ಕಾಫಿ'],
-        ['ferrero-rocher', 'Ferrero Rocher', 'Ferrero Rocher'],
-        ['coconut', 'Coconut', 'ತೆಂಗಿನಕಾಯಿ'],
+        ['marble-chocolate', { en: 'Marble Chocolate', kn: 'ಮಾರ್ಬಲ್ ಚಾಕೊಲೇಟ್' }],
+        ['almond', { en: 'Almond', kn: 'ಬಾದಾಮಿ' }],
+        ['dates', { en: 'Dates', kn: 'ಖರ್ಜೂರ' }],
+        ['roasted-almonds', { en: 'Roasted Almonds', kn: 'ಹುರಿದ ಬಾದಾಮಿ' }],
+        ['waffle', { en: 'Waffle', kn: 'ವಾಫಲ್' }],
+        ['raisin', { en: 'Raisin', kn: 'ಒಣದ್ರಾಕ್ಷಿ' }],
+        ['coffee', { en: 'Coffee', kn: 'ಕಾಫಿ' }],
+        ['ferrero-rocher', { en: 'Ferrero Rocher', kn: 'Ferrero Rocher' }],
+        ['coconut', { en: 'Coconut', kn: 'ತೆಂಗಿನಕಾಯಿ' }],
       ),
     ],
   },
 
   /* ---------------- Chocolates: Chocolate Bars ---------------- */
   ...[
-    ['dark-chocolate-bar', 'Dark Chocolate', 'ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್', 150],
-    ['milk-chocolate-bar', 'Milk Chocolate', 'ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್', 150],
-    ['white-chocolate-bar', 'White Chocolate', 'ವೈಟ್ ಚಾಕೊಲೇಟ್', 200],
-    ['strawberry-dark-chocolate-bar', 'Strawberry Dark Chocolate', 'ಸ್ಟ್ರಾಬೆರಿ ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್', 200],
-    ['orange-milk-chocolate-bar', 'Orange Milk Chocolate', 'ಆರೆಂಜ್ ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್', 200],
-    ['cranberry-white-chocolate-bar', 'Cranberry White Chocolate', 'ಕ್ರ್ಯಾನ್‌ಬೆರಿ ವೈಟ್ ಚಾಕೊಲೇಟ್', 250],
-    ['hazelnut-dark-chocolate-bar', 'Hazelnut Dark Chocolate', 'ಹ್ಯಾಜಲ್‌ನಟ್ ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್', 250],
-    ['almond-milk-chocolate-bar', 'Almond Milk Chocolate', 'ಬಾದಾಮಿ ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್', 250],
-    ['walnut-white-chocolate-bar', 'Walnut White Chocolate', 'ವಾಲ್‌ನಟ್ ವೈಟ್ ಚಾಕೊಲೇಟ್', 300],
-    ['coconut-bar', 'Coconut Bar', 'ತೆಂಗಿನಕಾಯಿ ಬಾರ್', 280],
-  ].map(([id, en, kn, price], i) => ({
+    ['dark-chocolate-bar', { en: 'Dark Chocolate', kn: 'ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್' }, 150],
+    ['milk-chocolate-bar', { en: 'Milk Chocolate', kn: 'ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್' }, 150],
+    ['white-chocolate-bar', { en: 'White Chocolate', kn: 'ವೈಟ್ ಚಾಕೊಲೇಟ್' }, 200],
+    ['strawberry-dark-chocolate-bar', { en: 'Strawberry Dark Chocolate', kn: 'ಸ್ಟ್ರಾಬೆರಿ ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್' }, 200],
+    ['orange-milk-chocolate-bar', { en: 'Orange Milk Chocolate', kn: 'ಆರೆಂಜ್ ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್' }, 200],
+    ['cranberry-white-chocolate-bar', { en: 'Cranberry White Chocolate', kn: 'ಕ್ರ್ಯಾನ್‌ಬೆರಿ ವೈಟ್ ಚಾಕೊಲೇಟ್' }, 250],
+    ['hazelnut-dark-chocolate-bar', { en: 'Hazelnut Dark Chocolate', kn: 'ಹ್ಯಾಜಲ್‌ನಟ್ ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್' }, 250],
+    ['almond-milk-chocolate-bar', { en: 'Almond Milk Chocolate', kn: 'ಬಾದಾಮಿ ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್' }, 250],
+    ['walnut-white-chocolate-bar', { en: 'Walnut White Chocolate', kn: 'ವಾಲ್‌ನಟ್ ವೈಟ್ ಚಾಕೊಲೇಟ್' }, 300],
+    ['coconut-bar', { en: 'Coconut Bar', kn: 'ತೆಂಗಿನಕಾಯಿ ಬಾರ್' }, 280],
+  ].map(([id, name, price], i) => ({
     ...base,
     id,
     slug: id,
     categoryId: 'chocolates',
     sectionId: 'chocolate-bars',
     sort: i + 1,
-    name: { en, kn },
+    name,
     image: 'bar',
     nameCustomisation: false,
     price,
@@ -385,29 +387,28 @@ export const products = [
 
   /* ---------------- Chocolates: Classic Favourites (sold by weight) ---------------- */
   ...[
-    ['classic-dark-chocolate', 'Dark Chocolate', 'ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್', 1100, [275, 550, 1100], null, []],
-    ['classic-milk-chocolate', 'Milk Chocolate', 'ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್', 1100, [275, 550, 1100], null, []],
-    ['classic-white-chocolate', 'White Chocolate', 'ವೈಟ್ ಚಾಕೊಲೇಟ್', 1400, [350, 700, 1400], null, []],
-    ['classic-caramel-delight', 'Caramel Delight', 'ಕ್ಯಾರಮೆಲ್ ಡಿಲೈಟ್', 1000, [250, 500, 1000], null, []],
+    ['classic-dark-chocolate', { en: 'Dark Chocolate', kn: 'ಡಾರ್ಕ್ ಚಾಕೊಲೇಟ್' }, 1100, [275, 550, 1100], null, []],
+    ['classic-milk-chocolate', { en: 'Milk Chocolate', kn: 'ಮಿಲ್ಕ್ ಚಾಕೊಲೇಟ್' }, 1100, [275, 550, 1100], null, []],
+    ['classic-white-chocolate', { en: 'White Chocolate', kn: 'ವೈಟ್ ಚಾಕೊಲೇಟ್' }, 1400, [350, 700, 1400], null, []],
+    ['classic-caramel-delight', { en: 'Caramel Delight', kn: 'ಕ್ಯಾರಮೆಲ್ ಡಿಲೈಟ್' }, 1000, [250, 500, 1000], null, []],
     [
       'classic-favourite-assortment',
-      'Classic Favourite Assortment',
-      'ಕ್ಲಾಸಿಕ್ ಫೇವರಿಟ್ ಅಸಾರ್ಟ್‌ಮೆಂಟ್',
+      { en: 'Classic Favourite Assortment', kn: 'ಕ್ಲಾಸಿಕ್ ಫೇವರಿಟ್ ಅಸಾರ್ಟ್‌ಮೆಂಟ್' },
       1400,
       [350, 700, 1400],
       { en: '92 pieces per kg.', kn: 'ಪ್ರತಿ ಕೆ.ಜಿಗೆ 92 ತುಂಡುಗಳು.' },
       [],
     ],
-    ['classic-dry-fruits', 'Dry Fruits', 'ಡ್ರೈ ಫ್ರೂಟ್ಸ್', 1300, [325, 650, 1300], null, []],
-    ['classic-triple-layer-chocolate', 'Triple Layer Chocolate', 'ಟ್ರಿಪಲ್ ಲೇಯರ್ ಚಾಕೊಲೇಟ್', 1300, [325, 650, 1300], null, ['top-selling']],
-  ].map(([id, en, kn, perKg, [p250, p500, p1000], description, badges], i) => ({
+    ['classic-dry-fruits', { en: 'Dry Fruits', kn: 'ಡ್ರೈ ಫ್ರೂಟ್ಸ್' }, 1300, [325, 650, 1300], null, []],
+    ['classic-triple-layer-chocolate', { en: 'Triple Layer Chocolate', kn: 'ಟ್ರಿಪಲ್ ಲೇಯರ್ ಚಾಕೊಲೇಟ್' }, 1300, [325, 650, 1300], null, ['top-selling']],
+  ].map(([id, name, perKg, [p250, p500, p1000], description, badges], i) => ({
     ...base,
     id,
     slug: id,
     categoryId: 'chocolates',
     sectionId: 'classic-favourites',
     sort: i + 1,
-    name: { en, kn },
+    name,
     description,
     badges,
     image: 'assortment',

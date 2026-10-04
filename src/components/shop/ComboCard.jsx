@@ -2,6 +2,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { formatINR } from '../../lib/pricing'
 import ProductArt from '../art/ProductArt'
 import { useShopSheets } from './ShopSheets'
+import 'virtual:dk-strings/combo'
 
 // "Pick any 3 bars for ₹699": a distinct black card with three bars fanned out.
 export default function ComboCard({ combo }) {

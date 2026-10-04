@@ -10,6 +10,7 @@ import CallOptions from '../components/contact/CallOptions'
 import CertificationNote from '../components/classes/CertificationNote'
 import ClassCard from '../components/classes/ClassCard'
 import BookingSheet from '../components/classes/BookingSheet'
+import 'virtual:dk-strings/classes'
 
 const STEPS = ['pick', 'send', 'confirm']
 const USER_INPUT = ['wheel', 'touchstart', 'keydown', 'pointerdown']

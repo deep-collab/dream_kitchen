@@ -5,7 +5,7 @@
   notes, address) are kept as typed, on one line each.
 */
 import { waLink } from '../config/site'
-import en from '../i18n/en.json'
+import { english as en } from '../i18n/strings' // only en.dates (core) is used here
 import { formatDay } from './dates'
 import { formatINR } from './pricing'
 import { formatPhone, oneLine } from './validation'
@@ -43,7 +43,9 @@ export function orderMessage(order) {
     `Name: ${oneLine(c.name)} | Phone: ${formatPhone(c.phone)}`,
     'Items:',
     ...order.items.flatMap((item, i) => itemLines(item, i + 1)),
-    `Subtotal: ${formatINR(order.subtotal)} | Delivery: ${formatINR(order.deliveryCharge)} | Total: ${formatINR(order.total)}`,
+    order.deliveryCharge == null
+      ? `Subtotal: ${formatINR(order.subtotal)} | Delivery: to be confirmed | Total: ${formatINR(order.total)} + delivery`
+      : `Subtotal: ${formatINR(order.subtotal)} | Delivery: ${formatINR(order.deliveryCharge)} | Total: ${formatINR(order.total)}`,
     `Preferred date: ${formatDay(order.preferredDate, en.dates, { year: true })}`,
     `Address: ${[c.address, c.area].map(oneLine).filter(Boolean).join(', ')}, Pincode ${c.pincode}`,
     ...(order.note ? [`Note for Hema: ${oneLine(order.note)}`] : []),

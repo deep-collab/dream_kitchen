@@ -13,7 +13,7 @@ export default function CartAnnouncer() {
       first.current = false
       return
     }
-    setMessage(t('common.cartWithCount', { count }))
+    setMessage(count === 1 ? t('common.cartWithCountOne') : t('common.cartWithCount', { count }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count])
   return (

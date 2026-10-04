@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { addLine, CART_STORAGE_KEY, LEGACY_CART_KEYS, parseStoredCart, removeLine, restoreLine, serialiseCart, setLineQty, updateLine } from '../lib/cart'
 import { cartCount, cartSubtotal } from '../lib/pricing'
 import { repriceCart } from '../lib/reprice'
-import { useMenu } from './MenuProvider'
+import { useLoadedMenu } from './MenuProvider'
 
 const CartContext = createContext(null)
 
@@ -23,7 +23,8 @@ function readCart() {
  * until the line is edited or the order is sent. Must sit inside MenuProvider.
  */
 export function CartProvider({ children }) {
-  const menu = useMenu()
+  // Re-checks prices once a page has loaded the menu; the cart count needs no menu
+  const menu = useLoadedMenu()
   const [stored, setStored] = useState(readCart)
 
   useEffect(() => {

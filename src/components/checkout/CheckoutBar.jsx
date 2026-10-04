@@ -2,6 +2,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { telLink } from '../../config/site'
 import { useAnyOverlayOpen } from '../../hooks/useModal'
 import { PhoneIcon, WhatsAppIcon } from '../icons'
+import 'virtual:dk-strings/checkout'
 
 /**
  * Phones only (<768px), on /checkout in place of the usual bottom bar: a small

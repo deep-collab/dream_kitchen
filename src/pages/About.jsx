@@ -1,5 +1,8 @@
+import 'virtual:dk-strings/about'
+
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
+import { classesEnabled } from '../config/site'
 import PageHero from '../components/PageHero'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
@@ -8,7 +11,8 @@ import CertificationNote from '../components/classes/CertificationNote'
 
 // Our Story: only facts from the brief (student, ₹2,500, loved home brand, handmade
 // and fresh to order, classes, certification). Hema's own words replace these later.
-const PARTS = ['start', 'fresh', 'teach']
+// "Teaching others" (classes) shows only while classes are switched on
+const PARTS = ['start', 'fresh', 'teach'].filter((k) => k !== 'teach' || classesEnabled())
 
 export default function About() {
   useSeo('about')

@@ -1,6 +1,7 @@
 // Step 4 QA: classes + booking, home sections, Our Story, Gallery, Contact, FAQ, 404,
 // full Kannada, plus the Step 3 carry-overs checked in a real browser (order ID date).
 // Needs the dev server: `npm run dev -- --port 5173`, then: node scripts/qa-step4.mjs [outDir]
+// Runs with classes switched on (window.__dkTestSite); Step 5 checks them switched off.
 // "Now" is frozen with Playwright's clock (Monday 5 Oct 2026, 10 am IST) so dates are stable.
 // WhatsApp is stubbed: wa.me answers with a local page and every URL is recorded.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -28,6 +29,9 @@ async function newPage(browser, width, lang, { now = MONDAY, timezoneId = 'Asia/
     ([l, block]) => {
       sessionStorage.setItem('dk_intro_seen', '1')
       localStorage.setItem('dk_lang', l)
+      // Classes are switched off in config until Hema's real classes are in (Step 5); this
+      // script tests the classes part, so it switches them on (dev builds only, src/config/site.js)
+      window.__dkTestSite = { classes: { enabled: true } }
       if (block) window.open = () => null // a browser that blocks the WhatsApp tab
     },
     [lang, blockPopups],

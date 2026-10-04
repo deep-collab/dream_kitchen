@@ -10,6 +10,7 @@ import Button from '../ui/Button'
 import Chip from '../ui/Chip'
 import TextField, { PhoneField } from '../ui/TextField'
 import { CheckIcon, InfoIcon } from '../icons'
+import 'virtual:dk-strings/callback'
 
 /**
  * "Request a call back": phone (required), name (optional), a time chip (optional).

@@ -1,6 +1,7 @@
 import { useI18n } from '../../i18n/I18nProvider'
 import { ORDER_STEPS } from '../../lib/order'
 import { CheckIcon } from '../icons'
+import 'virtual:dk-strings/track'
 
 /**
  * Received → Confirmed → Preparing → Dispatched → Delivered.

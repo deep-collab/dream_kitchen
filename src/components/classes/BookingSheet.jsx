@@ -18,6 +18,8 @@ import { RadioCard } from '../ui/RadioCard'
 import TextField, { PhoneField } from '../ui/TextField'
 import { AlertIcon, PhoneIcon, PinIcon } from '../icons'
 import { batchText, locationText, seatsText } from './classText'
+import 'virtual:dk-strings/booking'
+import 'virtual:dk-strings/checkout'
 
 const FORM_ID = 'class-booking-form'
 

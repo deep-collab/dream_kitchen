@@ -1,6 +1,9 @@
+import 'virtual:dk-strings/callback'
+
 import { useId, useState } from 'react'
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatCallHours } from '../../lib/hours'
+import { hasCallHours } from '../../config/site'
 import Button from '../ui/Button'
 import Sheet from '../ui/Sheet'
 import CallbackForm from './CallbackForm'
@@ -37,9 +40,11 @@ export default function CallOptions({ title, text, as: Heading = 'h2', variant =
         </Button>
         <VoiceMessageButton fullWidth />
       </div>
-      <p className="t-small mt-3 text-brown-2">
-        {t('hours.label')}: {formatCallHours(t)}
-      </p>
+      {hasCallHours() && (
+        <p className="t-small mt-3 text-brown-2">
+          {t('hours.label')}: {formatCallHours(t)}
+        </p>
+      )}
       <Sheet open={open} onClose={() => setOpen(false)} title={t('callback.title')}>
         <CallbackForm onDone={() => setOpen(false)} />
       </Sheet>

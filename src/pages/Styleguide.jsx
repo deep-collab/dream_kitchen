@@ -19,6 +19,7 @@ import LanguageToggle from '../components/ui/LanguageToggle'
 import Wordmark from '../components/brand/Wordmark'
 import * as Icons from '../components/icons'
 import ProductArt, { ART_KINDS } from '../components/art/ProductArt'
+import 'virtual:dk-strings/styleguide'
 
 // Dev-only QA page (see App.jsx). Shows every component in English and Kannada.
 const SWATCHES = [

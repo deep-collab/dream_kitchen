@@ -19,13 +19,12 @@ export default function Wordmark({ variant = 'horizontal', size = 'hero', as: Ta
         data-dk-hero={handoff ? 'lockup' : undefined}
       >
         <Symbol className="dk-lockup__symbol" />
+        {/* The spaces keep the words apart for tools that read the visible text (e.g. voice control) */}
         <span className="dk-lockup__name" aria-hidden="true">
-          <span>Dream</span>
-          <span>Kitchen</span>
-        </span>
+          <span>Dream</span> <span>Kitchen</span>
+        </span>{' '}
         <span className="dk-lockup__sub" aria-hidden="true">
-          <span className="dk-lockup__ruled">Handmade</span>
-          <span>Chocolates</span>
+          <span className="dk-lockup__ruled">Handmade</span> <span>Chocolates</span>
         </span>
       </Tag>
     )

@@ -4,6 +4,7 @@ import { dateParts, formatDay } from '../../lib/dates'
 import Badge from '../ui/Badge'
 import TextField from '../ui/TextField'
 import { AlertIcon, CheckIcon, DateIcon } from '../icons'
+import 'virtual:dk-strings/checkout'
 
 const chip =
   'flex h-full min-h-14 items-center justify-center rounded-control border-[1.5px] border-control-line bg-[#fffdf8] px-2 pt-4 pb-2.5 text-center leading-tight transition-colors hover:border-brown-2 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-cream peer-focus-visible:shadow-[0_0_0_3px_var(--color-ink)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-gold'

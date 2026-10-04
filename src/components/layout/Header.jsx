@@ -8,7 +8,7 @@ import LanguageToggle from '../ui/LanguageToggle'
 import { CartIcon, MenuIcon, PhoneIcon } from '../icons'
 import { MAIN_NAV } from './nav'
 import MobileMenu from './MobileMenu'
-import CartCount from './CartCount'
+import CartCount, { CartItemsSr } from './CartCount'
 
 // Sticky black header with a fine gold rule. Call is visible at every width.
 // Phones: wordmark · language · Call · Menu (the cart lives in the bottom bar).
@@ -74,10 +74,10 @@ export default function Header() {
           <Link
             to="/cart"
             className="hidden min-h-12 items-center gap-2 rounded-control px-3 font-bold whitespace-nowrap text-cream transition-colors hover:bg-white/10 md:inline-flex"
-            aria-label={t('common.cartWithCount', { count: pieces })}
           >
             <CartIcon className="h-6 w-6 text-gold" />
-            <span aria-hidden="true">{t('nav.cart')}</span>
+            <span>{t('nav.cart')}</span>
+            <CartItemsSr count={pieces} t={t} />
             <CartCount count={pieces} />
           </Link>
 

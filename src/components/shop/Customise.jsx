@@ -11,6 +11,7 @@ import TextField from '../ui/TextField'
 import Chip from '../ui/Chip'
 import QuantityStepper from '../ui/QuantityStepper'
 import Button from '../ui/Button'
+import 'virtual:dk-strings/customise'
 
 export const NAME_MAX = 20
 export const NOTE_MAX = 120

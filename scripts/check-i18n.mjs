@@ -36,6 +36,10 @@ const runtime = [
   'classes.full', 'classes.seatsLeft', 'classes.seatsLeftOne', 'classes.hours', 'classes.minutes',
   ...['pick', 'send', 'confirm'].flatMap((k) => [`classes.how.${k}.title`, `classes.how.${k}.text`]),
   ...['start', 'fresh', 'teach'].flatMap((k) => [`about.${k}.title`, `about.${k}.text`]),
+  // Step 5: text chosen by the classes switch and the unconfirmed delivery charge; weight units
+  'contact.call.text', 'contact.call.textClasses', 'notFound.help', 'notFound.helpClasses', 'seo.faq.descClasses',
+  ...['order', 'noTyping', 'early', 'arrive', 'delivery', 'pay', 'name', 'classes', 'change'].flatMap((k) => [`faq.items.${k}.q`, `faq.items.${k}.a`]),
+  'faq.items.delivery.aNoCharge', 'units.g', 'units.kg',
   // booking: every code returned by lib/classes.js bookingErrors()
   'booking.errors.name.required', 'booking.errors.phone.required', 'booking.errors.phone.invalid',
   ...['required', 'gone', 'full'].map((c) => `booking.errors.batch.${c}`),
@@ -78,6 +82,21 @@ for (const [label, list] of [['only in en.json', onlyEn], ['only in kn.json', on
 const emoji = Object.entries({ ...en, ...Object.fromEntries(Object.entries(kn).map(([k, v]) => [`kn:${k}`, v])) }).filter(([, v]) => /(?![©®™])\p{Extended_Pictographic}/u.test(v)) // © is not an emoji
 problems += emoji.length
 console.log(`emoji: ${emoji.length}`, emoji.map(([k]) => k).join(' '))
+
+// English text arrives with its screen (scripts/strings-split.mjs): a file that shows text from
+// a section outside the core must import that section itself, or the text could be missing
+// on whichever page loads the file first.
+const { CORE_SECTIONS } = await import('./strings-split.mjs')
+const lazySections = new Set(Object.keys(dicts.en).filter((s) => !CORE_SECTIONS.includes(s)))
+const unimported = []
+for (const f of files) {
+  if (/[\\/]i18n[\\/]/.test(f)) continue
+  const src = readFileSync(f, 'utf8')
+  const used = new Set([...src.matchAll(/\bt\(\s*['`]([a-zA-Z]+)\./g), ...src.matchAll(/['`]([a-zA-Z]+)\.[a-zA-Z.]+['`]/g)].map((m) => m[1]).filter((s) => lazySections.has(s)))
+  for (const s of used) if (!src.includes(`'virtual:dk-strings/${s}'`)) unimported.push(`${f}: ${s}`)
+}
+problems += unimported.length
+console.log(`sections used without their import: ${unimported.length}`, unimported.join(' '))
 
 // Unused strings: nobody should proofread text the site never shows. A key counts as
 // used when code reads it or one of its parents (t('faq.items') covers every item).

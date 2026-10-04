@@ -8,10 +8,10 @@ import { createOrder } from '../services'
 import { site } from '../config/site'
 import { dateChoices, earliestDate, formatDay, latestDate } from '../lib/dates'
 import { forgetDetails, loadDetails, markCartForClearing, saveDetails } from '../lib/deviceStore'
-import { ADDRESS_MAX, AREA_MAX, areaFieldMode, buildOrder, CHECKOUT_FIELDS, checkoutErrors, NAME_MAX, NOTE_MAX } from '../lib/order'
+import { ADDRESS_MAX, AREA_MAX, areaFieldMode, buildOrder, CHECKOUT_FIELDS, checkoutErrors, deliveryChargeFor, NAME_MAX, NOTE_MAX } from '../lib/order'
+import TotalRows, { useTotalText } from '../components/order/TotalRows'
 import { makeOrderId } from '../lib/orderId'
 import { openWhatsApp } from '../lib/openWhatsApp'
-import { formatINR } from '../lib/pricing'
 import { tidyPhoneInput } from '../lib/validation'
 import { orderWhatsAppUrl } from '../lib/whatsappMessage'
 import PageHero from '../components/PageHero'
@@ -25,6 +25,7 @@ import CheckoutBar from '../components/checkout/CheckoutBar'
 import CartNotices from '../components/order/CartNotices'
 import SummaryLines from '../components/order/SummaryLines'
 import { WalletIcon } from '../components/icons'
+import 'virtual:dk-strings/checkout'
 
 const FORM_ID = 'checkout-form'
 const DATE_NAME = 'co-date'
@@ -73,10 +74,10 @@ export default function Checkout() {
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
   const blur = (k) => () => setTouched((prev) => (prev[k] ? prev : { ...prev, [k]: true }))
 
-  const delivery = cart.lines.length ? site.delivery.charge : 0
-  const total = cart.subtotal + delivery
+  const delivery = deliveryChargeFor(cart.lines.length) // null while Hema hasn't confirmed the charge
+  const totalText = useTotalText()
   const ready = cart.checked && Boolean(menu)
-  const submitLabel = ready ? t('checkout.submit', { price: formatINR(total) }) : t('checkout.checkingPrices')
+  const submitLabel = ready ? t('checkout.submit', { price: totalText(cart.subtotal, delivery) }) : t('checkout.checkingPrices')
 
   const announce = (text) => {
     setAnnouncement('')
@@ -277,22 +278,7 @@ export default function Checkout() {
               <div className="mt-3">
                 <SummaryLines lines={cart.lines} />
               </div>
-              <dl className="mt-4 space-y-2">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-brown-2">{t('cart.subtotal')}</dt>
-                  <dd className="font-bold tabular-nums">{formatINR(cart.subtotal)}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-brown-2">{t('cart.deliveryKarnataka')}</dt>
-                  <dd className="font-bold tabular-nums">{formatINR(delivery)}</dd>
-                </div>
-                <div className="flex items-baseline justify-between gap-4 border-t border-line pt-3">
-                  <dt className="font-bold">{t('cart.total')}</dt>
-                  <dd className="t-price" aria-live="polite">
-                    {formatINR(total)}
-                  </dd>
-                </div>
-              </dl>
+              <TotalRows subtotal={cart.subtotal} delivery={delivery} live className="mt-4" />
             </section>
 
             <section aria-labelledby="co-payment">

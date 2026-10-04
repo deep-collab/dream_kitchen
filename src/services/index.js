@@ -2,13 +2,17 @@
   Data layer. Every component gets data ONLY through these functions.
   Stage A: local data files (src/data) + browser storage.
   Stage B: swap the bodies for Supabase calls; keep the same names and return shapes.
+
+  The data files load only when a page asks for them (dynamic imports below), so pages
+  without the menu (Our Story, Contact, Track, 404…) never download it.
 */
-import { categories, occasions } from '../data/categories'
-import { products } from '../data/products'
-import { combos } from '../data/combos'
-import { classes } from '../data/classes'
-import { reviews } from '../data/reviews'
-import { upcomingBatches } from '../lib/classes'
+let menuRequested = false
+export const loadMenuData = () => {
+  menuRequested = true
+  return import('../data/menu')
+}
+/** True once anything (e.g. a menu page starting to load) has asked for the menu data */
+export const menuWasRequested = () => menuRequested
 import { normaliseBookingId } from '../lib/bookingId'
 import { normalisePhone } from '../lib/validation'
 import { normaliseOrderId } from '../lib/orderId'
@@ -51,37 +55,42 @@ function withFixtures(list) {
   return list.map((p) => (window.__dkTestSoldOut.includes(p.id) ? { ...p, soldOut: true } : p))
 }
 
-const activeProducts = () => withFixtures(products.filter((p) => p.active).sort((a, b) => a.sort - b.sort))
+const activeProducts = async () => {
+  const { products } = await loadMenuData()
+  return withFixtures(products.filter((p) => p.active).sort((a, b) => a.sort - b.sort))
+}
 
 export async function getCategories() {
+  const { categories } = await loadMenuData()
   return [...categories].sort((a, b) => a.sort - b.sort)
 }
 
 export async function getOccasions() {
-  return occasions
+  return (await loadMenuData()).occasions
 }
 
 /** Whole menu in one call: categories, products, combos, occasions and a product lookup. */
 export async function getMenu() {
-  const list = activeProducts()
-  return { categories: await getCategories(), products: list, productsById: byId(list), combos: combos.filter((c) => c.active), occasions }
+  const [list, categories, { combos, occasions }] = await Promise.all([activeProducts(), getCategories(), loadMenuData()])
+  return { categories, products: list, productsById: byId(list), combos: combos.filter((c) => c.active), occasions }
 }
 
 /** Search matches English and Kannada product names (case-insensitive). */
 export async function getProducts({ categoryId, search } = {}) {
-  let list = activeProducts()
+  let list = await activeProducts()
   if (categoryId) list = list.filter((p) => p.categoryId === categoryId)
   const q = (search || '').trim().toLowerCase()
-  if (q) list = list.filter((p) => p.name.en.toLowerCase().includes(q) || p.name.kn.toLowerCase().includes(q))
+  // Stage A data carries English only in the browser (scripts/kannada-split.mjs); Stage B may return both
+  if (q) list = list.filter((p) => p.name.en.toLowerCase().includes(q) || p.name.kn?.toLowerCase().includes(q))
   return list
 }
 
 export async function getProduct(slug) {
-  return activeProducts().find((p) => p.slug === slug) || null
+  return (await activeProducts()).find((p) => p.slug === slug) || null
 }
 
 export async function getCombos() {
-  return combos.filter((c) => c.active)
+  return (await loadMenuData()).combos.filter((c) => c.active)
 }
 
 /* ---------- orders ---------- */
@@ -155,6 +164,7 @@ export async function createCallback(input) {
  * Stage B: read `classes` + `class_batches` (date, time, seats left) instead.
  */
 export async function getClasses({ now = new Date() } = {}) {
+  const [{ classes }, { upcomingBatches }] = await Promise.all([import('../data/classes'), import('../lib/classes')])
   return classes
     .filter((c) => c.active)
     .sort((a, b) => a.sort - b.sort)
@@ -181,6 +191,7 @@ export async function getSavedBooking(id) {
 
 /** Real reviews only (src/data/reviews.js). The home section is hidden while this is empty. */
 export async function getReviews() {
+  const { reviews } = await import('../data/reviews')
   return reviews.filter((r) => r.approved)
 }
 

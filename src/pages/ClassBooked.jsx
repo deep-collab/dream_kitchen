@@ -14,6 +14,9 @@ import { useToast } from '../components/ui/Toast'
 import Symbol from '../components/brand/Symbol'
 import { batchText, durationText, locationText, modeText } from '../components/classes/classText'
 import { CopyIcon, PinIcon } from '../components/icons'
+import 'virtual:dk-strings/booked'
+import 'virtual:dk-strings/booking'
+import 'virtual:dk-strings/success'
 
 /**
  * After "Send booking on WhatsApp". Nothing is booked until Hema replies, so the
@@ -29,7 +32,7 @@ export default function ClassBooked() {
   // Saved on this phone, so a refresh still shows it; navigation state covers blocked storage
   const { data: booking, loading } = useAsync(() => getSavedBooking(id).then((b) => b || (state?.booking?.id === id ? state.booking : null)), [id])
 
-  if (loading) return <Container className="min-h-[50vh] py-16" aria-busy="true" />
+  if (loading) return <Container className="min-h-dvh py-16" aria-busy="true" />
   if (!booking) return <Missing id={id} />
   const blocked = state?.opened === false
 

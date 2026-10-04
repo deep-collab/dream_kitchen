@@ -1,9 +1,13 @@
+import 'virtual:dk-strings/hero'
+
 import { Link, useLocation } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useCart } from '../context/CartProvider'
 import { useMenu } from '../context/MenuProvider'
 import { useSeo } from '../hooks/useSeo'
 import { site } from '../config/site'
+import { deliveryChargeFor } from '../lib/order'
+import TotalRows from '../components/order/TotalRows'
 import { formatINR, lineTotal } from '../lib/pricing'
 import { lineChoices } from '../lib/lineText'
 import { MAX_QTY } from '../lib/cart'
@@ -33,7 +37,7 @@ export default function Cart() {
   useSeo('cart')
   const { t } = useI18n()
   const { lines, count, subtotal, unavailableIds } = useCart()
-  const delivery = lines.length ? site.delivery.charge : 0
+  const delivery = deliveryChargeFor(lines.length)
   const blocked = unavailableIds.length > 0
 
   return (
@@ -67,22 +71,7 @@ export default function Cart() {
               <h2 id="summary-title" className="t-h3">
                 {t('cart.summary')}
               </h2>
-              <dl className="mt-4 space-y-2">
-                <div className="flex justify-between gap-4">
-                  <dt className="text-brown-2">{t('cart.subtotal')}</dt>
-                  <dd className="font-bold tabular-nums">{formatINR(subtotal)}</dd>
-                </div>
-                <div className="flex justify-between gap-4">
-                  <dt className="text-brown-2">{t('cart.deliveryKarnataka')}</dt>
-                  <dd className="font-bold tabular-nums">{formatINR(delivery)}</dd>
-                </div>
-                <div className="flex items-baseline justify-between gap-4 border-t border-line pt-3">
-                  <dt className="font-bold">{t('cart.total')}</dt>
-                  <dd className="t-price" aria-live="polite">
-                    {formatINR(subtotal + delivery)}
-                  </dd>
-                </div>
-              </dl>
+              <TotalRows subtotal={subtotal} delivery={delivery} live className="mt-4" />
               <div className="mt-5">
                 <PrebookNotice />
               </div>

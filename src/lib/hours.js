@@ -8,7 +8,9 @@ export function formatHour(hour, t) {
   return t(`hours.time.${part}`, { h })
 }
 
-// "10 am – 8 pm, Monday to Saturday", from the hours in config
+// "10 am – 8 pm, Monday to Saturday", from the hours in config; '' while Hema hasn't
+// confirmed them (site.hours is null), and every caller then hides the whole line.
 export function formatCallHours(t, hours = site.hours) {
+  if (!hours) return ''
   return t('hours.range', { opens: formatHour(hours.opens, t), closes: formatHour(hours.closes, t), days: t(`hours.days.${hours.days}`) })
 }

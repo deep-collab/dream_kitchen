@@ -12,6 +12,7 @@ import Button from '../components/ui/Button'
 import TextField, { PhoneField } from '../components/ui/TextField'
 import StatusTracker from '../components/order/StatusTracker'
 import { AlertIcon } from '../components/icons'
+import 'virtual:dk-strings/track'
 
 /**
  * Order ID + phone -> status. Everything goes through services.getOrderStatus,

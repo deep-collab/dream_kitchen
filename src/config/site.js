@@ -1,5 +1,6 @@
 // Every business setting lives here. Text shown to customers lives in src/i18n.
-// Values marked PLACEHOLDER need Hema's confirmation; empty strings are hidden on the site.
+// UNCONFIRMED = waiting for Hema. Leave those empty (null or '') until she confirms:
+// an empty value is hidden everywhere on the site, and every page still reads naturally.
 
 // Hema's mobile number: Call, WhatsApp, the page text and index.html all come from
 // this one line. 10 digits, no spaces, no +91. (tests/config.test.js checks that no
@@ -21,10 +22,11 @@ export const site = {
     handle: '@dreamkitchen_01_homemade',
     url: 'https://instagram.com/dreamkitchen_01_homemade',
   },
-  email: '', // PLACEHOLDER
+  email: '', // UNCONFIRMED: e.g. 'hello@example.com'. Empty = hidden.
 
-  // Call hours, 24-hour clock. PLACEHOLDER until Hema confirms.
-  hours: { opens: 10, closes: 20, days: 'monSat' },
+  // UNCONFIRMED: call hours, 24-hour clock, e.g. { opens: 10, closes: 20, days: 'monSat' }
+  // (10 am – 8 pm, Monday to Saturday). null = no hours are shown anywhere.
+  hours: null,
 
   // Pre-booking rules (src/lib/dates.js). Dates are always worked out in Indian time,
   // whatever time zone the customer's phone is set to.
@@ -44,20 +46,43 @@ export const site = {
   // Chocolate classes (src/lib/classes.js). Stage A lists upcoming batches from each
   // class's weekly slot in src/data/classes.js; Stage B reads class_batches instead.
   classes: {
+    // The whole Classes part of the site: page, home section, menu and footer links, FAQ
+    // answer, sitemap. false until Hema's real classes replace the SAMPLE ones in
+    // src/data/classes.js. true = everything works exactly as before.
+    enabled: false,
     batchesShown: 4, // upcoming batches listed per class (one per weekend)
     closeDaysBefore: 1, // booking closes this many days before the class day
     peopleMax: 6, // most seats one booking can take (also capped by seats left)
-    certificateImage: '', // PLACEHOLDER: e.g. '/certificate.jpg' (in public/). Replaces the "coming soon" note.
+    // UNCONFIRMED: Hema's certificate photo, replacing the "coming soon" note. Put the files in
+    // public/ and give the real pixel size, e.g. { src: '/certificate-1200.jpg', width: 1200,
+    // height: 900, srcSet: [{ src: '/certificate-600.jpg', width: 600 }, { src: '/certificate-1200.jpg', width: 1200 }] }
+    certificateImage: null,
   },
 
   delivery: {
-    charge: 50, // PLACEHOLDER: flat charge across Karnataka
+    // UNCONFIRMED: flat delivery charge across Karnataka in rupees, e.g. 50. null = no charge
+    // is shown or added; cart, checkout and the WhatsApp order say Hema confirms it.
+    charge: null,
     pincodePattern: /^5[6-9]\d{4}$/, // Karnataka pincodes start with 56, 57, 58 or 59
   },
 
-  fssai: '', // PLACEHOLDER: 14-digit licence, shown in the footer once filled
-  shelfLife: '', // PLACEHOLDER
+  fssai: '', // UNCONFIRMED: 14-digit licence, shown in the footer and on Contact once filled
+  shelfLife: '', // UNCONFIRMED (not shown anywhere yet)
 }
+
+// QA only, development builds only (production drops this): scripts/qa-*.mjs set
+// window.__dkTestSite before the app loads, e.g. { classes: { enabled: true } }, to check
+// both ways without editing this file.
+if (import.meta.env?.DEV && typeof window !== 'undefined' && window.__dkTestSite) {
+  for (const [key, value] of Object.entries(window.__dkTestSite)) {
+    site[key] = value && typeof value === 'object' && !Array.isArray(value) && site[key] ? { ...site[key], ...value } : value
+  }
+}
+
+/** Shown only once Hema confirms them (see UNCONFIRMED above) */
+export const hasCallHours = () => Boolean(site.hours)
+export const hasDeliveryCharge = () => Number.isFinite(site.delivery.charge)
+export const classesEnabled = () => site.classes.enabled === true
 
 export const telLink = `tel:${site.phone.tel}`
 

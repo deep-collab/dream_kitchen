@@ -1,7 +1,9 @@
+import 'virtual:dk-strings/contact'
+
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
-import { site, telLink } from '../config/site'
+import { classesEnabled, hasCallHours, site, telLink } from '../config/site'
 import { formatCallHours } from '../lib/hours'
 import PageHero from '../components/PageHero'
 import Container from '../components/ui/Container'
@@ -21,7 +23,7 @@ export default function Contact() {
   const more = [
     { icon: InstagramIcon, label: t('contact.instagram'), value: site.instagram.handle, href: site.instagram.url },
     site.email && { icon: MailIcon, label: t('contact.email'), value: site.email, href: `mailto:${site.email}` },
-    { icon: ClockIcon, label: t('contact.hours'), value: formatCallHours(t) },
+    hasCallHours() && { icon: ClockIcon, label: t('contact.hours'), value: formatCallHours(t) },
     { icon: TruckIcon, label: t('contact.delivery'), value: t('contact.deliveryText') },
     site.fssai && { icon: FaqIcon, label: t('contact.fssai'), value: site.fssai },
   ].filter(Boolean)
@@ -35,7 +37,7 @@ export default function Contact() {
             <h2 id="call-title" className="t-h2">
               {t('contact.call.title')}
             </h2>
-            <p className="mt-2 text-brown-2">{t('contact.call.text')}</p>
+            <p className="mt-2 text-brown-2">{t(classesEnabled() ? 'contact.call.textClasses' : 'contact.call.text')}</p>
             <a href={telLink} className="mt-3 inline-flex min-h-12 items-center gap-3 text-[1.5rem] font-bold tabular-nums">
               <PhoneIcon className="h-7 w-7 shrink-0" />
               {site.phone.display}
@@ -43,12 +45,14 @@ export default function Contact() {
             <Button variant="call" size="lg" fullWidth className="mt-3">
               {t('callOptions.call')}
             </Button>
-            <p className="t-small mt-3 flex items-start gap-2 text-brown-2">
-              <ClockIcon className="mt-0.5 h-5 w-5 shrink-0" />
-              <span>
-                {t('hours.label')}: {formatCallHours(t)}
-              </span>
-            </p>
+            {hasCallHours() && (
+              <p className="t-small mt-3 flex items-start gap-2 text-brown-2">
+                <ClockIcon className="mt-0.5 h-5 w-5 shrink-0" />
+                <span>
+                  {t('hours.label')}: {formatCallHours(t)}
+                </span>
+              </p>
+            )}
           </section>
 
           <section aria-labelledby="wa-title" className="rounded-card border border-line p-5 sm:p-6">

@@ -4,6 +4,7 @@ import ProductArt from '../art/ProductArt'
 import Button from '../ui/Button'
 import { ClockIcon, KidsIcon, OnlineIcon, PinIcon, UsersIcon } from '../icons'
 import { batchText, durationText, locationText, modeText, seatsText } from './classText'
+import 'virtual:dk-strings/classes'
 
 /**
  * One class: title, what you'll learn, upcoming dates with seats left, duration,

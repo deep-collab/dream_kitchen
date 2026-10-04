@@ -9,6 +9,8 @@ import ProductArt from '../art/ProductArt'
 import Button from '../ui/Button'
 import QuantityStepper from '../ui/QuantityStepper'
 import { CloseIcon, PlusIcon } from '../icons'
+import 'virtual:dk-strings/combo'
+import 'virtual:dk-strings/customise'
 
 /** State for "Pick any 3 bars for ₹699". `line` prefills it when editing a cart line. */
 export function useComboBuilder(combo, line) {

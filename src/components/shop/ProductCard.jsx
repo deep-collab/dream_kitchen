@@ -5,6 +5,8 @@ import ProductArt from '../art/ProductArt'
 import Badge from '../ui/Badge'
 import { useShopSheets } from './ShopSheets'
 import { useMenu } from '../../context/MenuProvider'
+import 'virtual:dk-strings/customise'
+import 'virtual:dk-strings/shop'
 
 export const BADGE_KEYS = { signature: 'badges.signature', 'top-selling': 'badges.topSelling' }
 

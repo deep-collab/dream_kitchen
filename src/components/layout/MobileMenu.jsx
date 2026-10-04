@@ -5,13 +5,13 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { useCart } from '../../context/CartProvider'
 import { useModal, usePresence } from '../../hooks/useModal'
 import { formatCallHours } from '../../lib/hours'
-import { telLink } from '../../config/site'
+import { hasCallHours, telLink } from '../../config/site'
 import Wordmark from '../brand/Wordmark'
 import Button from '../ui/Button'
 import LanguageToggle from '../ui/LanguageToggle'
 import { CartIcon, CloseIcon, PhoneIcon } from '../icons'
 import { MAIN_NAV, MORE_NAV } from './nav'
-import CartCount from './CartCount'
+import CartCount, { CartItemsSr } from './CartCount'
 
 // Full-screen black menu: big labelled rows with icons, language, and large Call and
 // WhatsApp buttons within thumb reach at the bottom.
@@ -66,9 +66,10 @@ export default function MobileMenu({ open, onClose }) {
               </li>
             ))}
             <li>
-              <NavLink to="/cart" onClick={onClose} className={row} aria-label={t('common.cartWithCount', { count: pieces })}>
+              <NavLink to="/cart" onClick={onClose} className={row}>
                 <CartIcon className="h-6 w-6 shrink-0 text-gold" />
-                <span aria-hidden="true">{t('nav.cart')}</span>
+                <span>{t('nav.cart')}</span>
+                <CartItemsSr count={pieces} t={t} />
                 <CartCount count={pieces} />
               </NavLink>
             </li>
@@ -101,9 +102,11 @@ export default function MobileMenu({ open, onClose }) {
           <Button variant="whatsapp" size="lg" fullWidth>
             {t('mobileMenu.chat')}
           </Button>
-          <p className="t-small mt-1 text-center text-muted">
-            {t('hours.label')}: {formatCallHours(t)}
-          </p>
+          {hasCallHours() && (
+            <p className="t-small mt-1 text-center text-muted">
+              {t('hours.label')}: {formatCallHours(t)}
+            </p>
+          )}
         </div>
       </div>
     </div>,

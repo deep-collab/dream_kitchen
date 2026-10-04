@@ -2,6 +2,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import Wordmark from '../brand/Wordmark'
 import Symbol from '../brand/Symbol'
 import Button from '../ui/Button'
+import 'virtual:dk-strings/hero'
 
 // Tiny four-point gold sparkles kept to the edges so they never sit behind text.
 // [left %, top %, size px, twinkle duration s, delay s]

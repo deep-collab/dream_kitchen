@@ -136,10 +136,66 @@ Known and accepted for now:
 - JS bundle: 488 → 544 KB (142 → 153 KB gzip), with no new libraries. The growth is the new pages and their Kannada text. Step 5: lazy-load pages and kn.json.
 - All Kannada needs Hema's proofreading (docs/kannada-for-hema.md).
 
-## Step 5: QA, performance, SEO, polish
-- [ ] Lighthouse mobile targets (Perf 90+, A11y 100, BP 95+, SEO 100)
-- [ ] Per-page meta, OG (absolute URLs once domain is known), sitemap, robots, LocalBusiness JSON-LD
-- [ ] Full PART 3 checklist, leftover-code search
+## Step 5: Launch prep and speed
+- [x] Classes switch: `site.classes.enabled` (false). Off hides the page (/classes and /classes/booked/… are the 404), the home section, menu, phone menu and footer links, the FAQ answer, Our Story's "Teaching others", and the sitemap entry. Every string shown elsewhere has a version without classes (contact.call.text, notFound.help, seo.faq.desc). Unit tests (tests/step5.test.js) check navigation, sitemap, strings and the switch in each page; qa-step5 checks every page at 4 widths × EN/KN, with a self-test, for any class text or link.
+- [x] Unconfirmed details empty by default, hidden everywhere: `hours: null`, `delivery.charge: null`, email, fssai, shelfLife, `certificateImage: null` (each marked UNCONFIRMED with an example). The delivery charge needed real logic: `deliveryChargeFor()` returns null while unconfirmed, and TotalRows shows "Hema confirms it on WhatsApp" / "Total before delivery". The checkout button reads "₹2,199 + delivery" and the WhatsApp order "Delivery: to be confirmed | Total: ₹2,199 + delivery". Order tests now state their own ₹50 charge instead of relying on the placeholder.
+- [x] Booking IDs stay CL-YYMMDD-XXXX; README explains why.
+- [x] docs/kannada-priority-for-hema.md (`node scripts/kannada-list.mjs`): Part 1 is 71 lines (54 texts customers act on, grouped by screen, English | Kannada | Correct?, examples instead of {placeholders}, no keys). Part 2, "Later, if you have time", has the other 585. The old docs/kannada-for-hema.md is replaced.
+- [x] Speed, with no React: owner approved Preact (preact/compat alias in vite.config.js; measured in a throwaway experiment first). Every page is lazy (src/routes.js). The customise/combo sheets load on first open. Menu, class and review data load on demand. English text is split per screen (scripts/strings-split.mjs; check-i18n enforces each file importing its sections). Icons are one file each. All Kannada is one JSON file fetched only for ಕನ್ನಡ (scripts/kannada-split.mjs strips `kn` from the data at build time and fails on anything it can't split). A head script preloads the current page's files (route preload) and, for returning Kannada readers, the Kannada file.
+- [x] Images: `Photo` (width/height always, srcSet for phones, lazy unless near the top) for the certificate and gallery. Today's site has no photos: product art and the logo are inline SVG. Fonts: preconnect + non-blocking stylesheet preload; nothing else preloaded.
+- [x] Launch: LAUNCH.md tick-list; netlify.toml (build, publish, Node 22, a year's caching for hashed files); sitemap.xml and robots.txt generated from data and config (the old sitemap listed 14 products from the old sample); the 404 page is `noindex`; the stale public/products/placeholder.svg is removed.
+- [x] Accessibility: logo and cart links' spoken names now match what is on screen (Lighthouse label-content-name-mismatch, failing on every page before); "1 items" fixed.
+- [x] QA: 241 tests, check-i18n clean, build clean; qa-step5 (launch defaults) and qa-step4 (classes on) clean; bundle-report and Lighthouse below. Screenshots: docs/screenshots/step5 (classes-on/ has the class screens only; the rest are in the main set).
+- [x] Committed locally (not pushed)
+
+### Speed, measured
+First visit, JavaScript downloaded before the page shows (gzip, `node scripts/bundle-report.mjs`, production build):
+
+| | Before (Step 4) | After |
+|---|---|---|
+| Every page, English | 149 KB (one file) | 45–66 KB (Home 65.6, Menu 63.9, Checkout 66, 404 45.3) |
+| Every page, Kannada | 149 KB | 59–79 KB (the Kannada file is 13.8 KB) |
+| English visitor downloads Kannada | yes (menu names, kn.json) | never (checked on all 11 pages) |
+
+Lighthouse mobile (default throttling, cold cache, real cart, median of 3; `node scripts/lighthouse.mjs`). Served over HTTP/2 like Netlify (`scripts/serve-http2.mjs`); the Step 4 build was rebuilt from git and measured the same way. Accessibility, Best Practices and SEO are 100 on every page after.
+
+| Performance | EN before | EN after | KN before | KN after |
+|---|---|---|---|---|
+| Home | 95 | 91 | 75 | 80 |
+| Menu | 96 | 90 | 81 | 82 |
+| Product | 75 | 93 | 77 | 84 |
+| Cart | 87 | 91 | 80 | 85 |
+| Checkout | 95 | 91 | 73 | 84 |
+
+Over HTTP/1.1 (`vite preview`) the after numbers are within 1–2 points (EN 89–91, KN 77–86). The JSON files are in docs/screenshots/step5.
+
+### Step 5 self-critique log
+Round 1 (measuring), all fixed:
+1. My first Lighthouse run measured an empty cart: Lighthouse ignores a profile passed through --chrome-flags, so checkout redirected to /cart unnoticed. The runner now starts its own Chrome per run and refuses any run that lands on another address.
+2. The next runs were all from a warm cache ("0 KB of JavaScript"): 172 orphaned Chrome processes from earlier runs were still listening on the shared port, and Lighthouse attached to them. Each run now gets its own port, Chrome is stopped by profile path, and a run with no JavaScript downloaded is refused.
+3. A stale Step 4 dev server held port 5173 (it survived TaskStop), so a smoke test passed against old code. Stopped and restarted before any QA.
+4. My bundle report counted the idle prefetch as "first load" for Kannada visitors. It now counts only files requested before the page signals it has rendered.
+
+Round 2 (speed), all fixed:
+5. The router looked 62 KB in the bundle attribution; built on its own it is 14 KB (source maps over-attribute). React + ReactDOM were the real 63 KB. Without a framework change the best was 104–125 KB, so I asked; with Preact, 45–66 KB.
+6. Splitting pages made a waterfall (HTML → main code → page code → menu data). Lighthouse LCP went 2.3 s → 3.3 s and Checkout fell to 86. Fixed with the route preload, and by starting menu preparation when a menu page starts loading rather than after its first render (Menu 88 → 90).
+7. The Kannada preload hint sat after the stylesheet, so the browser only ran it once the CSS arrived (~0.6 s on slow 4G). Moved above it: the Kannada file starts at 188 ms instead of 622, and throttled Kannada LCP went 2.10 s → 1.55 s.
+8. Ruled out by measurement, not assumption: the loading screen (home LCP identical with and without it), the Kannada web fonts (no change when blocked), and HTTP/1.1 vs HTTP/2 (1–2 points).
+9. Lazy-loading the phone menu overlay saved 0.2 KB. Reverted: not worth a slower first tap.
+
+Round 3 (correctness), all fixed:
+10. Retrying a failed Kannada download could never work: browsers cache a failed import() of a script for the life of the page. Kannada is now a JSON file fetched with fetch(), and the retry works (tested with the network cut, then restored).
+11. The Kannada list's Part 1 said "Add a name on the box (+₹549)". Each text now has its own example values (+₹100).
+12. The phone-number guard caught my kannada-list.mjs spelling the number again; it reads config.
+13. Node scripts couldn't import products.js after I moved weightLabel (extensionless import); fixed with the .js extension.
+14. Two launch blockers found while writing LAUNCH.md: Node version not pinned (Vite 8 needs 20.19+), and every unknown address answers 200, so Google could list "404" pages. netlify.toml pins Node 22; the 404 page is noindex.
+15. Nine icons nobody used (egg, leaf, heart… from the old sample's invented "trust badges") removed.
+
+Known and accepted for now:
+- Kannada Lighthouse is 80–85: the page can't show until its Kannada text arrives, and Kannada text takes longer to lay out. The next real lever is pre-rendering pages to static HTML at build time (not done; it's a bigger change, proposed in the Step 5 report).
+- Home, Menu and Checkout score a few points below Step 4 in English (95/96/95 → 91/90/91; still ≥ 90). Lighthouse's simulated LCP penalises a chain of small files more than one big file; measured with real 4× CPU / slow 4G throttling, home's main text appears at 1.25 s.
+- The only Kannada an English visitor receives: the word ಕನ್ನಡ on the language button, and the loading screen's Kannada tagline in index.html (~150 bytes, so Kannada readers see Kannada before any script runs).
+- Open Graph and canonical URLs still use the placeholder domain until the final one is known.
 
 ---
 

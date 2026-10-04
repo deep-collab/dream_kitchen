@@ -1,11 +1,14 @@
+import 'virtual:dk-strings/notFound'
+
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
 import Symbol from '../components/brand/Symbol'
+import { classesEnabled } from '../config/site'
 
 export default function NotFound() {
-  useSeo('notFound')
+  useSeo('notFound', undefined, { noindex: true })
   const { t } = useI18n()
   return (
     <Container className="py-16 lg:py-24">
@@ -19,7 +22,7 @@ export default function NotFound() {
             {t('notFound.shop')}
           </Button>
         </div>
-        <p className="mt-10 text-brown-2">{t('notFound.help')}</p>
+        <p className="mt-10 text-brown-2">{t(classesEnabled() ? 'notFound.helpClasses' : 'notFound.help')}</p>
         <div className="mt-4 flex flex-col gap-3 sm:flex-row">
           <Button variant="call">{t('callOptions.call')}</Button>
           <Button variant="whatsapp">{t('mobileMenu.chat')}</Button>

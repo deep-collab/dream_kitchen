@@ -2,7 +2,7 @@
   "brand": {
     "tagline": "Turning your cravings into sweet memories.",
     "lockupLabel": "Dream Kitchen, Handmade Chocolates",
-    "homeLink": "Dream Kitchen, home page"
+    "homeLink": "Dream Kitchen, Handmade Chocolates: home page"
   },
   "nav": {
     "shop": "Shop",
@@ -27,7 +27,11 @@
     "optional": "optional",
     "cartWithCount": "Cart, {count} items",
     "close": "Close",
-    "newTab": "(opens in a new tab)"
+    "newTab": "(opens in a new tab)",
+    "cartItems": ", {count} items",
+    "cartItemsOne": ", 1 item",
+    "cartEmptySr": ", empty",
+    "cartWithCountOne": "Cart, 1 item"
   },
   "seo": {
     "home": {
@@ -52,7 +56,8 @@
     },
     "faq": {
       "title": "FAQ | Dream Kitchen",
-      "desc": "Pre-booking, delivery, payment, names on boxes and classes: your questions, answered."
+      "desc": "Pre-booking, delivery, payment and names on boxes: your questions, answered.",
+      "descClasses": "Pre-booking, delivery, payment, names on boxes and classes: your questions, answered."
     },
     "track": {
       "title": "Track Your Order | Dream Kitchen",
@@ -198,7 +203,10 @@
       "changed": "A choice you made is no longer offered. Remove this and add it again."
     },
     "checkoutBlocked": "Remove the unavailable items above to continue.",
-    "checkoutEmpty": "Checkout needs at least 1 item. Add something sweet first, or call and order on the phone."
+    "checkoutEmpty": "Checkout needs at least 1 item. Add something sweet first, or call and order on the phone.",
+    "deliveryToConfirm": "Hema confirms it on WhatsApp",
+    "totalBeforeDelivery": "Total before delivery",
+    "plusDelivery": "{price} + delivery"
   },
   "checkout": {
     "title": "Checkout",
@@ -384,7 +392,8 @@
     "subtitle": "Call, WhatsApp, or ask Hema to call you back. Whatever is easiest for you.",
     "call": {
       "title": "Call Hema",
-      "text": "Order, book a class or ask a question on the phone."
+      "text": "Order or ask a question on the phone.",
+      "textClasses": "Order, book a class or ask a question on the phone."
     },
     "whatsapp": {
       "title": "WhatsApp",
@@ -407,51 +416,53 @@
     "title": "Questions & answers",
     "subtitle": "Can’t find your answer? Call or WhatsApp Hema.",
     "stillTitle": "Still have a question?",
-    "items": [
-      {
+    "items": {
+      "order": {
         "q": "How do I place an order?",
         "a": "Add treats to your cart, fill in your delivery details, pick a date and tap “Send order on WhatsApp”. WhatsApp opens with your full order ready. Press send, and Hema replies to confirm."
       },
-      {
+      "noTyping": {
         "q": "Can I order without typing?",
         "a": "Yes. Call {phone}, send a voice message on WhatsApp, or tap “Request a call back” and leave just your number. Hema will take your order on the phone."
       },
-      {
+      "early": {
         "q": "How early should I order?",
         "a": "Dream Kitchen is pre-booking only, with no urgent orders. Every order is dispatched after {days} business days (Monday to Saturday), so it is made fresh for you. Checkout shows the earliest date you can pick."
       },
-      {
+      "arrive": {
         "q": "When will my order arrive?",
         "a": "You choose a preferred date at checkout. Hema confirms the exact delivery date on WhatsApp."
       },
-      {
+      "delivery": {
         "q": "Where do you deliver, and what does it cost?",
-        "a": "Anywhere in Karnataka (pincodes starting with 56, 57, 58 or 59), for a flat delivery charge of ₹{charge}."
+        "a": "Anywhere in Karnataka (pincodes starting with 56, 57, 58 or 59), for a flat delivery charge of ₹{charge}.",
+        "aNoCharge": "Anywhere in Karnataka (pincodes starting with 56, 57, 58 or 59). Hema confirms the delivery charge on WhatsApp when she confirms your order."
       },
-      {
+      "pay": {
         "q": "How do I pay?",
         "a": "There is no payment on the website. After Hema confirms your order on WhatsApp, she shares UPI details."
       },
-      {
+      "name": {
         "q": "Can I have a name written on the box?",
         "a": "Yes, for ₹{namePrice}, on Brownie Tubs, Delight Boxes, the Assorted Cookie Dip Box and the Cookie Pie Tin. Turn on “Add a name on the box” when you choose the item, and type up to {nameMax} letters."
       },
-      {
+      "classes": {
         "q": "How do the chocolate classes work?",
         "a": "Pick a class and a date on the Classes page, then send your booking on WhatsApp. Hema confirms your seat. For in-person classes the address is shared after booking; online classes get a joining link."
       },
-      {
+      "change": {
         "q": "Can I change my order?",
         "a": "Call or WhatsApp Hema as soon as you can, and she will tell you what is possible."
       }
-    ]
+    }
   },
   "notFound": {
     "title": "Oops! This page melted away",
     "text": "The page you’re looking for isn’t here. Maybe a brownie will cheer you up?",
     "home": "Go to the home page",
     "shop": "See the menu",
-    "help": "Looking for an order or a class? Call or WhatsApp Hema and she will help."
+    "help": "Looking for an order? Call or WhatsApp Hema and she will help.",
+    "helpClasses": "Looking for an order or a class? Call or WhatsApp Hema and she will help."
   },
   "footer": {
     "talk": "Talk to us",
@@ -788,5 +799,14 @@
     "moreClasses": "See all classes",
     "missingTitle": "We couldn’t find this booking on this phone",
     "missingText": "If you booked on another phone, look there. For help, call or WhatsApp Dream Kitchen."
+  },
+  "units": {
+    "g": "{n}g",
+    "kg": "{n}kg"
+  },
+  "langError": {
+    "text": "Kannada could not load. Please check your internet and try again.",
+    "retry": "Try Kannada again",
+    "close": "Close this message"
   }
 }

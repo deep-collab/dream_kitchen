@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { site, telLink, waLink } from '../src/config/site.js'
 import { addLine, makeComboLine, makeProductLine } from '../src/lib/cart.js'
 import { repriceCart } from '../src/lib/reprice.js'
-import { buildOrder, checkoutErrors, cleanAddress, ORDER_STEPS } from '../src/lib/order.js'
-import { byId, ctx, form, menu, NOW, orderFrom, SAMPLES } from './fixtures/sampleOrders.js'
+import { buildOrder, checkoutErrors, cleanAddress, deliveryChargeFor, ORDER_STEPS } from '../src/lib/order.js'
+import { byId, ctx, form, menu, NOW, orderFrom, SAMPLE_DELIVERY, SAMPLE_ID, SAMPLES } from './fixtures/sampleOrders.js'
 import { ID_ALPHABET, isValidOrderId, makeOrderId, normaliseOrderId, ORDER_ID_PATTERN, orderIdError } from '../src/lib/orderId.js'
 import { zonedNow } from '../src/lib/dates.js'
 import { formatPhone, isValidPhone, isValidPincode, normalisePhone, phoneError, pincodeError } from '../src/lib/validation.js'
@@ -266,8 +266,8 @@ describe('buildOrder', () => {
       preferredDate: '2026-10-07',
       customer: { name: 'Asha Rao', phone: '9845012345', address: '12, 3rd Cross, Jayanagar 4th Block', area: 'Bengaluru', pincode: '560011' },
       subtotal: 2399,
-      deliveryCharge: site.delivery.charge,
-      total: 2399 + site.delivery.charge,
+      deliveryCharge: SAMPLE_DELIVERY.charge,
+      total: 2399 + SAMPLE_DELIVERY.charge,
     })
     expect(order.items[0]).toMatchObject({ kind: 'product', nameOnBox: 'Asha', namePrice: 100, qty: 1, unitPrice: 1099, lineTotal: 1099 })
     expect(order.createdAt).toBe(NOW.toISOString())
@@ -279,10 +279,23 @@ describe('buildOrder', () => {
     lines = lines.map((l, i) => (i === 0 ? { ...l, unitPrice: 350 } : l)) // stale price from an old visit
     const soldOutMenu = { ...menu, productsById: { ...byId, 'mango-delight': { ...byId['mango-delight'], soldOut: true } } }
     const checked = repriceCart(lines, soldOutMenu).lines
-    const order = buildOrder({ id: 'DK-261005-AAAA', now: NOW, lines: checked, menu: soldOutMenu, form: form() })
+    const order = buildOrder({ id: 'DK-261005-AAAA', now: NOW, lines: checked, menu: soldOutMenu, form: form(), delivery: SAMPLE_DELIVERY })
     expect(order.items).toHaveLength(1)
     expect(order.items[0].unitPrice).toBe(399)
     expect(order.total).toBe(449)
+  })
+
+  it('a delivery charge Hema has not confirmed yet is never invented', () => {
+    expect(deliveryChargeFor(0, { charge: null })).toBe(0) // empty cart: nothing to deliver
+    expect(deliveryChargeFor(2, { charge: null })).toBe(null)
+    expect(deliveryChargeFor(2, { charge: '' })).toBe(null)
+    expect(deliveryChargeFor(2, { charge: 50 })).toBe(50)
+    expect(deliveryChargeFor(2, { charge: 0 })).toBe(0) // free delivery is a real, confirmed charge
+    const order = orderFrom([['product', 'oreo-overload-tub', { size: '250g' }, 1]], {}, SAMPLE_ID, { charge: null })
+    expect(order).toMatchObject({ subtotal: 399, deliveryCharge: null, total: 399 })
+    const msg = orderMessage(order)
+    expect(msg).toContain('Subtotal: ₹399 | Delivery: to be confirmed | Total: ₹399 + delivery')
+    expect(msg).not.toMatch(/Delivery: ₹|NaN|null|undefined/)
   })
 
   it('status steps are the brief’s sequence', () => {
