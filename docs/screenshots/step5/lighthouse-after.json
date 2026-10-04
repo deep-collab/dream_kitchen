@@ -1,0 +1,153 @@
+[
+  {
+    "name": "Home",
+    "path": "/",
+    "scores": {
+      "performance": 90,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3347,
+    "tbt": 118,
+    "cls": 0,
+    "fcp": 1741,
+    "jsKb": 104,
+    "failing": [
+      "largest-contentful-paint (3.3 s)",
+      "max-potential-fid (170 ms)",
+      "largest-contentful-paint-element (3,350 ms)",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight (Est savings of 10 ms)"
+    ],
+    "details": {},
+    "lcpElement": "<p class=\"t-lead mt-4 max-w-[30rem] text-muted lg:max-w-[36rem]\">",
+    "perfRuns": [
+      89,
+      90,
+      91
+    ]
+  },
+  {
+    "name": "Menu",
+    "path": "/shop",
+    "scores": {
+      "performance": 89,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3228,
+    "tbt": 0,
+    "cls": 0,
+    "fcp": 2478,
+    "jsKb": 97,
+    "failing": [
+      "first-contentful-paint (2.5 s)",
+      "largest-contentful-paint (3.2 s)",
+      "mainthread-work-breakdown (2.5 s)",
+      "largest-contentful-paint-element (3,230 ms)",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "dom-size (1,572 elements)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {},
+    "lcpElement": "<p class=\"t-lead mt-3\">",
+    "perfRuns": [
+      85,
+      89,
+      97
+    ]
+  },
+  {
+    "name": "Product",
+    "path": "/product/ferrero-rocher-nutella-tub",
+    "scores": {
+      "performance": 91,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3190,
+    "tbt": 114,
+    "cls": 0.023,
+    "fcp": 1659,
+    "jsKb": 97,
+    "failing": [
+      "largest-contentful-paint (3.2 s)",
+      "max-potential-fid (160 ms)",
+      "largest-contentful-paint-element (3,190 ms)",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight (Est savings of 10 ms)"
+    ],
+    "details": {},
+    "lcpElement": "<h1 class=\"t-h1 mt-2\">",
+    "perfRuns": [
+      88,
+      91,
+      92
+    ]
+  },
+  {
+    "name": "Cart",
+    "path": "/cart",
+    "scores": {
+      "performance": 91,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3283,
+    "tbt": 81,
+    "cls": 0.035,
+    "fcp": 1626,
+    "jsKb": 97,
+    "failing": [
+      "largest-contentful-paint (3.3 s)",
+      "max-potential-fid (130 ms)",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {},
+    "lcpElement": "",
+    "perfRuns": [
+      90,
+      91,
+      91
+    ]
+  },
+  {
+    "name": "Checkout",
+    "path": "/checkout",
+    "scores": {
+      "performance": 91,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3237,
+    "tbt": 100,
+    "cls": 0.008,
+    "fcp": 1668,
+    "jsKb": 97,
+    "failing": [
+      "largest-contentful-paint (3.2 s)",
+      "max-potential-fid (130 ms)",
+      "largest-contentful-paint-element (3,240 ms)",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {},
+    "lcpElement": "<p class=\"t-lead mt-3 text-brown-2\">",
+    "perfRuns": [
+      90,
+      91,
+      91
+    ]
+  }
+]

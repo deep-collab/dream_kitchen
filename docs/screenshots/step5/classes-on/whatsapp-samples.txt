@@ -1,0 +1,31 @@
+Sample WhatsApp messages captured from the real pages during scripts/qa-step4.mjs (always English, plain text).
+
+Booking sent from the English site (390px)
+New class booking: CL-261005-3QS8
+Class: Chocolate Making for Beginners (in person, 3 hours)
+Batch: Sat, 10 Oct 2026, 11 am
+People: 2 × ₹1,499 = ₹2,998
+Name: Asha Rao | Phone: +91 98450 12345
+Please confirm my seats and share the payment details.
+
+Link: https://wa.me/919535706956?text=New%20class%20booking%3A%20CL-261005-3QS8%0AClass%3A%20Cho…
+
+Booking sent from the Kannada site (390px)
+New class booking: CL-261005-KJBB
+Class: Chocolate Making for Beginners (in person, 3 hours)
+Batch: Sat, 10 Oct 2026, 11 am
+People: 2 × ₹1,499 = ₹2,998
+Name: ಆಶಾ ರಾವ್ | Phone: +91 98450 12345
+Please confirm my seats and share the payment details.
+
+Link: https://wa.me/919535706956?text=New%20class%20booking%3A%20CL-261005-KJBB%0AClass%3A%20Cho…
+
+Order placed Monday 5 Oct 2026, 10 am IST (preferred date 2026-10-07)
+New order: DK-261005-QAAD
+Name: Asha Rao | Phone: +91 98450 12345
+Items:
+1) Oreo Overload (Brownie Tub) – 250g × 1 – ₹399
+Subtotal: ₹399 | Delivery: to be confirmed | Total: ₹399 + delivery
+Preferred date: Wed, 7 Oct 2026
+Address: 12, 3rd Cross, Jayanagar 4th Block, Bengaluru, Pincode 560011
+Please confirm my order and share UPI details.

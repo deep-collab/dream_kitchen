@@ -1,0 +1,15 @@
+Order sent while the delivery charge is not confirmed yet (site.delivery.charge empty), captured from the real page by scripts/qa-step5.mjs:
+
+New order: DK-261005-BJX2
+Name: Asha Rao | Phone: +91 98450 12345
+Items:
+1) Ferrero Rocher Nutella (Brownie Tub) – 500g × 1 – ₹1,099
+   Name on box: Asha (+₹100)
+   Occasion: Birthday
+2) Dreamy Biscoff Delight (Delight Box) – 250g × 2 – ₹1,100
+   Flavour: Mango
+Subtotal: ₹2,199 | Delivery: to be confirmed | Total: ₹2,199 + delivery
+Preferred date: Thu, 8 Oct 2026
+Address: 12, 3rd Cross, Jayanagar 4th Block, Bengaluru, Pincode 560011
+Note for Hema: Please call before delivering.
+Please confirm my order and share UPI details.

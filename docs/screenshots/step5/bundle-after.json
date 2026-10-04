@@ -1,0 +1,206 @@
+{
+  "label": "after",
+  "english": [
+    {
+      "path": "/",
+      "landed": "/",
+      "firstLoadKb": 65.6,
+      "files": 25,
+      "withPrefetchKb": 87.8,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/shop",
+      "landed": "/shop",
+      "firstLoadKb": 63.9,
+      "files": 22,
+      "withPrefetchKb": 82.3,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/product/ferrero-rocher-nutella-tub",
+      "landed": "/product/ferrero-rocher-nutella-tub",
+      "firstLoadKb": 64,
+      "files": 22,
+      "withPrefetchKb": 82.3,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/cart",
+      "landed": "/cart",
+      "firstLoadKb": 62.4,
+      "files": 23,
+      "withPrefetchKb": 82.3,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/checkout",
+      "landed": "/checkout",
+      "firstLoadKb": 66,
+      "files": 24,
+      "withPrefetchKb": 82.3,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/our-story",
+      "landed": "/our-story",
+      "firstLoadKb": 47.5,
+      "files": 11,
+      "withPrefetchKb": 84.9,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/contact",
+      "landed": "/contact",
+      "firstLoadKb": 52,
+      "files": 15,
+      "withPrefetchKb": 83.8,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/faq",
+      "landed": "/faq",
+      "firstLoadKb": 61.1,
+      "files": 22,
+      "withPrefetchKb": 84.1,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/gallery",
+      "landed": "/gallery",
+      "firstLoadKb": 46.4,
+      "files": 10,
+      "withPrefetchKb": 83.8,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/track",
+      "landed": "/track",
+      "firstLoadKb": 49.5,
+      "files": 11,
+      "withPrefetchKb": 85,
+      "kannadaFiles": []
+    },
+    {
+      "path": "/no-such-page",
+      "landed": "/no-such-page",
+      "firstLoadKb": 45.3,
+      "files": 7,
+      "withPrefetchKb": 82.3,
+      "kannadaFiles": []
+    }
+  ],
+  "kannada": [
+    {
+      "path": "/",
+      "landed": "/",
+      "firstLoadKb": 79.1,
+      "files": 26,
+      "withPrefetchKb": 101.3,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/shop",
+      "landed": "/shop",
+      "firstLoadKb": 77.4,
+      "files": 23,
+      "withPrefetchKb": 95.8,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/product/ferrero-rocher-nutella-tub",
+      "landed": "/product/ferrero-rocher-nutella-tub",
+      "firstLoadKb": 77.5,
+      "files": 23,
+      "withPrefetchKb": 95.8,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/cart",
+      "landed": "/cart",
+      "firstLoadKb": 75.9,
+      "files": 24,
+      "withPrefetchKb": 95.8,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/checkout",
+      "landed": "/checkout",
+      "firstLoadKb": 79.5,
+      "files": 25,
+      "withPrefetchKb": 95.8,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/our-story",
+      "landed": "/our-story",
+      "firstLoadKb": 61,
+      "files": 12,
+      "withPrefetchKb": 98.4,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/contact",
+      "landed": "/contact",
+      "firstLoadKb": 65.5,
+      "files": 16,
+      "withPrefetchKb": 97.3,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/faq",
+      "landed": "/faq",
+      "firstLoadKb": 74.6,
+      "files": 23,
+      "withPrefetchKb": 97.6,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/gallery",
+      "landed": "/gallery",
+      "firstLoadKb": 59.9,
+      "files": 11,
+      "withPrefetchKb": 97.3,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/track",
+      "landed": "/track",
+      "firstLoadKb": 63,
+      "files": 12,
+      "withPrefetchKb": 98.5,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    },
+    {
+      "path": "/no-such-page",
+      "landed": "/no-such-page",
+      "firstLoadKb": 58.8,
+      "files": 8,
+      "withPrefetchKb": 95.8,
+      "kannadaFiles": [
+        "/assets/kannada-9273d9f50c.json"
+      ]
+    }
+  ],
+  "problems": []
+}

@@ -1,0 +1,209 @@
+[
+  {
+    "name": "Home",
+    "path": "/",
+    "scores": {
+      "performance": 75,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 4618,
+    "tbt": 261,
+    "cls": 0.006,
+    "fcp": 2345,
+    "jsKb": 149,
+    "failing": [
+      "first-contentful-paint (2.3 s)",
+      "largest-contentful-paint (4.6 s)",
+      "total-blocking-time (260 ms)",
+      "max-potential-fid (200 ms)",
+      "interactive (4.6 s)",
+      "mainthread-work-breakdown (2.6 s)",
+      "largest-contentful-paint-element (4,620 ms)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 66 KiB)",
+      "dom-size (963 elements)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight (Est savings of 150 ms)"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, ಮುಖಪುಟ\" href=\"/\" data-discover=\"true\">",
+        "<a class=\"flex h-full flex-col items-center justify-center gap-1 px-1 text-center te…\" aria-label=\"ಕಾರ್ಟ್, 1 ವಸ್ತುಗಳು\" href=\"/cart\" data-discover=\"true\">"
+      ]
+    },
+    "lcpElement": "<p class=\"t-lead mt-4 max-w-[30rem] text-muted lg:max-w-[36rem]\">",
+    "perfRuns": [
+      70,
+      75,
+      75
+    ]
+  },
+  {
+    "name": "Menu",
+    "path": "/shop",
+    "scores": {
+      "performance": 81,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3688,
+    "tbt": 318,
+    "cls": 0.012,
+    "fcp": 1660,
+    "jsKb": 149,
+    "failing": [
+      "largest-contentful-paint (3.7 s)",
+      "speed-index (3.7 s)",
+      "total-blocking-time (320 ms)",
+      "max-potential-fid (210 ms)",
+      "interactive (5.2 s)",
+      "mainthread-work-breakdown (3.1 s)",
+      "largest-contentful-paint-element (3,690 ms)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 67 KiB)",
+      "dom-size (1,580 elements)",
+      "forced-reflow-insight",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, ಮುಖಪುಟ\" href=\"/\" data-discover=\"true\">",
+        "<a class=\"flex h-full flex-col items-center justify-center gap-1 px-1 text-center te…\" aria-label=\"ಕಾರ್ಟ್, 1 ವಸ್ತುಗಳು\" href=\"/cart\" data-discover=\"true\">"
+      ]
+    },
+    "lcpElement": "<p class=\"t-lead mt-3 max-w-[40rem] text-brown-2\">",
+    "perfRuns": [
+      70,
+      81,
+      87
+    ]
+  },
+  {
+    "name": "Product",
+    "path": "/product/ferrero-rocher-nutella-tub",
+    "scores": {
+      "performance": 77,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3129,
+    "tbt": 66,
+    "cls": 0.24,
+    "fcp": 2448,
+    "jsKb": 149,
+    "failing": [
+      "first-contentful-paint (2.4 s)",
+      "largest-contentful-paint (3.1 s)",
+      "max-potential-fid (150 ms)",
+      "cumulative-layout-shift (0.24)",
+      "interactive (4.1 s)",
+      "largest-contentful-paint-element (3,130 ms)",
+      "layout-shifts (2 layout shifts found)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 66 KiB)",
+      "cls-culprits-insight",
+      "forced-reflow-insight",
+      "network-dependency-tree-insight",
+      "render-blocking-insight (Est savings of 150 ms)"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, ಮುಖಪುಟ\" href=\"/\" data-discover=\"true\">",
+        "<a class=\"flex h-full flex-col items-center justify-center gap-1 px-1 text-center te…\" aria-label=\"ಕಾರ್ಟ್, 1 ವಸ್ತುಗಳು\" href=\"/cart\" data-discover=\"true\">"
+      ],
+      "layout-shifts": [
+        "<footer class=\"on-dark border-t border-gold/45 bg-ink text-muted\">",
+        "<span>"
+      ]
+    },
+    "lcpElement": "<p class=\"t-lead\">",
+    "perfRuns": [
+      71,
+      77,
+      83
+    ]
+  },
+  {
+    "name": "Cart",
+    "path": "/cart",
+    "scores": {
+      "performance": 80,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 4627,
+    "tbt": 142,
+    "cls": 0.044,
+    "fcp": 1657,
+    "jsKb": 149,
+    "failing": [
+      "largest-contentful-paint (4.6 s)",
+      "max-potential-fid (140 ms)",
+      "interactive (4.6 s)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 68 KiB)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, ಮುಖಪುಟ\" href=\"/\" data-discover=\"true\">",
+        "<a class=\"flex h-full flex-col items-center justify-center gap-1 px-1 text-center te…\" aria-label=\"ಕಾರ್ಟ್, 1 ವಸ್ತುಗಳು\" href=\"/cart\" data-discover=\"true\">"
+      ]
+    },
+    "lcpElement": "",
+    "perfRuns": [
+      73,
+      80,
+      80
+    ]
+  },
+  {
+    "name": "Checkout",
+    "path": "/checkout",
+    "scores": {
+      "performance": 73,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 4602,
+    "tbt": 0,
+    "cls": 0.016,
+    "fcp": 4452,
+    "jsKb": 149,
+    "failing": [
+      "first-contentful-paint (4.5 s)",
+      "largest-contentful-paint (4.6 s)",
+      "speed-index (4.5 s)",
+      "interactive (4.6 s)",
+      "largest-contentful-paint-element (4,600 ms)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 64 KiB)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight (Est savings of 150 ms)"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, ಮುಖಪುಟ\" href=\"/\" data-discover=\"true\">"
+      ]
+    },
+    "lcpElement": "<p class=\"t-lead mt-3 text-brown-2\">",
+    "perfRuns": [
+      69,
+      73,
+      95
+    ]
+  }
+]

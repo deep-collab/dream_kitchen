@@ -1,0 +1,192 @@
+[
+  {
+    "name": "Home",
+    "path": "/",
+    "scores": {
+      "performance": 95,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 2418,
+    "tbt": 31,
+    "cls": 0.015,
+    "fcp": 2266,
+    "jsKb": 149,
+    "failing": [
+      "first-contentful-paint (2.3 s)",
+      "interactive (3.9 s)",
+      "mainthread-work-breakdown (2.9 s)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 66 KiB)",
+      "dom-size (963 elements)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight (Est savings of 150 ms)"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, home page\" href=\"/\" data-discover=\"true\">",
+        "<a class=\"flex h-full flex-col items-center justify-center gap-1 px-1 text-center te…\" aria-label=\"Cart, 1 items\" href=\"/cart\" data-discover=\"true\">"
+      ]
+    },
+    "lcpElement": "<p class=\"t-lead mt-4 max-w-[30rem] text-muted lg:max-w-[36rem]\">",
+    "perfRuns": [
+      95,
+      95,
+      97
+    ]
+  },
+  {
+    "name": "Menu",
+    "path": "/shop",
+    "scores": {
+      "performance": 96,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 2446,
+    "tbt": 36,
+    "cls": 0.007,
+    "fcp": 1690,
+    "jsKb": 149,
+    "failing": [
+      "interactive (4.0 s)",
+      "mainthread-work-breakdown (2.4 s)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 67 KiB)",
+      "dom-size (1,580 elements)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, home page\" href=\"/\" data-discover=\"true\">",
+        "<a class=\"flex h-full flex-col items-center justify-center gap-1 px-1 text-center te…\" aria-label=\"Cart, 1 items\" href=\"/cart\" data-discover=\"true\">"
+      ]
+    },
+    "lcpElement": "<p class=\"t-lead mt-3\">",
+    "perfRuns": [
+      96,
+      96,
+      96
+    ]
+  },
+  {
+    "name": "Product",
+    "path": "/product/ferrero-rocher-nutella-tub",
+    "scores": {
+      "performance": 75,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3698,
+    "tbt": 22,
+    "cls": 0.26,
+    "fcp": 1690,
+    "jsKb": 149,
+    "failing": [
+      "largest-contentful-paint (3.7 s)",
+      "cumulative-layout-shift (0.26)",
+      "largest-contentful-paint-element (3,700 ms)",
+      "layout-shifts (2 layout shifts found)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 66 KiB)",
+      "cls-culprits-insight",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, home page\" href=\"/\" data-discover=\"true\">",
+        "<a class=\"flex h-full flex-col items-center justify-center gap-1 px-1 text-center te…\" aria-label=\"Cart, 1 items\" href=\"/cart\" data-discover=\"true\">"
+      ],
+      "layout-shifts": [
+        "<footer class=\"on-dark border-t border-gold/45 bg-ink text-muted\">",
+        "{\"score\":0.02349749850702116,\"subItems\":{\"type\":\"subitems\",\"items\":[{\"extra\":{\"type\":\"url\",\"value\":\"https://fonts.gstati"
+      ]
+    },
+    "lcpElement": "<h1 class=\"t-h1 mt-2\">",
+    "perfRuns": [
+      74,
+      75,
+      87
+    ]
+  },
+  {
+    "name": "Cart",
+    "path": "/cart",
+    "scores": {
+      "performance": 87,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3916,
+    "tbt": 62,
+    "cls": 0.007,
+    "fcp": 1656,
+    "jsKb": 149,
+    "failing": [
+      "largest-contentful-paint (3.9 s)",
+      "interactive (3.9 s)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 68 KiB)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, home page\" href=\"/\" data-discover=\"true\">",
+        "<a class=\"flex h-full flex-col items-center justify-center gap-1 px-1 text-center te…\" aria-label=\"Cart, 1 items\" href=\"/cart\" data-discover=\"true\">"
+      ]
+    },
+    "lcpElement": "",
+    "perfRuns": [
+      84,
+      87,
+      87
+    ]
+  },
+  {
+    "name": "Checkout",
+    "path": "/checkout",
+    "scores": {
+      "performance": 95,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 2410,
+    "tbt": 56,
+    "cls": 0.008,
+    "fcp": 2259,
+    "jsKb": 149,
+    "failing": [
+      "first-contentful-paint (2.3 s)",
+      "max-potential-fid (160 ms)",
+      "interactive (3.9 s)",
+      "label-content-name-mismatch",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "unused-javascript (Est savings of 65 KiB)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight (Est savings of 150 ms)"
+    ],
+    "details": {
+      "label-content-name-mismatch": [
+        "<a class=\"rounded-control p-1\" aria-label=\"Dream Kitchen, home page\" href=\"/\" data-discover=\"true\">"
+      ]
+    },
+    "lcpElement": "<p class=\"t-lead mt-3 text-brown-2\">",
+    "perfRuns": [
+      84,
+      95,
+      96
+    ]
+  }
+]
