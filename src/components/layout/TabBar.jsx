@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
 import { useAnyOverlayOpen } from '../../hooks/useModal'
+import { useCart } from '../../context/CartProvider'
 import { isCheckoutPath, MAIN_NAV } from './nav'
 
 // Phones and tablets (<1024px): the five main places, always within thumb reach, each an icon
@@ -10,7 +11,8 @@ export default function TabBar() {
   const { t } = useI18n()
   const hidden = useAnyOverlayOpen()
   const { pathname } = useLocation()
-  if (isCheckoutPath(pathname)) return null
+  const { count } = useCart()
+  if (isCheckoutPath(pathname, count)) return null
 
   return (
     <nav

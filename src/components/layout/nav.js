@@ -17,5 +17,6 @@ export const FOOTER_NAV = [
   { to: '/contact', key: 'nav.contact' },
 ]
 
-/** Pages where the bottom of the screen belongs to the order's own total bar (cart and checkout) */
-export const isCheckoutPath = (pathname) => /^\/(cart|checkout|pay)(\/|$)/.test(pathname)
+/** Pages where the bottom of the screen belongs to the order's own total bar (cart and checkout).
+ *  An empty cart has no total bar, so it keeps the tab bar. */
+export const isCheckoutPath = (pathname, cartCount = 1) => /^\/(checkout|pay)(\/|$)/.test(pathname) || (pathname === '/cart' && cartCount > 0)

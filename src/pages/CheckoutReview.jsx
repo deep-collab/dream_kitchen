@@ -92,7 +92,8 @@ export default function CheckoutReview() {
 
   const st = states.find((s) => s.id === form.state)
   const ready = remoteLoaded && canOrder
-  const label = !remoteLoaded ? t('common.loading') : !canOrder ? t('checkout.paymentsSoon') : placing ? t('checkout.placing') : t('checkout.placeOrder', { price: formatINR(q.total) })
+  const closed = remoteLoaded && !settings.store.open
+  const label = !remoteLoaded ? t('common.loading') : closed ? t('banner.closed') : !canOrder ? t('checkout.paymentsSoon') : placing ? t('checkout.placing') : t('checkout.placeOrder', { price: formatINR(q.total) })
 
   return (
     <Container className="py-5 pb-44 lg:py-10">
@@ -180,7 +181,7 @@ export default function CheckoutReview() {
               <span>{error}</span>
             </p>
           )}
-          <TotalBar label={t('cart.total')} total={formatINR(q.total ?? q.subtotal)} note={remoteLoaded && !canOrder ? t('checkout.paymentsSoonText', { phone: site.phone.display }) : undefined}>
+          <TotalBar label={t('cart.total')} total={formatINR(q.total ?? q.subtotal)} note={closed ? t('errors.storeClosed', { phone: site.phone.display }) : remoteLoaded && !canOrder ? t('checkout.paymentsSoonText', { phone: site.phone.display }) : undefined}>
             <Button size="lg" fullWidth onClick={onPlace} disabled={!ready || placing} aria-busy={placing || undefined} data-dk-place>
               {label}
             </Button>

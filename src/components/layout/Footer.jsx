@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
 import { site, telLink } from '../../config/site'
+import { useCart } from '../../context/CartProvider'
 import Wordmark from '../brand/Wordmark'
 import LanguageToggle from '../ui/LanguageToggle'
 import { PhoneIcon } from '../icons'
@@ -13,7 +14,8 @@ export default function Footer() {
   const year = new Date().getFullYear()
   // On the cart and checkout the order's total bar (taller than the tab bar) covers the bottom
   const { pathname } = useLocation()
-  const clear = isCheckoutPath(pathname) ? 'pb-48' : 'pb-[calc(var(--bar-h)+env(safe-area-inset-bottom)+1.25rem)]'
+  const { count } = useCart()
+  const clear = isCheckoutPath(pathname, count) ? 'pb-48' : 'pb-[calc(var(--bar-h)+env(safe-area-inset-bottom)+1.25rem)]'
   const link = 'inline-flex min-h-12 min-w-12 items-center text-cream underline-offset-4 transition-colors hover:text-gold-light hover:underline'
 
   return (
