@@ -1,83 +1,35 @@
 /*
-  Pure cart operations on an array of lines (cart schema v2). The CartProvider
-  wraps these with React state and localStorage. Covered by tests/pricing.test.js.
+  Pure cart operations on an array of lines (cart schema v3, Step 6 menu). The CartProvider
+  wraps these with React state and localStorage. Covered by tests/cart.test.js.
 
-  Line shapes (prices and labels are snapshotted when added, so the cart reads
-  correctly in both languages without refetching; Stage B re-validates on order):
-    product: { id, kind:'product', productId, slug, image, name:{en,kn},
-               sectionName:{en,kn}|null, selection, labels:{size,flavour,occasion},
-               unitPrice, qty }
-    combo:   { id, kind:'combo', comboId, name:{en,kn}, picks:[productId x3],
-               pickNames:[{en,kn} x3], image, unitPrice, qty }
+  A line: { id, productId, selection, qty, unitPrice, name: {en,kn}, art, refThumb? }
+    selection: what the customer chose (normaliseSelection in src/lib/pricing.js)
+    unitPrice / name: snapshots from when it was added, so the cart count and lines show at once,
+    before the menu has loaded; repriceCart() then puts today's price on every line.
+    refThumb: a tiny preview of the drawing reference photo (the photo itself is on the server).
 */
-import { defaultSelection, findChoice, priceForSelection } from './pricing'
-
-export const MAX_QTY = 20
-export const clampQty = (q) => Math.max(1, Math.min(MAX_QTY, Math.round(Number(q)) || 1))
+import { clampQty, normaliseSelection, unitPrice } from './pricing.js'
 
 let counter = 0
 export const newLineId = () => `l${Date.now().toString(36)}${(counter++).toString(36)}`
 
-/** Selection with irrelevant or empty values removed, so identical choices compare equal. */
-export function normaliseSelection(product, selection = {}) {
-  const s = { ...defaultSelection(product), ...selection }
-  const nameOn = Boolean(product.nameCustomisation && s.nameOn && String(s.name || '').trim())
-  return {
-    size: s.size || null,
-    flavour: s.flavour || null,
-    nameOn,
-    name: nameOn ? String(s.name).trim().slice(0, 20) : '',
-    occasion: s.occasion || null,
-    note: String(s.note || '').trim().slice(0, 120),
-  }
-}
+/** Same product and the same choices -> one line with a bigger quantity */
+export const lineKey = (line) => `${line.productId}|${JSON.stringify(line.selection)}`
 
-/** Identity used to merge lines: same product/combo and the same choices. */
-export function lineKey(line) {
-  if (line.kind === 'combo') return `combo|${line.comboId}|${[...line.picks].sort().join(',')}`
-  const s = line.selection
-  return ['product', line.productId, s.size, s.flavour, s.nameOn ? s.name.toLowerCase() : '', s.occasion, s.note].join('|')
-}
-
-/** Build a product line from the catalogue entry, choices and quantity. */
-export function makeProductLine(product, selection, qty, { sections = [], occasions = [] } = {}) {
+export function makeLine(product, selection, qty = 1, extra = {}) {
   const sel = normaliseSelection(product, selection)
-  const section = sections.find((s) => s.id === product.sectionId)
   return {
     id: newLineId(),
-    kind: 'product',
     productId: product.id,
-    slug: product.slug,
-    image: product.image,
-    name: product.name,
-    sectionName: section?.name || null,
     selection: sel,
-    labels: {
-      size: findChoice(product, 'size', sel.size)?.label || null,
-      flavour: findChoice(product, 'flavour', sel.flavour)?.label || null,
-      occasion: occasions.find((o) => o.id === sel.occasion)?.label || null,
-    },
-    unitPrice: priceForSelection(product, sel),
     qty: clampQty(qty),
+    unitPrice: unitPrice(product, sel),
+    name: product.name,
+    art: product.art,
+    ...(extra.refThumb && sel.drawingRef ? { refThumb: extra.refThumb } : {}),
   }
 }
 
-/** Build a combo line. productsById: { [id]: product } */
-export function makeComboLine(combo, picks, qty, productsById) {
-  return {
-    id: newLineId(),
-    kind: 'combo',
-    comboId: combo.id,
-    name: combo.name,
-    picks: [...picks],
-    pickNames: picks.map((id) => productsById[id].name),
-    image: combo.image,
-    unitPrice: combo.price,
-    qty: clampQty(qty),
-  }
-}
-
-/** Add a line; an identical line just gains quantity (capped at MAX_QTY). */
 export function addLine(lines, line) {
   const key = lineKey(line)
   const existing = lines.find((l) => lineKey(l) === key)
@@ -85,14 +37,11 @@ export function addLine(lines, line) {
   return [...lines, line]
 }
 
-/**
- * Replace line `id` with `next` (keeping its place). If the edit makes it identical
- * to another line, the two merge into the other line's position.
- */
+/** Replace line `id` (keeping its place and quantity); an edit that matches another line merges into it */
 export function updateLine(lines, id, next) {
   const index = lines.findIndex((l) => l.id === id)
   if (index === -1) return addLine(lines, next)
-  const updated = { ...next, id }
+  const updated = { ...next, id, qty: lines[index].qty }
   const rest = lines.filter((l) => l.id !== id)
   const twin = rest.find((l) => lineKey(l) === lineKey(updated))
   if (twin) return rest.map((l) => (l === twin ? { ...l, qty: clampQty(l.qty + updated.qty) } : l))
@@ -103,14 +52,13 @@ export function updateLine(lines, id, next) {
 
 export const setLineQty = (lines, id, qty) => lines.map((l) => (l.id === id ? { ...l, qty: clampQty(qty) } : l))
 
-/** Returns { lines, removed, index } so the caller can offer Undo. */
+/** Returns { lines, removed, index } so the caller can offer Undo */
 export function removeLine(lines, id) {
   const index = lines.findIndex((l) => l.id === id)
   if (index === -1) return { lines, removed: null, index: -1 }
   return { lines: lines.filter((l) => l.id !== id), removed: lines[index], index }
 }
 
-/** Put a removed line back where it was (Undo). */
 export function restoreLine(lines, line, index) {
   if (lines.some((l) => l.id === line.id)) return lines
   const out = [...lines]
@@ -118,23 +66,25 @@ export function restoreLine(lines, line, index) {
   return out
 }
 
-/* ---------- persistence (schema v2) ---------- */
+export const cartCount = (lines) => lines.reduce((n, l) => n + l.qty, 0)
 
-export const CART_STORAGE_KEY = 'dk_cart_v2'
-export const LEGACY_CART_KEYS = ['dk_cart']
+/* ---------- persistence ---------- */
+
+export const CART_STORAGE_KEY = 'dk_cart_v3'
+// Older carts held products that no longer exist (the Step 2–5 menu): dropped
+export const LEGACY_CART_KEYS = ['dk_cart', 'dk_cart_v2']
 
 const isValidLine = (l) =>
-  l && typeof l.id === 'string' && (l.kind === 'product' || l.kind === 'combo') && Number.isFinite(l.unitPrice) && l.unitPrice > 0 && l.qty >= 1
+  l && typeof l.id === 'string' && typeof l.productId === 'string' && l.selection && typeof l.selection === 'object' && Number.isFinite(l.qty) && l.qty >= 1 && l.name?.en
 
-/** Parse stored JSON: only { version: 2, lines } is accepted; anything else is an empty cart. */
 export function parseStoredCart(raw) {
   try {
     const data = JSON.parse(raw)
-    if (!data || data.version !== 2 || !Array.isArray(data.lines)) return []
+    if (!data || data.version !== 3 || !Array.isArray(data.lines)) return []
     return data.lines.filter(isValidLine).map((l) => ({ ...l, qty: clampQty(l.qty) }))
   } catch {
     return []
   }
 }
 
-export const serialiseCart = (lines) => JSON.stringify({ version: 2, lines })
+export const serialiseCart = (lines) => JSON.stringify({ version: 3, lines })

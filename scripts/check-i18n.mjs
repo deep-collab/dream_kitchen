@@ -12,38 +12,42 @@ const keys = new Set()
 for (const f of files) for (const m of readFileSync(f, 'utf8').matchAll(/\bt\(\s*['`]([a-zA-Z0-9_.]+)['`]/g)) keys.add(m[1])
 
 // Keys chosen at runtime (ternaries / template strings) that the regex above cannot see
+const codes = (prefix, list) => list.map((c) => `${prefix}.${c}`)
 const runtime = [
-  'cart.added', 'cart.updated', 'customise.add', 'customise.save', 'badges.signature', 'badges.topSelling', 'customise.size', 'customise.weight',
-  ...['removed', 'soldOut', 'changed'].map((k) => `cart.unavailable.${k}`),
-  ...['morning', 'afternoon', 'evening'].flatMap((k) => [`callback.times.${k}`, `callback.when.${k}`]),
-  ...['required', 'invalid'].map((c) => `callback.errors.phone.${c}`),
-  ...['received', 'confirmed', 'preparing', 'dispatched', 'delivered'].flatMap((k) => [`track.steps.${k}`, `track.stepText.${k}`]),
-  ...['required', 'invalid'].flatMap((c) => [`track.errors.orderId.${c}`, `track.errors.phone.${c}`]),
-  ...['confirm', 'pay', 'dispatch'].flatMap((k) => [`success.steps.${k}.title`, `success.steps.${k}.text`]),
-  // checkout: every code returned by lib/order.js checkoutErrors()
-  'checkout.errors.name.required',
-  'checkout.errors.phone.required', 'checkout.errors.phone.invalid',
-  'checkout.errors.address.required', 'checkout.errors.address.short',
-  'checkout.errors.area.required',
-  'checkout.errors.pincode.required', 'checkout.errors.pincode.format', 'checkout.errors.pincode.outside',
-  ...['required', 'invalid', 'tooSoon', 'closed', 'tooFar'].map((c) => `checkout.errors.date.${c}`),
-  'checkout.errors.note.long',
-  'dates.weekdays', 'dates.months', 'dates.format', 'dates.formatYear',
+  'cart.added', 'cart.updated', 'sheet.add', 'sheet.update',
+  ...codes('cart.unavailable', ['removed', 'soldOut', 'priceSoon', 'changed']),
   // useSeo(page) reads seo.<page>.title / .desc
-  ...['home', 'shop', 'about', 'gallery', 'contact', 'faq', 'track', 'cart', 'checkout', 'success', 'notFound', 'classes', 'classBooked', 'styleguide'].flatMap((p) => [`seo.${p}.title`, `seo.${p}.desc`]),
-  // Step 4: classes, booking, story
-  'classes.mode.inPerson', 'classes.mode.online', 'classes.location.inPerson', 'classes.location.online',
-  'classes.full', 'classes.seatsLeft', 'classes.seatsLeftOne', 'classes.hours', 'classes.minutes',
-  ...['pick', 'send', 'confirm'].flatMap((k) => [`classes.how.${k}.title`, `classes.how.${k}.text`]),
-  ...['start', 'fresh', 'teach'].flatMap((k) => [`about.${k}.title`, `about.${k}.text`]),
-  // Step 5: text chosen by the classes switch and the unconfirmed delivery charge; weight units
-  'contact.call.text', 'contact.call.textClasses', 'notFound.help', 'notFound.helpClasses', 'seo.faq.descClasses',
-  ...['order', 'noTyping', 'early', 'arrive', 'delivery', 'pay', 'name', 'classes', 'change'].flatMap((k) => [`faq.items.${k}.q`, `faq.items.${k}.a`]),
-  'faq.items.delivery.aNoCharge', 'units.g', 'units.kg',
-  // booking: every code returned by lib/classes.js bookingErrors()
-  'booking.errors.name.required', 'booking.errors.phone.required', 'booking.errors.phone.invalid',
-  ...['required', 'gone', 'full'].map((c) => `booking.errors.batch.${c}`),
-  ...['invalid', 'tooMany'].map((c) => `booking.errors.people.${c}`),
+  ...['home', 'menu', 'customize', 'classes', 'story', 'contact', 'faq', 'track', 'cart', 'checkout', 'pay', 'order', 'notFound'].flatMap((p) => [`seo.${p}.title`, `seo.${p}.desc`]),
+  // checkout: every code src/lib/checkout.js detailsErrors() returns, and the dispatch date
+  ...codes('checkout.errors.name', ['required', 'short', 'long']),
+  ...codes('checkout.errors.phone', ['required', 'invalid']),
+  'checkout.errors.email.invalid',
+  ...['line1', 'line2', 'city'].flatMap((f) => codes(`checkout.errors.${f}`, ['required', 'short', 'long'])),
+  ...codes('checkout.errors.pincode', ['required', 'format']),
+  ...codes('checkout.errors.state', ['required', 'invalid']),
+  'checkout.errors.landmark.long', 'checkout.errors.note.long',
+  ...codes('checkout.errors.date', ['required', 'invalid', 'tooSoon', 'closed', 'tooFar']),
+  ...codes('checkout.steps', ['details', 'review', 'pay']),
+  ...codes('checkout.zone', ['karnataka', 'outside']),
+  // product sheet: src/lib/pricing.js selectionErrors() and the photo upload
+  ...codes('sheet.errors.name', ['long', 'chars']),
+  ...codes('sheet.errors.drawingText', ['required', 'long', 'chars']),
+  ...codes('sheet.errors.photo', ['notImage', 'tooLarge', 'failed']),
+  ...codes('pay.errors.utr', ['required', 'format']),
+  ...codes('order.paymentStatus', ['pending', 'submitted', 'confirmed']),
+  ...['placed', 'payment_confirmed', 'preparing', 'shipped', 'delivered'].flatMap((k) => [`track.steps.${k}`, `track.stepText.${k}`]),
+  ...['required', 'invalid'].flatMap((c) => [`track.errors.orderId.${c}`, `track.errors.phone.${c}`]),
+  // class enquiry: src/lib/enquiry.js enquiryErrors()
+  ...codes('classes.errors.name', ['required', 'short', 'long']),
+  ...codes('classes.errors.phone', ['required', 'invalid']),
+  ...codes('classes.errors.interest', ['required', 'long']),
+  'classes.errors.dates.long', 'classes.errors.message.long',
+  ...codes('classes.sections', ['learn', 'duration', 'fee', 'batch', 'dates', 'bring']),
+  ...['start', 'fresh', 'teach'].flatMap((k) => [`story.${k}.title`, `story.${k}.text`]),
+  ...['order', 'pay', 'courier', 'when', 'track', 'name', 'ragi', 'change'].flatMap((k) => [`faq.items.${k}.q`, `faq.items.${k}.a`]),
+  // src/lib/api.js errorText()
+  ...codes('errors', ['network', 'server', 'tooMany', 'notReady', 'storeClosed', 'paymentsClosed', 'priceChanged', 'items', 'dispatchDate', 'details', 'rejected', 'notPending']),
+  'dates.weekdays', 'dates.months', 'dates.format', 'dates.formatYear', 'units.g', 'units.kg',
 ]
 runtime.forEach((k) => keys.add(k))
 keys.delete('a.b') // example in a code comment

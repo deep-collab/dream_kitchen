@@ -1,325 +1,190 @@
-import { useId, useRef, useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useCart } from '../context/CartProvider'
-import { useMenu } from '../context/MenuProvider'
+import { useShopStatus } from '../context/MenuProvider'
 import { useSeo } from '../hooks/useSeo'
-import { createOrder } from '../services'
-import { site } from '../config/site'
-import { dateChoices, earliestDate, formatDay, latestDate } from '../lib/dates'
-import { forgetDetails, loadDetails, markCartForClearing, saveDetails } from '../lib/deviceStore'
-import { ADDRESS_MAX, AREA_MAX, areaFieldMode, buildOrder, CHECKOUT_FIELDS, checkoutErrors, deliveryChargeFor, NAME_MAX, NOTE_MAX } from '../lib/order'
-import TotalRows, { useTotalText } from '../components/order/TotalRows'
-import { makeOrderId } from '../lib/orderId'
-import { openWhatsApp } from '../lib/openWhatsApp'
+import { useCartQuote } from '../hooks/useCartQuote'
+import { states } from '../data/states'
+import { DETAIL_FIELDS, detailsErrors, MAX } from '../lib/checkout'
+import { formatINR, stateMismatch, zoneForPincode } from '../lib/pricing'
 import { tidyPhoneInput } from '../lib/validation'
-import { orderWhatsAppUrl } from '../lib/whatsappMessage'
-import PageHero from '../components/PageHero'
+import { forgetDetails, loadDetails, loadDraft, saveDetails, saveDraft } from '../lib/deviceStore'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
 import Notice from '../components/ui/Notice'
 import TextField, { PhoneField } from '../components/ui/TextField'
-import CallOptions from '../components/contact/CallOptions'
-import DateChips from '../components/checkout/DateChips'
-import CheckoutBar from '../components/checkout/CheckoutBar'
-import CartNotices from '../components/order/CartNotices'
-import SummaryLines from '../components/order/SummaryLines'
-import { WalletIcon } from '../components/icons'
+import { CheckoutProgress, TotalBar } from '../components/checkout/CheckoutFrame'
+import { AlertIcon, InfoIcon } from '../components/icons'
 import 'virtual:dk-strings/checkout'
+import 'virtual:dk-strings/cart'
 
-const FORM_ID = 'checkout-form'
-const DATE_NAME = 'co-date'
-const EMPTY = { name: '', phone: '', address: '', area: '', pincode: '', date: '', note: '' }
+const EMPTY = Object.fromEntries(DETAIL_FIELDS.map((k) => [k, '']))
 
-function Section({ title, children, className = '' }) {
-  const id = useId()
-  return (
-    <section aria-labelledby={id} className={className}>
-      <h2 id={id} className="t-h3">
-        {title}
-      </h2>
-      <div className="mt-5 space-y-6">{children}</div>
-    </section>
-  )
-}
-
+/**
+ * Checkout step 1 of 3: the customer's details. Remembered on this phone (with "Not you? Clear").
+ * The checks are the same ones the server makes (src/lib/checkout.js).
+ */
 export default function Checkout() {
   useSeo('checkout')
-  const { t, lang } = useI18n()
+  const { t, pick } = useI18n()
   const cart = useCart()
-  const menu = useMenu()
   const navigate = useNavigate()
-  const [saved] = useState(loadDetails)
-  const [form, setForm] = useState(() => ({ ...EMPTY, ...saved, phone: tidyPhoneInput(saved?.phone || '') }))
-  const [remember, setRemember] = useState(true)
-  const [dateMode, setDateMode] = useState('chip')
+  const { settings } = useShopStatus()
+  const [initial] = useState(() => {
+    const draft = loadDraft()
+    const saved = loadDetails()
+    return { form: { ...EMPTY, ...saved, ...draft?.form }, remember: draft?.remember ?? true, prefilled: Boolean(saved?.name) }
+  })
+  const [form, setForm] = useState(() => ({ ...initial.form, phone: tidyPhoneInput(initial.form.phone || '') }))
+  const [remember, setRemember] = useState(initial.remember)
+  const [prefilled, setPrefilled] = useState(initial.prefilled)
   const [touched, setTouched] = useState({})
   const [submitted, setSubmitted] = useState(false)
   const [announcement, setAnnouncement] = useState('')
-  const sending = useRef(false)
-  const areaMode = areaFieldMode() // site.ordering.areaField
+  const [cleared, setCleared] = useState(false)
 
-  // Worked out on every render, so a page left open past midnight moves on with the day
-  const now = new Date()
-  const earliest = earliestDate(now)
-  const names = t('dates')
+  const zone = zoneForPincode(form.pincode)
+  const q = useCartQuote(zone)
 
-  if (!cart.lines.length && !sending.current) return <Navigate to="/cart" replace state={{ notice: 'checkoutEmpty' }} />
+  if (!cart.lines.length) return <Navigate to="/cart" replace state={{ notice: 'checkoutEmpty' }} />
+  if (cart.unavailableIds.length) return <Navigate to="/cart" replace />
 
-  const errors = checkoutErrors(form, now)
-  const messageFor = (k) =>
-    errors[k] && t(`checkout.errors.${k}.${errors[k]}`, { date: formatDay(earliest, names), days: site.ordering.maxDaysAhead, max: NOTE_MAX })
-  const shown = (k) => (touched[k] || submitted ? messageFor(k) : undefined)
-
+  const errors = detailsErrors(form)
+  const message = (k) => errors[k] && t(`checkout.errors.${k}.${errors[k]}`, { max: MAX[k] })
+  const shown = (k) => (touched[k] || submitted ? message(k) : undefined)
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
-  const blur = (k) => () => setTouched((prev) => (prev[k] ? prev : { ...prev, [k]: true }))
-
-  const delivery = deliveryChargeFor(cart.lines.length) // null while Hema hasn't confirmed the charge
-  const totalText = useTotalText()
-  const ready = cart.checked && Boolean(menu)
-  const submitLabel = ready ? t('checkout.submit', { price: totalText(cart.subtotal, delivery) }) : t('checkout.checkingPrices')
+  const blur = (k) => () => setTouched((p) => (p[k] ? p : { ...p, [k]: true }))
+  const mismatch = !errors.pincode && !errors.state && stateMismatch(form.state, zone)
+  const stateLabel = pick(states.find((s) => s.id === form.state)?.name || { en: '' })
 
   const announce = (text) => {
     setAnnouncement('')
     requestAnimationFrame(() => setAnnouncement(text))
   }
 
-  const focusField = (k) => {
-    let el
-    if (k === 'date') {
-      el =
-        dateMode === 'other'
-          ? document.getElementById(`${DATE_NAME}-other`)
-          : document.querySelector(`input[name="${DATE_NAME}"]:checked`) || document.querySelector(`input[name="${DATE_NAME}"]`)
-      document.getElementById(`${DATE_NAME}-group`)?.scrollIntoView({ block: 'start' })
-    } else {
-      el = document.getElementById(`co-${k}`)
-      el?.scrollIntoView({ block: 'center' })
-    }
-    el?.focus({ preventScroll: true })
-  }
-
   const onSubmit = (e) => {
     e.preventDefault()
-    if (sending.current || !ready) return
     setSubmitted(true)
-
-    if (cart.unavailableIds.length) {
-      const box = document.getElementById('co-unavailable')
-      box?.scrollIntoView({ block: 'center' })
-      box?.focus({ preventScroll: true })
-      announce(t('cart.checkoutBlocked'))
-      return
-    }
-
-    const at = new Date()
-    const errs = checkoutErrors(form, at)
-    const bad = CHECKOUT_FIELDS.filter((k) => errs[k])
+    const bad = DETAIL_FIELDS.filter((k) => errors[k])
     if (bad.length) {
-      focusField(bad[0])
-      const first = t(`checkout.errors.${bad[0]}.${errs[bad[0]]}`, { date: formatDay(earliestDate(at), names), days: site.ordering.maxDaysAhead, max: NOTE_MAX })
+      const el = document.getElementById(`co-${bad[0]}`)
+      el?.scrollIntoView({ block: 'center' })
+      el?.focus({ preventScroll: true })
+      const first = message(bad[0])
       announce(bad.length === 1 ? t('checkout.fixOne', { first }) : t('checkout.fixMany', { count: bad.length, first }))
       return
     }
-
-    // Build the order and open WhatsApp right here in the tap, before anything async,
-    // so phone browsers don't block the new tab.
-    const order = buildOrder({ id: makeOrderId(at), now: at, lines: cart.lines, menu, form, lang })
-    const opened = openWhatsApp(orderWhatsAppUrl(order))
-    sending.current = true
-
     if (remember) saveDetails(form)
     else forgetDetails()
-    markCartForClearing(order.id)
-    // The success page empties the cart once the order is saved and the page has loaded
-    createOrder(order).finally(() => navigate(`/order/${order.id}`, { state: { order, opened } }))
+    saveDraft({ ...loadDraft(), form, remember })
+    navigate('/checkout/review')
   }
 
-  const noteLength = form.note.length
+  const clearDetails = () => {
+    forgetDetails()
+    setForm({ ...EMPTY, note: form.note })
+    setPrefilled(false)
+    setTouched({})
+    setSubmitted(false)
+    setCleared(true)
+    document.getElementById('co-name')?.focus()
+  }
+
+  const field = (k, props = {}) => ({ id: `co-${k}`, value: form[k], onChange: set(k), onBlur: blur(k), error: shown(k), maxLength: MAX[k], ...props })
 
   return (
-    <>
-      <PageHero title={t('checkout.title')} subtitle={t('checkout.subtitle')} />
-      <Container className="py-8 lg:py-12">
-        <CartNotices id="co-unavailable" className="mb-8 max-w-[48rem]" />
+    <Container className="py-5 pb-40 lg:py-10">
+      <CheckoutProgress step={1} />
+      <h1 className="t-h2">{t('checkout.title')}</h1>
 
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-start lg:gap-12 xl:grid-cols-[minmax(0,1fr)_27rem]">
-          <div className="min-w-0 space-y-10">
-            {/* Outside the <form>: the call-back sheet has its own form */}
-            <CallOptions variant="feature" title={t('callOptions.checkoutTitle')} />
+      {prefilled && (
+        <p className="t-small mt-2 flex flex-wrap items-center gap-x-2">
+          <span>{t('checkout.welcomeBack', { name: form.name.split(' ')[0] })}</span>
+          <button type="button" onClick={clearDetails} className="inline-flex min-h-12 items-center font-bold underline underline-offset-4">
+            {t('checkout.notYou')}
+          </button>
+        </p>
+      )}
+      {cleared && (
+        <p role="status" className="t-small mt-2 font-bold">
+          {t('checkout.cleared')}
+        </p>
+      )}
 
-            <form id={FORM_ID} noValidate onSubmit={onSubmit} className="space-y-10">
-              <Section title={t('checkout.sections.details')}>
-                <TextField
-                  id="co-name"
-                  label={t('checkout.name')}
-                  autoComplete="name"
-                  autoCapitalize="words"
-                  maxLength={NAME_MAX}
-                  required
-                  value={form.name}
-                  onChange={set('name')}
-                  onBlur={blur('name')}
-                  error={shown('name')}
-                />
-                <PhoneField
-                  id="co-phone"
-                  label={t('checkout.phone')}
-                  hint={t('checkout.phoneHint')}
-                  required
-                  value={form.phone}
-                  onChange={set('phone')}
-                  onBlur={() => {
-                    blur('phone')()
-                    setForm((f) => ({ ...f, phone: tidyPhoneInput(f.phone) }))
-                  }}
-                  error={shown('phone')}
-                />
-              </Section>
-
-              <Section title={t('checkout.sections.address')} className="border-t border-line pt-10">
-                <TextField
-                  id="co-address"
-                  as="textarea"
-                  rows={3}
-                  label={t('checkout.address')}
-                  hint={t('checkout.addressHint')}
-                  autoComplete="street-address"
-                  maxLength={ADDRESS_MAX}
-                  required
-                  value={form.address}
-                  onChange={set('address')}
-                  onBlur={blur('address')}
-                  error={shown('address')}
-                />
-                <div className={`grid gap-6 ${areaMode === 'off' ? 'sm:grid-cols-[14rem]' : 'sm:grid-cols-[minmax(0,1fr)_14rem]'}`}>
-                  {areaMode !== 'off' && (
-                    <TextField
-                      id="co-area"
-                      label={t('checkout.area')}
-                      hint={t('checkout.areaHint')}
-                      autoComplete="address-level2"
-                      maxLength={AREA_MAX}
-                      required={areaMode === 'required'}
-                      optional={areaMode === 'optional'}
-                      value={form.area}
-                      onChange={set('area')}
-                      onBlur={blur('area')}
-                      error={shown('area')}
-                    />
-                  )}
-                  <TextField
-                    id="co-pincode"
-                    label={t('checkout.pincode')}
-                    hint={t('checkout.pincodeHint')}
-                    inputMode="numeric"
-                    autoComplete="postal-code"
-                    maxLength={7}
-                    placeholder="560001"
-                    required
-                    value={form.pincode}
-                    onChange={set('pincode')}
-                    onBlur={blur('pincode')}
-                    error={shown('pincode')}
-                  />
-                </div>
-              </Section>
-
-              <div className="space-y-6 border-t border-line pt-10">
-                <DateChips
-                  name={DATE_NAME}
-                  choices={dateChoices(now)}
-                  earliest={earliest}
-                  latest={latestDate(now)}
-                  value={form.date}
-                  mode={dateMode}
-                  onChange={({ date, mode }) => {
-                    setDateMode(mode)
-                    setForm((f) => ({ ...f, date }))
-                    if (mode === 'chip') setTouched((prev) => ({ ...prev, date: true }))
-                  }}
-                  onOtherBlur={blur('date')}
-                  error={shown('date')}
-                />
-                <Notice>
-                  <p>{t('checkout.prebook', { days: site.ordering.dispatchAfterBusinessDays })}</p>
-                </Notice>
-              </div>
-
-              <Section title={t('checkout.sections.note')} className="border-t border-line pt-10">
-                <TextField
-                  id="co-note"
-                  as="textarea"
-                  rows={3}
-                  optional
-                  label={t('checkout.noteLabel')}
-                  hint={`${t('checkout.noteHint')} ${t('checkout.noteCount', { count: noteLength, max: NOTE_MAX })}`}
-                  maxLength={NOTE_MAX}
-                  value={form.note}
-                  onChange={set('note')}
-                  onBlur={blur('note')}
-                  error={shown('note')}
-                />
-              </Section>
-            </form>
-          </div>
-
-          <div className="min-w-0 space-y-8 lg:sticky lg:top-[calc(var(--header-h)+1.5rem)] lg:max-h-[calc(100dvh-var(--header-h)-3rem)] lg:overflow-y-auto lg:overscroll-contain lg:p-1 lg:-m-1">
-            <section aria-labelledby="co-summary" className="rounded-card bg-champagne p-5 sm:p-6">
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4">
-                <h2 id="co-summary" className="t-h3">
-                  {t('checkout.sections.summary')}
-                </h2>
-                <Link to="/cart" className="inline-flex min-h-12 items-center font-bold underline underline-offset-4">
-                  {t('checkout.changeItems')}
-                </Link>
-              </div>
-              <p className="t-small text-brown-2">{cart.count === 1 ? t('checkout.itemsOne') : t('checkout.items', { count: cart.count })}</p>
-              <div className="mt-3">
-                <SummaryLines lines={cart.lines} />
-              </div>
-              <TotalRows subtotal={cart.subtotal} delivery={delivery} live className="mt-4" />
-            </section>
-
-            <section aria-labelledby="co-payment">
-              <h2 id="co-payment" className="t-h3">
-                {t('checkout.sections.payment')}
-              </h2>
-              <p className="mt-3 flex gap-3">
-                <WalletIcon className="mt-0.5 h-6 w-6 shrink-0" />
-                <span>{t('checkout.payment')}</span>
-              </p>
-            </section>
-
-            <label className="flex min-h-12 cursor-pointer items-start gap-3 rounded-control border-[1.5px] border-control-line bg-[#fffdf8] p-4 hover:border-brown-2">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-                aria-describedby="co-remember-hint"
-                className="mt-0.5 h-6 w-6 shrink-0 accent-ink"
-              />
-              <span>
-                <span className="block leading-snug font-bold">{t('checkout.remember')}</span>
-                <span id="co-remember-hint" className="t-small mt-1 block text-brown-2">
-                  {t('checkout.rememberHint')}
-                </span>
-              </span>
+      <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start">
+        <form id="co-form" noValidate onSubmit={onSubmit} className="min-w-0 space-y-5">
+          {/* Honeypot: hidden from people, filled in by bots; the server refuses those orders */}
+          <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+            <label>
+              Website
+              <input tabIndex={-1} autoComplete="off" value={form.website || ''} onChange={set('website')} />
             </label>
-
-            <div className="hidden md:block">
-              <Button type="submit" form={FORM_ID} variant="whatsapp" size="lg" fullWidth disabled={!ready}>
-                {submitLabel}
-              </Button>
-            </div>
           </div>
-        </div>
-      </Container>
 
-      <CheckoutBar formId={FORM_ID} label={submitLabel} disabled={!ready} />
+          <TextField label={t('checkout.name')} autoComplete="name" autoCapitalize="words" required {...field('name')} />
+          <PhoneField
+            label={t('checkout.phone')}
+            hint={t('checkout.phoneHint')}
+            required
+            {...field('phone', {
+              maxLength: 16,
+              onBlur: () => {
+                blur('phone')()
+                setForm((f) => ({ ...f, phone: tidyPhoneInput(f.phone) }))
+              },
+            })}
+          />
+          <TextField label={t('checkout.email')} hint={t('checkout.emailHint')} type="email" inputMode="email" autoComplete="email" optional {...field('email')} />
+          <TextField label={t('checkout.line1')} autoComplete="address-line1" required {...field('line1')} />
+          <TextField label={t('checkout.line2')} autoComplete="address-line2" required {...field('line2')} />
+          <div className="grid gap-5 sm:grid-cols-2">
+            <TextField label={t('checkout.city')} autoComplete="address-level2" required {...field('city')} />
+            <TextField label={t('checkout.pincode')} inputMode="numeric" autoComplete="postal-code" placeholder="560001" required {...field('pincode', { maxLength: 7 })} />
+          </div>
+          <TextField as="select" label={t('checkout.state')} autoComplete="address-level1" required {...field('state', { maxLength: undefined })}>
+            <option value="">{t('checkout.statePick')}</option>
+            {states.map((s) => (
+              <option key={s.id} value={s.id}>
+                {pick(s.name)}
+              </option>
+            ))}
+          </TextField>
+          {mismatch && (
+            <p role="status" className="flex items-start gap-2 rounded-control border-[1.5px] border-error bg-error-bg p-3 font-bold">
+              <AlertIcon className="mt-0.5 h-5 w-5 shrink-0 text-error" />
+              <span>{t('checkout.stateMismatch', { pincode: form.pincode.trim(), zone: t(`checkout.zone.${zone}`), state: stateLabel })}</span>
+            </p>
+          )}
+          <TextField label={t('checkout.landmark')} optional {...field('landmark')} />
+          <TextField
+            as="textarea"
+            rows={2}
+            label={t('checkout.note')}
+            optional
+            hint={t('checkout.noteHint', { count: form.note.length, max: MAX.note })}
+            {...field('note')}
+          />
+          <label className="flex min-h-12 cursor-pointer items-center gap-3">
+            <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="h-6 w-6 shrink-0 accent-ink" />
+            <span className="font-bold">{t('checkout.remember')}</span>
+          </label>
+        </form>
+
+        <aside className="lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
+          <Notice icon={InfoIcon} className="hidden lg:flex">
+            <p className="t-small">{t('cart.dispatch', { days: settings.leadTimes.standardBusinessDays })}</p>
+          </Notice>
+          <TotalBar label={zone ? t('cart.total') : t('cart.subtotal')} total={zone ? formatINR(q.total) : t('cart.totalPlusCourier', { price: formatINR(q.subtotal) })}>
+            <Button type="submit" form="co-form" size="lg" fullWidth data-dk-next>
+              {t('checkout.toReview')}
+            </Button>
+          </TotalBar>
+        </aside>
+      </div>
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
       </p>
-    </>
+    </Container>
   )
 }

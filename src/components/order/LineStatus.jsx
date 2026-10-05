@@ -1,6 +1,7 @@
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatINR } from '../../lib/pricing'
 import { AlertIcon, InfoIcon } from '../icons'
+import 'virtual:dk-strings/cart'
 
 /**
  * What changed on a cart line since it was added (src/lib/reprice.js):

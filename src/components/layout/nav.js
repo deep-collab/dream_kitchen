@@ -1,17 +1,21 @@
-import { classesEnabled } from '../../config/site'
-import { ClassesIcon, ContactIcon, FaqIcon, GalleryIcon, ShopIcon, StoryIcon, TrackIcon } from '../icons'
+import { BrushIcon, ClassesIcon, ContactIcon, HomeIcon, ShopIcon } from '../icons'
 
-// Main navigation (header on desktop, large rows in the mobile menu, footer links).
-// Classes appears only while site.classes.enabled is true.
+// The five main places (Hema's request: no more than five). Header on wide screens, the tab bar
+// on phones and tablets. Track Order, Our Story and FAQ live in the footer.
 export const MAIN_NAV = [
-  { to: '/shop', key: 'nav.shop', icon: ShopIcon },
-  classesEnabled() && { to: '/classes', key: 'nav.classes', icon: ClassesIcon },
-  { to: '/our-story', key: 'nav.story', icon: StoryIcon },
-  { to: '/track', key: 'nav.track', icon: TrackIcon },
+  { to: '/', key: 'nav.home', icon: HomeIcon, end: true },
+  { to: '/menu', key: 'nav.menu', icon: ShopIcon },
+  { to: '/customize', key: 'nav.customize', icon: BrushIcon },
+  { to: '/classes', key: 'nav.classes', icon: ClassesIcon },
   { to: '/contact', key: 'nav.contact', icon: ContactIcon },
-].filter(Boolean)
-
-export const MORE_NAV = [
-  { to: '/gallery', key: 'nav.gallery', icon: GalleryIcon },
-  { to: '/faq', key: 'nav.faq', icon: FaqIcon },
 ]
+
+export const FOOTER_NAV = [
+  { to: '/track', key: 'nav.track' },
+  { to: '/our-story', key: 'nav.story' },
+  { to: '/faq', key: 'nav.faq' },
+  { to: '/contact', key: 'nav.contact' },
+]
+
+/** Pages where the bottom of the screen belongs to the checkout's own total bar */
+export const isCheckoutPath = (pathname) => /^\/(checkout|pay)(\/|$)/.test(pathname)

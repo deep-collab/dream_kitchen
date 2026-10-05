@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { useI18n } from '../../i18n/I18nProvider'
 import { telLink, waLink } from '../../config/site'
 import { PhoneIcon, WhatsAppIcon } from '../icons'
 
@@ -9,7 +8,7 @@ import { PhoneIcon, WhatsAppIcon } from '../icons'
  *   tone:    'dark' when sitting on black (or wrap the area in .on-dark)
  *   size:    md | lg
  * Renders <Link> for `to`, <a> for `href`, otherwise <button>.
- * `call` defaults to the tel: link from config and `whatsapp` to the general chat link, unless
+ * `call` defaults to the tel: link from config and `whatsapp` to a plain chat (Contact only), unless
  * the button submits a form or has an onClick.
  */
 export default function Button({
@@ -25,7 +24,6 @@ export default function Button({
   type = 'button',
   ...props
 }) {
-  const { t } = useI18n()
   const cls = ['btn', `btn-${variant}`, size === 'lg' && 'btn-lg', fullWidth && 'btn-block', tone === 'dark' && 'btn-on-dark', className]
     .filter(Boolean)
     .join(' ')
@@ -53,7 +51,7 @@ export default function Button({
   let link = href
   const plain = type === 'button' && !props.onClick
   if (!link && plain && variant === 'call') link = telLink
-  if (!link && plain && variant === 'whatsapp') link = waLink(t('wa.general'))
+  if (!link && plain && variant === 'whatsapp') link = waLink()
   if (link) {
     const external = /^https?:/.test(link)
     return (

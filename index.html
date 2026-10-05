@@ -28,7 +28,8 @@
 
     <script>
       // Runs before first paint: language (and Kannada fonts only when needed),
-      // and whether the loading screen plays (once per browser session).
+      // and whether the loading screen plays: only on the very first visit, never with reduced
+      // motion (Step 6: at most 1 second, tap to skip).
       (function () {
         var h = document.documentElement
         try {
@@ -43,15 +44,15 @@
         } catch (e) {}
         var show = true
         try {
-          if (sessionStorage.getItem('dk_intro_seen')) show = false
-          else sessionStorage.setItem('dk_intro_seen', '1')
-        } catch (e) {}
-        // A very slow first byte leaves no room for a calm intro inside the 2.5 s cap.
-        if (performance.now() > 1300) show = false
-        if (show) {
-          h.classList.add('dk-intro-on', 'dk-intro-hold')
-          if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) h.classList.add('dk-intro-rm')
+          if (localStorage.getItem('dk_intro_seen') || sessionStorage.getItem('dk_intro_seen')) show = false
+          else localStorage.setItem('dk_intro_seen', '1')
+        } catch (e) {
+          show = false
         }
+        if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) show = false
+        // A slow first byte: go straight to the page rather than add a wait
+        if (performance.now() > 1200) show = false
+        if (show) h.classList.add('dk-intro-on', 'dk-intro-hold')
       })()
     </script>
 
@@ -88,8 +89,8 @@
         .dk-intro__stage { display: flex; flex-direction: column; align-items: center; gap: 26px; }
         @media (min-width: 1024px) { .dk-intro__stage { gap: 24px; } }
         .dk-intro__draw { fill: url(#dk-gold); fill-opacity: 0; stroke: url(#dk-gold); stroke-width: 1.3; stroke-linejoin: round; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
-        .dk-intro__word, .dk-intro__tag { opacity: 0; transform: translateY(8px); transition: opacity 0.45s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        #dk-intro.is-playing .dk-intro__draw { animation: dk-draw 0.8s cubic-bezier(0.45, 0, 0.25, 1) forwards, dk-fill 0.42s 0.6s ease forwards; }
+        .dk-intro__word, .dk-intro__tag { opacity: 0; transform: translateY(8px); transition: opacity 0.25s ease, transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        #dk-intro.is-playing .dk-intro__draw { animation: dk-draw 0.45s cubic-bezier(0.45, 0, 0.25, 1) forwards, dk-fill 0.22s 0.3s ease forwards; }
         #dk-intro.show-word .dk-intro__word, #dk-intro.show-tag .dk-intro__tag { opacity: 1; transform: none; }
         #dk-intro.is-static .dk-intro__draw { fill-opacity: 1; stroke: none; }
         #dk-intro.is-static .dk-intro__word, #dk-intro.is-static .dk-intro__tag { opacity: 1; transform: none; transition: none; }
@@ -104,13 +105,13 @@
         "@context": "https://schema.org",
         "@type": "LocalBusiness",
         "name": "Dream Kitchen",
-        "description": "Home-based handmade chocolates, loaded brownie tubs, delight boxes and cookies, made fresh to order.",
+        "description": "Home-based handmade brownie tubs, delight boxes, brownies and chocolates, made fresh to order and sent all over India.",
         "telephone": "{{dk:telephone}}",
         "image": "/og-image.png",
         "logo": "/icon-512.png",
         "founder": { "@type": "Person", "name": "Hema" },
         "address": { "@type": "PostalAddress", "addressRegion": "Karnataka", "addressCountry": "IN" },
-        "areaServed": { "@type": "State", "name": "Karnataka" },
+        "areaServed": { "@type": "Country", "name": "India" },
         "sameAs": ["https://instagram.com/dreamkitchen_01_homemade"]
       }
     </script>
@@ -127,7 +128,7 @@
                 <stop offset="0.38" stop-color="#fff6d8" stop-opacity="0" />
                 <stop offset="0.5" stop-color="#fff6d8" stop-opacity="0.8" />
                 <stop offset="0.62" stop-color="#fff6d8" stop-opacity="0" />
-                <animateTransform id="dk-shine-anim" attributeName="gradientTransform" type="translate" from="-1 -1" to="1 1" dur="0.6s" begin="indefinite" fill="freeze" />
+                <animateTransform id="dk-shine-anim" attributeName="gradientTransform" type="translate" from="-1 -1" to="1 1" dur="0.35s" begin="indefinite" fill="freeze" />
               </linearGradient>
             </defs>
             <use href="#dk-symbol" class="dk-intro__draw" />
@@ -143,9 +144,9 @@
     <div id="root"></div>
 
     <script>
-      // Loading screen: about 1.8 s, hard cap 2.5 s, tap or any key skips,
-      // static 0.5 s under reduced motion. On the home page the lockup glides into
-      // the hero's lockup; elsewhere the black curtain lifts.
+      // Loading screen (first visit only): about 0.9 s, hard cap 1 s from when it appears, tap or
+      // any key skips. On the home page the lockup glides into the hero's lockup; elsewhere the
+      // black curtain lifts. Never shown with reduced motion (see the head script).
       (function () {
         var html = document.documentElement
         var intro = document.getElementById('dk-intro')
@@ -160,9 +161,9 @@
           tag.setAttribute('lang', 'kn')
         }
 
-        var CAP = 2500 // ms since navigation start: the loader is gone by then, always
-        var EXIT = 450
         var start = performance.now()
+        var CAP = start + 1000 // the loader is gone 1 s after it appeared, always
+        var EXIT = 260
         var timers = []
         var exiting = false
         var finished = false
@@ -210,7 +211,7 @@
           if (exiting) return
           exiting = true
           timers.forEach(clearTimeout)
-          var ms = Math.min(fast ? 260 : EXIT, Math.max(0, CAP - performance.now() - 40))
+          var ms = Math.min(fast ? 180 : EXIT, Math.max(0, CAP - performance.now() - 30))
           var heroLockup = !fast && !reduce && visibleRect('[data-dk-hero="lockup"]')
 
           if (reduce) {
@@ -270,17 +271,17 @@
         later(function () {
           var shine = document.getElementById('dk-shine-anim')
           if (shine && shine.beginElement) shine.beginElement()
-        }, 880)
+        }, 380)
         // The wordmark waits (briefly) for Cinzel so it never swaps font mid-reveal.
         later(function poll() {
-          if (cinzelLoaded() || performance.now() - start >= 1100) {
+          if (cinzelLoaded() || performance.now() - start >= 450) {
             intro.classList.add('show-word')
-            later(function () { intro.classList.add('show-tag') }, 200)
+            later(function () { intro.classList.add('show-tag') }, 100)
           } else {
-            later(poll, 40)
+            later(poll, 30)
           }
-        }, 750)
-        later(tryExit, 1350)
+        }, 300)
+        later(tryExit, 640)
       })()
     </script>
     <script type="module" src="/src/main.jsx"></script>

@@ -5,676 +5,52 @@
     "homeLink": "Dream Kitchen, Handmade Chocolates: home page"
   },
   "nav": {
-    "shop": "Shop",
+    "home": "Home",
+    "menu": "Menu",
+    "customize": "Customize",
     "classes": "Classes",
-    "story": "Our Story",
-    "track": "Track Order",
     "contact": "Contact",
-    "gallery": "Gallery",
+    "track": "Track Order",
+    "story": "Our Story",
     "faq": "FAQ",
     "cart": "Cart",
-    "menu": "Menu",
     "skip": "Skip to main content",
-    "language": "Language",
-    "main": "Main"
+    "main": "Main",
+    "language": "Language"
   },
   "common": {
-    "continueShopping": "Continue shopping",
+    "close": "Close",
+    "optional": "optional",
+    "remove": "Remove",
+    "quantity": "Quantity",
     "decrease": "Decrease quantity",
     "increase": "Increase quantity",
-    "quantity": "Quantity",
-    "remove": "Remove",
-    "optional": "optional",
-    "cartWithCount": "Cart, {count} items",
-    "close": "Close",
-    "newTab": "(opens in a new tab)",
     "cartItems": ", {count} items",
     "cartItemsOne": ", 1 item",
     "cartEmptySr": ", empty",
-    "cartWithCountOne": "Cart, 1 item"
-  },
-  "seo": {
-    "home": {
-      "title": "Dream Kitchen | Handmade chocolates, brownie tubs and delight boxes",
-      "desc": "Handmade chocolates, loaded brownie tubs, delight boxes and cookies by Hema, made fresh to order. Pre-book on WhatsApp or call {phone}. Delivered across Karnataka."
-    },
-    "shop": {
-      "title": "Menu | Dream Kitchen",
-      "desc": "Loaded brownie tubs, delight boxes, cookies and handmade chocolates, made fresh to order."
-    },
-    "about": {
-      "title": "Our story | Dream Kitchen",
-      "desc": "How Hema started Dream Kitchen as a student with ₹2,500 and grew it into a loved home brand."
-    },
-    "gallery": {
-      "title": "Gallery | Dream Kitchen",
-      "desc": "Photos of Hema’s handmade chocolates are coming soon. See her latest work on Instagram."
-    },
-    "contact": {
-      "title": "Contact | Dream Kitchen",
-      "desc": "Call or WhatsApp Dream Kitchen on {phone}."
-    },
-    "faq": {
-      "title": "FAQ | Dream Kitchen",
-      "desc": "Pre-booking, delivery, payment and names on boxes: your questions, answered.",
-      "descClasses": "Pre-booking, delivery, payment, names on boxes and classes: your questions, answered."
-    },
-    "track": {
-      "title": "Track Your Order | Dream Kitchen",
-      "desc": "Check the status of your Dream Kitchen order with your order ID and phone number."
-    },
-    "cart": {
-      "title": "Your Cart | Dream Kitchen",
-      "desc": "Review your Dream Kitchen order."
-    },
-    "checkout": {
-      "title": "Checkout | Dream Kitchen",
-      "desc": "Enter your delivery details, pick a date and send your order on WhatsApp."
-    },
-    "success": {
-      "title": "Your order | Dream Kitchen",
-      "desc": "Your Dream Kitchen order is ready to send on WhatsApp."
-    },
-    "notFound": {
-      "title": "Page not found | Dream Kitchen",
-      "desc": "This page has melted away."
-    },
-    "classes": {
-      "title": "Chocolate classes | Dream Kitchen",
-      "desc": "Chocolate classes with Hema: beginners, a brownie tub masterclass, kids and online. Book your seat on WhatsApp."
-    },
-    "styleguide": {
-      "title": "Styleguide | Dream Kitchen",
-      "desc": "Internal component reference."
-    },
-    "classBooked": {
-      "title": "Your class booking | Dream Kitchen",
-      "desc": "Your Dream Kitchen class booking is ready to send on WhatsApp."
-    }
-  },
-  "home": {
-    "fresh": {
-      "title": "Our menu",
-      "text": "Brownie tubs, delight boxes, cookies and chocolates. Everything is made fresh after you order.",
-      "cta": "See the full menu"
-    },
-    "best": {
-      "title": "Our best sellers",
-      "lead": "Hema’s Signature brownie tub, her Top selling chocolate and the delight boxes she calls her best sellers. Tap one to choose a size."
-    },
-    "spotlight": {
-      "cta": "See all brownie tubs"
-    },
-    "combo": {
-      "all": "See all chocolates"
-    },
-    "classes": {
-      "title": "Chocolate classes with Hema",
-      "text": "Small, friendly classes where you make chocolates and brownie tubs with your own hands. Kids’ and online classes too.",
-      "cta": "See classes and dates",
-      "next": "Next: {date}"
-    },
-    "story": {
-      "title": "It started with ₹2,500",
-      "text": "Hema started Dream Kitchen as a student, with ₹2,500 and a love for chocolate. Order by order, she grew it into a loved home brand. Everything is still made by hand, fresh, after you order.",
-      "cta": "Read Hema’s story"
-    },
-    "talk": {
-      "title": "Prefer to talk?",
-      "text": "Call or WhatsApp Hema and she will take your order herself. No typing needed."
-    },
-    "instagram": {
-      "title": "See what Hema is making",
-      "text": "New treats and behind-the-scenes from her kitchen, on Instagram.",
-      "cta": "Follow on Instagram"
-    },
-    "reviews": {
-      "title": "What customers say"
-    }
-  },
-  "shop": {
-    "title": "Our menu",
-    "subtitle": "Everything is made fresh after you order. Tap any item to choose a size, add a name on the box, and more.",
-    "search": "Search the menu",
-    "searchPlaceholder": "Try “Nutella”, “mango” or “bar”",
-    "results": "{count} items for “{query}”",
-    "resultsOne": "1 item for “{query}”",
-    "empty": "Nothing on the menu matches that. Try another word, or call or WhatsApp Hema and she will help you choose.",
-    "categories": "Menu categories",
-    "clearSearch": "Clear search",
-    "choose": "Choose",
-    "from": "from {price}",
-    "sizesList": "{list} or {last}",
-    "flavourCount": "{count} flavours",
-    "highlights": "{list}.",
-    "whatYouGet": "What you get",
-    "soldOut": "Sold out",
-    "soldOutHelp": "Sold out for now. Call or WhatsApp to ask when it is back."
-  },
-  "product": {
-    "breadcrumb": "Breadcrumb",
-    "metaTitle": "{name} | {category} | Dream Kitchen",
-    "metaDesc": "{name} from Dream Kitchen’s {category}, made fresh to order. Pre-book online or call {phone}.",
-    "share": "Share this item",
-    "copied": "Link copied",
-    "more": "More {category}"
-  },
-  "cart": {
-    "title": "Your cart",
-    "emptyCta": "Browse the menu",
-    "subtotal": "Subtotal",
-    "total": "Total",
-    "checkout": "Continue to checkout",
-    "summary": "Order summary",
-    "noPayment": "No online payment. Hema will confirm on WhatsApp and share UPI details.",
-    "removed": "Removed {name}",
-    "countLine": "{count} items",
-    "added": "Added to cart",
-    "updated": "Cart updated",
-    "view": "View cart",
-    "undo": "Undo",
-    "edit": "Edit",
-    "each": "{price} each",
-    "qtyFor": "Quantity of {name}",
-    "size": "Size",
-    "nameOnBox": "Name on box",
-    "note": "Note",
-    "bars": "Bars",
-    "deliveryKarnataka": "Delivery (Karnataka)",
-    "addMore": "Add more items",
-    "callTitle": "Call to order instead",
-    "callText": "Would you rather talk? Call Hema and she will take your order on the phone.",
-    "emptyTitle": "Your cart is empty",
-    "emptyText": "Brownie tubs, delight boxes, cookies and chocolates, all made fresh for you. Have a look, or call and order on the phone.",
-    "countLineOne": "1 item",
-    "pricesUpdated": "Some prices have been updated",
-    "pricesUpdatedText": "Hema has changed some prices since you added these items. The new prices are shown below and will be used for your order.",
-    "priceWas": "Was {old}",
-    "priceNow": "now {new}",
-    "unavailableTitleOne": "1 item can’t be ordered right now",
-    "unavailableTitle": "{count} items can’t be ordered right now",
-    "unavailableText": "Remove it to continue. To ask when it’s back, call or WhatsApp Hema.",
-    "unavailableTextMany": "Remove them to continue. To ask when they’re back, call or WhatsApp Hema.",
-    "removeUnavailableOne": "Remove the unavailable item",
-    "removeUnavailable": "Remove {count} unavailable items",
-    "unavailable": {
-      "removed": "No longer on the menu",
-      "soldOut": "Sold out for now",
-      "changed": "A choice you made is no longer offered. Remove this and add it again."
-    },
-    "checkoutBlocked": "Remove the unavailable items above to continue.",
-    "checkoutEmpty": "Checkout needs at least 1 item. Add something sweet first, or call and order on the phone.",
-    "deliveryToConfirm": "Hema confirms it on WhatsApp",
-    "totalBeforeDelivery": "Total before delivery",
-    "plusDelivery": "{price} + delivery"
-  },
-  "checkout": {
-    "title": "Checkout",
-    "subtitle": "Tell us where to deliver, pick a date, and send your order to Hema on WhatsApp.",
-    "sections": {
-      "details": "Your details",
-      "address": "Delivery address",
-      "date": "Preferred date",
-      "note": "Note for Hema",
-      "summary": "Order summary",
-      "payment": "Payment"
-    },
-    "name": "Your name",
-    "phone": "Mobile number",
-    "phoneHint": "Hema will confirm your order on WhatsApp on this number.",
-    "address": "Address",
-    "addressHint": "House or flat number, street and a landmark",
-    "area": "Area or city",
-    "areaHint": "For example: Jayanagar, Bengaluru",
-    "pincode": "Pincode",
-    "pincodeHint": "We deliver within Karnataka.",
-    "dateHint": "The earliest date is {date}. We are closed on Sundays.",
-    "earliest": "Earliest",
-    "otherDate": "Pick another date",
-    "otherDateLabel": "Your date",
-    "otherDateHint": "Any day from {date}, except Sundays.",
-    "prebook": "Pre-booking only. Orders are dispatched after {days} business days. Hema will confirm the exact delivery date on WhatsApp.",
-    "noteLabel": "Anything Hema should know?",
-    "noteHint": "For example: please call before delivering.",
-    "noteCount": "{count} of {max} letters",
-    "itemsOne": "1 item",
-    "items": "{count} items",
-    "changeItems": "Change items",
-    "payment": "No payment now. Hema will confirm your order on WhatsApp and share UPI details.",
-    "remember": "Remember my details on this phone",
-    "rememberHint": "Your name, number and address stay only on this phone, ready for next time.",
-    "submit": "Send order on WhatsApp {price}",
-    "checkingPrices": "Checking today’s prices…",
-    "call": "Call",
-    "fixOne": "Please fix 1 thing: {first}",
-    "fixMany": "Please fix {count} things. First: {first}",
-    "errors": {
-      "name": {
-        "required": "Enter your name."
-      },
-      "phone": {
-        "required": "Enter your mobile number so Hema can confirm your order.",
-        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
-      },
-      "address": {
-        "required": "Enter your address: house or flat number, street and a landmark.",
-        "short": "Add a little more to your address: house or flat number, street and a landmark."
-      },
-      "area": {
-        "required": "Enter your area or city."
-      },
-      "pincode": {
-        "required": "Enter your 6-digit pincode.",
-        "format": "A pincode has 6 digits, like 560001.",
-        "outside": "We deliver within Karnataka only. Pincodes start with 56, 57, 58 or 59."
-      },
-      "date": {
-        "required": "Choose a date for your order.",
-        "invalid": "That date isn’t valid. Choose one of the dates above.",
-        "tooSoon": "That date is too soon. The earliest is {date}.",
-        "closed": "We are closed on that day. Please choose another date.",
-        "tooFar": "Choose a date within the next {days} days."
-      },
-      "note": {
-        "long": "Please keep your note to {max} letters."
-      }
-    }
-  },
-  "success": {
-    "title": "Your order is ready in WhatsApp",
-    "lead": "Tap Send to confirm it with Hema.",
-    "orderId": "Your order ID",
+    "newTab": "(opens in a new tab)",
+    "loading": "Loading…",
     "copy": "Copy",
-    "copyLabel": "Copy order ID {id}",
-    "copied": "Order ID copied",
-    "saveId": "Keep this ID to track your order.",
-    "fallbackTitle": "WhatsApp didn’t open?",
-    "fallbackText": "Open it again, or copy your order and paste it into WhatsApp. You can also call and we’ll take it on the phone.",
-    "openAgain": "Open WhatsApp again",
-    "copyDetails": "Copy order details",
-    "detailsCopied": "Order details copied. Paste them into WhatsApp.",
-    "copyFailed": "This phone did not allow copying. Please use Open WhatsApp again.",
-    "nextTitle": "What happens next",
-    "steps": {
-      "confirm": {
-        "title": "Hema confirms on WhatsApp",
-        "text": "She checks your order and replies to your message."
-      },
-      "pay": {
-        "title": "You pay by UPI",
-        "text": "She shares the UPI details. Nothing is paid on this website."
-      },
-      "dispatch": {
-        "title": "Dispatched after {days} business days",
-        "text": "Your order is made fresh, then sent to you. Hema confirms the delivery date."
-      }
-    },
-    "yourOrder": "Your order",
-    "preferredDate": "Preferred date",
-    "deliverTo": "Deliver to",
-    "track": "Track this order",
-    "missingTitle": "We couldn’t find this order on this phone",
-    "missingText": "If you placed it on another phone, look there. For help, call or WhatsApp Dream Kitchen.",
-    "blockedTitle": "One more step: send your order on WhatsApp",
-    "blockedLead": "WhatsApp did not open by itself. Tap the green button below to send your order to Hema."
-  },
-  "track": {
-    "title": "Track your order",
-    "subtitle": "Enter your order ID and the mobile number you ordered with.",
-    "orderId": "Order ID",
-    "orderIdHint": "It starts with DK, like DK‑261007‑7Q4M. You’ll find it in your WhatsApp order.",
-    "phone": "Mobile number",
-    "submit": "Check status",
-    "checking": "Checking…",
-    "errors": {
-      "orderId": {
-        "required": "Enter your order ID.",
-        "invalid": "Order IDs look like DK‑261007‑7Q4M. Please check and try again."
-      },
-      "phone": {
-        "required": "Enter the mobile number you ordered with.",
-        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
-      }
-    },
-    "statusFor": "Order {id}",
-    "placedOn": "Placed on {date}",
-    "preferred": "Preferred date: {date}",
-    "progress": "Order progress",
-    "current": "Current status: {status}",
-    "stepDone": "done",
-    "stepNow": "current step",
-    "stepNext": "not yet",
-    "steps": {
-      "received": "Received",
-      "confirmed": "Confirmed",
-      "preparing": "Preparing",
-      "dispatched": "Dispatched",
-      "delivered": "Delivered"
-    },
-    "stepText": {
-      "received": "Your order has reached Dream Kitchen.",
-      "confirmed": "Hema has confirmed your order and payment.",
-      "preparing": "Your treats are being made fresh.",
-      "dispatched": "Your order is on its way.",
-      "delivered": "Delivered. Enjoy every bite!"
-    },
-    "receivedHelp": "Hema will confirm your order on WhatsApp. For updates, call or WhatsApp Dream Kitchen.",
-    "notFound": "We couldn’t find this order on this phone. For updates, call or WhatsApp Dream Kitchen."
-  },
-  "about": {
-    "title": "Our story",
-    "lead": "A home kitchen in Karnataka, a student with ₹2,500, and a lot of chocolate.",
-    "start": {
-      "title": "How it started",
-      "text": "Hema started Dream Kitchen while she was still a student, with ₹2,500 and a love for making chocolate. Order by order, she grew it into a loved home brand."
-    },
-    "fresh": {
-      "title": "Handmade, and made fresh for you",
-      "text": "Every chocolate, brownie tub, delight box and cookie is made by hand after you order. That is why Dream Kitchen is pre-booking only: nothing waits on a shelf."
-    },
-    "teach": {
-      "title": "Teaching others",
-      "text": "Hema also teaches chocolate classes, so you can make these treats in your own kitchen too.",
-      "cta": "See the classes"
-    },
-    "cta": "See the menu"
-  },
-  "gallery": {
-    "title": "Gallery",
-    "subtitle": "Photos of Hema’s chocolates are coming to this page soon.",
-    "emptyTitle": "Until then, see them on Instagram",
-    "emptyText": "Hema shares her latest brownie tubs, delight boxes and chocolates on Instagram.",
-    "follow": "See photos on Instagram",
-    "browse": "Browse the menu"
-  },
-  "contact": {
-    "title": "Contact Dream Kitchen",
-    "subtitle": "Call, WhatsApp, or ask Hema to call you back. Whatever is easiest for you.",
-    "call": {
-      "title": "Call Hema",
-      "text": "Order or ask a question on the phone.",
-      "textClasses": "Order, book a class or ask a question on the phone."
-    },
-    "whatsapp": {
-      "title": "WhatsApp",
-      "text": "Type a message, or send a voice message if you would rather talk."
-    },
-    "callback": {
-      "title": "Ask Hema to call you"
-    },
-    "more": "More ways to reach us",
-    "instagram": "Instagram",
-    "email": "Email",
-    "hours": "Call hours",
-    "delivery": "Delivery",
-    "deliveryText": "Across Karnataka. Pre-booking only.",
-    "fssai": "FSSAI licence",
-    "questions": "Common questions are answered in the FAQ.",
-    "faqLink": "Read the FAQ"
-  },
-  "faq": {
-    "title": "Questions & answers",
-    "subtitle": "Can’t find your answer? Call or WhatsApp Hema.",
-    "stillTitle": "Still have a question?",
-    "items": {
-      "order": {
-        "q": "How do I place an order?",
-        "a": "Add treats to your cart, fill in your delivery details, pick a date and tap “Send order on WhatsApp”. WhatsApp opens with your full order ready. Press send, and Hema replies to confirm."
-      },
-      "noTyping": {
-        "q": "Can I order without typing?",
-        "a": "Yes. Call {phone}, send a voice message on WhatsApp, or tap “Request a call back” and leave just your number. Hema will take your order on the phone."
-      },
-      "early": {
-        "q": "How early should I order?",
-        "a": "Dream Kitchen is pre-booking only, with no urgent orders. Every order is dispatched after {days} business days (Monday to Saturday), so it is made fresh for you. Checkout shows the earliest date you can pick."
-      },
-      "arrive": {
-        "q": "When will my order arrive?",
-        "a": "You choose a preferred date at checkout. Hema confirms the exact delivery date on WhatsApp."
-      },
-      "delivery": {
-        "q": "Where do you deliver, and what does it cost?",
-        "a": "Anywhere in Karnataka (pincodes starting with 56, 57, 58 or 59), for a flat delivery charge of ₹{charge}.",
-        "aNoCharge": "Anywhere in Karnataka (pincodes starting with 56, 57, 58 or 59). Hema confirms the delivery charge on WhatsApp when she confirms your order."
-      },
-      "pay": {
-        "q": "How do I pay?",
-        "a": "There is no payment on the website. After Hema confirms your order on WhatsApp, she shares UPI details."
-      },
-      "name": {
-        "q": "Can I have a name written on the box?",
-        "a": "Yes, for ₹{namePrice}, on Brownie Tubs, Delight Boxes, the Assorted Cookie Dip Box and the Cookie Pie Tin. Turn on “Add a name on the box” when you choose the item, and type up to {nameMax} letters."
-      },
-      "classes": {
-        "q": "How do the chocolate classes work?",
-        "a": "Pick a class and a date on the Classes page, then send your booking on WhatsApp. Hema confirms your seat. For in-person classes the address is shared after booking; online classes get a joining link."
-      },
-      "change": {
-        "q": "Can I change my order?",
-        "a": "Call or WhatsApp Hema as soon as you can, and she will tell you what is possible."
-      }
-    }
-  },
-  "notFound": {
-    "title": "Oops! This page melted away",
-    "text": "The page you’re looking for isn’t here. Maybe a brownie will cheer you up?",
-    "home": "Go to the home page",
-    "shop": "See the menu",
-    "help": "Looking for an order? Call or WhatsApp Hema and she will help.",
-    "helpClasses": "Looking for an order or a class? Call or WhatsApp Hema and she will help."
-  },
-  "footer": {
-    "talk": "Talk to us",
-    "explore": "Explore",
-    "whatsapp": "WhatsApp us",
-    "fssai": "FSSAI licence no. {fssai}",
-    "rights": "© {year} Dream Kitchen",
-    "prebook": "Pre-booking only. Delivered across Karnataka."
-  },
-  "mobileBar": {
-    "label": "Quick contact and cart",
-    "call": "Call",
-    "whatsapp": "WhatsApp",
-    "cart": "Cart"
-  },
-  "wa": {
-    "general": "Hi Dream Kitchen"
+    "callUs": "Call {phone}",
+    "cartWithCount": "Cart, {count} items",
+    "cartWithCountOne": "Cart, 1 item"
   },
   "header": {
     "call": "Call"
   },
-  "notice": {
-    "prebook": "Pre-booking only. Orders are dispatched after {days} business days."
+  "footer": {
+    "links": "Useful links",
+    "rights": "© {year} Dream Kitchen",
+    "fssai": "FSSAI licence no. {fssai}",
+    "shipping": "Made fresh to order. Sent all over India by courier."
   },
-  "mobileMenu": {
-    "title": "Menu",
-    "callUs": "Call Dream Kitchen",
-    "chat": "Chat on WhatsApp"
+  "banner": {
+    "closed": "Orders are paused for now.",
+    "label": "Notice from Dream Kitchen"
   },
-  "hours": {
-    "label": "Call hours",
-    "range": "{opens} – {closes}, {days}",
-    "days": {
-      "monSat": "Monday to Saturday"
-    },
-    "time": {
-      "morning": "{h} am",
-      "noon": "12 noon",
-      "afternoon": "{h} pm",
-      "evening": "{h} pm",
-      "night": "{h} pm"
-    }
-  },
-  "hero": {
-    "support": "Handmade chocolates, loaded brownie tubs and delight boxes, made fresh to order.",
-    "orderNow": "Order now",
-    "callToOrder": "Call to order"
-  },
-  "classes": {
-    "title": "Chocolate classes with Hema",
-    "subtitle": "Small, friendly classes where you make real chocolates with your own hands. Pick a class and a date, then book your seat on WhatsApp.",
-    "listTitle": "Choose a class",
-    "learn": "What you’ll learn",
-    "dates": "Upcoming dates",
-    "mode": {
-      "inPerson": "In person",
-      "online": "Live online"
-    },
-    "hours": "{count} hours",
-    "minutes": "{count} minutes",
-    "ages": "Ages {min}–{max}",
-    "groupSize": "Up to {count} people",
-    "perPerson": "per person",
-    "seatsLeft": "{count} seats left",
-    "seatsLeftOne": "1 seat left",
-    "full": "Full",
-    "dateTime": "{date}, {time}",
-    "book": "Book a seat",
-    "bookLabel": "Book a seat: {class}",
-    "location": {
-      "inPerson": "Address shared after booking.",
-      "online": "Joining link shared after booking."
-    },
-    "noDates": "New dates are coming soon. Call or WhatsApp Hema to ask.",
-    "cert": {
-      "title": "Hema’s certification",
-      "text": "Hema is completing her chocolatier certification. Certificate coming soon.",
-      "alt": "Hema’s chocolatier certificate"
-    },
-    "how": {
-      "title": "How booking works",
-      "pick": {
-        "title": "Choose a class and a date",
-        "text": "Tap Book a seat, pick a date and say how many people are coming."
-      },
-      "send": {
-        "title": "Send it on WhatsApp",
-        "text": "Your booking opens in WhatsApp, ready to send to Hema. No payment on this website."
-      },
-      "confirm": {
-        "title": "Hema confirms your seat",
-        "text": "She replies on WhatsApp with the payment details and the address, or the joining link for an online class."
-      }
-    },
-    "ask": {
-      "title": "Questions about a class?",
-      "text": "Call or WhatsApp Hema. She will help you choose, and can take your booking on the phone."
-    }
-  },
-  "styleguide": {
-    "title": "Styleguide",
-    "intro": "Every component in English and Kannada, for QA. Development builds only, never indexed.",
-    "sections": {
-      "colours": "Colours",
-      "type": "Type",
-      "brand": "Brand",
-      "buttons": "Buttons",
-      "controls": "Choices",
-      "fields": "Form fields",
-      "display": "Badges and notices",
-      "overlay": "Sheet",
-      "icons": "Icons",
-      "art": "Illustrations"
-    },
-    "onLight": "On cream",
-    "onDark": "On black",
-    "buttons": {
-      "primary": "Order now",
-      "secondary": "See the menu",
-      "call": "Call to order",
-      "whatsapp": "Chat on WhatsApp",
-      "disabled": "Not available"
-    },
-    "sizeLegend": "Size",
-    "sizes": {
-      "s250": "250 g",
-      "s500": "500 g",
-      "s750": "750 g"
-    },
-    "flavourLegend": "Flavour",
-    "flavours": {
-      "chocolate": "Chocolate",
-      "strawberry": "Strawberry",
-      "mango": "Mango",
-      "butterscotch": "Butterscotch"
-    },
-    "nameToggle": "Name on box (+₹100)",
-    "nameToggleDesc": "Hema writes a name on the lid",
-    "on": "On",
-    "off": "Off",
-    "name": "Name on the box",
-    "nameHint": "Up to 20 letters",
-    "phone": "Phone number",
-    "phoneError": "Enter a 10-digit mobile number, like 98765 43210.",
-    "note": "Note to Hema",
-    "time": "Best time to call",
-    "times": {
-      "morning": "Morning",
-      "afternoon": "Afternoon",
-      "evening": "Evening"
-    },
-    "badges": {
-      "signature": "Signature",
-      "top": "Top selling",
-      "soldOut": "Sold out"
-    },
-    "headingTitle": "Brownie tubs",
-    "headingLead": "A tub filled with delicious fudgy brownies, creamy spreads, premium toppings & pure happiness in every bite!",
-    "sheetOpen": "Open the sample sheet",
-    "sheetTitle": "Ferrero Rocher Nutella",
-    "sheetBody": "This is how the customise sheet opens. Drag the top strip down, press Esc or tap Close.",
-    "sheetAdd": "Add to cart ₹549",
-    "sheetCall": "Prefer to talk? Call {phone}",
-    "typeSample": "Turning your cravings into sweet memories."
-  },
-  "badges": {
-    "signature": "Signature",
-    "topSelling": "Top selling"
-  },
-  "customise": {
-    "size": "Choose a size",
-    "weight": "Choose a weight",
-    "perKg": "{price} per kg",
-    "weighs": "{grams}g",
-    "flavour": "Flavour",
-    "flavourHint": "Choose one. No extra cost.",
-    "flavourError": "Choose a flavour",
-    "nameToggle": "Add a name on the box (+{price})",
-    "on": "On",
-    "off": "Off",
-    "nameLabel": "Name on the box",
-    "count": "{count}/{max} letters",
-    "namePreview": "Name on box:",
-    "nameEmpty": "Type a name to add it. The extra charge only applies once a name is typed.",
-    "occasion": "Occasion",
-    "occasionHint": "Tap one if it is for something special. Tap again to clear.",
-    "note": "Note to Hema",
-    "notePlaceholder": "For example: less sweet, or deliver after 5 pm",
-    "includes": "Inside the box",
-    "total": "Total",
-    "totalFor": "{qty} × {unit}",
-    "includesName": "(includes name on box {price})",
-    "add": "Add to cart {price}",
-    "save": "Update cart {price}",
-    "call": "Prefer to talk? Call {phone}",
-    "sheetHelp": "Choose your options, then use the Add to cart button at the bottom."
-  },
-  "combo": {
-    "cardText": "Mix any of our {count} chocolate bars. The same bar twice or three times is fine.",
-    "choose": "Choose {count} bars",
-    "intro": "Pick any {count} bars for {price}. Repeats are fine.",
-    "trayCount": "{picked} of {total} bars picked",
-    "trayFull": "All 3 bars picked",
-    "slot": "Bar {n}",
-    "add": "Add",
-    "inTray": "(×{count} in your box)",
-    "separately": "Bought separately",
-    "comboPrice": "Combo price",
-    "save": "You save {amount}",
-    "cheaperHint": "These 3 bars cost {amount} bought separately, which is less than the {price} combo.",
-    "addIndividually": "Add these individually for {amount}",
-    "pickMore": "Pick {count} more to continue."
+  "units": {
+    "g": "{n} g",
+    "kg": "{n} kg"
   },
   "dates": {
     "weekdays": [
@@ -703,110 +79,546 @@
     "format": "{weekday}, {day} {month}",
     "formatYear": "{weekday}, {day} {month} {year}"
   },
-  "callOptions": {
-    "checkoutTitle": "Don’t want to type? Call us and we’ll take your order.",
-    "searchTitle": "Can’t find it? Talk to Hema",
-    "call": "Call Dream Kitchen",
-    "requestCallback": "Request a call back",
-    "voice": "Send a voice message",
-    "voiceHelp": "Tap the mic in WhatsApp to send a voice message."
-  },
-  "callback": {
-    "title": "Request a call back",
-    "intro": "Leave your number and Hema will call you. That’s all you need to type.",
-    "phone": "Your mobile number",
-    "name": "Your name",
-    "time": "Best time to call",
-    "times": {
-      "morning": "Morning",
-      "afternoon": "Afternoon",
-      "evening": "Evening"
-    },
-    "when": {
-      "morning": "in the morning",
-      "afternoon": "in the afternoon",
-      "evening": "in the evening"
-    },
-    "timeHint": "Tap one if you like. Tap again to clear.",
-    "submit": "Send request on WhatsApp",
-    "doneTitle": "Your request is ready in WhatsApp",
-    "doneText": "Tap Send in WhatsApp. Hema will call you on {phone}.",
-    "doneTextWhen": "Tap Send in WhatsApp. Hema will call you on {phone} {when}.",
-    "notOpened": "WhatsApp didn’t open?",
-    "openAgain": "Open WhatsApp again",
-    "done": "Done",
-    "errors": {
-      "phone": {
-        "required": "Enter your mobile number so Hema can call you back.",
-        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
-      }
-    },
-    "blockedTitle": "One more step: send your request on WhatsApp",
-    "blockedText": "WhatsApp did not open by itself. Tap the green button to send your request to Hema, or simply call.",
-    "openWhatsApp": "Open WhatsApp"
-  },
-  "booking": {
-    "name": "Your name",
-    "phone": "Mobile number",
-    "phoneHint": "Hema will confirm your seat on WhatsApp on this number.",
-    "batch": "Choose a date",
-    "people": "How many people?",
-    "peopleKids": "How many children?",
-    "peopleHint": "Up to {max} in one booking. For a bigger group, call Hema.",
-    "total": "Total",
-    "totalFor": "{count} × {price}",
-    "payNote": "No payment now. Hema will confirm your seat on WhatsApp and share the payment details.",
-    "submit": "Send booking on WhatsApp {price}",
-    "call": "Prefer to talk? Call {phone}",
-    "errors": {
-      "name": {
-        "required": "Enter your name."
-      },
-      "phone": {
-        "required": "Enter your mobile number so Hema can confirm your seat.",
-        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
-      },
-      "batch": {
-        "required": "Choose a date for the class.",
-        "gone": "That date is no longer open. Please choose another date.",
-        "full": "That date is full. Please choose another date."
-      },
-      "people": {
-        "invalid": "Choose how many people are coming.",
-        "tooMany": "You can book up to {max} seats here. For more, call Hema."
-      }
-    }
-  },
-  "booked": {
-    "title": "Your booking is ready in WhatsApp",
-    "lead": "Tap Send to send it to Hema. Your seat is confirmed once she replies.",
-    "blockedTitle": "One more step: send your booking on WhatsApp",
-    "blockedLead": "WhatsApp did not open by itself. Tap the green button below to send your booking to Hema.",
-    "bookingId": "Your booking ID",
-    "copyLabel": "Copy booking ID {id}",
-    "copied": "Booking ID copied",
-    "saveId": "Keep this ID in case you need to ask Hema about your booking.",
-    "fallbackText": "Open it again, or call Hema and book on the phone.",
-    "copyDetails": "Copy booking details",
-    "detailsCopied": "Booking details copied. Paste them into WhatsApp.",
-    "yourBooking": "Your booking",
-    "class": "Class",
-    "when": "Date and time",
-    "people": "People",
-    "name": "Name",
-    "total": "Total",
-    "where": "Where",
-    "moreClasses": "See all classes",
-    "missingTitle": "We couldn’t find this booking on this phone",
-    "missingText": "If you booked on another phone, look there. For help, call or WhatsApp Dream Kitchen."
-  },
-  "units": {
-    "g": "{n}g",
-    "kg": "{n}kg"
-  },
   "langError": {
     "text": "Kannada could not load. Please check your internet and try again.",
     "retry": "Try Kannada again",
     "close": "Close this message"
+  },
+  "hours": {
+    "label": "Call hours",
+    "range": "{opens} – {closes}, {days}",
+    "days": {
+      "monSat": "Monday to Saturday"
+    },
+    "time": {
+      "morning": "{h} am",
+      "noon": "12 noon",
+      "afternoon": "{h} pm",
+      "evening": "{h} pm",
+      "night": "{h} pm"
+    }
+  },
+  "seo": {
+    "home": {
+      "title": "Dream Kitchen | Handmade chocolates, brownie tubs and delight boxes",
+      "desc": "Handmade brownie tubs, delight boxes, brownies and chocolates by Hema, made fresh to order and sent all over India. Order online or call {phone}."
+    },
+    "menu": {
+      "title": "Menu | Dream Kitchen",
+      "desc": "Brownie tubs, delight boxes, brownies and chocolates, made fresh to order. Order and pay on the website."
+    },
+    "customize": {
+      "title": "Customize | Dream Kitchen",
+      "desc": "A name or a drawing on your Delight Box, or a Drawing Chocolate Bar made just for you."
+    },
+    "classes": {
+      "title": "Chocolate classes | Dream Kitchen",
+      "desc": "Chocolate classes with Hema. Details are coming soon: send an enquiry and she will contact you."
+    },
+    "story": {
+      "title": "Our story | Dream Kitchen",
+      "desc": "How Hema started Dream Kitchen as a student with ₹2,500 and grew it into a loved home brand."
+    },
+    "contact": {
+      "title": "Contact | Dream Kitchen",
+      "desc": "Call Dream Kitchen on {phone}, or chat on WhatsApp."
+    },
+    "faq": {
+      "title": "FAQ | Dream Kitchen",
+      "desc": "Ordering, paying by UPI, courier charges, dispatch dates, names and drawings: your questions, answered."
+    },
+    "track": {
+      "title": "Track your order | Dream Kitchen",
+      "desc": "See where your Dream Kitchen order is with your order ID and phone number."
+    },
+    "cart": {
+      "title": "Your cart | Dream Kitchen",
+      "desc": "Your Dream Kitchen cart."
+    },
+    "checkout": {
+      "title": "Checkout | Dream Kitchen",
+      "desc": "Your details, courier and payment."
+    },
+    "pay": {
+      "title": "Pay for your order | Dream Kitchen",
+      "desc": "Pay by UPI for your Dream Kitchen order."
+    },
+    "order": {
+      "title": "Your order | Dream Kitchen",
+      "desc": "Your Dream Kitchen order."
+    },
+    "notFound": {
+      "title": "Page not found | Dream Kitchen",
+      "desc": "This page has melted away."
+    }
+  },
+  "home": {
+    "orderNow": "Order now",
+    "pick": "What would you like?"
+  },
+  "menu": {
+    "title": "Menu",
+    "lead": "Made fresh after you order. Tap an item to choose.",
+    "tabs": "Menu categories",
+    "from": "from {price}",
+    "priceSoon": "Price coming soon",
+    "soldOut": "Sold out"
+  },
+  "sheet": {
+    "size": "Size",
+    "ragi": "Make it Ragi",
+    "ragiExtra": "+{price}, ragi flour instead of maida",
+    "on": "On",
+    "off": "Off",
+    "name": "Name on the box",
+    "nameHint": "Free. Up to {max} letters, in English or Kannada.",
+    "namePreview": "It will read:",
+    "drawing": "Add a drawing",
+    "drawingExtra": "+{price}",
+    "drawingNote": "Drawing orders need extra preparation time.",
+    "drawingText": "Describe the drawing",
+    "drawingTextHint": "For example: a small pink teddy bear with a balloon. {count}/{max}",
+    "drawingTextBar": "What should Hema draw?",
+    "photo": "Reference photo",
+    "photoHint": "A picture of what you’d like drawn helps Hema.",
+    "photoAdd": "Add a photo",
+    "photoChange": "Change photo",
+    "photoRemove": "Remove photo",
+    "photoUploading": "Uploading photo…",
+    "photoAdded": "Photo added",
+    "ingredients": "Ingredients",
+    "contains": "Contains: egg, dairy, gluten, nuts where used.",
+    "ragiGluten": "Ragi version: not confirmed gluten-free yet. If you have an allergy, please call before ordering.",
+    "courierFrom": "+ courier from {price}",
+    "add": "Add to cart {price}",
+    "update": "Update cart {price}",
+    "priceSoon": "Price coming soon",
+    "priceSoonText": "Hema will add the sizes and prices soon. To order now, call {phone}.",
+    "soldOut": "Sold out for now",
+    "soldOutText": "To ask when it’s back, call {phone}.",
+    "call": "Prefer to talk? Call {phone}",
+    "weight": "{grams} g",
+    "errors": {
+      "name": {
+        "long": "Please keep the name to {max} letters.",
+        "chars": "Please use only English or Kannada letters, numbers and simple punctuation."
+      },
+      "drawingText": {
+        "required": "Tell Hema what to draw, in a few words.",
+        "long": "Please keep it to {max} letters.",
+        "chars": "Please remove the special characters."
+      },
+      "photo": {
+        "notImage": "That file isn’t a photo. Please choose a JPG, PNG or WebP picture.",
+        "tooLarge": "That photo is too big even after shrinking. Please choose a smaller one.",
+        "failed": "The photo didn’t upload. Check your internet and try again, or order without it."
+      }
+    }
+  },
+  "cart": {
+    "title": "Your cart",
+    "countLine": "{count} items",
+    "countLineOne": "1 item",
+    "added": "Added to cart",
+    "updated": "Cart updated",
+    "view": "View cart",
+    "removed": "Removed {name}",
+    "undo": "Undo",
+    "edit": "Edit",
+    "each": "{price} each",
+    "qtyFor": "Quantity of {name}",
+    "size": "Size",
+    "ragi": "Ragi version",
+    "nameOnBox": "Name on the box",
+    "drawing": "Drawing",
+    "photoAttached": "Reference photo added",
+    "subtotal": "Items",
+    "courier": "Courier",
+    "courierRates": "{karnataka} within Karnataka, {outside} outside",
+    "courierHow": "Courier: {smallKa} within Karnataka, {smallOut} outside; {largeKa} / {largeOut} with a 500 g or 700 g Delight Box. One charge per order.",
+    "total": "Total",
+    "totalPlusCourier": "{price} + courier",
+    "checkout": "Continue",
+    "addMore": "Add more items",
+    "dispatch": "Made fresh after you order. Dispatched after {days} business days.",
+    "emptyTitle": "Your cart is empty",
+    "emptyText": "Brownie tubs, delight boxes, brownies and chocolates, all made fresh for you.",
+    "emptyCta": "See the menu",
+    "pricesUpdated": "Some prices have been updated",
+    "pricesUpdatedText": "Hema has changed some prices since you added these items. The new prices are shown below.",
+    "priceWas": "Was {old}",
+    "priceNow": "now {new}",
+    "unavailableTitleOne": "1 item can’t be ordered right now",
+    "unavailableTitle": "{count} items can’t be ordered right now",
+    "unavailableText": "Remove it to continue.",
+    "unavailableTextMany": "Remove them to continue.",
+    "removeUnavailableOne": "Remove the unavailable item",
+    "removeUnavailable": "Remove {count} unavailable items",
+    "unavailable": {
+      "removed": "No longer on the menu",
+      "soldOut": "Sold out for now",
+      "priceSoon": "Price coming soon",
+      "changed": "A choice you made is no longer offered. Remove this and add it again."
+    },
+    "checkoutBlocked": "Remove the unavailable items above to continue.",
+    "checkoutEmpty": "Checkout needs at least 1 item."
+  },
+  "checkout": {
+    "title": "Checkout",
+    "progress": "Step {n} of 3: {name}",
+    "steps": {
+      "details": "Details",
+      "review": "Review",
+      "pay": "Pay"
+    },
+    "welcomeBack": "Welcome back, {name}. Your details are filled in.",
+    "notYou": "Not you? Clear",
+    "cleared": "Details cleared.",
+    "name": "Your name",
+    "phone": "Mobile number",
+    "phoneHint": "For the courier, and to find your order later.",
+    "email": "Email",
+    "emailHint": "We’ll email your order confirmation and tracking.",
+    "line1": "House, flat or building",
+    "line2": "Street and area",
+    "city": "Town or city",
+    "pincode": "Pincode",
+    "state": "State",
+    "statePick": "Choose your state",
+    "landmark": "Landmark",
+    "note": "Note for Hema",
+    "noteHint": "For example: please call before delivering. {count}/{max}",
+    "remember": "Remember my details on this phone",
+    "stateMismatch": "Pincode {pincode} is {zone}, but you chose {state}. Please check both. The courier charge follows the pincode.",
+    "zone": {
+      "karnataka": "in Karnataka",
+      "outside": "outside Karnataka"
+    },
+    "toReview": "Continue to review",
+    "fixOne": "Please fix 1 thing: {first}",
+    "fixMany": "Please fix {count} things. First: {first}",
+    "reviewTitle": "Check your order",
+    "editItems": "Change items",
+    "editDetails": "Change",
+    "deliverTo": "Deliver to",
+    "courierTo": "Courier ({zone})",
+    "dispatchTitle": "Preferred dispatch date",
+    "dispatchHint": "The earliest is {date}. We are closed on Sundays.",
+    "dispatchHintDrawing": "The earliest is {date}, because drawings need extra time. We are closed on Sundays.",
+    "earliest": "Earliest",
+    "otherDate": "Pick another date",
+    "otherDateLabel": "Your date",
+    "otherDateHint": "Any day from {date}, except Sundays.",
+    "courierNote": "Delivery time depends on the courier after dispatch.",
+    "placeOrder": "Place order and pay {price}",
+    "placing": "Placing your order…",
+    "paymentsSoon": "Payments open soon",
+    "paymentsSoonText": "Online orders open very soon. To order today, call {phone}.",
+    "errors": {
+      "name": {
+        "required": "Write your name.",
+        "short": "Write your full name.",
+        "long": "Please shorten your name."
+      },
+      "phone": {
+        "required": "Give your mobile number for the courier.",
+        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
+      },
+      "email": {
+        "invalid": "That email doesn’t look right. Check it, or leave it empty."
+      },
+      "line1": {
+        "required": "Write your house, flat or building.",
+        "short": "Add a little more, like the house number.",
+        "long": "Please shorten this line."
+      },
+      "line2": {
+        "required": "Write your street and area.",
+        "short": "Add a little more, like the street name.",
+        "long": "Please shorten this line."
+      },
+      "city": {
+        "required": "Write your town or city.",
+        "short": "Write the full name of your town or city.",
+        "long": "Please shorten the town or city."
+      },
+      "pincode": {
+        "required": "Enter your 6-digit pincode.",
+        "format": "A pincode has 6 digits and doesn’t start with 0, like 560001."
+      },
+      "state": {
+        "required": "Choose your state.",
+        "invalid": "Choose your state from the list."
+      },
+      "landmark": {
+        "long": "Please shorten the landmark."
+      },
+      "note": {
+        "long": "Please keep the note to {max} letters."
+      },
+      "date": {
+        "required": "Choose a dispatch date.",
+        "invalid": "That date isn’t valid. Pick one of the dates above.",
+        "tooSoon": "That date is too soon. The earliest is {date}.",
+        "closed": "We are closed that day. Please pick another date.",
+        "tooFar": "Please pick a date within the next {days} days."
+      }
+    }
+  },
+  "pay": {
+    "title": "Pay {price}",
+    "orderSaved": "Order {code} is saved. Pay to confirm it.",
+    "scan": "Scan this QR code with any UPI app (Google Pay, PhonePe, Paytm…) and pay {price}.",
+    "qrAlt": "Dream Kitchen UPI QR code",
+    "app": "Pay {price} with a UPI app",
+    "upiId": "UPI ID",
+    "copyUpi": "Copy UPI ID",
+    "upiCopied": "UPI ID copied",
+    "amountNote": "Please pay exactly {price} and write {code} in the note if your app asks.",
+    "afterTitle": "After paying",
+    "utr": "12-digit UPI reference (UTR)",
+    "utrHint": "Find it in your UPI app under the payment details. It has 12 numbers.",
+    "screenshot": "Payment screenshot",
+    "screenshotHint": "Optional, if it’s easier than finding the number.",
+    "screenshotAdd": "Add screenshot",
+    "submit": "I’ve paid",
+    "submitting": "Sending…",
+    "check": "Hema will confirm your payment, usually within a few hours. You’ll see the status on Track Order.",
+    "online": "Pay by card, UPI or net banking",
+    "onlineOr": "Or pay online",
+    "onlineFailed": "The online payment didn’t finish. You can try again, or pay by UPI above.",
+    "later": "You can come back to this page later: it is saved on this phone, and on Track Order.",
+    "errors": {
+      "utr": {
+        "required": "Enter the 12-digit UPI reference.",
+        "format": "The UPI reference has exactly 12 numbers. Please check it."
+      },
+      "screenshot": "The screenshot didn’t upload. Try again, or send just the number."
+    }
+  },
+  "order": {
+    "title": "Thank you! Your order is placed",
+    "code": "Order ID",
+    "copyCode": "Copy order ID {code}",
+    "codeCopied": "Order ID copied",
+    "keep": "Keep this ID to track your order.",
+    "items": "Your items",
+    "payment": "Payment",
+    "paymentStatus": {
+      "pending": "Waiting for your payment",
+      "submitted": "Payment submitted, awaiting check",
+      "confirmed": "Payment received"
+    },
+    "payNow": "Pay now",
+    "dispatch": "Preferred dispatch date",
+    "courierNote": "Delivery time depends on the courier after dispatch.",
+    "track": "Track your order",
+    "needPhone": "Enter the mobile number you ordered with to see this order.",
+    "show": "Show my order",
+    "notFound": "We couldn’t find this order with that number. Check both, or call {phone}."
+  },
+  "track": {
+    "title": "Track your order",
+    "lead": "Enter your order ID and the mobile number you ordered with. Works on any phone.",
+    "orderId": "Order ID",
+    "orderIdHint": "It starts with DK, like DK‑261007‑7Q4M.",
+    "phone": "Mobile number",
+    "submit": "Check status",
+    "checking": "Checking…",
+    "statusFor": "Order {id}",
+    "placedOn": "Placed on {date}",
+    "progress": "Order progress",
+    "stepDone": "done",
+    "stepNow": "current step",
+    "stepNext": "not yet",
+    "steps": {
+      "placed": "Placed",
+      "payment_confirmed": "Payment confirmed",
+      "preparing": "Preparing",
+      "shipped": "Shipped",
+      "delivered": "Delivered"
+    },
+    "stepText": {
+      "placed": "Your order has reached Dream Kitchen.",
+      "payment_confirmed": "Hema has received your payment.",
+      "preparing": "Your treats are being made fresh.",
+      "shipped": "Your order is with the courier.",
+      "delivered": "Delivered. Enjoy every bite!"
+    },
+    "awaitingPayment": "Waiting for your payment.",
+    "awaitingCheck": "Payment submitted. Hema will check it, usually within a few hours.",
+    "courier": "Courier",
+    "trackingNo": "Tracking number",
+    "trackCourier": "Track with the courier",
+    "cancelled": "This order was cancelled",
+    "cancelledText": "Questions? Call {phone}.",
+    "notFound": "We couldn’t find an order with that ID and number. Please check both, or call {phone}.",
+    "errors": {
+      "orderId": {
+        "required": "Enter your order ID.",
+        "invalid": "Order IDs look like DK‑261007‑7Q4M. Please check and try again."
+      },
+      "phone": {
+        "required": "Enter the mobile number you ordered with.",
+        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
+      }
+    }
+  },
+  "customize": {
+    "title": "Make it yours",
+    "lead": "Two ways to make a gift personal.",
+    "box": {
+      "title": "Delight Box with a name or a drawing",
+      "text": "Any Delight Box can carry a name for free, or a drawing for {price}.",
+      "pick": "Choose a flavour to start"
+    },
+    "bar": {
+      "title": "Drawing Chocolate Bar",
+      "text": "A chocolate bar with a drawing of your choice. Describe it, and add a photo if you have one.",
+      "cta": "Choose the drawing bar {price}"
+    },
+    "drawingNote": "Drawings need extra preparation time."
+  },
+  "classes": {
+    "title": "Chocolate classes with Hema",
+    "lead": "Class details are coming soon. Send an enquiry and Hema will contact you.",
+    "soon": "Details coming soon",
+    "sections": {
+      "learn": "What you’ll learn",
+      "duration": "Duration",
+      "fee": "Fee",
+      "batch": "Batch size",
+      "dates": "Upcoming dates",
+      "bring": "What to bring"
+    },
+    "formTitle": "Send an enquiry",
+    "name": "Your name",
+    "phone": "Mobile number",
+    "interest": "Which class, or what would you like to learn?",
+    "interestHint": "For example: chocolate making for beginners.",
+    "dates": "Preferred dates",
+    "datesHint": "For example: weekends in November.",
+    "message": "Message",
+    "send": "Send enquiry",
+    "sending": "Sending…",
+    "sentTitle": "Thank you! Your enquiry is sent",
+    "sentText": "Hema will contact you on {phone}.",
+    "another": "Send another enquiry",
+    "errors": {
+      "name": {
+        "required": "Write your name.",
+        "short": "Write your full name.",
+        "long": "Please shorten your name."
+      },
+      "phone": {
+        "required": "Give your mobile number so Hema can call you.",
+        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
+      },
+      "interest": {
+        "required": "Tell Hema which class, or what you’d like to learn.",
+        "long": "Please shorten this a little."
+      },
+      "dates": {
+        "long": "Please shorten this a little."
+      },
+      "message": {
+        "long": "Please keep the message to {max} letters."
+      }
+    }
+  },
+  "story": {
+    "title": "Our story",
+    "lead": "A home kitchen in Karnataka, a student with ₹2,500, and a lot of chocolate.",
+    "start": {
+      "title": "How it started",
+      "text": "Hema started Dream Kitchen while she was still a student, with ₹2,500 and a love for making chocolate. Order by order, she grew it into a loved home brand."
+    },
+    "fresh": {
+      "title": "Handmade, and made fresh for you",
+      "text": "Everything is made by hand after you order. That is why nothing waits on a shelf, and why each order needs a few days."
+    },
+    "teach": {
+      "title": "Teaching others",
+      "text": "Hema also teaches chocolate classes, so you can make these treats in your own kitchen too.",
+      "cta": "About the classes"
+    },
+    "instagram": {
+      "title": "See what Hema is making",
+      "text": "New treats and behind-the-scenes from her kitchen, on Instagram.",
+      "cta": "Follow on Instagram"
+    },
+    "cta": "See the menu"
+  },
+  "contact": {
+    "title": "Contact Dream Kitchen",
+    "lead": "Call Hema, or chat on WhatsApp.",
+    "call": "Call {phone}",
+    "callText": "Order, ask about a delivery or a class, on the phone.",
+    "whatsapp": "Chat on WhatsApp",
+    "whatsappText": "For questions. Orders are placed and paid on the website.",
+    "instagram": "Instagram",
+    "email": "Email",
+    "fssai": "FSSAI licence",
+    "track": "Track an order",
+    "faq": "Read the FAQ"
+  },
+  "faq": {
+    "title": "Questions & answers",
+    "lead": "Can’t find your answer? Call {phone}.",
+    "items": {
+      "order": {
+        "q": "How do I order?",
+        "a": "Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay by UPI on the website. You get an order ID to track it."
+      },
+      "pay": {
+        "q": "How do I pay?",
+        "a": "By UPI on the website: scan the QR code or tap “Pay with a UPI app”, then enter the 12-digit UPI reference. Hema confirms your payment, usually within a few hours."
+      },
+      "courier": {
+        "q": "Where do you deliver, and what does courier cost?",
+        "a": "All over India. One courier charge per order: {smallKa} within Karnataka and {smallOut} outside, or {largeKa} / {largeOut} when the order has a 500 g or 700 g Delight Box."
+      },
+      "when": {
+        "q": "When will my order be sent?",
+        "a": "Everything is made fresh after you order and dispatched after {days} business days (Monday to Saturday). Drawings need extra time. You pick the dispatch date at checkout; delivery time then depends on the courier."
+      },
+      "track": {
+        "q": "How do I track my order?",
+        "a": "Open Track Order and enter your order ID and phone number. You’ll see each step, and the courier’s tracking number once it is shipped."
+      },
+      "name": {
+        "q": "Can I have a name or a drawing on the box?",
+        "a": "Yes, on any Delight Box: a name is free, a drawing is {drawingPrice}. There is also a Drawing Chocolate Bar on the Customize page."
+      },
+      "ragi": {
+        "q": "What is the Ragi version?",
+        "a": "Our brownies made with ragi flour instead of maida. Tap “Make it Ragi” when you choose a brownie box."
+      },
+      "change": {
+        "q": "Can I change or cancel my order?",
+        "a": "Call {phone} as soon as you can, and Hema will tell you what is possible."
+      }
+    }
+  },
+  "notFound": {
+    "title": "Oops! This page melted away",
+    "text": "The page you’re looking for isn’t here. Maybe a brownie will cheer you up?",
+    "home": "Go to the home page",
+    "menu": "See the menu",
+    "help": "Looking for an order? Use Track Order, or call {phone}."
+  },
+  "errors": {
+    "network": "No internet connection. Please check it and try again.",
+    "server": "Something went wrong on our side. Please try again, or call {phone}.",
+    "tooMany": "Too many tries in a short time. Please wait a few minutes, or call {phone}.",
+    "notReady": "Online orders open very soon. To order today, call {phone}.",
+    "storeClosed": "Orders are paused for now. Please try again later, or call {phone}.",
+    "paymentsClosed": "Payments open soon. To order today, call {phone}.",
+    "priceChanged": "Some prices have just changed. Please check your cart.",
+    "items": "Something in your cart can’t be ordered right now. Please check your cart.",
+    "dispatchDate": "That dispatch date isn’t available any more. Please pick another.",
+    "details": "Please check your details.",
+    "rejected": "We couldn’t accept this. Please call {phone}.",
+    "notPending": "This order is already paid or closed."
   }
 }

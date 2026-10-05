@@ -10,14 +10,14 @@ const chip =
   'flex h-full min-h-14 items-center justify-center rounded-control border-[1.5px] border-control-line bg-[#fffdf8] px-2 pt-4 pb-2.5 text-center leading-tight transition-colors hover:border-brown-2 peer-checked:border-ink peer-checked:bg-ink peer-checked:text-cream peer-focus-visible:shadow-[0_0_0_3px_var(--color-ink)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-gold'
 
 /**
- * "Preferred date": the next allowed dates as big chips (earliest marked), plus
+ * "Preferred dispatch date": the next allowed dates as big chips (earliest marked), plus
  * "Pick another date" with a native date input that can't go earlier than the
  * earliest date. Real radio inputs underneath, so arrow keys and screen readers
  * work natively. Sundays and closed dates never appear (src/lib/dates.js).
  *   value: 'YYYY-MM-DD' | ''   mode: 'chip' | 'other'
  *   onChange({ date, mode })   onOtherBlur()
  */
-export default function DateChips({ name, choices, earliest, latest, value, mode, onChange, onOtherBlur, error }) {
+export default function DateChips({ name, choices, earliest, latest, value, mode, onChange, onOtherBlur, error, hint }) {
   const { t } = useI18n()
   const names = t('dates')
   const uid = useId()
@@ -28,9 +28,9 @@ export default function DateChips({ name, choices, earliest, latest, value, mode
 
   return (
     <fieldset id={`${name}-group`} className="scroll-mt-28">
-      <legend className="t-h3 w-full">{t('checkout.sections.date')}</legend>
-      <p id={hintId} className="mt-2 text-brown-2">
-        {t('checkout.dateHint', { date: formatDay(earliest, names) })}
+      <legend className="w-full text-[1.125rem] font-bold">{t('checkout.dispatchTitle')}</legend>
+      <p id={hintId} className="t-small mt-1 text-brown-2">
+        {hint}
       </p>
       {groupError && (
         <p id={errId} className="t-small mt-3 flex items-start gap-2 font-bold text-error">
@@ -39,7 +39,7 @@ export default function DateChips({ name, choices, earliest, latest, value, mode
         </p>
       )}
 
-      <ul className={`mt-5 grid grid-cols-2 gap-x-2.5 gap-y-4 sm:grid-cols-5 ${groupError ? 'rounded-control outline-2 outline-offset-4 outline-error outline-dashed' : ''}`}>
+      <ul className={`mt-5 grid grid-cols-3 gap-x-2 gap-y-4 sm:grid-cols-6 ${groupError ? 'rounded-control outline-2 outline-offset-4 outline-error outline-dashed' : ''}`}>
         {choices.map((iso, i) => {
           const p = dateParts(iso)
           const checked = mode === 'chip' && value === iso

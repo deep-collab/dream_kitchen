@@ -9,24 +9,6 @@ import { useId } from 'react'
 
 const S = { fill: 'none', strokeLinecap: 'round', strokeLinejoin: 'round' }
 
-// Scalloped (fluted) ellipse edge for the cookie pie tin, generated once
-function scallop(cx, cy, rx, ry, bumps, depth) {
-  const pts = []
-  for (let i = 0; i <= bumps * 2; i++) {
-    const a = (i / (bumps * 2)) * Math.PI * 2
-    const r = i % 2 ? 1 : 1 - depth
-    pts.push([cx + Math.cos(a) * rx * r, cy + Math.sin(a) * ry * r])
-  }
-  let d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`
-  for (let i = 1; i < pts.length; i += 2) {
-    const [qx, qy] = pts[i]
-    const [x, y] = pts[i + 1] || pts[0]
-    d += ` Q${qx.toFixed(1)} ${qy.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`
-  }
-  return d + 'Z'
-}
-const PIE_EDGE = scallop(80, 86, 54, 32, 22, 0.06)
-
 const ART = {
   tub: (
     <>
@@ -58,49 +40,6 @@ const ART = {
       <rect x="128" y="64" width="13" height="16" rx="2.5" transform="rotate(12 134 72)" />
     </>
   ),
-  'cookie-dip-tin': (
-    <>
-      <path d="M22 98 V106 Q68 138 114 106 V98" />
-      <ellipse cx="68" cy="98" rx="46" ry="26" />
-      <ellipse cx="68" cy="96" rx="40" ry="21" opacity=".6" />
-      <circle cx="52" cy="94" r="13" />
-      <circle cx="78" cy="86" r="12" />
-      <circle cx="82" cy="106" r="10.5" />
-      <path d="M48 90 h.1 M56 97 h.1 M51 101 h.1 M75 83 h.1 M82 89 h.1 M79 104 h.1 M86 108 h.1" strokeWidth="3.2" />
-      <path d="M102 44 L104.5 58 Q115 62 125.5 58 L128 44" />
-      <ellipse cx="115" cy="44" rx="13" ry="5" />
-      <path d="M107 44 q4 6 8 1 q4 6 8 0" opacity=".8" />
-      <path d="M126 62 L128.5 74 Q137 78 145.5 74 L148 62" />
-      <ellipse cx="137" cy="62" rx="11" ry="4.5" />
-      <path d="M130 62 q3.5 5 7 1 q3.5 5 7 0" opacity=".8" />
-    </>
-  ),
-  'cookie-pie-tin': (
-    <>
-      <path d={PIE_EDGE} />
-      <path d="M26 86 V94 Q80 136 134 94 V86" />
-      <ellipse cx="80" cy="86" rx="44" ry="25" opacity=".55" />
-      <path d="M80 86 L123 80 M80 86 L112 104" opacity=".8" />
-      <rect x="54" y="74" width="7" height="6" rx="1.5" transform="rotate(-15 57 77)" />
-      <rect x="70" y="94" width="7" height="6" rx="1.5" transform="rotate(20 73 97)" />
-      <rect x="92" y="70" width="6" height="5" rx="1.5" transform="rotate(10 95 72)" />
-      <rect x="50" y="92" width="6" height="5" rx="1.5" />
-      <path d="M96 52 L134 46 Q140 58 128 68 Z" />
-      <path d="M104 54 h.1 M118 52 h.1 M124 60 h.1" strokeWidth="3.2" />
-    </>
-  ),
-  'cookie-pie-box': (
-    <>
-      <path d="M44 72 H112 V122 H44 Z" />
-      <path d="M44 72 L60 58 H128 L112 72" />
-      <path d="M128 58 V108 L112 122" />
-      <path d="M60 58 L54 30 H122 L128 58" opacity=".85" />
-      <path d="M66 70 L100 62 Q104 54 96 50 Q80 50 66 70 Z" />
-      <path d="M76 63 h.1 M88 58 h.1 M93 61 h.1" strokeWidth="3.2" />
-      <circle cx="78" cy="97" r="11" opacity=".8" />
-      <path d="M74 100 q4 -10 9 -8 q-1 7 -9 8 Z M78 97 q-6 -7 -2 -10 q4 3 2 10" opacity=".9" />
-    </>
-  ),
   bar: (
     <g transform="rotate(-12 80 80)">
       <rect x="40" y="30" width="80" height="96" rx="4" />
@@ -114,17 +53,6 @@ const ART = {
       <path d="M36 98 H124 M36 112 H124" opacity=".6" />
       <path d="M98.3 30 H116 Q120 30 120 34 V50 L112 46 L106 52 L98.3 46 Z" opacity=".35" />
       <path d="M128 18 l10 4 l-4 9 l-9 -3 Z" />
-    </g>
-  ),
-  'colour-blast': (
-    <g transform="rotate(-8 80 80)">
-      <rect x="30" y="46" width="100" height="68" rx="6" />
-      <rect x="35" y="51" width="90" height="58" rx="4" opacity=".45" />
-      <path d="M38 96 C54 70 66 104 82 80 S112 70 122 58" />
-      <path d="M38 108 C58 86 70 112 90 92 S116 88 124 76" opacity=".7" />
-      <path d="M46 62 h.1 M60 58 h.1 M100 100 h.1 M112 96 h.1 M70 104 h.1 M96 62 h.1" strokeWidth="3.4" />
-      <path d="M78 58 l2 5 l5 2 l-5 2 l-2 5 l-2 -5 l-5 -2 l5 -2 Z" opacity=".9" />
-      <path d="M104 80 l3 -3 M52 80 l-3 3 M114 66 l3 1" />
     </g>
   ),
   assortment: (
@@ -148,6 +76,35 @@ const ART = {
       <path d="M74 103 q3 -4 6 0 t6 0 M74 109 q3 -4 6 0 t6 0" opacity=".75" />
       <circle cx="109" cy="106" r="10" />
       <path d="M109 98 v16 M101 106 h16" opacity=".6" />
+    </>
+  ),
+  // Brownies: an open box seen from above, five fudgy squares (two over three) with a crackled top
+  'brownie-box': (
+    <>
+      <path d="M30 50 L48 34 H112 L130 50" opacity=".7" />
+      <rect x="30" y="50" width="100" height="72" rx="4" />
+      <rect x="40" y="58" width="37" height="26" rx="3" />
+      <rect x="83" y="58" width="37" height="26" rx="3" />
+      <rect x="40" y="90" width="24" height="24" rx="3" />
+      <rect x="68" y="90" width="24" height="24" rx="3" />
+      <rect x="96" y="90" width="24" height="24" rx="3" />
+      <path d="M46 66 l7 4 l6 -3 M90 68 l6 -3 l8 4 M46 98 l5 4 M74 100 l6 -3 M101 98 l6 4" opacity=".6" />
+      <circle cx="66" cy="75" r="1.6" fill="currentColor" stroke="none" />
+      <circle cx="108" cy="76" r="1.6" fill="currentColor" stroke="none" />
+    </>
+  ),
+  // Drawing Chocolate Bar: a smooth bar with a little heart drawn on it, and a fine brush
+  'drawing-bar': (
+    <>
+      <g transform="rotate(-10 80 82)">
+        <rect x="32" y="46" width="96" height="66" rx="6" />
+        <rect x="38" y="52" width="84" height="54" rx="4" opacity=".5" />
+        <path d="M80 94 C66 84 62 76 68 70 C72 66 78 68 80 73 C82 68 88 66 92 70 C98 76 94 84 80 94 Z" />
+        <path d="M50 62 q4 -4 8 0 M104 98 q4 -4 8 0" opacity=".6" />
+      </g>
+      <path d="M118 30 L136 18" />
+      <path d="M114 33 l4 -3 l3 4 l-4 3 Z" />
+      <path d="M114 36 q-6 6 -10 10 q4 1 9 -4 q3 -3 1 -6" />
     </>
   ),
   // Chocolate classes: a mixing bowl of melted chocolate, a whisk, and a mould tray in front
@@ -191,7 +148,7 @@ function Sparkle({ x, y, s = 1 }) {
 export const ART_KINDS = Object.keys(ART)
 
 /**
- * kind: tub | delight-box | cookie-dip-tin | cookie-pie-tin | cookie-pie-box | bar | colour-blast | assortment | class
+ * kind: tub | delight-box | brownie-box | bar | drawing-bar | assortment | class
  * label: pass a description when the image is meaningful on its own; omit when the
  *        product name sits right beside it (then the tile is decorative).
  */

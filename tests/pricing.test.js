@@ -295,7 +295,7 @@ describe('settings, UPI and UTR', () => {
   })
 
   it('UPI IDs', () => {
-    expect(['hema@okaxis', 'dream.kitchen-01@ybl', '9535706956@paytm'].every(isUpiId)).toBe(true)
+    expect(['hema@okaxis', 'dream.kitchen-01@ybl', '9876543210@paytm'].every(isUpiId)).toBe(true)
     expect(['', 'hema', '@okaxis', 'he ma@okaxis', 'hema@1bank'].some(isUpiId)).toBe(false)
   })
 

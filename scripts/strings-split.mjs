@@ -15,7 +15,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-export const CORE_SECTIONS = ['brand', 'nav', 'common', 'footer', 'mobileBar', 'wa', 'header', 'notice', 'mobileMenu', 'hours', 'dates', 'units', 'langError', 'badges', 'callOptions', 'seo', 'cart']
+export const CORE_SECTIONS = ['brand', 'nav', 'common', 'header', 'footer', 'banner', 'units', 'dates', 'langError', 'hours', 'seo', 'errors']
 const PREFIX = 'virtual:dk-strings/'
 
 export default function stringsSplit() {

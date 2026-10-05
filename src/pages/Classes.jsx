@@ -1,101 +1,122 @@
-import { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useState } from 'react'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
-import { useAsync } from '../hooks/useAsync'
-import { getClasses } from '../services'
-import PageHero from '../components/PageHero'
+import { classInfo } from '../data/classInfo'
+import { ENQUIRY_FIELDS, ENQUIRY_MAX, enquiryErrors } from '../lib/enquiry'
+import { formatPhone, tidyPhoneInput } from '../lib/validation'
+import { errorText } from '../lib/api'
+import { sendClassEnquiry } from '../services'
 import Container from '../components/ui/Container'
-import CallOptions from '../components/contact/CallOptions'
-import CertificationNote from '../components/classes/CertificationNote'
-import ClassCard from '../components/classes/ClassCard'
-import BookingSheet from '../components/classes/BookingSheet'
+import Button from '../components/ui/Button'
+import TextField, { PhoneField } from '../components/ui/TextField'
+import ProductArt from '../components/art/ProductArt'
+import { AlertIcon, CheckIcon } from '../components/icons'
 import 'virtual:dk-strings/classes'
 
-const STEPS = ['pick', 'send', 'confirm']
-const USER_INPUT = ['wheel', 'touchstart', 'keydown', 'pointerdown']
+const SECTIONS = ['learn', 'duration', 'fee', 'batch', 'dates', 'bring']
+const EMPTY = { name: '', phone: '', interest: '', dates: '', message: '', website: '' }
 
+/**
+ * Classes: a short info page (every section from src/data/classInfo.js, "Details coming soon"
+ * until Hema fills it in) and an enquiry form saved on the website; Hema gets an email.
+ */
 export default function Classes() {
   useSeo('classes')
-  const { t } = useI18n()
-  const { hash } = useLocation()
-  const { data: list } = useAsync(() => getClasses(), [])
-  const [sheet, setSheet] = useState({ open: false, cls: null, key: 0 })
+  const { t, pick, lang } = useI18n()
+  const [form, setForm] = useState(EMPTY)
+  const [tried, setTried] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [sent, setSent] = useState(null)
+  const [error, setError] = useState(null)
+  const errors = enquiryErrors(form)
+  const msg = (k) => tried && errors[k] && t(`classes.errors.${k}.${errors[k]}`, { max: ENQUIRY_MAX[k] })
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
 
-  // /classes#slug (from the home page) scrolls to that class once the list is in. Web
-  // fonts change the cards' heights as they arrive (the Kannada ones load on demand, and
-  // later still on a slow phone), so it scrolls again whenever the page's layout changes
-  // size. It stops once the fonts are in and the layout has been still for a second
-  // (10 seconds at most), or as soon as the person scrolls or taps themselves.
-  useEffect(() => {
-    if (!list || !hash) return
-    let alive = true
-    let quiet
-    const scroll = () => alive && document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView({ block: 'start', behavior: 'instant' })
-    const stop = () => {
-      alive = false
-      clearTimeout(quiet)
-      clearTimeout(cap)
-      resized?.disconnect()
-      document.fonts?.removeEventListener('loadingdone', settle)
-      USER_INPUT.forEach((e) => window.removeEventListener(e, stop))
-    }
-    const settle = () => {
-      if (!alive) return
-      requestAnimationFrame(scroll)
-      clearTimeout(quiet)
-      quiet = setTimeout(() => (!document.fonts || document.fonts.status === 'loaded' ? stop() : settle()), 1000)
-    }
-    const resized = typeof ResizeObserver === 'function' ? new ResizeObserver(settle) : null
-    const cap = setTimeout(stop, 10000)
-    settle()
-    resized?.observe(document.getElementById('main'))
-    document.fonts?.ready.then(settle)
-    document.fonts?.addEventListener('loadingdone', settle)
-    USER_INPUT.forEach((e) => window.addEventListener(e, stop, { passive: true }))
-    return stop
-  }, [list, hash])
+  const onSubmit = async (e) => {
+    e.preventDefault()
+    setTried(true)
+    const bad = ENQUIRY_FIELDS.find((k) => errors[k])
+    if (bad) return document.getElementById(`ce-${bad}`)?.focus()
+    setBusy(true)
+    setError(null)
+    const r = await sendClassEnquiry({ ...form, lang })
+    setBusy(false)
+    if (r.ok) {
+      setSent(form.phone)
+      setForm(EMPTY)
+      setTried(false)
+    } else setError(errorText(t, r))
+  }
 
   return (
-    <>
-      <PageHero title={t('classes.title')} subtitle={t('classes.subtitle')} />
-      <Container className="py-10 lg:py-14">
-        <CertificationNote className="max-w-[46rem]" />
-
-        <section aria-labelledby="class-list-title" className="mt-10 lg:mt-14">
-          <h2 id="class-list-title" className="t-h2">
-            {t('classes.listTitle')}
-          </h2>
-          <div className="mt-6 space-y-6 lg:space-y-8" aria-busy={!list}>
-            {list?.map((cls) => (
-              <ClassCard key={cls.id} cls={cls} onBook={(c) => setSheet((s) => ({ open: true, cls: c, key: s.key + 1 }))} />
-            ))}
+    <Container className="py-6 lg:py-10">
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <div>
+          <div className="flex items-start gap-4">
+            <ProductArt kind="class" rounded="rounded-card" className="h-20 w-20 shrink-0" />
+            <div>
+              <h1 className="t-h2">{t('classes.title')}</h1>
+              <p className="mt-1 text-brown-2">{t('classes.lead')}</p>
+            </div>
           </div>
-        </section>
-
-        <section aria-labelledby="how-title" className="mt-12 lg:mt-16">
-          <h2 id="how-title" className="t-h2">
-            {t('classes.how.title')}
-          </h2>
-          <ol className="mt-6 grid gap-6 md:grid-cols-3">
-            {STEPS.map((s, i) => (
-              <li key={s} className="flex gap-4 md:flex-col">
-                <span aria-hidden="true" className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink text-[1.125rem] font-bold text-gold-light">
-                  {i + 1}
-                </span>
-                <div className="min-w-0">
-                  <h3 className="font-body text-[1.125rem] leading-snug font-bold">{t(`classes.how.${s}.title`)}</h3>
-                  <p className="mt-1 text-brown-2">{t(`classes.how.${s}.text`)}</p>
-                </div>
-              </li>
+          <dl className="mt-5 divide-y divide-line border-y border-line">
+            {SECTIONS.map((k) => (
+              <div key={k} className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr]">
+                <dt className="font-bold">{t(`classes.sections.${k}`)}</dt>
+                <dd className={classInfo[k] ? '' : 'text-brown-2 italic'}>{classInfo[k] ? pick(classInfo[k]) : t('classes.soon')}</dd>
+              </div>
             ))}
-          </ol>
+          </dl>
+        </div>
+
+        <section aria-labelledby="ce-title" className="rounded-card bg-champagne p-4 sm:p-6">
+          <h2 id="ce-title" className="t-h3">
+            {t('classes.formTitle')}
+          </h2>
+          {sent ? (
+            <div role="status" className="mt-4 space-y-3">
+              <p className="flex items-center gap-2 font-bold">
+                <CheckIcon className="h-6 w-6" />
+                {t('classes.sentTitle')}
+              </p>
+              <p>{t('classes.sentText', { phone: formatPhone(sent) })}</p>
+              <Button variant="secondary" onClick={() => setSent(null)}>
+                {t('classes.another')}
+              </Button>
+            </div>
+          ) : (
+            <form noValidate onSubmit={onSubmit} className="mt-4 space-y-4">
+              <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                <label>
+                  Website
+                  <input tabIndex={-1} autoComplete="off" value={form.website} onChange={set('website')} />
+                </label>
+              </div>
+              <TextField id="ce-name" label={t('classes.name')} autoComplete="name" maxLength={ENQUIRY_MAX.name} value={form.name} onChange={set('name')} error={msg('name')} />
+              <PhoneField
+                id="ce-phone"
+                label={t('classes.phone')}
+                value={form.phone}
+                onChange={set('phone')}
+                onBlur={() => setForm((f) => ({ ...f, phone: tidyPhoneInput(f.phone) }))}
+                error={msg('phone')}
+              />
+              <TextField id="ce-interest" label={t('classes.interest')} hint={t('classes.interestHint')} maxLength={ENQUIRY_MAX.interest} value={form.interest} onChange={set('interest')} error={msg('interest')} />
+              <TextField id="ce-dates" label={t('classes.dates')} hint={t('classes.datesHint')} optional maxLength={ENQUIRY_MAX.dates} value={form.dates} onChange={set('dates')} error={msg('dates')} />
+              <TextField id="ce-message" as="textarea" rows={3} label={t('classes.message')} optional maxLength={ENQUIRY_MAX.message} value={form.message} onChange={set('message')} error={msg('message')} />
+              {error && (
+                <p role="alert" className="flex items-start gap-2 font-bold text-error">
+                  <AlertIcon className="mt-0.5 h-5 w-5 shrink-0" />
+                  {error}
+                </p>
+              )}
+              <Button type="submit" size="lg" fullWidth disabled={busy} data-dk-enquire>
+                {busy ? t('classes.sending') : t('classes.send')}
+              </Button>
+            </form>
+          )}
         </section>
-
-        <CallOptions title={t('classes.ask.title')} text={t('classes.ask.text')} variant="feature" className="mt-12 max-w-[46rem] lg:mt-16" />
-      </Container>
-
-      <BookingSheet key={sheet.key} cls={sheet.cls} open={sheet.open} onClose={() => setSheet((s) => ({ ...s, open: false }))} />
-    </>
+      </div>
+    </Container>
   )
 }

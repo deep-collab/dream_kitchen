@@ -1,43 +1,54 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { getMenu, menuWasRequested } from '../services'
+import { categories as CATEGORIES, products as PRODUCTS } from '../config/shop'
+import { applyOverrides, applySettings } from '../lib/pricing'
+import { loadRemoteMenu } from '../services'
 
 const MenuContext = createContext(null)
 
-// Loads the whole menu once, the first time a page asks for it (useMenu), and shares it with
-// the shop, sheets and cart. Pages that never show the menu never download it.
-// Stage B: getMenu() reads Supabase; nothing here changes.
+/**
+ * The menu and Hema's settings, shared by every page:
+ *   src/config/shop.js (small, English only in the browser build; Kannada comes with the Kannada
+ *   file), with Hema's admin changes and settings from /api/menu on top, combined by the shared
+ *   pricing module exactly as the server does it. The remote part is fetched once, after the first
+ *   page has painted; until it arrives the config prices show and ordering waits.
+ */
 export function MenuProvider({ children }) {
-  const [menu, setMenu] = useState(null)
-  const [wanted, setWanted] = useState(false)
-  // A menu page starting to load asks for the data at once (src/routes.js). Start preparing the
-  // menu right away too, in parallel with the page's code, instead of after its first render.
+  const [remote, setRemote] = useState(undefined) // undefined = loading, null = unavailable
+
+  const fetchRemote = useCallback((fresh = false) => loadRemoteMenu({ fresh }).then((r) => setRemote(r)), [])
   useEffect(() => {
-    if (menuWasRequested()) setWanted(true)
-  }, [])
-  useEffect(() => {
-    if (!wanted) return
-    let alive = true
-    getMenu().then((m) => alive && setMenu({ ...m, sections: m.categories.flatMap((c) => c.sections) }))
-    return () => {
-      alive = false
+    const go = () => fetchRemote()
+    if (window.__dkReady) go()
+    else window.addEventListener('dk:ready', go, { once: true })
+    return () => window.removeEventListener('dk:ready', go)
+  }, [fetchRemote])
+  const refresh = useCallback(() => fetchRemote(true), [fetchRemote])
+
+  const value = useMemo(() => {
+    const all = applyOverrides(PRODUCTS, remote?.overrides || [])
+    const settings = applySettings(remote?.settings || {})
+    return {
+      menu: {
+        categories: CATEGORIES.filter((c) => !c.hidden).sort((a, b) => a.sort - b.sort),
+        products: all.filter((p) => p.active !== false).sort((a, b) => a.sort - b.sort),
+        productsById: Object.fromEntries(all.map((p) => [p.id, p])),
+      },
+      settings,
+      refresh,
+      remoteLoaded: remote !== undefined,
+      // Orders can be placed: the server is set up, the shop is open, and there is a way to pay
+      canOrder: Boolean(remote?.ready && settings.store.open && (settings.payment.upiId || remote?.razorpay?.enabled)),
+      razorpay: remote?.razorpay || { enabled: false },
     }
-  }, [wanted])
-  const want = useCallback(() => setWanted(true), [])
-  const value = useMemo(() => ({ menu, want }), [menu, want])
+  }, [remote, refresh])
   return <MenuContext.Provider value={value}>{children}</MenuContext.Provider>
 }
 
-/** For pages that show the menu: starts loading it. null while loading, then
- *  { categories, sections, products, productsById, combos, occasions } */
-export function useMenu() {
-  const ctx = useContext(MenuContext)
-  const want = ctx.want
-  useEffect(() => want(), [want])
-  return ctx.menu
-}
+/** { categories, products (on the menu, in order), productsById (all, for the cart check) } */
+export const useMenu = () => useContext(MenuContext).menu
 
-/** The menu if a page has already loaded it, else null. Never starts a download
- *  (the cart uses it to re-check prices, but the cart count in the header doesn't need it). */
-export function useLoadedMenu() {
-  return useContext(MenuContext).menu
+/** Hema's settings (courier rates, lead times, UPI, store open, banner), and whether ordering is open */
+export function useShopStatus() {
+  const { settings, refresh, remoteLoaded, canOrder, razorpay } = useContext(MenuContext)
+  return { settings, refresh, remoteLoaded, canOrder, razorpay }
 }

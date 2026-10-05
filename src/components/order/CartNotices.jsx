@@ -4,6 +4,7 @@ import Button from '../ui/Button'
 import Notice from '../ui/Notice'
 import { useToast } from '../ui/Toast'
 import { AlertIcon, InfoIcon, TrashIcon } from '../icons'
+import 'virtual:dk-strings/cart'
 
 /**
  * Cart-wide results of the price check, shown in the cart and at checkout:

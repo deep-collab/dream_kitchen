@@ -61,11 +61,11 @@ export function readStoredLang() {
 }
 
 // Menu text in Kannada: the data's own `kn` (Stage B, or unit tests), else the lazy table
-// keyed by the English, else weights ("250g" -> "250 ಗ್ರಾಂ" from kn.json units), else English.
+// keyed by the English, else weights ("250 g" -> "250 ಗ್ರಾಂ" from kn.json units), else English.
 function kannadaFor(field) {
   if (field.kn) return field.kn
   if (menuKannada[field.en]) return menuKannada[field.en]
-  const weight = /^(\d+(?:\.\d+)?)(g|kg)$/.exec(field.en || '')
+  const weight = /^(\d+(?:\.\d+)?) ?(g|kg)$/.exec(field.en || '')
   if (weight && dictionaries.kn?.units) return interpolate(dictionaries.kn.units[weight[2]], { n: weight[1] })
   return field.en
 }

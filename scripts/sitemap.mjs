@@ -1,26 +1,15 @@
 /*
-  sitemap.xml and robots.txt, written at build time from the real data and config, so they
-  can never list products that don't exist (the old hand-written sitemap did) and follow the
-  classes switch. Used by vite.config.js; tests/sitemap.test.js checks the output.
+  sitemap.xml and robots.txt, written at build time (vite.config.js). Only the pages people can
+  land on from Google; cart, checkout, pay, order pages, the admin and the 404 are left out.
 */
-import { products } from '../src/data/products.js'
+export const STATIC_PATHS = ['/', '/menu', '/customize', '/classes', '/our-story', '/contact', '/faq', '/track']
 
-// Pages people can land on from Google. Cart, checkout, order pages and the 404 are left out.
-export const STATIC_PATHS = ['/', '/shop', '/our-story', '/gallery', '/contact', '/faq', '/track']
+export const sitemapPaths = () => STATIC_PATHS
 
-/** Every public address, in sitemap order. */
-export function sitemapPaths({ classesEnabled }) {
-  return [
-    ...STATIC_PATHS,
-    ...(classesEnabled ? ['/classes'] : []),
-    ...products.filter((p) => p.active).map((p) => `/product/${p.slug}`),
-  ]
-}
-
-export function sitemapXml({ url, classesEnabled }) {
+export function sitemapXml({ url }) {
   const base = url.replace(/\/$/, '')
-  const rows = sitemapPaths({ classesEnabled }).map((path) => `  <url><loc>${base}${path}</loc></url>`)
+  const rows = sitemapPaths().map((path) => `  <url><loc>${base}${path}</loc></url>`)
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${rows.join('\n')}\n</urlset>\n`
 }
 
-export const robotsTxt = ({ url }) => `User-agent: *\nAllow: /\n\nSitemap: ${url.replace(/\/$/, '')}/sitemap.xml\n`
+export const robotsTxt = ({ url }) => `User-agent: *\nAllow: /\nDisallow: /admin\n\nSitemap: ${url.replace(/\/$/, '')}/sitemap.xml\n`

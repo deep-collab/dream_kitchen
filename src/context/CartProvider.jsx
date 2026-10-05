@@ -1,12 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { addLine, CART_STORAGE_KEY, LEGACY_CART_KEYS, parseStoredCart, removeLine, restoreLine, serialiseCart, setLineQty, updateLine } from '../lib/cart'
-import { cartCount, cartSubtotal } from '../lib/pricing'
+import { addLine, cartCount, CART_STORAGE_KEY, LEGACY_CART_KEYS, parseStoredCart, removeLine, restoreLine, serialiseCart, setLineQty, updateLine } from '../lib/cart'
 import { repriceCart } from '../lib/reprice'
-import { useLoadedMenu } from './MenuProvider'
+import { useMenu } from './MenuProvider'
 
 const CartContext = createContext(null)
 
-// Cart schema v2 in localStorage. Old sample carts (v1) are dropped silently.
 function readCart() {
   try {
     LEGACY_CART_KEYS.forEach((k) => localStorage.removeItem(k))
@@ -17,14 +15,12 @@ function readCart() {
 }
 
 /**
- * The cart, always checked against today's menu (src/lib/reprice.js): lines carry
- * today's price, `priceWas` when it changed and `unavailable` when they can't be
- * ordered. The stored cart keeps what the customer saw, so the price notice stays
- * until the line is edited or the order is sent. Must sit inside MenuProvider.
+ * The cart, always checked against today's menu (src/lib/reprice.js):
+ * lines carry today's price, `priceWas` when it changed and `unavailable` when they can't be
+ * ordered. The stored cart keeps what the customer saw, so a price notice stays visible.
  */
 export function CartProvider({ children }) {
-  // Re-checks prices once a page has loaded the menu; the cart count needs no menu
-  const menu = useLoadedMenu()
+  const menu = useMenu()
   const [stored, setStored] = useState(readCart)
 
   useEffect(() => {
@@ -62,16 +58,18 @@ export function CartProvider({ children }) {
     return () => setStored((prev) => removed.reduce((acc, r) => restoreLine(acc, r.line, r.index), prev))
   }, [])
   const remove = useCallback((id) => removeMany([id]), [removeMany])
+  /** After the server said prices changed: store today's prices so the notice can go */
+  const acceptPrices = useCallback((lines) => setStored(lines.map(({ priceWas: _p, unavailable: _u, ...l }) => l)), [])
 
-  const checked = useMemo(() => (menu ? repriceCart(stored, menu) : null), [stored, menu])
+  const checked = useMemo(() => (menu ? repriceCart(stored, menu.productsById) : null), [stored, menu])
   const value = useMemo(() => {
     const lines = checked ? checked.lines : stored
+    const available = lines.filter((l) => !l.unavailable)
     return {
       lines,
       count: cartCount(lines),
-      // Unavailable lines are not charged (checkout blocks them until removed)
-      subtotal: cartSubtotal(lines.filter((l) => !l.unavailable)),
-      checked: Boolean(checked), // false until today's menu has loaded
+      subtotal: available.reduce((sum, l) => sum + (l.unitPrice || 0) * l.qty, 0),
+      checked: Boolean(checked),
       priceChanged: checked?.priceChanged || false,
       unavailableIds: lines.filter((l) => l.unavailable).map((l) => l.id),
       add,
@@ -80,8 +78,9 @@ export function CartProvider({ children }) {
       remove,
       removeMany,
       clear,
+      acceptPrices,
     }
-  }, [checked, stored, add, update, setQty, remove, removeMany, clear])
+  }, [checked, stored, add, update, setQty, remove, removeMany, clear, acceptPrices])
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
 }
 

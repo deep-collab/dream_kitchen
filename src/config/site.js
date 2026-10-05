@@ -10,7 +10,7 @@ const PHONE = '9535706956'
 export const site = {
   name: 'Dream Kitchen',
   founder: 'Hema',
-  url: 'https://dreamkitchen.netlify.app', // PLACEHOLDER: final domain (Step 5)
+  url: 'https://dreamkitchen.netlify.app', // TO CONFIRM: final domain (Netlify's own URL variable is used by the server)
 
   phone: {
     display: `+91 ${PHONE.slice(0, 5)} ${PHONE.slice(5)}`, // "+91 98765 43210" style
@@ -28,51 +28,16 @@ export const site = {
   // (10 am – 8 pm, Monday to Saturday). null = no hours are shown anywhere.
   hours: null,
 
-  // Pre-booking rules (src/lib/dates.js). Dates are always worked out in Indian time,
-  // whatever time zone the customer's phone is set to.
-  ordering: {
-    timeZone: 'Asia/Kolkata',
-    businessDays: [1, 2, 3, 4, 5, 6], // Monday to Saturday (0 = Sunday)
-    closedDates: [], // Hema's holidays as 'YYYY-MM-DD', e.g. '2026-11-01'. Skipped like Sundays.
-    dispatchAfterBusinessDays: 2, // earliest date = this many business days after today
-    orderCutoffHour: null, // hook only, unused for now: e.g. 18 = orders after 6 pm count from tomorrow
-    dateChoices: 10, // date chips shown at checkout
-
-    // Checkout form settings. Change them here; no other file needs editing.
-    maxDaysAhead: 90, // furthest preferred date a customer can pick, in calendar days
-    areaField: 'required', // the "Area or city" field: 'required' | 'optional' | 'off' (hidden)
-  },
-
-  // Chocolate classes (src/lib/classes.js). Stage A lists upcoming batches from each
-  // class's weekly slot in src/data/classes.js; Stage B reads class_batches instead.
-  classes: {
-    // The whole Classes part of the site: page, home section, menu and footer links, FAQ
-    // answer, sitemap. false until Hema's real classes replace the SAMPLE ones in
-    // src/data/classes.js. true = everything works exactly as before.
-    enabled: false,
-    batchesShown: 4, // upcoming batches listed per class (one per weekend)
-    closeDaysBefore: 1, // booking closes this many days before the class day
-    peopleMax: 6, // most seats one booking can take (also capped by seats left)
-    // UNCONFIRMED: Hema's certificate photo, replacing the "coming soon" note. Put the files in
-    // public/ and give the real pixel size, e.g. { src: '/certificate-1200.jpg', width: 1200,
-    // height: 900, srcSet: [{ src: '/certificate-600.jpg', width: 600 }, { src: '/certificate-1200.jpg', width: 1200 }] }
-    certificateImage: null,
-  },
-
-  delivery: {
-    // UNCONFIRMED: flat delivery charge across Karnataka in rupees, e.g. 50. null = no charge
-    // is shown or added; cart, checkout and the WhatsApp order say Hema confirms it.
-    charge: null,
-    pincodePattern: /^5[6-9]\d{4}$/, // Karnataka pincodes start with 56, 57, 58 or 59
-  },
+  // Menu, prices, courier, lead times and ordering rules: src/config/shop.js (one file, shared
+  // with the server).
 
   fssai: '', // UNCONFIRMED: 14-digit licence, shown in the footer and on Contact once filled
   shelfLife: '', // UNCONFIRMED (not shown anywhere yet)
 }
 
-// QA only, development builds only (production drops this): scripts/qa-*.mjs set
-// window.__dkTestSite before the app loads, e.g. { classes: { enabled: true } }, to check
-// both ways without editing this file.
+// QA only, development builds only (production drops this): scripts/qa-*.mjs may set
+// window.__dkTestSite before the app loads, e.g. { hours: { opens: 10, closes: 20, days: 'monSat' } },
+// to check both ways without editing this file.
 if (import.meta.env?.DEV && typeof window !== 'undefined' && window.__dkTestSite) {
   for (const [key, value] of Object.entries(window.__dkTestSite)) {
     site[key] = value && typeof value === 'object' && !Array.isArray(value) && site[key] ? { ...site[key], ...value } : value
@@ -81,8 +46,6 @@ if (import.meta.env?.DEV && typeof window !== 'undefined' && window.__dkTestSite
 
 /** Shown only once Hema confirms them (see UNCONFIRMED above) */
 export const hasCallHours = () => Boolean(site.hours)
-export const hasDeliveryCharge = () => Number.isFinite(site.delivery.charge)
-export const classesEnabled = () => site.classes.enabled === true
 
 export const telLink = `tel:${site.phone.tel}`
 

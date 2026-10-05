@@ -8,6 +8,8 @@ import { site } from './src/config/site.js'
 import kannadaSplit, { kannadaFileName } from './scripts/kannada-split.mjs'
 import stringsSplit from './scripts/strings-split.mjs'
 import { robotsTxt, sitemapXml } from './scripts/sitemap.mjs'
+import devApi from './scripts/dev-api.mjs'
+import { redirectsFile } from './src/config/redirects.js'
 
 const readJson = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'))
 const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
@@ -70,19 +72,19 @@ function kannadaPreload() {
 // reads the address and starts the page's own files at once, alongside the main code.
 // Built from the real file names, so it can never point at a file that doesn't exist.
 const ROUTE_FILES = [
-  ['^/$', 'src/pages/Home.jsx', true],
-  ['^/shop$', 'src/pages/Shop.jsx', true],
-  ['^/product/', 'src/pages/Product.jsx', true],
-  ['^/cart$', 'src/pages/Cart.jsx', true],
-  ['^/checkout$', 'src/pages/Checkout.jsx', true],
-  ['^/faq$', 'src/pages/FAQ.jsx', true],
-  ['^/order/', 'src/pages/OrderSuccess.jsx'],
+  ['^/$', 'src/pages/Home.jsx'],
+  ['^/menu$', 'src/pages/Menu.jsx'],
+  ['^/customize$', 'src/pages/Customize.jsx'],
+  ['^/cart$', 'src/pages/Cart.jsx'],
+  ['^/checkout$', 'src/pages/Checkout.jsx'],
+  ['^/checkout/review$', 'src/pages/CheckoutReview.jsx'],
+  ['^/pay/', 'src/pages/Pay.jsx'],
+  ['^/order/', 'src/pages/OrderConfirmed.jsx'],
   ['^/track$', 'src/pages/Track.jsx'],
-  ['^/our-story$', 'src/pages/About.jsx'],
-  ['^/gallery$', 'src/pages/Gallery.jsx'],
-  ['^/contact$', 'src/pages/Contact.jsx'],
   ['^/classes$', 'src/pages/Classes.jsx'],
-  ['^/classes/booked/', 'src/pages/ClassBooked.jsx'],
+  ['^/our-story$', 'src/pages/Story.jsx'],
+  ['^/contact$', 'src/pages/Contact.jsx'],
+  ['^/faq$', 'src/pages/FAQ.jsx'],
 ]
 function routePreload() {
   return {
@@ -100,14 +102,10 @@ function routePreload() {
           for (const f of chunk.imports) filesOf(ctx.bundle[f], seen)
           return seen
         }
-        const menu = chunkOf('src/data/menu.js')
-        if (!menu) throw new Error('[dk-route-preload] the menu data chunk was not found')
-        const routes = ROUTE_FILES.filter(([, page]) => site.classes.enabled === true || !page.includes('Class')).map(([pattern, page, needsMenu]) => {
+        const routes = ROUTE_FILES.map(([pattern, page]) => {
           const chunk = chunkOf(page)
           if (!chunk) throw new Error(`[dk-route-preload] no chunk for ${page}`)
-          const files = filesOf(chunk)
-          if (needsMenu) filesOf(menu, files)
-          return [pattern, [...files]]
+          return [pattern, [...filesOf(chunk)]]
         })
         const notFound = [...filesOf(chunkOf('src/pages/NotFound.jsx'))]
         const script = `<script>(function(){var p=location.pathname.replace(/\\/+$/,'')||'/',r=${JSON.stringify(routes)},f=${JSON.stringify(notFound)};for(var i=0;i<r.length;i++)if(new RegExp(r[i][0]).test(p)){f=r[i][1];break}f.forEach(function(h){var l=document.createElement('link');l.rel='modulepreload';l.crossOrigin='';l.href='/'+h;document.head.appendChild(l)})})()</script>`
@@ -117,15 +115,17 @@ function routePreload() {
   }
 }
 
-// sitemap.xml and robots.txt from the data and config (scripts/sitemap.mjs). Build only.
+// sitemap.xml, robots.txt (scripts/sitemap.mjs) and Netlify's _redirects. Build only.
 function seoFiles() {
   return {
     name: 'dk-seo-files',
     apply: 'build',
     generateBundle() {
-      const opts = { url: site.url, classesEnabled: site.classes.enabled === true }
+      const opts = { url: site.url }
       this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemapXml(opts) })
       this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robotsTxt(opts) })
+      // Netlify: old addresses (301) and the app / admin rewrites, from src/config/redirects.js
+      this.emitFile({ type: 'asset', fileName: '_redirects', source: redirectsFile() })
     },
   }
 }
@@ -145,6 +145,6 @@ const PREACT = [
 ]
 
 export default defineConfig({
-  plugins: [dreamKitchenHtml(), kannadaSplit(), stringsSplit(), kannadaPreload(), routePreload(), seoFiles(), react(), tailwindcss()],
+  plugins: [devApi(), dreamKitchenHtml(), kannadaSplit(), stringsSplit(), kannadaPreload(), routePreload(), seoFiles(), react(), tailwindcss()],
   resolve: { alias: PREACT },
 })
