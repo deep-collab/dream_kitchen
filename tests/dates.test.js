@@ -1,10 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest'
-import { site } from '../src/config/site.js'
+import { leadTimes, ordering } from '../src/config/shop.js'
 import en from '../src/i18n/en.json'
 import kn from '../src/i18n/kn.json'
 import {
   addDaysISO,
   dateChoices,
+  dispatchRules,
   earliestDate,
   formatDay,
   isBusinessDay,
@@ -18,15 +19,29 @@ import {
 
 // Noon in India on a given date. October 2026: Mon 5, Tue 6, Wed 7, Thu 8, Fri 9, Sat 10, Sun 11.
 const ist = (date, time = '12:00') => new Date(`${date}T${time}:00+05:30`)
-const rules = (over = {}) => ({ ...site.ordering, ...over })
+const rules = (over = {}) => ({ ...dispatchRules(), ...over })
 
 describe('config', () => {
   it('matches the brief: Mon–Sat, 2 business days, no cut-off yet', () => {
-    expect(site.ordering.businessDays).toEqual([1, 2, 3, 4, 5, 6])
-    expect(site.ordering.closedDates).toEqual([])
-    expect(site.ordering.dispatchAfterBusinessDays).toBe(2)
-    expect(site.ordering.orderCutoffHour).toBeNull()
-    expect(site.ordering.timeZone).toBe('Asia/Kolkata')
+    expect(ordering.businessDays).toEqual([1, 2, 3, 4, 5, 6])
+    expect(ordering.closedDates).toEqual([])
+    expect(leadTimes.standardBusinessDays).toBe(2)
+    expect(dispatchRules().dispatchAfterBusinessDays).toBe(2)
+    expect(ordering.orderCutoffHour).toBeNull()
+    expect(ordering.timeZone).toBe('Asia/Kolkata')
+  })
+
+  it('a drawing in the cart adds Hema’s extra days (TO CONFIRM: placeholder value)', () => {
+    expect(dispatchRules({ drawing: true }).dispatchAfterBusinessDays).toBe(leadTimes.standardBusinessDays + leadTimes.drawingExtraBusinessDays)
+    expect(dispatchRules({ drawing: true, leadTimes: { standardBusinessDays: 2, drawingExtraBusinessDays: 3 } }).dispatchAfterBusinessDays).toBe(5)
+  })
+})
+
+describe('earliest dispatch with a drawing', () => {
+  it('Monday + 2 standard + 2 extra business days → Friday', () => {
+    const r = dispatchRules({ drawing: true, leadTimes: { standardBusinessDays: 2, drawingExtraBusinessDays: 2 } })
+    expect(earliestDate(ist('2026-10-05'), r)).toBe('2026-10-09')
+    expect(preferredDateError('2026-10-07', ist('2026-10-05'), r)).toBe('tooSoon')
   })
 })
 
@@ -101,8 +116,8 @@ describe('Indian time, whatever the phone is set to', () => {
 })
 
 describe('dateChoices', () => {
-  it('gives the next 10 allowed dates from the earliest, skipping Sundays', () => {
-    const list = dateChoices(ist('2026-10-09')) // Friday
+  it('gives the next allowed dates from the earliest, skipping Sundays', () => {
+    const list = dateChoices(ist('2026-10-09'), 10) // Friday
     expect(list).toEqual([
       '2026-10-12',
       '2026-10-13',
@@ -135,6 +150,7 @@ describe('preferredDateError', () => {
   it('accepts the earliest and later business days', () => {
     expect(preferredDateError('2026-10-12', now)).toBeNull()
     expect(preferredDateError('2026-11-30', now)).toBeNull()
+    expect(dateChoices(now)).toHaveLength(ordering.dateChoices)
   })
   it('explains what is wrong', () => {
     expect(preferredDateError('', now)).toBe('required')

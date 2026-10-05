@@ -1,336 +1,318 @@
+// The shared pricing module (src/lib/pricing.js) against Hema's menu (src/config/shop.js).
+// The same module prices the website and the server, so these numbers are what customers pay.
 import { describe, expect, it } from 'vitest'
-import { products } from '../src/data/products.js'
-import { categories, occasions } from '../src/data/categories.js'
-import { combos } from '../src/data/combos.js'
+import { categories, optionPrices, products } from '../src/config/shop.js'
 import {
-  cartCount,
-  cartSubtotal,
-  cheaperIndividually,
-  comboIndividualTotal,
-  comboPrice,
-  comboSavings,
+  applyOverrides,
+  applySettings,
+  clampQty,
   defaultSelection,
   formatINR,
   fromPrice,
-  isComboComplete,
-  lineTotal,
-  priceForSelection,
+  hasPriceRange,
+  isForSale,
+  isUpiId,
+  normaliseSelection,
+  quote,
+  selectionErrors,
+  unitPrice,
+  upiLink,
+  utrError,
 } from '../src/lib/pricing.js'
-import {
-  addLine,
-  clampQty,
-  lineKey,
-  makeComboLine,
-  makeProductLine,
-  MAX_QTY,
-  parseStoredCart,
-  removeLine,
-  restoreLine,
-  serialiseCart,
-  setLineQty,
-  updateLine,
-} from '../src/lib/cart.js'
 
-const byId = Object.fromEntries(products.map((p) => [p.id, p]))
-const sections = categories.flatMap((c) => c.sections)
-const ctx = { sections, occasions }
+const P = Object.fromEntries(products.map((p) => [p.id, p]))
+const item = (id, selection = {}, qty = 1) => ({ product: P[id], selection: { ...defaultSelection(P[id]), ...selection }, qty })
+const total = (...items) => quote(items, 'karnataka').subtotal
 
-/*
-  Every price on Hema's menu, typed in again by hand from BUILD_BRIEF.md (not
-  derived from the data file), so a typo in either place fails the build.
-  [productId, { sizeId: price } | fixed price, nameCustomisation]
-*/
-const MENU = [
-  // Brownie Tubs (250g / 500g / 750g)
-  ['ferrero-rocher-nutella-tub', { '250g': 549, '500g': 999, '750g': 1499 }, true],
-  ['lotus-biscoff-bliss-tub', { '250g': 449, '500g': 799, '750g': 1149 }, true],
-  ['red-velvet-white-chocolate-tub', { '250g': 449, '500g': 799, '750g': 1149 }, true],
-  ['oreo-overload-tub', { '250g': 399, '500g': 699, '750g': 999 }, true],
-  ['nutty-caramel-crunch-tub', { '250g': 429, '500g': 749, '750g': 1049 }, true],
-  // Delight Boxes
-  ['dreamy-biscoff-delight', 550, true],
-  ['red-velvet-delight', 950, true],
-  ['pista-delight', 950, true],
-  ['chocolate-delight', { '500g': 950, '700g': 1100 }, true],
-  ['strawberry-red-velvet-delight', { '500g': 950, '700g': 1100 }, true],
-  ['mango-delight', { '500g': 950, '700g': 1100 }, true],
-  ['butterscotch-delight', { '500g': 950, '700g': 1100 }, true],
-  ['red-velvet-premium-delight', { '500g': 1800, '700g': 2100 }, true],
-  ['pista-premium-delight', { '500g': 1800, '700g': 2400 }, true],
-  // Cookies
-  ['assorted-cookie-dip-box', { '250g': 349, '500g': 599, '750g': 849 }, true],
-  ['cookie-pie-tin', { '500g': 950, '750g': 1100 }, true],
-  ['cookie-pie-box', 250, false],
-  // Chocolates: Colour Blast
-  ['colour-blast-bar', 150, false],
-  // Chocolates: bars
-  ['dark-chocolate-bar', 150, false],
-  ['milk-chocolate-bar', 150, false],
-  ['white-chocolate-bar', 200, false],
-  ['strawberry-dark-chocolate-bar', 200, false],
-  ['orange-milk-chocolate-bar', 200, false],
-  ['cranberry-white-chocolate-bar', 250, false],
-  ['hazelnut-dark-chocolate-bar', 250, false],
-  ['almond-milk-chocolate-bar', 250, false],
-  ['walnut-white-chocolate-bar', 300, false],
-  ['coconut-bar', 280, false],
-  // Chocolates: Classic Favourites (250g / 500g / 1kg)
-  ['classic-dark-chocolate', { '250g': 275, '500g': 550, '1kg': 1100 }, false],
-  ['classic-milk-chocolate', { '250g': 275, '500g': 550, '1kg': 1100 }, false],
-  ['classic-white-chocolate', { '250g': 350, '500g': 700, '1kg': 1400 }, false],
-  ['classic-caramel-delight', { '250g': 250, '500g': 500, '1kg': 1000 }, false],
-  ['classic-favourite-assortment', { '250g': 350, '500g': 700, '1kg': 1400 }, false],
-  ['classic-dry-fruits', { '250g': 325, '500g': 650, '1kg': 1300 }, false],
-  ['classic-triple-layer-chocolate', { '250g': 325, '500g': 650, '1kg': 1300 }, false],
-]
-
-const PRICE_CASES = MENU.flatMap(([id, prices]) =>
-  typeof prices === 'number' ? [[id, null, prices]] : Object.entries(prices).map(([size, price]) => [id, size, price]),
-)
-
-const flavourFor = (p) => p.optionGroups.find((grp) => grp.id === 'flavour')?.choices[0].id ?? null
-
-describe('menu data', () => {
-  it('has exactly the 35 products on her menu, all active and in stock', () => {
-    expect(products).toHaveLength(35)
-    expect(MENU).toHaveLength(35)
-    expect(new Set(products.map((p) => p.id)).size).toBe(35)
-    expect(products.map((p) => p.id).sort()).toEqual(MENU.map(([id]) => id).sort())
-    expect(products.every((p) => p.active && !p.soldOut)).toBe(true)
+describe('the menu is exactly Hema’s list', () => {
+  it('has 5 tubs, 4 delight boxes, 5 brownies, 2 chocolates and the drawing bar', () => {
+    const by = (c) => products.filter((p) => p.category === c).map((p) => p.id)
+    expect(by('brownie-tubs')).toEqual(['ferrero-rocher-nutella-tub', 'lotus-biscoff-tub', 'red-velvet-white-chocolate-tub', 'oreo-overload-tub', 'dream-cake-tub'])
+    expect(by('delight-boxes')).toEqual(['red-velvet-delight-box', 'chocolate-delight-box', 'mango-delight-box', 'pista-delight-box'])
+    expect(by('brownies')).toEqual(['plain-brownies', 'nutty-brownies', 'nutella-brownies', 'walnut-brownies', 'assorted-brownies'])
+    expect(by('chocolates')).toEqual(['pista-bar', 'almond-bar'])
+    expect(by('customize')).toEqual(['drawing-chocolate-bar'])
+    expect(products).toHaveLength(17)
   })
 
-  it('has 5 tubs, 9 delight boxes, 3 cookies and 18 chocolates', () => {
-    const count = (c) => products.filter((p) => p.categoryId === c).length
-    expect([count('brownie-tubs'), count('delight-boxes'), count('cookies'), count('chocolates')]).toEqual([5, 9, 3, 18])
+  it('has no butter delight box, no cookies, no other bars and no combo', () => {
+    const ids = products.map((p) => p.id).join(' ')
+    expect(ids).not.toMatch(/butter|cookie|colour|classic|name-bar|combo|nutty-caramel/)
+    expect(categories.map((c) => c.id)).toEqual(['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates', 'customize'])
   })
 
-  it('uses only the badges she stated', () => {
-    const badged = products.filter((p) => p.badges.length).map((p) => [p.id, p.badges])
-    expect(badged).toEqual([
-      ['ferrero-rocher-nutella-tub', ['signature']],
-      ['classic-triple-layer-chocolate', ['top-selling']],
+  it('lists the drawing bar only on the Customize page', () => {
+    expect(products.filter((p) => p.menu === false).map((p) => p.id)).toEqual(['drawing-chocolate-bar'])
+  })
+
+  it('every product has a name in both languages and a known category', () => {
+    const ids = new Set(categories.map((c) => c.id))
+    for (const p of products) {
+      expect(p.name.en && p.name.kn, p.id).toBeTruthy()
+      expect(ids.has(p.category), p.id).toBe(true)
+      expect(p.slug).toBe(p.id)
+    }
+  })
+})
+
+describe('prices', () => {
+  const sizePrices = (id) => P[id].sizes.map((s) => [s.id, s.price])
+
+  it('Delight Boxes: Red Velvet, Chocolate, Mango ₹650 / ₹1,250 / ₹1,900; Pista ₹750 / ₹1,500 / ₹2,250', () => {
+    for (const id of ['red-velvet-delight-box', 'chocolate-delight-box', 'mango-delight-box'])
+      expect(sizePrices(id)).toEqual([
+        ['250g', 650],
+        ['500g', 1250],
+        ['700g', 1900],
+      ])
+    expect(sizePrices('pista-delight-box')).toEqual([
+      ['250g', 750],
+      ['500g', 1500],
+      ['700g', 2250],
     ])
   })
 
-  it('offers flavours only where she listed them', () => {
-    expect(byId['dreamy-biscoff-delight'].optionGroups[0].choices.map((c) => c.id)).toEqual(['chocolate', 'strawberry', 'mango', 'butterscotch'])
-    expect(byId['colour-blast-bar'].optionGroups[0].choices).toHaveLength(9)
-    expect(products.filter((p) => p.optionGroups.some((grp) => grp.id === 'flavour')).map((p) => p.id)).toEqual(['dreamy-biscoff-delight', 'colour-blast-bar'])
+  it('Brownies (5 pieces): Plain ₹350, Nutty ₹549, Nutella ₹549, Walnut ₹650, Assorted ₹700; ragi +₹50 (+₹80 Assorted)', () => {
+    const got = Object.fromEntries(products.filter((p) => p.category === 'brownies').map((p) => [p.id, [p.price, p.ragiPrice]]))
+    expect(got).toEqual({
+      'plain-brownies': [350, 50],
+      'nutty-brownies': [549, 50],
+      'nutella-brownies': [549, 50],
+      'walnut-brownies': [650, 50],
+      'assorted-brownies': [700, 80],
+    })
   })
 
-  it('every product has Kannada text for its name', () => {
-    for (const p of products) expect(p.name.kn, p.id).toBeTruthy()
+  it('Chocolates: Pista Bar ₹450 (250 g shown), Almond Bar ₹150 (no weight)', () => {
+    expect([P['pista-bar'].price, P['pista-bar'].grams, P['pista-bar'].showWeight]).toEqual([450, 250, true])
+    expect([P['almond-bar'].price, P['almond-bar'].grams, P['almond-bar'].showWeight]).toEqual([150, undefined, undefined])
   })
 
-  it('records her per-kg rates for Classic Favourites', () => {
-    expect(byId['classic-white-chocolate'].pricePerKg).toBe(1400)
-    expect(byId['classic-caramel-delight'].pricePerKg).toBe(1000)
-  })
-})
-
-describe('every price matches her menu', () => {
-  it.each(PRICE_CASES)('%s %s = ₹%i', (id, size, price) => {
-    const product = byId[id]
-    expect(product, id).toBeDefined()
-    const sizes = product.optionGroups.find((grp) => grp.id === 'size')
-    if (size) {
-      expect(sizes.choices.map((c) => c.id)).toContain(size)
-      expect(priceForSelection(product, { size, flavour: flavourFor(product) })).toBe(price)
-    } else {
-      expect(sizes).toBeUndefined()
-      expect(priceForSelection(product, { flavour: flavourFor(product) })).toBe(price)
-    }
+  it('Drawing Chocolate Bar ₹950; a drawing on a Delight Box +₹450; the name on the box is free', () => {
+    expect(P['drawing-chocolate-bar'].price).toBe(950)
+    expect(optionPrices).toEqual({ nameOnBox: 0, drawing: 450 })
   })
 
-  it('size choices are exactly the ones she lists, in her order', () => {
-    for (const [id, prices] of MENU) {
-      const sizes = byId[id].optionGroups.find((grp) => grp.id === 'size')
-      if (typeof prices === 'number') continue
-      expect(sizes.choices.map((c) => c.id), id).toEqual(Object.keys(prices))
-    }
+  it('Dream Cake Tub has no price yet: "coming soon", not for sale', () => {
+    const p = P['dream-cake-tub']
+    expect(p.priceStatus).toBe('coming-soon')
+    expect(fromPrice(p)).toBeNull()
+    expect(isForSale(p)).toBe(false)
+    expect(unitPrice(p, defaultSelection(p))).toBeNull()
+    expect(selectionErrors(p, defaultSelection(p)).product).toBe('unavailable')
   })
 
-  it('the first size is preselected and "from" is the lowest price', () => {
-    expect(defaultSelection(byId['ferrero-rocher-nutella-tub']).size).toBe('250g')
-    expect(fromPrice(byId['pista-premium-delight'])).toBe(1800)
-    expect(fromPrice(byId['coconut-bar'])).toBe(280)
-  })
-
-  it('an unknown size has no price', () => {
-    expect(priceForSelection(byId['oreo-overload-tub'], { size: '1kg' })).toBeNull()
+  it('the four old tubs keep the prices from Hema’s first menu (flagged TO CONFIRM)', () => {
+    const tubs = products.filter((p) => p.category === 'brownie-tubs' && p.priceStatus === 'live')
+    expect(tubs.map((p) => [p.id, p.sizes.map((s) => s.price)])).toEqual([
+      ['ferrero-rocher-nutella-tub', [549, 999, 1499]],
+      ['lotus-biscoff-tub', [449, 799, 1149]],
+      ['red-velvet-white-chocolate-tub', [449, 799, 1149]],
+      ['oreo-overload-tub', [399, 699, 999]],
+    ])
+    for (const t of tubs) expect(t.toConfirm).toBeTruthy()
   })
 })
 
-describe('formatINR', () => {
-  it('uses ₹, Indian grouping and no decimals', () => {
-    expect(formatINR(549)).toBe('₹549')
-    expect(formatINR(1499)).toBe('₹1,499')
-    expect(formatINR(150000)).toBe('₹1,50,000')
-    expect(formatINR(2400.4)).toBe('₹2,400')
+describe('the brief’s worked examples', () => {
+  it('Red Velvet 500 g + name + drawing = ₹1,700', () => {
+    expect(total(item('red-velvet-delight-box', { size: '500g', name: 'Hema', drawing: true, drawingText: 'A small cat' }))).toBe(1700)
+  })
+  it('Pista 700 g + drawing = ₹2,700', () => {
+    expect(total(item('pista-delight-box', { size: '700g', drawing: true, drawingText: 'Two hearts' }))).toBe(2700)
+  })
+  it('Assorted ragi = ₹780', () => expect(total(item('assorted-brownies', { ragi: true }))).toBe(780))
+  it('Walnut ragi = ₹700', () => expect(total(item('walnut-brownies', { ragi: true }))).toBe(700))
+  it('Plain + Pista Bar = ₹800', () => expect(total(item('plain-brownies'), item('pista-bar'))).toBe(800))
+  it('Drawing Chocolate Bar = ₹950', () => expect(total(item('drawing-chocolate-bar', { drawingText: 'Our wedding date' }))).toBe(950))
+})
+
+describe('every product × size × ragi × name × drawing combination', () => {
+  const cases = []
+  for (const p of products.filter(isForSale)) {
+    const sizes = p.sizes?.length ? p.sizes : [null]
+    const ragis = Number.isFinite(p.ragiPrice) ? [false, true] : [false]
+    const names = p.options.name ? ['', 'ಹೇಮಾ'] : ['']
+    const drawings = p.options.drawing === true ? [false, true] : [p.options.drawing === 'included']
+    for (const size of sizes)
+      for (const ragi of ragis)
+        for (const name of names)
+          for (const drawing of drawings) {
+            const expected = (size ? size.price : p.price) + (ragi ? p.ragiPrice : 0) + (p.options.drawing === true && drawing ? 450 : 0)
+            cases.push([p.id, size?.id || '-', ragi, name, drawing, expected])
+          }
+  }
+
+  // 4 tubs × 3 sizes, 4 boxes × 3 sizes × name × drawing, 5 brownies × ragi, 2 bars, the drawing bar
+  it('covers all of them', () => expect(cases.length).toBe(4 * 3 + 4 * 3 * 2 * 2 + 5 * 2 + 2 + 1))
+
+  it.each(cases)('%s size %s ragi %s name "%s" drawing %s = ₹%i', (id, size, ragi, name, drawing, expected) => {
+    const sel = { size: size === '-' ? null : size, ragi, name, drawing, drawingText: drawing ? 'A rose' : '' }
+    expect(unitPrice(P[id], sel)).toBe(expected)
+    expect(selectionErrors(P[id], sel)).toEqual({})
   })
 })
 
-describe('name customisation (+₹100)', () => {
-  const tub = byId['ferrero-rocher-nutella-tub']
-  it.each(MENU)('%s allows it: %s / %s', (id, _prices, allowed) => {
-    expect(byId[id].nameCustomisation).toBe(allowed)
-  })
-
-  it('adds ₹100 only when the switch is on and a name is typed', () => {
-    expect(priceForSelection(tub, { size: '250g' })).toBe(549)
-    expect(priceForSelection(tub, { size: '250g', nameOn: true, name: 'Amma' })).toBe(649)
-    expect(priceForSelection(tub, { size: '250g', nameOn: true, name: '   ' })).toBe(549)
-    expect(priceForSelection(tub, { size: '250g', nameOn: false, name: 'Amma' })).toBe(549)
-    expect(priceForSelection(tub, { size: '750g', nameOn: true, name: 'Ravi' })).toBe(1599)
-  })
-
-  it('never charges where the product does not allow it', () => {
-    for (const id of ['cookie-pie-box', 'dark-chocolate-bar', 'colour-blast-bar', 'classic-white-chocolate']) {
-      const p = byId[id]
-      const sel = { ...defaultSelection(p), flavour: flavourFor(p), nameOn: true, name: 'Amma' }
-      expect(priceForSelection(p, sel), id).toBe(priceForSelection(p, { ...sel, nameOn: false, name: '' }))
-    }
-  })
-
-  it('works with fixed-price items and flavours too', () => {
-    expect(priceForSelection(byId['dreamy-biscoff-delight'], { flavour: 'mango', nameOn: true, name: 'Anu' })).toBe(650)
-    expect(priceForSelection(byId['pista-delight'], { nameOn: true, name: 'Anu' })).toBe(1050)
+describe('from prices on the menu cards', () => {
+  it.each([
+    ['red-velvet-delight-box', 650, true],
+    ['pista-delight-box', 750, true],
+    ['ferrero-rocher-nutella-tub', 549, true],
+    ['plain-brownies', 350, false],
+    ['pista-bar', 450, false],
+    ['almond-bar', 150, false],
+  ])('%s from ₹%i (range: %s)', (id, from, range) => {
+    expect(fromPrice(P[id])).toBe(from)
+    expect(hasPriceRange(P[id])).toBe(range)
   })
 })
 
-describe('cart lines', () => {
-  const tub = byId['ferrero-rocher-nutella-tub']
-  const line = (sel, qty = 1, product = tub) => makeProductLine(product, { ...defaultSelection(product), ...sel }, qty, ctx)
-
-  it('quantity math: line total, subtotal and count', () => {
-    const a = line({ size: '500g' }, 3) // 999 x 3
-    const b = line({ size: '250g', nameOn: true, name: 'Amma' }, 2) // 649 x 2
-    expect(lineTotal(a)).toBe(2997)
-    expect(lineTotal(b)).toBe(1298)
-    expect(cartSubtotal([a, b])).toBe(4295)
-    expect(cartCount([a, b])).toBe(5)
+describe('choices that are not allowed', () => {
+  it('ragi only on brownies, name and drawing only where offered: ignored in the price', () => {
+    expect(unitPrice(P['pista-bar'], { ragi: true, drawing: true, name: 'X' })).toBe(450)
+    expect(unitPrice(P['plain-brownies'], { drawing: true, name: 'X' })).toBe(350)
+    expect(normaliseSelection(P['plain-brownies'], { drawing: true, name: 'X', ragi: true })).toEqual({
+      size: null,
+      ragi: true,
+      name: '',
+      drawing: false,
+      drawingText: '',
+      drawingRef: null,
+    })
   })
 
-  it('clamps quantity to 1–20', () => {
-    expect(clampQty(0)).toBe(1)
-    expect(clampQty(25)).toBe(MAX_QTY)
-    expect(line({ size: '250g' }, 99).qty).toBe(20)
+  it('a missing or unknown size has no price', () => {
+    expect(unitPrice(P['mango-delight-box'], { size: null })).toBeNull()
+    expect(unitPrice(P['mango-delight-box'], { size: '1kg' })).toBeNull()
+    expect(selectionErrors(P['mango-delight-box'], { size: '1kg' }).size).toBe('unknown')
+    expect(selectionErrors(P['mango-delight-box'], { size: null }).size).toBe('required')
   })
 
-  it('merges identical selections by increasing the quantity', () => {
-    let lines = addLine([], line({ size: '250g', occasion: 'birthday' }, 1))
-    lines = addLine(lines, line({ size: '250g', occasion: 'birthday' }, 2))
-    expect(lines).toHaveLength(1)
-    expect(lines[0].qty).toBe(3)
-    lines = addLine(lines, line({ size: '250g', occasion: 'gifting' }, 1))
-    expect(lines).toHaveLength(2)
+  it('a drawing needs a description of 3–200 characters', () => {
+    const p = P['chocolate-delight-box']
+    expect(selectionErrors(p, { size: '250g', drawing: true, drawingText: '' }).drawingText).toBe('required')
+    expect(selectionErrors(p, { size: '250g', drawing: true, drawingText: 'x'.repeat(201) }).drawingText).toBe('long')
+    expect(selectionErrors(P['drawing-chocolate-bar'], { drawingText: ' ' }).drawingText).toBe('required')
+    expect(selectionErrors(p, { size: '250g', drawing: false, drawingText: '' })).toEqual({})
   })
 
-  it('treats a name the same regardless of spaces, and ignores names when the switch is off', () => {
-    expect(lineKey(line({ size: '250g', nameOn: true, name: ' Amma ' }))).toBe(lineKey(line({ size: '250g', nameOn: true, name: 'Amma' })))
-    expect(lineKey(line({ size: '250g', nameOn: false, name: 'Amma' }))).toBe(lineKey(line({ size: '250g' })))
+  it('name on the box: up to 20 English or Kannada letters', () => {
+    const p = P['mango-delight-box']
+    expect(selectionErrors(p, { size: '250g', name: 'Happy 25th, Amma!' })).toEqual({})
+    expect(selectionErrors(p, { size: '250g', name: 'ಹುಟ್ಟುಹಬ್ಬದ ಶುಭಾಶಯ' })).toEqual({})
+    expect(selectionErrors(p, { size: '250g', name: 'ಟಬ್‌ಗಳು' })).toEqual({}) // with a zero-width joiner
+    expect(selectionErrors(p, { size: '250g', name: 'x'.repeat(21) }).name).toBe('long')
+    expect(selectionErrors(p, { size: '250g', name: '<script>' }).name).toBe('chars')
+    expect(selectionErrors(p, { size: '250g', name: 'Hi 🎂' }).name).toBe('chars')
   })
 
-  it('merging never exceeds the maximum quantity', () => {
-    let lines = addLine([], line({ size: '250g' }, 15))
-    lines = addLine(lines, line({ size: '250g' }, 10))
-    expect(lines[0].qty).toBe(20)
+  it('a reference photo must be one the upload function made', () => {
+    const p = P['mango-delight-box']
+    const ok = 'refs/20261005/0b0c8f5e-6a43-4f43-9a0e-2d6f2f1b7c11.webp'
+    expect(selectionErrors(p, { size: '250g', drawing: true, drawingText: 'A rose', drawingRef: ok })).toEqual({})
+    expect(selectionErrors(p, { size: '250g', drawing: true, drawingText: 'A rose', drawingRef: '../../etc/passwd' }).drawingRef).toBe('invalid')
+    expect(normaliseSelection(p, { size: '250g', drawing: true, drawingText: 'A rose', drawingRef: 'https://evil.example/x.png' }).drawingRef).toBeNull()
   })
 
-  it('editing a line keeps its place and reprices it', () => {
-    const a = line({ size: '250g' })
-    const b = line({ size: '250g' }, 1, byId['coconut-bar'])
-    const edited = line({ size: '750g', nameOn: true, name: 'Meera' }, 2)
-    const lines = updateLine([a, b], a.id, edited)
-    expect(lines.map((l) => l.id)).toEqual([a.id, b.id])
-    expect(lines[0].unitPrice).toBe(1599)
-    expect(lines[0].qty).toBe(2)
-    expect(lines[0].labels.size.en).toBe('750g')
+  it('sold out and hidden products are not for sale', () => {
+    expect(isForSale({ ...P['almond-bar'], soldOut: true })).toBe(false)
+    expect(isForSale({ ...P['almond-bar'], active: false })).toBe(false)
+    expect(quote([{ product: { ...P['almond-bar'], soldOut: true }, selection: {}, qty: 1 }], 'karnataka').subtotal).toBe(0)
   })
 
-  it('editing a line into a copy of another merges them', () => {
-    const a = line({ size: '250g' }, 1)
-    const b = line({ size: '500g' }, 2)
-    const lines = updateLine([a, b], a.id, line({ size: '500g' }, 1))
-    expect(lines).toHaveLength(1)
-    expect(lines[0].id).toBe(b.id)
-    expect(lines[0].qty).toBe(3)
-  })
-
-  it('set quantity, remove and undo', () => {
-    const a = line({ size: '250g' })
-    const b = line({ size: '500g' })
-    let lines = setLineQty([a, b], b.id, 4)
-    expect(lines[1].qty).toBe(4)
-    const { lines: after, removed, index } = removeLine(lines, a.id)
-    expect(after).toHaveLength(1)
-    lines = restoreLine(after, removed, index)
-    expect(lines.map((l) => l.id)).toEqual([a.id, b.id])
-  })
-
-  it('snapshots labels in both languages', () => {
-    const l = line({ flavour: 'butterscotch', occasion: 'self-love' }, 1, byId['dreamy-biscoff-delight'])
-    expect(l.labels.flavour).toEqual({ en: 'Butterscotch', kn: 'ಬಟರ್‌ಸ್ಕಾಚ್' })
-    expect(l.labels.occasion.en).toBe('Self-love')
-    expect(l.sectionName.en).toBe('Dreamy Biscoff Delight')
+  it('quantity is 1–10 per item', () => {
+    expect([clampQty(0), clampQty(3.4), clampQty(11), clampQty('x')]).toEqual([1, 3, 10, 1])
   })
 })
 
-describe('bars combo: pick any 3 for ₹699', () => {
-  const combo = combos.find((c) => c.id === 'bars-pick-3')
-
-  it('is her offer: 3 bars, ₹699, all 10 bars eligible, repeats allowed', () => {
-    expect(comboPrice(combo)).toBe(699)
-    expect(combo.pick).toBe(3)
-    expect(combo.allowRepeats).toBe(true)
-    expect(combo.eligibleProductIds.sort()).toEqual(products.filter((p) => p.sectionId === 'chocolate-bars').map((p) => p.id).sort())
+describe('Hema’s admin changes (applyOverrides)', () => {
+  it('changes a size price and a fixed price, keeps courier tiers from the config', () => {
+    const [box, bar] = applyOverrides(
+      [P['mango-delight-box'], P['almond-bar']],
+      [
+        {
+          id: 'mango-delight-box',
+          sizes: [
+            { id: '250g', price: 700 },
+            { id: '500g', price: 1300 },
+            { id: '700g', price: 1950 },
+          ],
+        },
+        { id: 'almond-bar', price: 175, soldOut: true },
+      ],
+    )
+    expect(box.sizes.map((s) => [s.price, s.courierTier])).toEqual([
+      [700, 'small'],
+      [1300, 'large'],
+      [1950, 'large'],
+    ])
+    expect([bar.price, bar.soldOut]).toEqual([175, true])
   })
 
-  it('needs exactly 3 eligible bars; repeats are fine', () => {
-    expect(isComboComplete(combo, ['dark-chocolate-bar', 'dark-chocolate-bar'])).toBe(false)
-    expect(isComboComplete(combo, ['dark-chocolate-bar', 'dark-chocolate-bar', 'dark-chocolate-bar'])).toBe(true)
-    expect(isComboComplete(combo, ['dark-chocolate-bar', 'milk-chocolate-bar', 'coconut-bar', 'coconut-bar'])).toBe(false)
-    expect(isComboComplete(combo, ['dark-chocolate-bar', 'milk-chocolate-bar', 'colour-blast-bar'])).toBe(false)
+  it('turns on a tub once Hema sends its sizes and prices', () => {
+    const [tub] = applyOverrides(
+      [P['dream-cake-tub']],
+      [
+        {
+          id: 'dream-cake-tub',
+          priceStatus: 'live',
+          sizes: [
+            { id: 'small', label: 'Small', price: 499 },
+            { id: 'large', label: 'Large', price: 899 },
+          ],
+        },
+      ],
+    )
+    expect(isForSale(tub)).toBe(true)
+    expect(fromPrice(tub)).toBe(499)
+    expect(tub.sizes[1]).toEqual({ id: 'large', price: 899, label: 'Large', courierTier: 'small' })
   })
 
-  it('shows the right savings', () => {
-    const picks = ['walnut-white-chocolate-bar', 'coconut-bar', 'hazelnut-dark-chocolate-bar'] // 300 + 280 + 250
-    expect(comboIndividualTotal(picks, byId)).toBe(830)
-    expect(comboSavings(combo, picks, byId)).toBe(131)
-    expect(cheaperIndividually(combo, picks, byId)).toBe(false)
-  })
-
-  it('detects when the 3 bars are cheaper individually (and never changes ₹699)', () => {
-    const picks = ['dark-chocolate-bar', 'milk-chocolate-bar', 'white-chocolate-bar'] // 150 + 150 + 200
-    expect(comboIndividualTotal(picks, byId)).toBe(500)
-    expect(comboSavings(combo, picks, byId)).toBe(-199)
-    expect(cheaperIndividually(combo, picks, byId)).toBe(true)
-    expect(comboPrice(combo)).toBe(699)
-  })
-
-  it('break-even edges: ₹700 saves ₹1, an incomplete pick is never "cheaper"', () => {
-    const picks = ['walnut-white-chocolate-bar', 'white-chocolate-bar', 'white-chocolate-bar'] // 300 + 200 + 200
-    expect(comboSavings(combo, picks, byId)).toBe(1)
-    expect(cheaperIndividually(combo, ['dark-chocolate-bar'], byId)).toBe(false)
-  })
-
-  it('goes into the cart as ONE line listing its 3 bars; same bars in any order merge', () => {
-    const a = makeComboLine(combo, ['coconut-bar', 'dark-chocolate-bar', 'coconut-bar'], 1, byId)
-    const b = makeComboLine(combo, ['dark-chocolate-bar', 'coconut-bar', 'coconut-bar'], 2, byId)
-    expect(a.unitPrice).toBe(699)
-    expect(a.pickNames.map((n) => n.en)).toEqual(['Coconut Bar', 'Dark Chocolate', 'Coconut Bar'])
-    const lines = addLine(addLine([], a), b)
-    expect(lines).toHaveLength(1)
-    expect(lineTotal(lines[0])).toBe(2097)
+  it('ignores nonsense: negative, decimal or huge prices, unknown fields', () => {
+    const [bar] = applyOverrides([P['almond-bar']], [{ id: 'almond-bar', price: -5, ragiPrice: 9, priceStatus: 'free', evil: true }])
+    expect(bar).toEqual(P['almond-bar'])
+    const [b2] = applyOverrides([P['almond-bar']], [{ id: 'almond-bar', price: 12.5 }])
+    expect(b2.price).toBe(150)
   })
 })
 
-describe('stored cart (schema v2)', () => {
-  it('round-trips v2 and silently drops the old sample cart', () => {
-    const l = makeProductLine(byId['coconut-bar'], {}, 2, ctx)
-    expect(parseStoredCart(serialiseCart([l]))).toEqual([l])
-    expect(parseStoredCart(JSON.stringify([{ productId: 'p01', qty: 2, price: 199 }]))).toEqual([])
-    expect(parseStoredCart('not json')).toEqual([])
-    expect(parseStoredCart(JSON.stringify({ version: 2, lines: [{ id: 'x', kind: 'product', unitPrice: 0, qty: 1 }] }))).toEqual([])
+describe('settings, UPI and UTR', () => {
+  it('defaults come from the config: no UPI yet, store open', () => {
+    const s = applySettings({})
+    expect(s.payment.upiId).toBe('')
+    expect(s.store.open).toBe(true)
+    expect(s.courier.rates.small).toEqual({ karnataka: 90, outside: 100 })
+    expect(s.leadTimes.standardBusinessDays).toBe(2)
+  })
+
+  it('Hema’s settings win, bad values fall back', () => {
+    const s = applySettings({ upiId: 'hema@okaxis', courierRates: { large: { outside: 160 }, small: { karnataka: -1 } }, storeOpen: false, leadDrawingExtra: 3 })
+    expect(s.payment.upiId).toBe('hema@okaxis')
+    expect(s.courier.rates).toEqual({ small: { karnataka: 90, outside: 100 }, large: { karnataka: 100, outside: 160 } })
+    expect(s.store.open).toBe(false)
+    expect(s.leadTimes.drawingExtraBusinessDays).toBe(3)
+    expect(applySettings({ upiId: 'not a upi' }).payment.upiId).toBe('')
+  })
+
+  it('UPI IDs', () => {
+    expect(['hema@okaxis', 'dream.kitchen-01@ybl', '9535706956@paytm'].every(isUpiId)).toBe(true)
+    expect(['', 'hema', '@okaxis', 'he ma@okaxis', 'hema@1bank'].some(isUpiId)).toBe(false)
+  })
+
+  it('the UPI app link carries the amount and the order ID', () => {
+    expect(upiLink({ upiId: 'hema@okaxis', name: 'Dream Kitchen', amount: 1790, orderCode: 'DK-261005-7Q4M' })).toBe(
+      'upi://pay?pa=hema@okaxis&pn=Dream%20Kitchen&am=1790.00&cu=INR&tn=DK-261005-7Q4M',
+    )
+  })
+
+  it('UTR: exactly 12 digits (spaces and dashes are tidied)', () => {
+    expect(utrError('')).toBe('required')
+    expect(utrError('1234 5678 9012')).toBeNull()
+    expect(utrError('12345678901')).toBe('format')
+    expect(utrError('12345678901A')).toBe('format')
+  })
+
+  it('formats rupees the Indian way', () => {
+    expect([formatINR(1700), formatINR(150000)]).toEqual(['₹1,700', '₹1,50,000'])
   })
 })

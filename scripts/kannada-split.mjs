@@ -1,7 +1,8 @@
 /*
   Vite plugin: English visitors never download Kannada menu text.
 
-  The data files (src/data/*.js) are written with both languages side by side,
+  The data files (src/data/*.js, plus the shop config src/config/shop.js) are written with both
+  languages side by side,
   { en: 'Mango', kn: 'ಮಾವು' }, which is how Hema's admin panel will store them later.
   In the browser build:
     - every { en, kn } pair loses its `kn` half, so the data in the main bundle is English only;
@@ -64,11 +65,20 @@ export function stripKannada(code, id = 'data file') {
   return out
 }
 
+/** Files whose { en, kn } pairs are split: every src/data/*.js and the shop config */
+export const DATA_FILES = ['src/config/shop.js']
+export const dataFiles = (root) => [
+  ...readdirSync(resolve(root, 'src/data'))
+    .filter((f) => f.endsWith('.js'))
+    .map((f) => join(resolve(root, 'src/data'), f)),
+  ...DATA_FILES.map((f) => resolve(root, f)),
+]
+
 /** { english: kannada } from every data file. Throws on an English text with two translations. */
-export function kannadaTable(dir) {
+export function kannadaTable(root) {
   const table = {}
-  for (const f of readdirSync(dir).filter((f) => f.endsWith('.js'))) {
-    for (const { en, kn } of findPairs(readFileSync(join(dir, f), 'utf8'))) {
+  for (const file of dataFiles(root)) {
+    for (const { en, kn } of findPairs(readFileSync(file, 'utf8'))) {
       if (table[en] !== undefined && table[en] !== kn) throw new Error(`[dk-kannada-split] "${en}" has two Kannada translations: "${table[en]}" and "${kn}". Use one.`)
       table[en] = kn
     }
@@ -90,7 +100,7 @@ const DEV_URL = '/__dk/kannada.json'
 
 export function kannadaPayload(root) {
   const kn = JSON.parse(readFileSync(resolve(root, 'src/i18n/kn.json'), 'utf8'))
-  return JSON.stringify({ kn, menu: kannadaTable(resolve(root, 'src/data')) })
+  return JSON.stringify({ kn, menu: kannadaTable(root) })
 }
 
 /** The built file's name: changes whenever any Kannada changes, so browsers never keep an old copy */
@@ -98,10 +108,14 @@ export const kannadaFileName = (root) => `assets/kannada-${createHash('sha256').
 
 export default function kannadaSplit() {
   let dataDir
+  let extra = []
   let root
   let building = false
   let fileName
-  const isData = (id) => id.replaceAll('\\', '/').startsWith(dataDir) && id.endsWith('.js')
+  const isData = (id) => {
+    const path = id.replaceAll('\\', '/')
+    return (path.startsWith(dataDir) && path.endsWith('.js')) || extra.includes(path)
+  }
   return {
     name: 'dk-kannada-split',
     enforce: 'pre',
@@ -109,6 +123,7 @@ export default function kannadaSplit() {
       root = config.root
       building = config.command === 'build'
       dataDir = resolve(config.root, 'src/data').replaceAll('\\', '/') + '/'
+      extra = DATA_FILES.map((f) => resolve(config.root, f).replaceAll('\\', '/'))
     },
     configureServer(server) {
       server.middlewares.use(DEV_URL, (req, res) => {
