@@ -24,7 +24,9 @@ describe('navigation', () => {
 
 describe('no WhatsApp ordering', () => {
   it('only the Contact page links to WhatsApp (plus the Button helper it could use)', () => {
-    const users = srcFiles.filter((f) => /waLink\(|wa\.me/.test(read(f))).map((f) => f.replaceAll('\\', '/'))
+    // Hema's admin may WhatsApp a customer (brief 6.2); customer pages may not offer WhatsApp ordering
+    const customerFiles = srcFiles.filter((f) => !/[\\/]admin[\\/]/.test(f))
+    const users = customerFiles.filter((f) => /waLink\(|wa\.me/.test(read(f))).map((f) => f.replaceAll('\\', '/'))
     expect(users.sort()).toEqual(['src/components/ui/Button.jsx', 'src/config/site.js', 'src/pages/Contact.jsx'])
   })
 
