@@ -6,7 +6,7 @@
       "landed": "/",
       "firstLoadKb": 47.6,
       "files": 7,
-      "withPrefetchKb": 71.4,
+      "withPrefetchKb": 71.5,
       "kannadaFiles": []
     },
     {
@@ -20,7 +20,7 @@
     {
       "path": "/customize",
       "landed": "/customize",
-      "firstLoadKb": 47.7,
+      "firstLoadKb": 47.8,
       "files": 8,
       "withPrefetchKb": 71.4,
       "kannadaFiles": []
@@ -28,7 +28,7 @@
     {
       "path": "/cart",
       "landed": "/cart",
-      "firstLoadKb": 51.8,
+      "firstLoadKb": 52.6,
       "files": 13,
       "withPrefetchKb": 70.2,
       "kannadaFiles": []
@@ -37,7 +37,7 @@
       "path": "/checkout",
       "landed": "/checkout",
       "firstLoadKb": 51.1,
-      "files": 12,
+      "files": 11,
       "withPrefetchKb": 70.2,
       "kannadaFiles": []
     },
@@ -54,13 +54,13 @@
       "landed": "/our-story",
       "firstLoadKb": 44.9,
       "files": 5,
-      "withPrefetchKb": 71.3,
+      "withPrefetchKb": 71.4,
       "kannadaFiles": []
     },
     {
       "path": "/contact",
       "landed": "/contact",
-      "firstLoadKb": 44.4,
+      "firstLoadKb": 44.5,
       "files": 4,
       "withPrefetchKb": 71.4,
       "kannadaFiles": []
@@ -70,7 +70,7 @@
       "landed": "/faq",
       "firstLoadKb": 44.7,
       "files": 4,
-      "withPrefetchKb": 71.6,
+      "withPrefetchKb": 71.7,
       "kannadaFiles": []
     },
     {
@@ -78,7 +78,7 @@
       "landed": "/track",
       "firstLoadKb": 51.9,
       "files": 13,
-      "withPrefetchKb": 74.3,
+      "withPrefetchKb": 74.4,
       "kannadaFiles": []
     },
     {
@@ -94,9 +94,9 @@
     {
       "path": "/",
       "landed": "/",
-      "firstLoadKb": 57.2,
+      "firstLoadKb": 57.3,
       "files": 8,
-      "withPrefetchKb": 81,
+      "withPrefetchKb": 81.1,
       "kannadaFiles": [
         "/assets/kannada-66ce4bc438.json"
       ]
@@ -106,7 +106,7 @@
       "landed": "/menu",
       "firstLoadKb": 57.9,
       "files": 8,
-      "withPrefetchKb": 79.8,
+      "withPrefetchKb": 79.9,
       "kannadaFiles": [
         "/assets/kannada-66ce4bc438.json"
       ]
@@ -114,7 +114,7 @@
     {
       "path": "/customize",
       "landed": "/customize",
-      "firstLoadKb": 57.3,
+      "firstLoadKb": 57.4,
       "files": 9,
       "withPrefetchKb": 81,
       "kannadaFiles": [
@@ -124,9 +124,9 @@
     {
       "path": "/cart",
       "landed": "/cart",
-      "firstLoadKb": 61.5,
+      "firstLoadKb": 62.2,
       "files": 14,
-      "withPrefetchKb": 79.8,
+      "withPrefetchKb": 79.9,
       "kannadaFiles": [
         "/assets/kannada-66ce4bc438.json"
       ]
@@ -135,8 +135,8 @@
       "path": "/checkout",
       "landed": "/checkout",
       "firstLoadKb": 60.7,
-      "files": 13,
-      "withPrefetchKb": 79.8,
+      "files": 12,
+      "withPrefetchKb": 79.9,
       "kannadaFiles": [
         "/assets/kannada-66ce4bc438.json"
       ]
@@ -146,7 +146,7 @@
       "landed": "/classes",
       "firstLoadKb": 58.8,
       "files": 9,
-      "withPrefetchKb": 82,
+      "withPrefetchKb": 82.1,
       "kannadaFiles": [
         "/assets/kannada-66ce4bc438.json"
       ]
@@ -156,7 +156,7 @@
       "landed": "/our-story",
       "firstLoadKb": 54.5,
       "files": 6,
-      "withPrefetchKb": 80.9,
+      "withPrefetchKb": 81,
       "kannadaFiles": [
         "/assets/kannada-66ce4bc438.json"
       ]
@@ -174,9 +174,9 @@
     {
       "path": "/faq",
       "landed": "/faq",
-      "firstLoadKb": 54.3,
+      "firstLoadKb": 54.4,
       "files": 5,
-      "withPrefetchKb": 81.2,
+      "withPrefetchKb": 81.3,
       "kannadaFiles": [
         "/assets/kannada-66ce4bc438.json"
       ]
@@ -186,7 +186,7 @@
       "landed": "/track",
       "firstLoadKb": 61.5,
       "files": 14,
-      "withPrefetchKb": 83.9,
+      "withPrefetchKb": 84,
       "kannadaFiles": [
         "/assets/kannada-66ce4bc438.json"
       ]
@@ -196,7 +196,7 @@
       "landed": "/no-such-page",
       "firstLoadKb": 54,
       "files": 6,
-      "withPrefetchKb": 80.4,
+      "withPrefetchKb": 80.5,
       "kannadaFiles": [
         "/assets/kannada-66ce4bc438.json"
       ]

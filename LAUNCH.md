@@ -1,43 +1,42 @@
 # Before going live
 
-Tick each line once it is true. Lines already ticked were checked in Step 5 (see `docs/PROGRESS.md`).
+Tick each line once it is true. Lines already ticked were checked in Step 6 (see `docs/PROGRESS.md`).
 
-## Hema's details (`src/config/site.js`)
-- [x] Phone and WhatsApp number defined in one place (`PHONE`, +91 95357 06956); a test fails if it is typed anywhere else
-- [ ] Hema confirms that number is the one customers should call and WhatsApp
-- [ ] Call hours confirmed and filled in (`hours`; hidden everywhere until then)
-- [ ] Delivery charge confirmed and filled in (`delivery.charge`; until then cart, checkout and the WhatsApp order say Hema confirms it)
-- [ ] FSSAI licence number filled in, if she has one (`fssai`; shown in the footer and on Contact once filled)
-- [ ] Email (`email`) and shelf life (`shelfLife`): filled in or left empty on purpose
-- [ ] Final web address in `url` (used by the sitemap, robots.txt and Google)
-- [x] Her menu: 35 items, prices and words as she gave them (Step 2)
-- [ ] Hema looks through the live menu once and confirms every price
+## Accounts and settings (`docs/SETUP-BACKEND.md`)
+- [ ] Supabase project created (Mumbai), `supabase/migrations/…_init.sql` and `supabase/seed.sql` run
+- [ ] Sign-ups switched off in Supabase Auth; Hema's admin user created and added to `admin_users`
+- [ ] Resend account (signed up with Hema's email), API key made
+- [ ] Netlify environment variables: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (secret), `RESEND_API_KEY` (secret), `HEMA_EMAIL`; redeployed
+- [ ] `https://<site>/api/menu` shows `"ready":true` (also proves Netlify sends /api to the functions, not the app)
+- [ ] Hema logs in at `/admin`, adds her UPI ID and QR in Settings; the red warning is gone
+- [ ] Optional: own email domain verified in Resend + `EMAIL_FROM`, so customers get emails too
 
-## Classes
-- [x] Switched off (`classes.enabled: false`): no page, link, home section, FAQ answer or sitemap entry
-- [ ] Decision: keep them off, or replace the SAMPLE classes in `src/data/classes.js` with her real ones (dates, times, prices, seats), confirm payment and booking rules, then set `classes.enabled: true`
-
-## Kannada
-- [ ] Hema checks the first table in `docs/kannada-priority-for-hema.md` (54 lines: ordering, booking, errors) and corrections are made
-- [ ] The rest ("Later, if you have time"), whenever she can
+## Hema confirms (TO CONFIRM in `src/config/shop.js`, or set in /admin)
+- [ ] Brownie Tub sizes and prices (the four old tubs show her first-menu prices and weights; Dream Cake Tub shows "Price coming soon")
+- [ ] Dream Cake Tub description (none yet)
+- [ ] Extra preparation days for drawings (placeholder: 2 business days, `leadTimes.drawingExtraBusinessDays` or /admin Settings)
+- [ ] Ragi brownies: gluten-free or not (`brownieInfo.ragiGlutenFree`; the site says "not confirmed")
+- [ ] Class details: what you'll learn, duration, fee, batch size, dates, what to bring (`src/data/classInfo.js`)
+- [ ] Her UPI ID and QR (in /admin)
+- [ ] Call hours, email, FSSAI number (`src/config/site.js`; hidden until filled)
+- [ ] Final web address (`site.url`) for Google and the sitemap
+- [ ] She reads the Kannada list `docs/kannada-priority-for-hema.md` (Part 1 first)
+- [ ] Real product photos (or AI ones from `docs/photo-prompts.md`; check Pista is green and Mango is yellow), then `node scripts/photos.mjs`
 
 ## Netlify
-- [x] `netlify.toml`: build `npm run build`, publish `dist`, Node 22, long caching for hashed files
-- [x] `public/_redirects`: every page address opens the site (refreshing /shop or /product/… works)
-- [x] Unknown addresses show the "page melted away" page in both languages, with Call and WhatsApp, and tell Google not to list it
-- [ ] Site connected to the GitHub repository; first deploy succeeds
+- [x] `netlify.toml`: build, publish, Node 22, functions directory, caching, security headers, admin noindex
+- [x] `_redirects` written at build: old product and page addresses 301 to the new menu; `/admin/*` to the admin page; everything else to the app (404 page is noindex)
+- [ ] Site connected to the GitHub repository; first deploy succeeds; functions listed under Logs → Functions
 - [ ] Custom domain (if any) added and HTTPS on
-- [ ] On the live site: open `/shop`, refresh, and open `/no-such-page` (shows the 404 page)
 
-## Test on the live site, from a phone
-- [x] Checked with WhatsApp stubbed: every Call link is `tel:+919535706956`, every WhatsApp link goes to 919535706956 (1,112 links, 0 wrong)
-- [ ] Place one real test order: it arrives in Hema's WhatsApp, complete and readable
-- [ ] Send one call-back request and one voice message: both arrive
-- [ ] Tap Call on a phone: it rings Hema
+## Test on the live site, from a phone (after the accounts are set up)
+- [x] Locally with the practice database: the whole journey (order → UPI reference → admin → Shipped → Track Order on another phone → emails) passes `scripts/qa-step6.mjs`
+- [ ] One real small order, paid by UPI: Hema gets both emails, confirms it in /admin, Track Order shows each step on another phone; then cancel it
+- [ ] Old link check: `/shop` and `/product/coconut-bar` land on the menu
 - [ ] Switch to ಕನ್ನಡ and back once: everything changes and the cart stays
 
-## Quality (Step 5)
-- [x] 241 unit tests pass, string checks clean, build clean
-- [x] 4 widths × English and Kannada: no sideways scroll, no clipped text, every tap target 48px or more, no English left on Kannada pages
-- [x] First visit downloads 45–66 KB of JavaScript in English (was 149 KB), 59–79 KB in Kannada; English visitors never download Kannada
-- [x] Lighthouse mobile, before and after: see `docs/PROGRESS.md`
+## Quality (Step 6)
+- [x] 251 unit tests (pricing, courier, cart, server functions, database security in real Postgres, Supabase adapter), string checks clean, build clean, no secrets in `dist/`
+- [x] 4 widths × English and Kannada × 17 screens: no sideways scroll, no clipped text, every tap target 48px or more, focus rings, no English left on Kannada pages
+- [x] First visit downloads 44–53 KB of JavaScript in English, 54–62 KB in Kannada; the admin's code never reaches customers
+- [x] Lighthouse mobile (English): Performance 91–93, Accessibility / Best Practices / SEO 100

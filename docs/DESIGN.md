@@ -6,6 +6,35 @@ The design idea is **a box of chocolates from a careful home kitchen**. Black an
 
 ---
 
+## Step 6 changes (5 Oct 2026): simpler, photo-first
+
+Feedback: the site copied too much of the reference theme; too complex, too much scrolling. The
+look stays (tokens, fonts, symbol, gold line drawings); the structure got much simpler. Where the
+sections below describe Steps 1–5 layouts that no longer exist (pre-booking strip, hamburger menu,
+Call/WhatsApp/Cart bottom bar, home sections, shop list rows, combo tray), this section wins.
+
+| Area | Now |
+|---|---|
+| Loading screen | First visit only (localStorage), ≤ 1 s from appearing (draw 0.45 s, word at 0.3 s, exit 0.26 s), tap/any key skips, **none** with reduced motion |
+| Header | Logo · (≥1024px) Home, Menu, Customize, Classes, Contact · compact language switch · Call · Cart icon with count (word "Cart" from 768px) |
+| Tab bar (<1024px) | 5 items, icon + word, gold for the current page; 15px labels (Kannada 14px, one line, never broken inside a word): the one exception to the 16px minimum, as on phone apps. Hidden while a sheet is open and on the cart (with items) and checkout, which have their own total bar |
+| Banner | Hema's announcement (black, muted gold) or "Orders are paused" + her message (error-tinted), under the header |
+| Home | Compact hero (lockup, tagline, one gold "Order now"; ≈ 55% of a 390px screen) + 6 photo tiles, 4:3, 2 per row / 3 from 640px; short footer. 2.1 screens at 390px (was 9.4) |
+| Menu | Small title, sticky pill tabs (Tubs, Delight Boxes, Brownies, Chocolates) with scroll-spy, sections with a t-h3 and an optional note; cards 2 / 3 / 4 per row: square photo, bold name, "from ₹X", a black "+" circle. The whole card is one button |
+| Product sheet | Photo 112–128px beside the live price; sizes as a 3-across choice with prices; Toggles for ragi and drawing (+₹450 shown); name field with a black "It will read:" preview in gold; reference photo button; ingredients folded in a `<details>`; footer "+ courier from ₹90", total, big "Add to cart ₹X" |
+| Checkout | 3-step progress line (Details → Review → Pay) and a black total bar fixed to the bottom on phones (in the summary column from 1024px); the cart uses the same bar |
+| Pay | QR in a white frame, "Pay ₹X with a UPI app" (phones only), UPI ID with Copy, the UTR field, optional screenshot, champagne "Hema will confirm…" box |
+| Order / Track | Black order-ID card with Copy; payment and dispatch cards; numbered vertical timeline with dates; courier box at "Shipped"; cancelled in an error box |
+| Photos | `ProductPhoto`: `public/products/<slug>.webp` (srcset 600/1200) when it exists, else the gold drawing (new: brownie box, drawing bar); never a broken image |
+| Admin | Separate page; cream body, black top bar, red warning bar, 4-item bottom bar; system fonts only (headings in the body font, bold); big cards and one-tap buttons; green "Payment received", red-outlined "Cancel" |
+
+Removed components: MobileMenu, NoticeStrip, MobileBar, PageHero, HomeSections, ComboBuilder/Card,
+Customise, BookingSheet, ClassCard, CertificationNote, CallOptions, CallbackForm, VoiceMessageButton,
+CheckoutBar, SummaryLines, StatusTracker, Styleguide page. New: TabBar, Banner, ProductPhoto,
+CheckoutProgress/TotalBar, OrderParts (StatusTimeline, OrderItems), PhoneGate.
+
+---
+
 ## 1. Colour tokens
 
 | Token | Hex | Use |

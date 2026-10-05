@@ -1,6 +1,64 @@
 # Build progress
 
-Read this first in every session. Source of truth: CLAUDE.md (PART 1 of BUILD_BRIEF.md). Design rules: docs/DESIGN.md. Audit: docs/AUDIT.md.
+Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
+
+## Step 6: Hema's requests of 5 Oct 2026 (branch step6-hema-requests)
+Brief: docs/HEMA-REQUESTS-2026-10-05.md. Plan (product and page tables, data model, risks): docs/STEP6-PLAN.md.
+- [x] Phase 0: brief saved, plan, before screenshots and heights (docs/screenshots/step6/before)
+- [x] Phase 1: one shop config (src/config/shop.js) and one pricing module (src/lib/pricing.js) shared by site and server; dispatch dates with drawing lead time; Indian states
+- [x] Phase 2: Supabase migration (RLS everywhere, SQL functions for the service role only, private uploads bucket), seed, 11 Netlify Functions, mock store, Resend email + dev outbox, Razorpay built but off, rate limits + honeypot
+- [x] Phase 3: the simpler site: Home (hero + 6 tiles), 5-item navigation, Menu with tabs, product sheet (size / ragi / name / drawing + photo), Customize, Cart with courier, 3-step checkout, UPI Pay, confirmation, Track Order on any device, Classes info + enquiry, Contact (only WhatsApp link), Story, FAQ; old menu, combo, WhatsApp ordering, call-back, gallery, product pages and sample classes removed; old addresses 301; 1-second first-visit loader
+- [x] Phase 4: /admin (own bundle): orders tabs, order detail with one-tap actions, menu, settings, enquiries
+- [x] Phase 5: photo pipeline (scripts/photos.mjs) and docs/photo-prompts.md
+- [x] Phase 6: QA script, secrets check, bundle and Lighthouse, DATA-MODEL, SETUP-BACKEND, admin guide with screenshots, Kannada list
+- [x] Two self-critique rounds (below)
+- [x] Committed locally on step6-hema-requests (not pushed, not merged)
+
+### Measured (390 × 844 phone; before = Step 5 site, after = Step 6)
+| | Before | After |
+|---|---|---|
+| Home height | 9.43 screens | 2.09 screens |
+| Menu height | 12.34 | 4.49 |
+| Product sheet content | 1.73 | 0.64 |
+| Checkout (first screen of the form) | 5.45 | 2.81 (step 1 of 3) |
+| Taps from opening the site to Add to cart | 3 | 3 |
+| First-time checkout, cart → confirmation (QA typing at ~9 letters/s) | — (WhatsApp) | 13 s, 13 steps |
+| First-visit JS, English (gzip) | 45–66 KB | 44–53 KB |
+| First-visit JS, Kannada | 59–79 KB | 54–62 KB |
+| Lighthouse mobile, English: Performance (Home / Menu / Cart / Checkout) | 91 / 90 / 91 / 91 | 92 / 91 / 93 / 91 |
+| Lighthouse Accessibility / Best Practices / SEO | 100 / 100 / 100 | 100 / 100 / 100 |
+| Lighthouse Performance, Kannada | 80 / 82 / 85 / 84 | 79 / 80 / 78 / 88 |
+Screenshots: docs/screenshots/step6 (before/, after/, <width>-<lang>-<page>.png, admin/). Reports: qa-report.json, bundle-after.json, lighthouse-after(-kn).json.
+
+### Tests
+251 unit tests: every price combination and the brief's examples (₹1,700 / ₹2,700 / ₹780 / ₹700 / ₹800 / ₹950), every courier case, cart and re-pricing, 37 server tests (tampered price and total, sold out, duplicate submit, bad pincodes, the whole admin journey, Razorpay signatures), 19 database tests in real Postgres (PGlite: anon can't read orders, RLS, constraints, functions), 8 Supabase adapter tests. `node scripts/qa-step6.mjs`: 4 widths × EN/KN × 17 screens clean; journey to Track Order on another browser; emails; enquiry to admin; security; loader. `node scripts/check-secrets.mjs`: dist/ clean (proven with a planted key).
+
+### Step 6 self-critique log
+Bugs the QA found while building (fixed): Kannada date chips and "Earliest" badge too wide at 360/768px; the Customize tab label 1px too wide at 360px; the footer FAQ link 35px wide; Kannada tab labels breaking inside a word (now one line, 14px); a menu save in the admin wiping its own "Saved" message; **the dev server stripped the Kannada names from the server's copy of the menu** (orders and emails now always carry both languages; the build-time split skips server code).
+
+Round 1 (as a first-time customer on a slow phone, as Hema with 10 orders, as a picky designer), all fixed:
+1. Cart on phones: Continue was below the fold even with two items. The cart now has the same sticky total bar as checkout.
+2. Checkout: a Karnataka pincode now fills in the state (one less thing to choose).
+3. Admin order cards didn't say what to make; they now list the items ("Pista Delight Box 500 g + drawing × 1, …").
+4. New orders appeared only after a reload; the list now refreshes on return to the app and every minute, plus a Refresh button.
+5. "Preparing" is sorted by dispatch date (what to make next first).
+6. "← Orders" lost the tab Hema came from; it goes back to it now.
+7. Admin headings fell back to a system serif (the admin loads no web fonts); they use the body font, bold.
+8. The footer's last line could hide under the taller total bar on cart and checkout; more room there.
+
+Round 2, all fixed:
+9. An empty cart lost the tab bar (no total bar to replace it); it keeps it now.
+10. With orders paused by Hema, the Review button said "Payments open soon"; it now says "Orders are paused for now." with her message.
+Re-run after each round: tests, check-i18n, qa-step6 (0 problems), compare heights, bundle report, secrets.
+
+Known and accepted:
+- Real accounts are needed for the live site (docs/SETUP-BACKEND.md). Until then it shows the menu and "Payments open soon"; nothing breaks.
+- Netlify routes /api/* to the functions by their `config.path`; LAUNCH.md has the one live check (`/api/menu`).
+- No product photos yet: gold drawings everywhere (identical per category).
+- Home has a small layout shift in Lighthouse (CLS 0.075, under the 0.1 limit), most likely the logo font arriving.
+- UPI payments are confirmed by Hema by hand (Phase 1); Razorpay automates it once she has an account.
+- The tub weights (250 g / 500 g / 750 g) show because her first menu had them; tub sizes are TO CONFIRM.
+- Kannada: as built; Hema proofreads docs/kannada-priority-for-hema.md. (Owner: no more Kannada work this step.)
 
 ## Step 1: Foundation
 - [x] A. CLAUDE.md = PART 1 + build roadmap; this checklist

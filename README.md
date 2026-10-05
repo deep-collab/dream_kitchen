@@ -1,84 +1,43 @@
-# Dream Kitchen website
+# Dream Kitchen
 
-Website for Dream Kitchen, Hema's home kitchen for handmade chocolates, loaded brownie tubs, delight boxes and cookies in Karnataka.
-Built with Vite + React components (run on Preact, see below) + react-router + Tailwind CSS. The brief is in `CLAUDE.md`, progress in `docs/PROGRESS.md`, and what must be true before going live in `LAUNCH.md`.
+Website for Dream Kitchen, Hema's home brand of brownie tubs, delight boxes, brownies and
+chocolates, made fresh to order and sent all over India. Customers order and pay (UPI) on the
+website; Hema runs everything from `/admin` on her phone. English and ಕನ್ನಡ.
 
-**Status: Stage A (Steps 1–5 done).** Customers order through WhatsApp. Orders and call-back requests are kept only on the customer's phone until Stage B (Supabase) adds the database and Hema's admin panel.
+## Run it on this computer
 
-## Run it on your computer
+```
+npm install
+npm run dev        # http://localhost:5173 (shop) and http://localhost:5173/admin
+```
+No accounts needed: without Supabase keys the dev server uses a practice database in `.dev-data/`
+and writes emails to `.dev-data/outbox/`. To log in to the practice admin and try payments, create
+a `.env` (see `.env.example`) with `DK_DEV_ADMIN_EMAIL`, `DK_DEV_ADMIN_PASSWORD` and `UPI_ID=test@upi`.
 
-```bash
-npm install      # first time only
-npm run dev      # then open http://localhost:5173
-npm test         # unit tests
-npm run build    # production build, saved to /dist (Netlify runs this, see netlify.toml)
+## Checks
+```
+npm test                          # 251 tests: prices, courier, cart, server, database security
+node scripts/check-i18n.mjs       # English/Kannada strings
+node scripts/qa-step6.mjs         # browser QA (dev server running; see the top of the file)
+npm run build && node scripts/check-secrets.mjs
+node scripts/bundle-report.mjs after    # with `npx vite preview --port 4173` running
 ```
 
-Checks used in QA (dev server: `npm run dev -- --port 5173`; production: `npm run build && npm run preview -- --port 4173`):
-
-| Check | Command |
+## Where things are
+| What | Where |
 |---|---|
-| Every string in English and Kannada, none unused, each screen loads its own text | `node scripts/check-i18n.mjs` |
-| Launch defaults, language switching mid-order, failed Kannada download (dev) | `node scripts/qa-step5.mjs` |
-| Classes switched on: booking flow and all Step 4 checks (dev) | `node scripts/qa-step4.mjs docs/screenshots/step5/classes-on` |
-| What each page downloads; English visitors get no Kannada (production) | `node scripts/bundle-report.mjs` |
-| Lighthouse mobile on home, menu, product, cart, checkout (production) | `node scripts/lighthouse.mjs after` |
-| Kannada list for Hema | `node scripts/kannada-list.mjs` |
+| Menu, prices, courier rates, lead times (one file) | `src/config/shop.js` |
+| Pricing (shared by website and server) | `src/lib/pricing.js` |
+| Phone, Instagram, hours, email, FSSAI | `src/config/site.js` |
+| Words on the site | `src/i18n/en.json`, `src/i18n/kn.json` |
+| Server (orders, payment, uploads, admin) | `netlify/functions`, `netlify/lib` |
+| Database | `supabase/migrations`, `supabase/seed.sql`, `docs/DATA-MODEL.md` |
+| Hema's admin | `admin/index.html`, `src/admin` |
+| Product photos | drop into `photos-incoming/`, run `node scripts/photos.mjs`; prompts in `docs/photo-prompts.md` |
 
-## Where things live
+## Going live
+1. Accounts and Netlify settings: `docs/SETUP-BACKEND.md` (about 30 minutes, free).
+2. The checklist, including what Hema still has to confirm: `LAUNCH.md`.
+3. Hema's guide to the admin: `docs/admin-guide-for-hema.md`.
 
-| What | File |
-|---|---|
-| Phone and WhatsApp number (one line: `PHONE`), Instagram, call hours, delivery charge, pre-booking rules, the "Area or city" field, the 90-day date limit, the classes switch, FSSAI, email | `src/config/site.js` |
-| Hema's menu (35 products, her words and prices), categories, the 3-bar combo | `src/data/products.js`, `src/data/categories.js`, `src/data/combos.js` |
-| Chocolate classes (SAMPLE, switched off) | `src/data/classes.js` |
-| Customer reviews (empty: the home section stays hidden until real ones are added) | `src/data/reviews.js` |
-| All English text / all Kannada text | `src/i18n/en.json` / `src/i18n/kn.json` |
-| Kannada for Hema to check (short list first, the rest after) | `docs/kannada-priority-for-hema.md` |
-| Data functions (menu, orders, classes, bookings, call-backs, reviews, gallery) | `src/services/index.js` |
-| Design rules | `docs/DESIGN.md` |
-
-### Settings you can change without touching code (`src/config/site.js`)
-
-- `PHONE`: Hema's 10-digit number. Every Call button, WhatsApp link, page text and the Google listing use it. A test fails if the number is typed anywhere else.
-- **Unconfirmed details stay empty until Hema confirms them**, and an empty value is hidden everywhere: `hours` (call hours), `delivery.charge`, `email`, `fssai`, `shelfLife`, `classes.certificateImage`. Each has an example in its comment. While the delivery charge is empty, cart and checkout say "Hema confirms it on WhatsApp", the button reads "Send order on WhatsApp ₹399 + delivery", and the WhatsApp order says "Delivery: to be confirmed".
-- `classes.enabled`: `false` (now) hides the whole Classes part: page, home section, menu and footer links, the FAQ answer, Our Story's "Teaching others" and the sitemap entry. `true` brings it all back exactly as built in Step 4.
-- `ordering.areaField`: `'required'`, `'optional'` or `'off'` for the "Area or city" field at checkout.
-- `ordering.maxDaysAhead`: how far ahead a customer may pick a date (90 days now).
-- `ordering.closedDates`: Hema's holidays, e.g. `['2026-11-01']`.
-- `classes.certificateImage`: Hema's certificate photo, replacing the "Certificate coming soon" note. Put it in `public/` at two sizes (about 600 and 1200 pixels wide) and fill in `{ src, width, height, srcSet }` as shown in the comment there. Width and height stop the page jumping while it loads.
-
-## Needs Hema's confirmation
-
-The full tick-list is `LAUNCH.md`. In short:
-
-1. **Call hours** and the **delivery charge**: empty (hidden) until she confirms them.
-2. **FSSAI licence number**, **shelf life**, **email**: empty, so hidden.
-3. **Final web address**: `dreamkitchen.netlify.app` is a placeholder in `site.url` (sitemap, robots.txt, Google).
-4. **Classes**: switched off. Every class in `src/data/classes.js` is a sample (titles, prices, lengths and group sizes from the brief; "What you'll learn", days, times and seats written for the demo). To launch them: her real classes, how they are paid (the booking message asks Hema for "the payment details"), the 1-day booking cut-off and the 6-seat limit, then `classes.enabled: true`.
-5. **Certificate**: send the photo once she has it.
-6. **Kannada**: the first table of `docs/kannada-priority-for-hema.md` (54 lines customers act on), then the rest when she can.
-7. **Our Story** uses only the facts in the brief. Hema's own words would make it much better.
-8. **FAQ**: "Can I change my order?" says only "call or WhatsApp Hema as soon as you can". Add her real policy if she has one.
-9. **Reviews** and **Gallery photos**: none yet; never invented.
-
-## How ordering works now (Stage A)
-
-- Pre-booking only. Every order is dispatched after 2 business days (Monday to Saturday), worked out in Indian time whatever the phone's clock says.
-- Karnataka pincodes only (56, 57, 58, 59). Flat delivery charge once Hema confirms it.
-- Checkout makes an order ID like `DK-261005-7Q4M`: the date the order is **placed** (Indian time), then 4 random characters. It then opens WhatsApp with the full order in English. Payment is by UPI, shared by Hema on WhatsApp.
-- **Class booking IDs** are `CL-YYMMDD-XXXX` (e.g. `CL-261005-7Q4M`), not the brief's CL-0001, for the same reason as orders: nothing is stored centrally yet, so a counter on each phone would give every phone CL-0001. Stage B switches both to database numbers.
-- If the phone blocks WhatsApp from opening, the site says "One more step" and shows an Open WhatsApp button. It never claims something was sent when it wasn't.
-- Track Order finds orders placed on the same phone (status "Received"). Stage B adds real tracking.
-
-## Speed (Step 5)
-
-- Every page is its own small download; the menu data, the customise sheet and each screen's English text load with the screens that use them.
-- All Kannada (words and menu names) is one file, fetched only when someone chooses ಕನ್ನಡ. English visitors never download it. The only Kannada they get is the word ಕನ್ನಡ on the language button and the tagline on the loading screen.
-- The site runs on **Preact** (an ~8 KB React-compatible library) instead of React (~63 KB), through an alias in `vite.config.js`; components are written as React components. `react` stays in `package.json` only because react-router and the build plugin list it as a peer.
-- Result: a first visit downloads 45–66 KB of JavaScript in English (was 149 KB) and 59–79 KB in Kannada.
-
-## Phases
-
-1. Stage A, Steps 1–5 ✅: design, menu, cart, checkout, WhatsApp ordering, call-backs, Track Order, classes (off until Hema's are ready), all pages, English and Kannada, speed and launch prep
-2. Stage B: Supabase database, Hema's admin panel, real tracking and order numbers
+History and decisions: `docs/PROGRESS.md`. Design: `docs/DESIGN.md`. Working rules: `CLAUDE.md`.
