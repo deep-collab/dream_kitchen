@@ -315,6 +315,7 @@ describe('admin', () => {
     let list = await call(admin, { action: 'orders', tab: 'new' }, { headers: h })
     expect(list.body.counts).toMatchObject({ new: 1, payment: 0 })
     expect(list.body.orders[0]).toMatchObject({ code, total: 2100, paymentStatus: 'pending', hasDrawing: true })
+    expect(list.body.orders[0].itemsText).toBe('Red Velvet Delight Box 500 g + drawing × 1, Almond Bar × 2')
 
     await call(submitPayment, { code, phone: '9845012345', utr: '412356789012' })
     list = await call(admin, { action: 'orders', tab: 'payment' }, { headers: h })

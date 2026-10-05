@@ -140,7 +140,14 @@ export default function Checkout() {
           <TextField label={t('checkout.line2')} autoComplete="address-line2" required {...field('line2')} />
           <div className="grid gap-5 sm:grid-cols-2">
             <TextField label={t('checkout.city')} autoComplete="address-level2" required {...field('city')} />
-            <TextField label={t('checkout.pincode')} inputMode="numeric" autoComplete="postal-code" placeholder="560001" required {...field('pincode', { maxLength: 7 })} />
+            <TextField label={t('checkout.pincode')} inputMode="numeric" autoComplete="postal-code" placeholder="560001" required {...field('pincode', {
+                  maxLength: 7,
+                  // A Karnataka pincode fills in the state (one less thing to choose); never overrides a choice
+                  onBlur: () => {
+                    blur('pincode')()
+                    setForm((f) => (!f.state && zoneForPincode(f.pincode) === 'karnataka' ? { ...f, state: 'karnataka' } : f))
+                  },
+                })} />
           </div>
           <TextField as="select" label={t('checkout.state')} autoComplete="address-level1" required {...field('state', { maxLength: undefined })}>
             <option value="">{t('checkout.statePick')}</option>

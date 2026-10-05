@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { adminCall, problem } from './api'
 import { Btn, day, Field, formatINR, input, PAYMENT_WORDS, paymentTone, Pill, SaveMessage, STATUS_WORDS, useSave, when } from './ui'
 import { copyText } from '../lib/clipboard'
@@ -21,6 +21,7 @@ const ACTION_WORDS = {
  */
 export default function OrderDetail() {
   const { code } = useParams()
+  const navigate = useNavigate()
   const [order, setOrder] = useState(null)
   const [error, setError] = useState('')
   const [asking, setAsking] = useState(null) // 'shipped' | 'cancel'
@@ -64,7 +65,17 @@ export default function OrderDetail() {
 
   return (
     <div className="space-y-5">
-      <Link to="/" className="inline-flex min-h-12 items-center gap-1 font-bold">
+      <Link
+        to="/"
+        onClick={(e) => {
+          // Back to the same tab of the list when she came from it
+          if (window.history.state?.idx > 0) {
+            e.preventDefault()
+            navigate(-1)
+          }
+        }}
+        className="inline-flex min-h-12 items-center gap-1 font-bold"
+      >
         <BackIcon className="h-5 w-5" /> Orders
       </Link>
       <div>

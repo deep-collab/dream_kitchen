@@ -1,16 +1,19 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
 import { site, telLink } from '../../config/site'
 import Wordmark from '../brand/Wordmark'
 import LanguageToggle from '../ui/LanguageToggle'
 import { PhoneIcon } from '../icons'
-import { FOOTER_NAV } from './nav'
+import { FOOTER_NAV, isCheckoutPath } from './nav'
 
 // Short black footer: Call, Track Order, Our Story, FAQ, Contact and the language switch.
 // Bottom padding clears the tab bar (plus the safe-area inset) below 1024px.
 export default function Footer() {
   const { t } = useI18n()
   const year = new Date().getFullYear()
+  // On the cart and checkout the order's total bar (taller than the tab bar) covers the bottom
+  const { pathname } = useLocation()
+  const clear = isCheckoutPath(pathname) ? 'pb-48' : 'pb-[calc(var(--bar-h)+env(safe-area-inset-bottom)+1.25rem)]'
   const link = 'inline-flex min-h-12 min-w-12 items-center text-cream underline-offset-4 transition-colors hover:text-gold-light hover:underline'
 
   return (
@@ -43,7 +46,7 @@ export default function Footer() {
 
       <div className="dk-container">
         <hr className="rule-gold" />
-        <div className="t-small flex flex-col gap-1 pt-4 pb-[calc(var(--bar-h)+env(safe-area-inset-bottom)+1.25rem)] text-center sm:flex-row sm:flex-wrap sm:justify-between sm:gap-x-8 sm:text-left lg:pb-6">
+        <div className={`t-small flex flex-col gap-1 pt-4 text-center sm:flex-row sm:flex-wrap sm:justify-between sm:gap-x-8 sm:text-left lg:pb-6 ${clear}`}>
           <p>{t('footer.rights', { year })}</p>
           <p>{t('footer.shipping')}</p>
           {site.fssai && <p>{t('footer.fssai', { fssai: site.fssai })}</p>}

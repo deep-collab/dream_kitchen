@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { adminCall, problem } from './api'
-import { day, formatINR, PAYMENT_WORDS, paymentTone, Pill, STATUS_WORDS, when } from './ui'
+import { Btn, day, formatINR, PAYMENT_WORDS, paymentTone, Pill, STATUS_WORDS, when } from './ui'
 
 const TABS = [
   ['new', 'New'],
@@ -18,22 +18,36 @@ export default function Orders() {
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    let alive = true
-    setError('')
-    adminCall('orders', { tab }).then((r) => {
-      if (!alive) return
-      if (r.ok) setData(r.data)
-      else setError(problem(r))
-    })
-    return () => {
-      alive = false
-    }
+  const [busy, setBusy] = useState(false)
+  const load = useCallback(async () => {
+    setBusy(true)
+    const r = await adminCall('orders', { tab })
+    setBusy(false)
+    if (r.ok) {
+      setData(r.data)
+      setError('')
+    } else setError(problem(r))
   }, [tab])
+  // New orders show up by themselves: on opening, when Hema comes back to the app, and every minute
+  useEffect(() => {
+    load()
+    const onVisible = () => document.visibilityState === 'visible' && load()
+    document.addEventListener('visibilitychange', onVisible)
+    const timer = setInterval(() => document.visibilityState === 'visible' && load(), 60_000)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      clearInterval(timer)
+    }
+  }, [load])
 
   return (
     <div>
-      <h1 className="t-h2">Orders</h1>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="t-h2">Orders</h1>
+        <Btn tone="light" onClick={load} disabled={busy}>
+          {busy ? 'Checking…' : 'Refresh'}
+        </Btn>
+      </div>
       <div role="tablist" aria-label="Order lists" className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
         {TABS.map(([k, label]) => (
           <button
@@ -62,8 +76,9 @@ export default function Orders() {
                 <p className="t-price">{formatINR(o.total)}</p>
               </div>
               <p className="mt-1">
-                {o.name}, {o.city} · {o.itemCount} {o.itemCount === 1 ? 'item' : 'items'}
+                {o.name}, {o.city}
               </p>
+              <p className="t-small text-brown-2">{o.itemsText}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <Pill tone={paymentTone(o.paymentStatus)}>{PAYMENT_WORDS[o.paymentStatus]}</Pill>
                 <Pill>{STATUS_WORDS[o.status]}</Pill>

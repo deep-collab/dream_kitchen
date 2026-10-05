@@ -276,6 +276,8 @@ export function adminSummary(row) {
     dispatchDate: row.dispatch_date,
     hasDrawing: row.has_drawing,
     itemCount: (row.items || []).reduce((n, i) => n + (i.qty || 0), 0),
+    // "Pista Delight Box 500 g × 1, Walnut Brownies (ragi) × 2": what to make, without opening the order
+    itemsText: (row.items || []).map((i) => `${i.name?.en || i.productId}${i.size ? ` ${i.size.label}` : ''}${i.ragi ? ' (ragi)' : ''}${i.drawing ? ' + drawing' : ''} × ${i.qty}`).join(', '),
   }
 }
 

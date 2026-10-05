@@ -16,6 +16,7 @@ import { useToast } from '../components/ui/Toast'
 import ProductPhoto from '../components/shop/ProductPhoto'
 import { useShopSheets } from '../components/shop/ShopSheets'
 import CartNotices from '../components/order/CartNotices'
+import { TotalBar } from '../components/checkout/CheckoutFrame'
 import LineStatus from '../components/order/LineStatus'
 import TotalRows from '../components/order/TotalRows'
 import { CartIcon, InfoIcon, TrashIcon } from '../components/icons'
@@ -34,7 +35,7 @@ export default function Cart() {
   if (!cart.lines.length) return <EmptyCart />
 
   return (
-    <Container className="py-6 lg:py-10">
+    <Container className="py-6 pb-40 lg:py-10">
       <h1 className="t-h2">{t('cart.title')}</h1>
       <p className="t-small text-brown-2">{cart.count === 1 ? t('cart.countLineOne') : t('cart.countLine', { count: cart.count })}</p>
 
@@ -65,14 +66,16 @@ export default function Cart() {
               <p>{settings.store.open ? t('checkout.paymentsSoonText', { phone: site.phone.display }) : t('errors.storeClosed', { phone: site.phone.display })}</p>
             </Notice>
           )}
-          <Button to={blocked ? undefined : '/checkout'} size="lg" fullWidth className="mt-5" disabled={blocked} aria-describedby={blocked ? 'cart-blocked' : undefined} data-dk-continue>
-            {t('cart.checkout')}
-          </Button>
           {blocked && (
             <p id="cart-blocked" className="t-small mt-3 font-bold text-error">
               {t('cart.checkoutBlocked')}
             </p>
           )}
+          <TotalBar label={t('cart.total')} total={t('cart.totalPlusCourier', { price: formatINR(q.subtotal) })}>
+            <Button to={blocked ? undefined : '/checkout'} size="lg" fullWidth disabled={blocked} aria-describedby={blocked ? 'cart-blocked' : undefined} data-dk-continue>
+              {t('cart.checkout')}
+            </Button>
+          </TotalBar>
         </aside>
       </div>
     </Container>

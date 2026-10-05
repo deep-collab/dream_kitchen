@@ -32,7 +32,7 @@ export default function AdminApp() {
 
   const tab = 'flex h-full flex-col items-center justify-center gap-0.5 text-[0.9375rem] font-bold'
   return (
-    <div className="flex min-h-dvh flex-col bg-cream">
+    <div className="flex min-h-dvh flex-col bg-cream [&_.t-h2]:font-body [&_.t-h2]:font-bold [&_.t-h3]:font-body [&_.t-h3]:font-bold">
       <header className="on-dark sticky top-0 z-30 border-b border-gold/45 bg-ink text-cream">
         <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-3 px-4">
           <p className="font-wordmark text-gold-light">Dream Kitchen · Admin</p>

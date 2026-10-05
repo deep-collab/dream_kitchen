@@ -208,7 +208,10 @@ export default handle(async (req, context) => {
       const rows = await store.listOrders({ limit: 300 })
       const tab = TABS[body.tab] ? body.tab : 'new'
       const counts = Object.fromEntries(Object.entries(TABS).map(([k, f]) => [k, rows.filter(f).length]))
-      return json(200, { tab, counts, orders: rows.filter(TABS[tab]).map(adminSummary) })
+      const list = rows.filter(TABS[tab])
+      // What to make next comes first: by dispatch date while preparing, newest first elsewhere
+      if (tab === 'preparing') list.sort((a, b) => (a.dispatch_date < b.dispatch_date ? -1 : a.dispatch_date > b.dispatch_date ? 1 : 0))
+      return json(200, { tab, counts, orders: list.map(adminSummary) })
     }
 
     case 'order':
