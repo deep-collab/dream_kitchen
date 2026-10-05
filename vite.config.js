@@ -12,6 +12,8 @@ import devApi from './scripts/dev-api.mjs'
 import { redirectsFile } from './src/config/redirects.js'
 
 const readJson = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'))
+// Hema's admin is its own page (admin/index.html, src/admin): none of the customer-page extras
+const isAdminPage = (ctx) => /[\\/]admin[\\/]index\.html$/.test(ctx.filename || '') || ctx.path?.startsWith('/admin/')
 const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;')
 
 // Fills the {{dk:*}} markers in index.html: the symbol sprite (from the unaltered
@@ -53,7 +55,8 @@ function kannadaPreload() {
     apply: 'build',
     transformIndexHtml: {
       order: 'post',
-      handler(html) {
+      handler(html, ctx) {
+        if (isAdminPage(ctx)) return html
         const file = kannadaFileName(import.meta.dirname)
         // as=fetch + crossorigin so the page's own fetch() reuses this download
         const script = `<script>try{if(localStorage.getItem('dk_lang')==='kn'){var l=document.createElement('link');l.rel='preload';l.as='fetch';l.crossOrigin='anonymous';l.href='/${file}';document.head.appendChild(l)}}catch(e){}</script>`
@@ -93,6 +96,7 @@ function routePreload() {
     transformIndexHtml: {
       order: 'post',
       handler(html, ctx) {
+        if (isAdminPage(ctx)) return html
         const chunks = Object.values(ctx.bundle).filter((c) => c.type === 'chunk')
         const chunkOf = (path) => chunks.find((c) => c.facadeModuleId?.replaceAll('\\', '/').endsWith(`/${path}`))
         // A chunk and everything it imports statically
@@ -145,6 +149,9 @@ const PREACT = [
 ]
 
 export default defineConfig({
+  // Two pages: the shop (index.html) and Hema's admin (admin/index.html). The admin has its own
+  // bundle, so customers download none of it.
+  build: { rollupOptions: { input: { main: 'index.html', admin: 'admin/index.html' } } },
   plugins: [devApi(), dreamKitchenHtml(), kannadaSplit(), stringsSplit(), kannadaPreload(), routePreload(), seoFiles(), react(), tailwindcss()],
   resolve: { alias: PREACT },
 })

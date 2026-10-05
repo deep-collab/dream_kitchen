@@ -12,6 +12,12 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { loadEnv } from 'vite'
 
+// /admin and /admin/orders/DK-… open the admin page (Netlify does this with _redirects)
+function adminPage(req, _res, next) {
+  if (/^\/admin(\/[^.]*)?(\?.*)?$/.test(req.url || '') && !req.url.startsWith('/admin/index.html')) req.url = '/admin/index.html'
+  next()
+}
+
 function middleware(load) {
   return async (req, res, next) => {
     if (!req.url?.startsWith('/api/')) return next()
@@ -54,9 +60,11 @@ export default function devApi() {
       process.env.DK_DEV_DATA_DIR ??= '.dev-data'
     },
     configureServer(server) {
+      server.middlewares.use(adminPage)
       server.middlewares.use(middleware((name) => server.ssrLoadModule(`/netlify/functions/${name}.mjs`)))
     },
     configurePreviewServer(server) {
+      server.middlewares.use(adminPage)
       server.middlewares.use(middleware((name) => import(pathToFileURL(resolve(`netlify/functions/${name}.mjs`)).href)))
     },
   }
