@@ -5,3 +5,8 @@ dist
 !.env.example
 *.log
 .DS_Store
+# Local mock database, dev emails and uploads (scripts/dev-api.mjs)
+.dev-data
+# Photos waiting to be converted by scripts/photos.mjs
+photos-incoming/*
+!photos-incoming/README.md

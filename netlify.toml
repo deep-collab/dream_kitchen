@@ -8,6 +8,12 @@
   # Vite 8 needs Node 20.19+ or 22.12+; pin it so Netlify never builds with an older default
   NODE_VERSION = "22"
 
+# Server code: orders, payment, uploads, admin (each file answers at /api/<name>, see its config.path).
+# They import the same menu config and pricing module as the website (src/config/shop.js, src/lib/pricing.js).
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
 # Files in /assets have a content hash in their name (a new name whenever they change), so
 # browsers may keep them for a year: repeat visits download no JavaScript, CSS or Kannada again.
 [[headers]]
@@ -15,4 +21,25 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Page addresses (/shop, /product/…) all serve index.html: see public/_redirects
+[[headers]]
+  for = "/products/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Hema's admin: never in search results, never inside another site's frame
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    X-Frame-Options = "DENY"
+    Cache-Control = "no-store"
+
+# Page addresses (/menu, /order/…) all serve index.html, and old addresses of removed products
+# redirect to their category: see public/_redirects

@@ -1,9 +1,8 @@
 /*
-  Field rules for checkout, call-back and Track Order. Pure, covered by tests/order.test.js.
-  Each *Error function returns null when the value is fine, or a short reason code
-  that the page turns into a sentence (en.json / kn.json) saying how to fix it.
+  Small field rules shared by the website and the server (checkout, Track Order, class
+  enquiries). Pure. Each *Error function returns null when the value is fine, or a short reason
+  code that the page turns into a sentence (en.json / kn.json) saying how to fix it.
 */
-import { site } from '../config/site'
 
 /**
  * Indian mobile number to its 10 digits. Accepts what people type or autofill:
@@ -38,17 +37,8 @@ export function tidyPhoneInput(value) {
   return isValidPhone(value) ? formatPhone(value).slice(4) : value
 }
 
-/** "560 001" -> "560001" */
-export const normalisePincode = (value) => String(value ?? '').replace(/\s/g, '')
-
-/** null | 'required' | 'format' (not 6 digits) | 'outside' (not a Karnataka pincode) */
-export function pincodeError(value) {
-  const pin = normalisePincode(value)
-  if (!pin) return 'required'
-  if (!/^\d{6}$/.test(pin)) return 'format'
-  return site.delivery.pincodePattern.test(pin) ? null : 'outside'
-}
-export const isValidPincode = (value) => pincodeError(value) === null
-
-/** Collapses spaces and line breaks: for one-line fields and the WhatsApp message. */
+/** Collapses spaces and line breaks: for one-line fields, emails and the database. */
 export const oneLine = (value) => String(value ?? '').replace(/\s+/g, ' ').trim()
+
+/** A plain email address (optional fields check emptiness themselves) */
+export const isEmail = (value) => /^[^\s@<>()]+@[^\s@<>()]+\.[^\s@<>()]{2,}$/.test(oneLine(value)) && oneLine(value).length <= 120
