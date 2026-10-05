@@ -1,7 +1,7 @@
 // Lighthouse, mobile settings (Lighthouse defaults: Moto G-class phone, slow 4G), on the
 // production build. Needs `npm run build` and `npm run preview -- --port 4173`, then:
 //   node scripts/lighthouse.mjs <label> [lang]        e.g. node scripts/lighthouse.mjs after en
-// Writes docs/screenshots/step5/lighthouse-<label>[-kn].json and prints a table.
+// Writes docs/screenshots/step6/lighthouse-<label>[-kn].json and prints a table (DK_OUT to change).
 //
 // Cart and checkout are measured with a real cart. Lighthouse would wipe storage before each
 // run, and ignores a profile passed through --chrome-flags, so instead: one profile is filled
@@ -20,11 +20,10 @@ import { chromium } from 'playwright'
 const BASE = process.env.DK_LH_BASE || 'http://localhost:4173'
 const label = process.argv[2] || 'run'
 const lang = process.argv[3] || 'en'
-const OUT = 'docs/screenshots/step5'
+const OUT = process.env.DK_OUT || 'docs/screenshots/step6'
 const PAGES = [
   ['Home', '/'],
-  ['Menu', '/shop'],
-  ['Product', '/product/ferrero-rocher-nutella-tub'],
+  ['Menu', '/menu'],
   ['Cart', '/cart'],
   ['Checkout', '/checkout'],
 ]
@@ -42,18 +41,14 @@ const seed = join(work, 'seed')
 {
   const ctx = await chromium.launchPersistentContext(seed, { headless: true, ignoreHTTPSErrors: true })
   const page = await ctx.newPage()
-  await page.goto(BASE + '/shop')
+  await page.goto(BASE + '/menu')
   await page.waitForFunction(() => window.__dkReady === true)
   // The production build has no /src: write one line in the stored format (src/lib/cart.js)
   await page.evaluate((l) => {
     localStorage.setItem('dk_lang', l)
-    const line = {
-      id: 'lh1', kind: 'product', productId: 'oreo-overload-tub', slug: 'oreo-overload-tub', image: 'tub',
-      name: { en: 'Oreo Overload' }, sectionName: null,
-      selection: { size: '250g', flavour: null, nameOn: false, name: '', occasion: null, note: '' },
-      labels: { size: { en: '250g' }, flavour: null, occasion: null }, unitPrice: 399, qty: 1,
-    }
-    localStorage.setItem('dk_cart_v2', JSON.stringify({ version: 2, lines: [line] }))
+    localStorage.setItem('dk_intro_seen', '1') // a returning customer with a cart: no loading screen
+    const line = { id: 'b1', productId: 'oreo-overload-tub', selection: { size: '250g', ragi: false, name: '', drawing: false, drawingText: '', drawingRef: null }, qty: 1, unitPrice: 399, name: { en: 'Oreo Overload Tub' }, art: 'tub' }
+    localStorage.setItem('dk_cart_v3', JSON.stringify({ version: 3, lines: [line] }))
   }, lang)
   await ctx.close()
   // Keep the stored cart, drop every cache, so each run is a first visit

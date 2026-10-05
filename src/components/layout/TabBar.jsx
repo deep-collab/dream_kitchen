@@ -32,7 +32,7 @@ export default function TabBar() {
               {({ isActive }) => (
                 <>
                   <Icon className={`h-6 w-6 ${isActive ? 'text-gold-light' : 'text-gold'}`} />
-                  <span className="max-w-full whitespace-nowrap [&:lang(kn)]:text-[0.875rem] [&:lang(kn)]:tracking-tight">{t(key)}</span>
+                  <span className="max-w-full tracking-tight whitespace-nowrap [&:lang(kn)]:text-[0.875rem]">{t(key)}</span>
                 </>
               )}
             </NavLink>

@@ -39,7 +39,7 @@ export default function DateChips({ name, choices, earliest, latest, value, mode
         </p>
       )}
 
-      <ul className={`mt-5 grid grid-cols-3 gap-x-2 gap-y-4 sm:grid-cols-6 ${groupError ? 'rounded-control outline-2 outline-offset-4 outline-error outline-dashed' : ''}`}>
+      <ul className={`mt-5 grid grid-cols-3 gap-x-2 gap-y-4 lg:grid-cols-6 ${groupError ? 'rounded-control outline-2 outline-offset-4 outline-error outline-dashed' : ''}`}>
         {choices.map((iso, i) => {
           const p = dateParts(iso)
           const checked = mode === 'chip' && value === iso
@@ -59,13 +59,13 @@ export default function DateChips({ name, choices, earliest, latest, value, mode
                 <span className={`${chip} relative flex-col`}>
                   {checked && <CheckIcon className="absolute top-1.5 left-1.5 h-5 w-5" />}
                   <span className="text-base">{names.weekdays[p.weekday]}</span>
-                  <span className="text-[1.125rem] font-bold whitespace-nowrap">
+                  <span className="text-[1.125rem] font-bold [&:lang(kn)]:text-base">
                     {p.day} {names.months[p.month - 1]}
                   </span>
                 </span>
                 {i === 0 && (
                   <span aria-hidden="true" className="pointer-events-none absolute -top-3.5 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                    <Badge className="px-2 leading-[1.4] ring-2 ring-cream">{t('checkout.earliest')}</Badge>
+                    <Badge className="px-2 leading-[1.4] ring-2 ring-cream [&:lang(kn)]:px-1.5 [&:lang(kn)]:text-[0.875rem]">{t('checkout.earliest')}</Badge>
                   </span>
                 )}
               </label>

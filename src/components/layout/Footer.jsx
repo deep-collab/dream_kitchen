@@ -11,7 +11,7 @@ import { FOOTER_NAV } from './nav'
 export default function Footer() {
   const { t } = useI18n()
   const year = new Date().getFullYear()
-  const link = 'inline-flex min-h-12 items-center text-cream underline-offset-4 transition-colors hover:text-gold-light hover:underline'
+  const link = 'inline-flex min-h-12 min-w-12 items-center text-cream underline-offset-4 transition-colors hover:text-gold-light hover:underline'
 
   return (
     <footer className="on-dark border-t border-gold/45 bg-ink text-muted">

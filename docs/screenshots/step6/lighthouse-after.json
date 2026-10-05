@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Home",
+    "path": "/",
+    "scores": {
+      "performance": 92,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 2944,
+    "tbt": 136,
+    "cls": 0.075,
+    "fcp": 1538,
+    "jsKb": 82,
+    "failing": [
+      "largest-contentful-paint (2.9 s)",
+      "max-potential-fid (190 ms)",
+      "largest-contentful-paint-element (2,940 ms)",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {},
+    "lcpElement": "<h1 aria-label=\"Dream Kitchen, Handmade Chocolates\" data-dk-hero=\"lockup\" class=\"dk-lockup dk-lockup--hero \">",
+    "perfRuns": [
+      92,
+      92,
+      93
+    ]
+  },
+  {
+    "name": "Menu",
+    "path": "/menu",
+    "scores": {
+      "performance": 91,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3053,
+    "tbt": 166,
+    "cls": 0,
+    "fcp": 1553,
+    "jsKb": 80,
+    "failing": [
+      "largest-contentful-paint (3.1 s)",
+      "max-potential-fid (210 ms)",
+      "largest-contentful-paint-element (3,050 ms)",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {},
+    "lcpElement": "<p class=\"t-small mt-1 text-brown-2\">",
+    "perfRuns": [
+      90,
+      91,
+      92
+    ]
+  },
+  {
+    "name": "Cart",
+    "path": "/cart",
+    "scores": {
+      "performance": 93,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 3063,
+    "tbt": 124,
+    "cls": 0,
+    "fcp": 1596,
+    "jsKb": 80,
+    "failing": [
+      "largest-contentful-paint (3.1 s)",
+      "max-potential-fid (170 ms)",
+      "largest-contentful-paint-element (3,060 ms)",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {},
+    "lcpElement": "<p class=\"t-small mt-3 text-brown-2\">",
+    "perfRuns": [
+      93,
+      93,
+      94
+    ]
+  },
+  {
+    "name": "Checkout",
+    "path": "/checkout",
+    "scores": {
+      "performance": 91,
+      "accessibility": 100,
+      "best-practices": 100,
+      "seo": 100
+    },
+    "lcp": 2753,
+    "tbt": 0,
+    "cls": 0,
+    "fcp": 2753,
+    "jsKb": 80,
+    "failing": [
+      "first-contentful-paint (2.8 s)",
+      "largest-contentful-paint (2.8 s)",
+      "largest-contentful-paint-element (2,750 ms)",
+      "render-blocking-resources (Est savings of 0 ms)",
+      "network-dependency-tree-insight",
+      "render-blocking-insight"
+    ],
+    "details": {},
+    "lcpElement": "<p id=\"co-email-hint\" class=\"t-small mt-2 text-brown-2\">",
+    "perfRuns": [
+      91,
+      91,
+      91
+    ]
+  }
+]

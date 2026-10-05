@@ -141,9 +141,10 @@ export default function kannadaSplit() {
     generateBundle() {
       if (fileName) this.emitFile({ type: 'asset', fileName, source: kannadaPayload(root) })
     },
-    transform(code, id) {
-      // Unit tests read the data files as written (both languages)
-      if (process.env.VITEST || !isData(id.split('?')[0])) return null
+    transform(code, id, options) {
+      // Unit tests and the server (the dev API loads the functions through Vite's SSR) read the
+      // data files as written: order records and emails need the Kannada names
+      if (process.env.VITEST || options?.ssr || !isData(id.split('?')[0])) return null
       return { code: stripKannada(code, id), map: null }
     },
   }

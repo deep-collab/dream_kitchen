@@ -1,0 +1,15 @@
+{
+  "label": "after",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "pages": {
+    "home": 2.15,
+    "menu": 4.54,
+    "sheet": 0.64,
+    "checkout": 2.74
+  },
+  "tapsToAddToCart": 3,
+  "errors": []
+}

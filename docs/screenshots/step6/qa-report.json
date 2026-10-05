@@ -1,0 +1,38 @@
+{
+  "overflow": [],
+  "textOverflow": [],
+  "smallTargets": [],
+  "focus": [],
+  "links": [],
+  "halfWritten": [],
+  "englishOnKannada": [],
+  "journey": [
+    "taps from opening the site to Add to cart: 3",
+    "order DK-261005-DHX6: confirmation shows \"submitted\"",
+    "confirmation after reload: DK-261005-DHX6",
+    "Track Order (other browser) after Shipped shows the courier: true",
+    "Track Order on another browser, step by step: placed -> payment_confirmed -> preparing -> shipped -> delivered",
+    "emails written to .dev-data/outbox: 2 (New-order-DK-261005-DHX6-639, Payment-to-check-DK-261005-DHX6-639)",
+    "class enquiry appears in admin: true (lang kn)"
+  ],
+  "security": [
+    "admin action without a login: 401",
+    "admin action with a forged token: 401",
+    "order lookup with the wrong phone: 404",
+    "order with a tampered price: 409 priceChanged",
+    "customer pages loaded admin code: false",
+    "/admin/orders without a login shows: the login form (orders list visible: false)"
+  ],
+  "loader": [
+    "first visit: shown true, gone 451 ms after first check (page time 961 ms)",
+    "second visit shows it: false",
+    "reduced motion shows it: false"
+  ],
+  "timing": {
+    "checkoutSteps": 13,
+    "checkoutSeconds": 14,
+    "note": "cart -> confirmation, typing at ~9 letters a second, waiting for each page"
+  },
+  "consoleErrors": [],
+  "failures": []
+}

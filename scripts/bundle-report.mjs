@@ -2,7 +2,7 @@
 // Needs `npm run build` and `npm run preview -- --port 4173`, then: node scripts/bundle-report.mjs [label]
 // For each page: every JS file the browser fetched, sized as gzip from dist (what a server
 // sends), and checks that an English visitor downloads no Kannada at all. Exits non-zero if not.
-// Writes docs/screenshots/step5/bundle-<label>.json.
+// Writes docs/screenshots/step6/bundle-<label>.json (DK_OUT to change).
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { gzipSync } from 'node:zlib'
 import { chromium } from 'playwright'
@@ -14,12 +14,13 @@ const label = process.argv[2] || 'after'
 const KANNADA = /[ಀ-೿]/g
 // The two places where Kannada must reach everyone (see docs/PROGRESS.md, Step 5)
 const ALLOWED_KANNADA = ['ಕನ್ನಡ'] // the language button's own label
-const PAGES = ['/', '/shop', '/product/ferrero-rocher-nutella-tub', '/cart', '/checkout', '/our-story', '/contact', '/faq', '/gallery', '/track', '/no-such-page']
+const PAGES = ['/', '/menu', '/customize', '/cart', '/checkout', '/classes', '/our-story', '/contact', '/faq', '/track', '/no-such-page']
+const OUT = process.env.DK_OUT || 'docs/screenshots/step6'
 const gz = (file) => gzipSync(readFileSync(`${DIST}${file}`)).length
 const kb = (n) => (n / 1024).toFixed(1)
 // JS, plus the Kannada JSON file (all Kannada text, fetched only for ಕನ್ನಡ readers)
 const isCode = (p) => p.endsWith('.js') || /\/assets\/kannada-[\w]+\.json$/.test(p)
-mkdirSync('docs/screenshots/step5', { recursive: true })
+mkdirSync(OUT, { recursive: true })
 
 const browser = await chromium.launch()
 const report = { label, english: [], kannada: [], problems: [] }
@@ -30,13 +31,13 @@ for (const lang of ['en', 'kn']) {
     await ctx.addInitScript((l) => {
       // The exact moment the page says it has rendered (before any idle prefetch starts)
       window.addEventListener('dk:ready', () => (window.__dkReadyAt = performance.now()), { once: true })
-      sessionStorage.setItem('dk_intro_seen', '1')
+      localStorage.setItem('dk_intro_seen', '1')
       if (l === 'kn') localStorage.setItem('dk_lang', 'kn')
     }, lang)
     if (path === '/cart' || path === '/checkout')
       await ctx.addInitScript(() => {
-        const line = { id: 'b1', kind: 'product', productId: 'oreo-overload-tub', slug: 'oreo-overload-tub', image: 'tub', name: { en: 'Oreo Overload' }, sectionName: null, selection: { size: '250g', flavour: null, nameOn: false, name: '', occasion: null, note: '' }, labels: { size: { en: '250g' }, flavour: null, occasion: null }, unitPrice: 399, qty: 1 }
-        localStorage.setItem('dk_cart_v2', JSON.stringify({ version: 2, lines: [line] }))
+        const line = { id: 'b1', productId: 'oreo-overload-tub', selection: { size: '250g', ragi: false, name: '', drawing: false, drawingText: '', drawingRef: null }, qty: 1, unitPrice: 399, name: { en: 'Oreo Overload Tub' }, art: 'tub' }
+        localStorage.setItem('dk_cart_v3', JSON.stringify({ version: 3, lines: [line] }))
       })
     const page = await ctx.newPage()
     const scripts = new Set()
@@ -60,6 +61,7 @@ for (const lang of ['en', 'kn']) {
       const text = readFileSync(`${DIST}${f}`, 'utf8')
       return (text.match(/[ಀ-೿]+/g) || []).some((w) => !ALLOWED_KANNADA.includes(w))
     })
+    if (all.some((f) => /admin/.test(f))) report.problems.push(`${path}: a customer page downloaded admin code`)
     const landed = new URL(page.url()).pathname
     const row = { path, landed, firstLoadKb: Number(kb(firstGz)), files: firstLoad.length, withPrefetchKb: Number(kb(allGz)), kannadaFiles }
     report[lang === 'en' ? 'english' : 'kannada'].push(row)
@@ -72,7 +74,7 @@ for (const lang of ['en', 'kn']) {
 }
 await browser.close()
 
-writeFileSync(`docs/screenshots/step5/bundle-${label}.json`, JSON.stringify(report, null, 2))
+writeFileSync(`${OUT}/bundle-${label}.json`, JSON.stringify(report, null, 2))
 for (const [name, rows] of [['English visitor', report.english], ['Kannada visitor', report.kannada]]) {
   console.log(`\n${name} (390px, cold): JS gzip`)
   console.log('page                                   first load   files   after idle prefetch   Kannada files')
