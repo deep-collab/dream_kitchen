@@ -1,0 +1,15 @@
+{
+  "label": "before",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "pages": {
+    "home": 9.43,
+    "menu": 12.34,
+    "sheet": 1.73,
+    "checkout": 5.45
+  },
+  "tapsToAddToCart": 3,
+  "errors": []
+}
