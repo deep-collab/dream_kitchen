@@ -6,12 +6,13 @@ import { useMenu, useShopStatus } from '../context/MenuProvider'
 import { useSeo } from '../hooks/useSeo'
 import { useCartQuote } from '../hooks/useCartQuote'
 import { states } from '../data/states'
-import { site } from '../config/site'
+import { site, waLink } from '../config/site'
 import { ordering } from '../config/shop'
 import { formatINR, zoneForPincode } from '../lib/pricing'
 import { dateChoices, dispatchRules, earliestDate, formatDay, latestDate, preferredDateError } from '../lib/dates'
 import { formatPhone } from '../lib/validation'
 import { lineChoices } from '../lib/lineText'
+import { cartOrderText } from '../lib/whatsappText'
 import { attemptKey, clearAttempt, clearDraft, loadDraft, rememberOrder, saveDraft } from '../lib/deviceStore'
 import { errorText } from '../lib/api'
 import { createOrder } from '../services'
@@ -93,6 +94,8 @@ export default function CheckoutReview() {
   const st = states.find((s) => s.id === form.state)
   const ready = remoteLoaded && canOrder
   const closed = remoteLoaded && !settings.store.open
+  // Open, but online ordering isn't set up yet (database or payment): order on WhatsApp instead
+  const viaWhatsApp = remoteLoaded && !canOrder && !closed
   const label = !remoteLoaded ? t('common.loading') : closed ? t('banner.closed') : !canOrder ? t('checkout.paymentsSoon') : placing ? t('checkout.placing') : t('checkout.placeOrder', { price: formatINR(q.total) })
 
   return (
@@ -181,10 +184,17 @@ export default function CheckoutReview() {
               <span>{error}</span>
             </p>
           )}
-          <TotalBar label={t('cart.total')} total={formatINR(q.total ?? q.subtotal)} note={closed ? t('errors.storeClosed', { phone: site.phone.display }) : remoteLoaded && !canOrder ? t('checkout.paymentsSoonText', { phone: site.phone.display }) : undefined}>
-            <Button size="lg" fullWidth onClick={onPlace} disabled={!ready || placing} aria-busy={placing || undefined} data-dk-place>
-              {label}
-            </Button>
+          <TotalBar label={t('cart.total')} total={formatINR(q.total ?? q.subtotal)} note={closed ? t('errors.storeClosed', { phone: site.phone.display }) : viaWhatsApp ? t('checkout.paymentsSoonText') : undefined}>
+            {viaWhatsApp ? (
+              <Button variant="whatsapp" size="lg" fullWidth href={waLink(cartOrderText(cart.lines, menu.productsById))} data-dk-whatsapp-order>
+                {t('checkout.orderWhatsApp')}
+                <span className="sr-only"> {t('common.newTab')}</span>
+              </Button>
+            ) : (
+              <Button size="lg" fullWidth onClick={onPlace} disabled={!ready || placing} aria-busy={placing || undefined} data-dk-place>
+                {label}
+              </Button>
+            )}
           </TotalBar>
         </aside>
       </div>

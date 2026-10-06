@@ -8,11 +8,11 @@
   "englishOnKannada": [],
   "journey": [
     "taps from opening the site to Add to cart: 3",
-    "order DK-261006-RKHK: confirmation shows \"submitted\"",
-    "confirmation after reload: DK-261006-RKHK",
+    "order DK-261006-7GAQ: confirmation shows \"submitted\"",
+    "confirmation after reload: DK-261006-7GAQ",
     "Track Order (other browser) after Shipped shows the courier: true",
     "Track Order on another browser, step by step: placed -> payment_confirmed -> preparing -> shipped -> delivered",
-    "emails written to .dev-data/outbox: 2 (New-order-DK-261006-RKHK-639, Payment-to-check-DK-261006-RKHK-639)",
+    "emails written to .dev-data/outbox: 2 (New-order-DK-261006-7GAQ-639, Payment-to-check-DK-261006-7GAQ-639)",
     "class enquiry appears in admin: true (lang kn)"
   ],
   "security": [
@@ -24,7 +24,7 @@
     "/admin/orders without a login shows: the login form (orders list visible: false)"
   ],
   "loader": [
-    "first visit: shown false, gone 27 ms after first check (page time 206 ms)",
+    "first visit: shown false, gone 15 ms after first check (page time 994 ms)",
     "second visit shows it: false",
     "reduced motion shows it: false"
   ],

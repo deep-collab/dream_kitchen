@@ -109,7 +109,7 @@
     },
     "classes": {
       "title": "Chocolate classes | Dream Kitchen",
-      "desc": "Chocolate classes with Hema. Details are coming soon: send an enquiry and she will contact you."
+      "desc": "Chocolate classes with Hema: Basic, Advanced and Brownie. A 2-day class every Saturday and Sunday. Book on WhatsApp."
     },
     "story": {
       "title": "Our story | Dream Kitchen",
@@ -310,7 +310,8 @@
     "placeOrder": "Place order and pay {price}",
     "placing": "Placing your order…",
     "paymentsSoon": "Payments open soon",
-    "paymentsSoonText": "Online orders open very soon. To order today, call {phone}.",
+    "paymentsSoonText": "Online ordering opens soon – order on WhatsApp.",
+    "orderWhatsApp": "Order on WhatsApp",
     "errors": {
       "name": {
         "required": "Write your name.",
@@ -417,6 +418,8 @@
   "track": {
     "title": "Track your order",
     "lead": "Enter your order ID and the mobile number you ordered with. Works on any phone.",
+    "soon": "Order tracking coming soon. WhatsApp us for your order status.",
+    "whatsapp": "WhatsApp us",
     "orderId": "Order ID",
     "orderIdHint": "It starts with DK, like DK‑261007‑7Q4M.",
     "phone": "Mobile number",
@@ -478,16 +481,16 @@
   },
   "classes": {
     "title": "Chocolate classes with Hema",
-    "lead": "Class details are coming soon. Send an enquiry and Hema will contact you.",
-    "soon": "Details coming soon",
+    "lead": "Learn with Hema in a 2-day class, every Saturday and Sunday. Pick a class and book it on WhatsApp.",
     "sections": {
-      "learn": "What you’ll learn",
+      "when": "When",
       "duration": "Duration",
-      "fee": "Fee",
-      "batch": "Batch size",
-      "dates": "Upcoming dates",
-      "bring": "What to bring"
+      "slots": "Time slots"
     },
+    "choose": "Choose a class",
+    "cardTitle": "{name} class",
+    "beginner": "Beginner friendly",
+    "bookWhatsApp": "Book on WhatsApp",
     "formTitle": "Send an enquiry",
     "name": "Your name",
     "phone": "Mobile number",
@@ -607,9 +610,9 @@
     "network": "No internet connection. Please check it and try again.",
     "server": "Something went wrong on our side. Please try again, or call {phone}.",
     "tooMany": "Too many tries in a short time. Please wait a few minutes, or call {phone}.",
-    "notReady": "Online orders open very soon. To order today, call {phone}.",
+    "notReady": "Online ordering opens soon – order on WhatsApp.",
     "storeClosed": "Orders are paused for now. Please try again later, or call {phone}.",
-    "paymentsClosed": "Payments open soon. To order today, call {phone}.",
+    "paymentsClosed": "Online ordering opens soon – order on WhatsApp.",
     "priceChanged": "Some prices have just changed. Please check your cart.",
     "items": "Something in your cart can’t be ordered right now. Please check your cart.",
     "dispatchDate": "That dispatch date isn’t available any more. Please pick another.",

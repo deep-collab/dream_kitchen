@@ -28,7 +28,7 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - **`src/lib/pricing.js`**: the one pricing module (unit prices, options, courier zone/tier/charge, Hema's admin overrides and settings, UPI link, UTR). Imported by the website **and** every server function, so totals can never disagree.
 - `src/lib/dates.js` (dispatch dates, IST), `src/lib/checkout.js` (customer details), `src/lib/enquiry.js` (class enquiry): shared by site and server too.
 - Hema's admin changes live in Supabase (`products` / `settings` override columns, NULL = config) and are applied by `applyOverrides` / `applySettings` on both sides.
-- Text: `src/i18n/en.json` + `kn.json` (customer pages, both languages); `netlify/lib/emailText.mjs` (customer emails); admin text is English, in `src/admin`. Business details: `src/config/site.js`. Class page text: `src/data/classInfo.js`.
+- Text: `src/i18n/en.json` + `kn.json` (customer pages, both languages); `netlify/lib/emailText.mjs` (customer emails); admin text is English, in `src/admin`. Business details: `src/config/site.js`. Class details (days, slots, the three classes and prices): `src/data/classInfo.js`.
 
 ## The menu (Hema's, exactly; never invent prices, weights, ingredients or claims)
 - Brownie Tubs: Ferrero Rocher Nutella, Lotus Biscoff, Red Velvet White Chocolate, Oreo Overload (prices kept from her first menu, TO CONFIRM), Dream Cake Tub ("Price coming soon").
@@ -46,9 +46,13 @@ then the 12-digit UTR, optional screenshot) → Confirmation (works after reload
 payment in /admin. Track Order works on any device with order ID + phone:
 Placed → Payment confirmed → Preparing → Shipped (courier + tracking) → Delivered; Cancelled shown apart.
 Order IDs `DK-YYMMDD-XXXX` (IST date + 4 characters, unique in the database).
-WhatsApp (Hema, 7 Oct 2026): the home hero's "Order on WhatsApp" (message typed in: `site.whatsappOrderText`)
-and a plain "Chat on WhatsApp" on Contact, nowhere else. No Call buttons or tel: links on customer pages;
-the number is plain text on Contact (Hema's admin keeps Call / WhatsApp-the-customer).
+WhatsApp (Hema, 7 Oct 2026): the home hero's "Order on WhatsApp" (message typed in: `site.whatsappOrderText`),
+"Chat on WhatsApp" on Contact, and "Book on WhatsApp" on each class card. While the database isn't connected
+(`/api/menu` → `ready: false`, `backendReady` in MenuProvider): Track Order shows "coming soon" + WhatsApp
+instead of its form, the class enquiry form is hidden, and the cart and checkout review say "Online ordering
+opens soon – order on WhatsApp" with a WhatsApp button carrying the cart (`src/lib/whatsappText.js`).
+No Call buttons or tel: links on customer pages; the number is plain text on Contact (Hema's admin keeps
+Call / WhatsApp-the-customer).
 
 ## Brand and look (unchanged)
 Black #0F0F0F, gold #C9A227 + gradient (#EBD27A → #D4AF37 → #B8901E), champagne #F3E7CF, cream #FFF9EF,

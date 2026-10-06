@@ -67,7 +67,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Delivery time depends on the courier after dispatch. | ಕಳುಹಿಸಿದ ನಂತರ ತಲುಪುವ ಸಮಯ ಕೊರಿಯರ್ ಮೇಲೆ ಅವಲಂಬಿತ. | |
 | Place order and pay ₹1,700 | ಆರ್ಡರ್ ಮಾಡಿ, ₹1,700 ಪಾವತಿಸಿ | |
 | Payments open soon | ಪಾವತಿ ಶೀಘ್ರದಲ್ಲೇ ಆರಂಭ | |
-| Online orders open very soon. To order today, call +91 95357 06956. | ಆನ್‌ಲೈನ್ ಆರ್ಡರ್ ಶೀಘ್ರದಲ್ಲೇ ಆರಂಭವಾಗುತ್ತದೆ. ಇಂದೇ ಆರ್ಡರ್ ಮಾಡಲು +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Online ordering opens soon – order on WhatsApp. | ಆನ್‌ಲೈನ್ ಆರ್ಡರ್ ಶೀಘ್ರದಲ್ಲೇ ಆರಂಭ – ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡಿ. | |
 | **Paying by UPI** | | |
 | Pay ₹1,700 | ₹1,700 ಪಾವತಿಸಿ | |
 | Order DK-261005-7Q4M is saved. Pay to confirm it. | ಆರ್ಡರ್ DK-261005-7Q4M ಉಳಿಸಲಾಗಿದೆ. ದೃಢೀಕರಿಸಲು ಪಾವತಿಸಿ. | |
@@ -95,17 +95,25 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Payment submitted. Hema will check it, usually within a few hours. | ಪಾವತಿ ಕಳುಹಿಸಲಾಗಿದೆ. ಹೇಮಾ ಅವರು ಸಾಮಾನ್ಯವಾಗಿ ಕೆಲವು ಗಂಟೆಗಳಲ್ಲಿ ಪರಿಶೀಲಿಸುತ್ತಾರೆ. | |
 | Tracking number | ಟ್ರ್ಯಾಕಿಂಗ್ ಸಂಖ್ಯೆ | |
 | This order was cancelled | ಈ ಆರ್ಡರ್ ರದ್ದಾಗಿದೆ | |
-| **Class enquiry** | | |
-| Class details are coming soon. Send an enquiry and Hema will contact you. | ತರಗತಿಯ ವಿವರಗಳು ಶೀಘ್ರದಲ್ಲೇ. ವಿಚಾರಣೆ ಕಳುಹಿಸಿ, ಹೇಮಾ ಅವರು ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತಾರೆ. | |
-| Details coming soon | ವಿವರಗಳು ಶೀಘ್ರದಲ್ಲೇ | |
+| **Classes** | | |
+| Learn with Hema in a 2-day class, every Saturday and Sunday. Pick a class and book it on WhatsApp. | ಹೇಮಾ ಅವರೊಂದಿಗೆ 2 ದಿನಗಳ ತರಗತಿ, ಪ್ರತಿ ಶನಿವಾರ ಮತ್ತು ಭಾನುವಾರ. ತರಗತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ, ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಬುಕ್ ಮಾಡಿ. | |
+| Choose a class | ತರಗತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ | |
+| Asha class | Asha ತರಗತಿ | |
+| Beginner friendly | ಆರಂಭಿಕರಿಗೆ ಸೂಕ್ತ | |
+| Book on WhatsApp | ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಬುಕ್ ಮಾಡಿ | |
 | Send an enquiry | ವಿಚಾರಣೆ ಕಳುಹಿಸಿ | |
 | Which class, or what would you like to learn? | ಯಾವ ತರಗತಿ, ಅಥವಾ ಏನು ಕಲಿಯಲು ಇಷ್ಟ? | |
 | Send enquiry | ವಿಚಾರಣೆ ಕಳುಹಿಸಿ | |
 | Thank you! Your enquiry is sent | ಧನ್ಯವಾದಗಳು! ನಿಮ್ಮ ವಿಚಾರಣೆ ಕಳುಹಿಸಲಾಗಿದೆ | |
+| **While online ordering is not open** | | |
+| Online ordering opens soon – order on WhatsApp. | ಆನ್‌ಲೈನ್ ಆರ್ಡರ್ ಶೀಘ್ರದಲ್ಲೇ ಆರಂಭ – ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡಿ. | |
+| Order on WhatsApp | ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡಿ | |
+| Order tracking coming soon. WhatsApp us for your order status. | ಆರ್ಡರ್ ಸ್ಥಿತಿ ನೋಡುವ ಸೌಲಭ್ಯ ಶೀಘ್ರದಲ್ಲೇ. ನಿಮ್ಮ ಆರ್ಡರ್ ಸ್ಥಿತಿಗಾಗಿ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
+| WhatsApp us | ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ | |
 | **When something goes wrong** | | |
 | No internet connection. Please check it and try again. | ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವಿಲ್ಲ. ದಯವಿಟ್ಟು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. | |
 | Some prices have just changed. Please check your cart. | ಕೆಲವು ಬೆಲೆಗಳು ಈಗಷ್ಟೇ ಬದಲಾಗಿವೆ. ದಯವಿಟ್ಟು ನಿಮ್ಮ ಕಾರ್ಟ್ ಪರಿಶೀಲಿಸಿ. | |
-| Payments open soon. To order today, call +91 95357 06956. | ಪಾವತಿ ಶೀಘ್ರದಲ್ಲೇ ಆರಂಭ. ಇಂದೇ ಆರ್ಡರ್ ಮಾಡಲು +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Online ordering opens soon – order on WhatsApp. | ಆನ್‌ಲೈನ್ ಆರ್ಡರ್ ಶೀಘ್ರದಲ್ಲೇ ಆರಂಭ – ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡಿ. | |
 | **Emails customers receive** | | |
 | Your Dream Kitchen order DK-261005-7Q4M | ನಿಮ್ಮ Dream Kitchen ಆರ್ಡರ್ DK-261005-7Q4M | |
 | Hi Asha, thank you for your order! | ನಮಸ್ಕಾರ Asha, ನಿಮ್ಮ ಆರ್ಡರ್‌ಗೆ ಧನ್ಯವಾದಗಳು! | |
@@ -130,7 +138,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Drawing | ಚಿತ್ರ | |
 | With love, Hema, Dream Kitchen | ಪ್ರೀತಿಯಿಂದ, ಹೇಮಾ, Dream Kitchen | |
 
-## Later, if you have time (424 more)
+## Later, if you have time (421 more)
 
 ### Logo and tagline
 
@@ -251,7 +259,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Customize \| Dream Kitchen | ಕಸ್ಟಮೈಸ್ \| Dream Kitchen | |
 | A name or a drawing on your Delight Box, or a Drawing Chocolate Bar made just for you. | ನಿಮ್ಮ ಡಿಲೈಟ್ ಬಾಕ್ಸ್ ಮೇಲೆ ಹೆಸರು ಅಥವಾ ಚಿತ್ರ, ಅಥವಾ ನಿಮಗಾಗಿಯೇ ಮಾಡಿದ ಡ್ರಾಯಿಂಗ್ ಚಾಕೊಲೇಟ್ ಬಾರ್. | |
 | Chocolate classes \| Dream Kitchen | ಚಾಕೊಲೇಟ್ ತರಗತಿಗಳು \| Dream Kitchen | |
-| Chocolate classes with Hema. Details are coming soon: send an enquiry and she will contact you. | ಹೇಮಾ ಅವರೊಂದಿಗೆ ಚಾಕೊಲೇಟ್ ತರಗತಿಗಳು. ವಿವರಗಳು ಶೀಘ್ರದಲ್ಲೇ: ವಿಚಾರಣೆ ಕಳುಹಿಸಿ, ಹೇಮಾ ಅವರು ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತಾರೆ. | |
+| Chocolate classes with Hema: Basic, Advanced and Brownie. A 2-day class every Saturday and Sunday. Book on WhatsApp. | ಹೇಮಾ ಅವರೊಂದಿಗೆ ಚಾಕೊಲೇಟ್ ತರಗತಿಗಳು: ಬೇಸಿಕ್, ಅಡ್ವಾನ್ಸ್ಡ್ ಮತ್ತು ಬ್ರೌನಿ. ಪ್ರತಿ ಶನಿವಾರ ಮತ್ತು ಭಾನುವಾರ 2 ದಿನಗಳ ತರಗತಿ. ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಬುಕ್ ಮಾಡಿ. | |
 | Our story \| Dream Kitchen | ನಮ್ಮ ಕಥೆ \| Dream Kitchen | |
 | How Hema started Dream Kitchen as a student with ₹2,500 and grew it into a loved home brand. | ಹೇಮಾ ಅವರು ವಿದ್ಯಾರ್ಥಿನಿಯಾಗಿದ್ದಾಗ ₹2,500 ರಿಂದ Dream Kitchen ಆರಂಭಿಸಿ ಜನಮೆಚ್ಚಿದ ಮನೆಯ ಬ್ರ್ಯಾಂಡ್ ಆಗಿ ಬೆಳೆಸಿದ ಕಥೆ. | |
 | Contact \| Dream Kitchen | ಸಂಪರ್ಕ \| Dream Kitchen | |
@@ -499,12 +507,9 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | English | ಕನ್ನಡ | Correct? |
 |---|---|---|
 | Chocolate classes with Hema | ಹೇಮಾ ಅವರೊಂದಿಗೆ ಚಾಕೊಲೇಟ್ ತರಗತಿಗಳು | |
-| What you’ll learn | ನೀವು ಕಲಿಯುವುದು | |
+| When | ಯಾವಾಗ | |
 | Duration | ಅವಧಿ | |
-| Fee | ಶುಲ್ಕ | |
-| Batch size | ತಂಡದ ಗಾತ್ರ | |
-| Upcoming dates | ಮುಂದಿನ ದಿನಾಂಕಗಳು | |
-| What to bring | ತರಬೇಕಾದದ್ದು | |
+| Time slots | ಸಮಯ | |
 | Your name | ನಿಮ್ಮ ಹೆಸರು | |
 | Mobile number | ಮೊಬೈಲ್ ಸಂಖ್ಯೆ | |
 | For example: chocolate making for beginners. | ಉದಾ: ಆರಂಭಿಕರಿಗೆ ಚಾಕೊಲೇಟ್ ತಯಾರಿಕೆ. | |
@@ -596,7 +601,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 |---|---|---|
 | Something went wrong on our side. Please try again, or call +91 95357 06956. | ನಮ್ಮ ಕಡೆ ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
 | Too many tries in a short time. Please wait a few minutes, or call +91 95357 06956. | ಕಡಿಮೆ ಸಮಯದಲ್ಲಿ ತುಂಬಾ ಪ್ರಯತ್ನಗಳು. ದಯವಿಟ್ಟು ಕೆಲವು ನಿಮಿಷ ಕಾಯಿರಿ, ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
-| Online orders open very soon. To order today, call +91 95357 06956. | ಆನ್‌ಲೈನ್ ಆರ್ಡರ್ ಶೀಘ್ರದಲ್ಲೇ ಆರಂಭವಾಗುತ್ತದೆ. ಇಂದೇ ಆರ್ಡರ್ ಮಾಡಲು +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Online ordering opens soon – order on WhatsApp. | ಆನ್‌ಲೈನ್ ಆರ್ಡರ್ ಶೀಘ್ರದಲ್ಲೇ ಆರಂಭ – ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡಿ. | |
 | Orders are paused for now. Please try again later, or call +91 95357 06956. | ಸದ್ಯಕ್ಕೆ ಆರ್ಡರ್‌ಗಳನ್ನು ನಿಲ್ಲಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
 | Something in your cart can’t be ordered right now. Please check your cart. | ನಿಮ್ಮ ಕಾರ್ಟ್‌ನಲ್ಲಿರುವ ಒಂದು ವಸ್ತುವನ್ನು ಈಗ ಆರ್ಡರ್ ಮಾಡಲು ಆಗುವುದಿಲ್ಲ. ದಯವಿಟ್ಟು ಕಾರ್ಟ್ ಪರಿಶೀಲಿಸಿ. | |
 | That dispatch date isn’t available any more. Please pick another. | ಆ ಕಳುಹಿಸುವ ದಿನಾಂಕ ಈಗ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಬೇರೆ ಆರಿಸಿ. | |

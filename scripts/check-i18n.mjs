@@ -42,7 +42,7 @@ const runtime = [
   ...codes('classes.errors.phone', ['required', 'invalid']),
   ...codes('classes.errors.interest', ['required', 'long']),
   'classes.errors.dates.long', 'classes.errors.message.long',
-  ...codes('classes.sections', ['learn', 'duration', 'fee', 'batch', 'dates', 'bring']),
+  ...codes('classes.sections', ['when', 'duration', 'slots']),
   ...['start', 'fresh', 'teach'].flatMap((k) => [`story.${k}.title`, `story.${k}.text`]),
   ...['order', 'pay', 'courier', 'when', 'track', 'name', 'ragi', 'change'].flatMap((k) => [`faq.items.${k}.q`, `faq.items.${k}.a`]),
   // src/lib/api.js errorText()

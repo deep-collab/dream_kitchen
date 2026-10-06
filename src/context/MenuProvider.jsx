@@ -36,6 +36,8 @@ export function MenuProvider({ children }) {
       settings,
       refresh,
       remoteLoaded: remote !== undefined,
+      // The database is connected (/api/menu says ready). Until then, forms that need it are hidden
+      backendReady: remote?.ready === true,
       // Orders can be placed: the server is set up, the shop is open, and there is a way to pay
       canOrder: Boolean(remote?.ready && settings.store.open && (settings.payment.upiId || remote?.razorpay?.enabled)),
       razorpay: remote?.razorpay || { enabled: false },
@@ -47,8 +49,8 @@ export function MenuProvider({ children }) {
 /** { categories, products (on the menu, in order), productsById (all, for the cart check) } */
 export const useMenu = () => useContext(MenuContext).menu
 
-/** Hema's settings (courier rates, lead times, UPI, store open, banner), and whether ordering is open */
+/** Hema's settings (courier rates, lead times, UPI, store open, banner), whether the database is connected, and whether ordering is open */
 export function useShopStatus() {
-  const { settings, refresh, remoteLoaded, canOrder, razorpay } = useContext(MenuContext)
-  return { settings, refresh, remoteLoaded, canOrder, razorpay }
+  const { settings, refresh, remoteLoaded, backendReady, canOrder, razorpay } = useContext(MenuContext)
+  return { settings, refresh, remoteLoaded, backendReady, canOrder, razorpay }
 }

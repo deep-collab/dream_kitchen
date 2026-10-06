@@ -2,6 +2,12 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 7 Oct 2026: classes, and the site without a database
+- [x] Classes: Hema's details (every Saturday and Sunday, 2-day class, 9–11 AM or 12–2 PM) and 3 cards: Basic ₹2,500, Advanced ₹3,500, Brownie ₹3,500 (beginner friendly), each "Book on WhatsApp" ("Hi, I'd like to book the <class> class"). Empty rows removed. "Book a class" on Home lands on the cards
+- [x] Until the database keys are set (`/api/menu` → ready: false): Track Order shows "Order tracking coming soon. WhatsApp us for your order status." + WhatsApp; the class enquiry form is hidden; the cart and checkout review show "Online ordering opens soon – order on WhatsApp." and a WhatsApp button with the cart typed in (instead of Checkout / Place order)
+- [x] Checked with no database (390/1280 × EN/KN, every page: no errors, no failing /api calls, nothing clipped) and with the mock database (qa-step6 clean, enquiry form and Track Order work)
+- New Kannada for Hema to check: class days/slots/names, the cards, Track "coming soon", the "opens soon" line
+
 ## 7 Oct 2026: home hero buttons, no Call
 - [x] Hero: "Order now" (menu) + "Order on WhatsApp" (wa.me, "Hi Dream Kitchen, I'd like to place an order.") + "Book a class" (/classes#book lands on the enquiry form). Phones: Order now full width, the other two side by side (48px); desktop: one row. Hero height unchanged at 390px (466 EN / 468 KN) and 1280px
 - [x] Call buttons and tel: links removed from customer pages (header, footer, product sheet, Contact, order confirmed, 404); the number is plain text on Contact. Contact texts updated; tests and qa-step6 enforce the new rule

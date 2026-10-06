@@ -26,9 +26,41 @@ describe('WhatsApp and Call (Hema, 7 Oct 2026)', () => {
   const customerFiles = srcFiles.filter((f) => !/[\\/]admin[\\/]/.test(f))
   const using = (re) => customerFiles.filter((f) => re.test(read(f))).map((f) => f.replaceAll('\\', '/')).sort()
 
-  it('WhatsApp only on the home hero ("Order on WhatsApp") and the Contact page (plus the Button helper)', () => {
+  it('WhatsApp only where Hema asked: home hero, Contact, class cards, and Track / cart / review while the database is not connected', () => {
     // Hema's admin may also WhatsApp a customer (brief 6.2)
-    expect(using(/waLink\(|wa\.me/)).toEqual(['src/components/home/Hero.jsx', 'src/components/ui/Button.jsx', 'src/config/site.js', 'src/pages/Contact.jsx'])
+    expect(using(/waLink\(|wa\.me/)).toEqual([
+      'src/components/home/Hero.jsx',
+      'src/components/ui/Button.jsx',
+      'src/config/site.js',
+      'src/pages/Cart.jsx',
+      'src/pages/CheckoutReview.jsx',
+      'src/pages/Classes.jsx',
+      'src/pages/Contact.jsx',
+      'src/pages/Track.jsx',
+    ])
+  })
+
+  it('class cards: Hema\'s three classes, prices and booking message', async () => {
+    const { classes, classSchedule } = await import('../src/data/classInfo.js')
+    const { classBookingText } = await import('../src/lib/whatsappText.js')
+    expect(classes.map((c) => [c.name.en, c.price, Boolean(c.beginnerFriendly)])).toEqual([
+      ['Basic', 2500, false],
+      ['Advanced', 3500, false],
+      ['Brownie', 3500, true],
+    ])
+    expect(classBookingText(classes[0])).toBe("Hi, I'd like to book the Basic class")
+    expect(classSchedule.slots.en).toBe('9–11 AM or 12–2 PM')
+    expect(en.checkout.paymentsSoonText).toBe('Online ordering opens soon – order on WhatsApp.')
+  })
+
+  it('the cart WhatsApp message lists every item in English', async () => {
+    const { cartOrderText } = await import('../src/lib/whatsappText.js')
+    const box = products.find((p) => p.id === 'red-velvet-delight-box')
+    const text = cartOrderText(
+      [{ productId: box.id, qty: 2, selection: { size: '500g', name: 'Amma' }, name: box.name }],
+      { [box.id]: box },
+    )
+    expect(text).toBe(`Hi Dream Kitchen, I'd like to place an order.\n- 2 x Red Velvet Delight Box (500 g, name on the box: "Amma")`)
   })
 
   it('the hero types in exactly the message Hema asked for', async () => {

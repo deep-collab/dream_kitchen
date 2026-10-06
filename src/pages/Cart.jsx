@@ -5,9 +5,10 @@ import { useMenu, useShopStatus } from '../context/MenuProvider'
 import { useSeo } from '../hooks/useSeo'
 import { useCartQuote } from '../hooks/useCartQuote'
 import { limits } from '../config/shop'
-import { site } from '../config/site'
+import { site, waLink } from '../config/site'
 import { formatINR } from '../lib/pricing'
 import { lineChoices } from '../lib/lineText'
+import { cartOrderText } from '../lib/whatsappText'
 import Container from '../components/ui/Container'
 import Button from '../components/ui/Button'
 import QuantityStepper from '../components/ui/QuantityStepper'
@@ -28,6 +29,9 @@ export default function Cart() {
   const { t } = useI18n()
   const cart = useCart()
   const { settings, canOrder, remoteLoaded } = useShopStatus()
+  const menu = useMenu()
+  // The shop is open but online ordering isn't (database or payment not set up yet): WhatsApp instead
+  const viaWhatsApp = remoteLoaded && !canOrder && settings.store.open
   const q = useCartQuote(null)
   const blocked = cart.unavailableIds.length > 0
   const r = settings.courier.rates
@@ -63,7 +67,7 @@ export default function Cart() {
           <p className="t-small mt-2 text-brown-2">{t('cart.dispatch', { days: settings.leadTimes.standardBusinessDays })}</p>
           {remoteLoaded && !canOrder && (
             <Notice icon={InfoIcon} className="mt-4">
-              <p>{settings.store.open ? t('checkout.paymentsSoonText', { phone: site.phone.display }) : t('errors.storeClosed', { phone: site.phone.display })}</p>
+              <p>{settings.store.open ? t('checkout.paymentsSoonText') : t('errors.storeClosed', { phone: site.phone.display })}</p>
             </Notice>
           )}
           {blocked && (
@@ -72,9 +76,16 @@ export default function Cart() {
             </p>
           )}
           <TotalBar label={t('cart.total')} total={t('cart.totalPlusCourier', { price: formatINR(q.subtotal) })}>
-            <Button to={blocked ? undefined : '/checkout'} size="lg" fullWidth disabled={blocked} aria-describedby={blocked ? 'cart-blocked' : undefined} data-dk-continue>
-              {t('cart.checkout')}
-            </Button>
+            {viaWhatsApp ? (
+              <Button variant="whatsapp" size="lg" fullWidth href={waLink(cartOrderText(cart.lines, menu.productsById))} data-dk-whatsapp-order>
+                {t('checkout.orderWhatsApp')}
+                <span className="sr-only"> {t('common.newTab')}</span>
+              </Button>
+            ) : (
+              <Button to={blocked ? undefined : '/checkout'} size="lg" fullWidth disabled={blocked} aria-describedby={blocked ? 'cart-blocked' : undefined} data-dk-continue>
+                {t('cart.checkout')}
+              </Button>
+            )}
           </TotalBar>
         </aside>
       </div>

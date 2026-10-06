@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
-import { site } from '../config/site'
+import { site, waLink } from '../config/site'
+import { useShopStatus } from '../context/MenuProvider'
+import { orderStatusText } from '../lib/whatsappText'
 import { normaliseOrderId, orderIdError } from '../lib/orderId'
 import { phoneError, tidyPhoneInput } from '../lib/validation'
 import { myOrders, phoneForOrder, rememberOrder } from '../lib/deviceStore'
@@ -16,12 +18,42 @@ import { AlertIcon } from '../components/icons'
 import 'virtual:dk-strings/track'
 
 /**
+ * Track Order. Until the database is connected there are no orders to look up, so the page says
+ * tracking is coming soon and offers WhatsApp instead of the form (nothing can fail).
+ */
+export default function Track() {
+  useSeo('track')
+  const { t } = useI18n()
+  const { remoteLoaded, backendReady } = useShopStatus()
+  if (remoteLoaded && backendReady) return <TrackForm />
+  return (
+    <Container className="py-6 lg:py-10">
+      <div className="max-w-2xl">
+        <h1 className="t-h2">{t('track.title')}</h1>
+        {remoteLoaded ? (
+          <div className="mt-5 rounded-card bg-champagne p-5" data-dk-track-soon>
+            <p className="font-bold">{t('track.soon')}</p>
+            <Button variant="whatsapp" size="lg" href={waLink(orderStatusText)} className="mt-4 w-full sm:w-auto">
+              {t('track.whatsapp')}
+              <span className="sr-only"> {t('common.newTab')}</span>
+            </Button>
+          </div>
+        ) : (
+          <p role="status" className="mt-5 text-brown-2">
+            {t('common.loading')}
+          </p>
+        )}
+      </div>
+    </Container>
+  )
+}
+
+/**
  * Track Order on any phone: the order ID AND the phone number it was placed with (the server
  * needs both, so nobody can look up someone else's order). The ID can come from the link in the
  * confirmation email (?id=); on the phone that placed it, the number is filled in too.
  */
-export default function Track() {
-  useSeo('track')
+function TrackForm() {
   const { t } = useI18n()
   const [params] = useSearchParams()
   const initialId = normaliseOrderId(params.get('id') || myOrders()[0]?.code || '')

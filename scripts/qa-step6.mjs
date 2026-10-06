@@ -88,9 +88,10 @@ async function audit(page, label) {
   if (r.overflow) report.overflow.push(label)
   r.small.forEach((s) => report.smallTargets.push(`${label}: ${s}`))
   r.clipped.forEach((s) => report.textOverflow.push(`${label}: ${s}`))
-  // Hema, 7 Oct 2026: no Call links on customer pages; WhatsApp only on Home ("Order on WhatsApp") and Contact
+  // Hema, 7 Oct 2026: no Call links on customer pages; WhatsApp only on Home, Contact and the class cards
+  // (with the database connected, as here; Track, cart and review add WhatsApp only without it)
   r.tel.forEach((h) => report.links.push(`${label}: Call link ${h}`))
-  if (r.wa && !/-(home|contact)$/.test(label)) report.links.push(`${label}: WhatsApp link outside Home and Contact`)
+  if (r.wa && !/-(home|contact|classes)$/.test(label)) report.links.push(`${label}: WhatsApp link outside Home, Contact and Classes`)
 }
 
 // Half-written text, and English left on a Kannada page

@@ -46,7 +46,8 @@ const PRIORITY = [
   ['Checkout: review', ['checkout.reviewTitle', 'checkout.deliverTo', 'checkout.courierTo', 'checkout.dispatchTitle', 'checkout.dispatchHintDrawing', 'checkout.courierNote', 'checkout.placeOrder', 'checkout.paymentsSoon', 'checkout.paymentsSoonText']],
   ['Paying by UPI', ['pay.title', 'pay.orderSaved', 'pay.scan', 'pay.app', 'pay.copyUpi', 'pay.amountNote', 'pay.afterTitle', 'pay.utr', 'pay.utrHint', 'pay.screenshot', 'pay.submit', 'pay.check', 'pay.errors.utr.format']],
   ['After ordering, and Track Order', ['order.title', 'order.keep', 'order.paymentStatus.pending', 'order.paymentStatus.submitted', 'order.paymentStatus.confirmed', 'track.lead', 'track.steps.placed', 'track.steps.payment_confirmed', 'track.steps.shipped', 'track.awaitingCheck', 'track.trackingNo', 'track.cancelled']],
-  ['Class enquiry', ['classes.lead', 'classes.soon', 'classes.formTitle', 'classes.interest', 'classes.send', 'classes.sentTitle']],
+  ['Classes', ['classes.lead', 'classes.choose', 'classes.cardTitle', 'classes.beginner', 'classes.bookWhatsApp', 'classes.formTitle', 'classes.interest', 'classes.send', 'classes.sentTitle']],
+  ['While online ordering is not open', ['checkout.paymentsSoonText', 'checkout.orderWhatsApp', 'track.soon', 'track.whatsapp']],
   ['When something goes wrong', ['errors.network', 'errors.priceChanged', 'errors.paymentsClosed']],
 ]
 const part1 = ['| English | ಕನ್ನಡ | Correct? |', '|---|---|---|']
