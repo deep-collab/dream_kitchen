@@ -99,14 +99,9 @@ export default function OrderConfirmed() {
           <OrderItems order={order} />
         </section>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <Button to={`/track?id=${order.code}`} icon={TrackIcon} size="lg">
-            {t('order.track')}
-          </Button>
-          <Button variant="call" size="lg">
-            {t('common.callUs')}
-          </Button>
-        </div>
+        <Button to={`/track?id=${order.code}`} icon={TrackIcon} size="lg" className="mt-6 w-full sm:w-auto">
+          {t('order.track')}
+        </Button>
       </div>
     </Container>
   )

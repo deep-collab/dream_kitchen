@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
-import { hasCallHours, site, telLink, waLink } from '../config/site'
+import { hasCallHours, site, waLink } from '../config/site'
 import { formatCallHours } from '../lib/hours'
 import Container from '../components/ui/Container'
-import { ClockIcon, InstagramIcon, MailIcon, PhoneIcon, WhatsAppIcon } from '../components/icons'
+import { ClockIcon, InstagramIcon, MailIcon, WhatsAppIcon } from '../components/icons'
 import 'virtual:dk-strings/contact'
 
 /**
@@ -23,15 +23,6 @@ export default function Contact() {
         <p className="mt-1 text-brown-2">{t('contact.lead')}</p>
 
         <ul className="mt-5 space-y-3">
-          <li>
-            <a href={telLink} className={`${row} on-dark border-ink bg-ink text-cream hover:border-gold`}>
-              <PhoneIcon className="h-7 w-7 shrink-0 text-gold" />
-              <span>
-                <span className="block text-[1.125rem] font-bold">{t('contact.call', { phone: site.phone.display })}</span>
-                <span className="t-small block text-muted">{t('contact.callText')}</span>
-              </span>
-            </a>
-          </li>
           <li>
             <a href={waLink()} target="_blank" rel="noopener noreferrer" className={row}>
               <WhatsAppIcon className="h-7 w-7 shrink-0 text-whatsapp" />
@@ -66,6 +57,9 @@ export default function Contact() {
           )}
         </ul>
 
+        <p className="mt-5">
+          <span className="font-bold">{t('contact.phone')}:</span> {site.phone.display}
+        </p>
         {hasCallHours() && (
           <p className="mt-5 flex gap-3">
             <ClockIcon className="mt-0.5 h-6 w-6 shrink-0" />

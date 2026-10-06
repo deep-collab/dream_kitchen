@@ -46,7 +46,9 @@ then the 12-digit UTR, optional screenshot) → Confirmation (works after reload
 payment in /admin. Track Order works on any device with order ID + phone:
 Placed → Payment confirmed → Preparing → Shipped (courier + tracking) → Delivered; Cancelled shown apart.
 Order IDs `DK-YYMMDD-XXXX` (IST date + 4 characters, unique in the database).
-No WhatsApp ordering anywhere; a plain "Chat on WhatsApp" link only on Contact. Call stays everywhere.
+WhatsApp (Hema, 7 Oct 2026): the home hero's "Order on WhatsApp" (message typed in: `site.whatsappOrderText`)
+and a plain "Chat on WhatsApp" on Contact, nowhere else. No Call buttons or tel: links on customer pages;
+the number is plain text on Contact (Hema's admin keeps Call / WhatsApp-the-customer).
 
 ## Brand and look (unchanged)
 Black #0F0F0F, gold #C9A227 + gradient (#EBD27A → #D4AF37 → #B8901E), champagne #F3E7CF, cream #FFF9EF,

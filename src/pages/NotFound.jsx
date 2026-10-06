@@ -25,7 +25,6 @@ export default function NotFound() {
           <Button to="/track" variant="secondary">
             {t('nav.track')}
           </Button>
-          <Button variant="call">{t('common.callUs')}</Button>
         </div>
       </div>
     </Container>

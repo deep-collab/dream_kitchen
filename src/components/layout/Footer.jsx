@@ -1,13 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
-import { site, telLink } from '../../config/site'
+import { site } from '../../config/site'
 import { useCart } from '../../context/CartProvider'
 import Wordmark from '../brand/Wordmark'
 import LanguageToggle from '../ui/LanguageToggle'
-import { PhoneIcon } from '../icons'
 import { FOOTER_NAV, isCheckoutPath } from './nav'
 
-// Short black footer: Call, Track Order, Our Story, FAQ, Contact and the language switch.
+// Short black footer: Track Order, Our Story, FAQ, Contact and the language switch.
 // Bottom padding clears the tab bar (plus the safe-area inset) below 1024px.
 export default function Footer() {
   const { t } = useI18n()
@@ -27,12 +26,6 @@ export default function Footer() {
 
         <nav aria-label={t('footer.links')}>
           <ul className="grid grid-cols-2 gap-x-6 sm:flex sm:flex-wrap sm:justify-center sm:gap-x-8">
-            <li className="col-span-2 sm:col-span-1">
-              <a href={telLink} className={`${link} gap-2 font-bold`}>
-                <PhoneIcon className="h-5 w-5 text-gold" />
-                {t('common.callUs')}
-              </a>
-            </li>
             {FOOTER_NAV.map(({ to, key }) => (
               <li key={to}>
                 <Link to={to} className={link}>

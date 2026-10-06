@@ -2,7 +2,7 @@
 // UNCONFIRMED = waiting for Hema. Leave those empty (null or '') until she confirms:
 // an empty value is hidden everywhere on the site, and every page still reads naturally.
 
-// Hema's mobile number: Call, WhatsApp, the page text and index.html all come from
+// Hema's mobile number: WhatsApp, the page text and index.html all come from
 // this one line. 10 digits, no spaces, no +91. (tests/config.test.js checks that no
 // other file spells the number out.)
 const PHONE = '9535706956'
@@ -18,6 +18,8 @@ export const site = {
     tel: `+91${PHONE}`, // tel: links
   },
   whatsapp: `91${PHONE}`, // wa.me format: country code + number, no "+"
+  // Typed in for the customer by the home page's "Order on WhatsApp" button
+  whatsappOrderText: "Hi Dream Kitchen, I'd like to place an order.",
   instagram: {
     handle: '@dreamkitchen_01_homemade',
     url: 'https://instagram.com/dreamkitchen_01_homemade',

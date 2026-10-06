@@ -16,10 +16,10 @@ Call/WhatsApp/Cart bottom bar, home sections, shop list rows, combo tray), this 
 | Area | Now |
 |---|---|
 | Loading screen | First visit only (localStorage), ≤ 1 s from appearing (draw 0.45 s, word at 0.3 s, exit 0.26 s), tap/any key skips, **none** with reduced motion |
-| Header | Logo · (≥1024px) Home, Menu, Customize, Classes, Contact · compact language switch · Call · Cart icon with count (word "Cart" from 768px) |
+| Header | Logo · (≥1024px) Home, Menu, Customize, Classes, Contact · compact language switch · Cart icon with count (word "Cart" from 768px). No Call (7 Oct 2026: no Call buttons on customer pages) |
 | Tab bar (<1024px) | 5 items, icon + word, gold for the current page; 15px labels (Kannada 14px, one line, never broken inside a word): the one exception to the 16px minimum, as on phone apps. Hidden while a sheet is open and on the cart (with items) and checkout, which have their own total bar |
 | Banner | Hema's announcement (black, muted gold) or "Orders are paused" + her message (error-tinted), under the header |
-| Home | Compact hero (lockup, tagline, one gold "Order now"; ≈ 55% of a 390px screen) + 6 photo tiles, 4:3, 2 per row / 3 from 640px; short footer. 2.1 screens at 390px (was 9.4) |
+| Home | Compact hero (lockup, tagline; gold "Order now", then outline "Order on WhatsApp" (gold WhatsApp icon) and "Book a class" (→ /classes#book): on phones Order now full width and the two outlines side by side, 48px; one row from 768px; ≈ 55% of a 390px screen) + 6 photo tiles, 4:3, 2 per row / 3 from 640px; short footer. 2.1 screens at 390px (was 9.4) |
 | Menu | Small title, sticky pill tabs (Tubs, Delight Boxes, Brownies, Chocolates) with scroll-spy, sections with a t-h3 and an optional note; cards 2 / 3 / 4 per row: square photo, bold name, "from ₹X", a black "+" circle. The whole card is one button |
 | Product sheet | Photo 112–128px beside the live price; sizes as a 3-across choice with prices; Toggles for ragi and drawing (+₹450 shown); name field with a black "It will read:" preview in gold; reference photo button; ingredients folded in a `<details>`; footer "+ courier from ₹90", total, big "Add to cart ₹X" |
 | Checkout | 3-step progress line (Details → Review → Pay) and a black total bar fixed to the bottom on phones (in the summary column from 1024px); the cart uses the same bar |
@@ -316,7 +316,7 @@ Mobile (360)                          Desktop (1280)
 **Layout:** `Layout`, `SkipLink`, `Header`, `MobileMenu`, `NoticeStrip`, `MobileBar`, `Footer`, `Container`, `SectionHeading`, `PageHero` (page title band)
 
 **Controls:**
-- `Button`: variants `primary` | `secondary` | `call` | `whatsapp`; `tone` light | dark; sizes md | lg; `fullWidth`; renders `<button>`, `<a>` or `<Link>`
+- `Button`: variants `primary` | `secondary` | `whatsapp`; `tone` light | dark; sizes md | lg; `fullWidth`; renders `<button>`, `<a>` or `<Link>`
 - `IconButton` (always has a visible or aria label), `Chip`, `RadioCard` (label plus price), `Toggle` (switch), `QuantityStepper`, `TextField`, `PhoneField`, `LanguageToggle` (segmented and compact)
 
 **Display:** `Badge`, `Notice`

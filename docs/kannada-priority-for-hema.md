@@ -130,7 +130,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Drawing | ಚಿತ್ರ | |
 | With love, Hema, Dream Kitchen | ಪ್ರೀತಿಯಿಂದ, ಹೇಮಾ, Dream Kitchen | |
 
-## Later, if you have time (426 more)
+## Later, if you have time (424 more)
 
 ### Logo and tagline
 
@@ -168,15 +168,8 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | (opens in a new tab) | (ಹೊಸ ಟ್ಯಾಬ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ) | |
 | Loading… | ತೆರೆಯುತ್ತಿದೆ… | |
 | Copy | ನಕಲಿಸಿ | |
-| Call +91 95357 06956 | +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ | |
 | Cart, 3 items | ಕಾರ್ಟ್, 3 ವಸ್ತುಗಳು | |
 | Cart, 1 item | ಕಾರ್ಟ್, 1 ವಸ್ತು | |
-
-### Top of every page
-
-| English | ಕನ್ನಡ | Correct? |
-|---|---|---|
-| Call | ಕರೆ | |
 
 ### Bottom of every page
 
@@ -282,6 +275,8 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 
 | English | ಕನ್ನಡ | Correct? |
 |---|---|---|
+| Order on WhatsApp | ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಆರ್ಡರ್ | |
+| Book a class | ತರಗತಿ ಬುಕ್ ಮಾಡಿ | |
 | What would you like? | ನಿಮಗೆ ಏನು ಬೇಕು? | |
 
 ### Menu page
@@ -313,7 +308,6 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Hema will add the sizes and prices soon. To order now, call +91 95357 06956. | ಹೇಮಾ ಅವರು ಶೀಘ್ರದಲ್ಲೇ ಗಾತ್ರ ಮತ್ತು ಬೆಲೆ ಸೇರಿಸುತ್ತಾರೆ. ಈಗಲೇ ಆರ್ಡರ್ ಮಾಡಲು +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
 | Sold out for now | ಸದ್ಯಕ್ಕೆ ಖಾಲಿಯಾಗಿದೆ | |
 | To ask when it’s back, call +91 95357 06956. | ಮತ್ತೆ ಯಾವಾಗ ಸಿಗುತ್ತದೆ ಎಂದು ಕೇಳಲು +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
-| Prefer to talk? Call +91 95357 06956 | ಮಾತನಾಡಲು ಇಷ್ಟವೇ? +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ | |
 | 250 g | 250 ಗ್ರಾಂ | |
 | Please keep the name to 20 letters. | ದಯವಿಟ್ಟು ಹೆಸರನ್ನು 20 ಅಕ್ಷರಗಳೊಳಗೆ ಇಡಿ. | |
 | Please use only English or Kannada letters, numbers and simple punctuation. | ದಯವಿಟ್ಟು ಇಂಗ್ಲಿಷ್ ಅಥವಾ ಕನ್ನಡ ಅಕ್ಷರಗಳು, ಅಂಕಿಗಳು ಮತ್ತು ಸರಳ ಚಿಹ್ನೆಗಳನ್ನು ಮಾತ್ರ ಬಳಸಿ. | |
@@ -553,11 +547,10 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | English | ಕನ್ನಡ | Correct? |
 |---|---|---|
 | Contact Dream Kitchen | Dream Kitchen ಸಂಪರ್ಕಿಸಿ | |
-| Call Hema, or chat on WhatsApp. | ಹೇಮಾ ಅವರಿಗೆ ಕರೆ ಮಾಡಿ, ಅಥವಾ ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಮಾತನಾಡಿ. | |
-| Call +91 95357 06956 | +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ | |
-| Order, ask about a delivery or a class, on the phone. | ಆರ್ಡರ್, ಡೆಲಿವರಿ ಅಥವಾ ತರಗತಿಯ ಬಗ್ಗೆ ಫೋನ್‌ನಲ್ಲೇ ಕೇಳಿ. | |
+| Chat with Hema on WhatsApp, or find her on Instagram. | ಹೇಮಾ ಅವರೊಂದಿಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಮಾತನಾಡಿ, ಅಥವಾ ಇನ್‌ಸ್ಟಾಗ್ರಾಮ್‌ನಲ್ಲಿ ನೋಡಿ. | |
+| Phone | ಫೋನ್ | |
 | Chat on WhatsApp | ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಮಾತನಾಡಿ | |
-| For questions. Orders are placed and paid on the website. | ಪ್ರಶ್ನೆಗಳಿಗಾಗಿ. ಆರ್ಡರ್ ಮತ್ತು ಪಾವತಿ ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲೇ. | |
+| For questions and orders. | ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಆರ್ಡರ್‌ಗಳಿಗಾಗಿ. | |
 | Instagram | ಇನ್‌ಸ್ಟಾಗ್ರಾಮ್ | |
 | Email | ಇಮೇಲ್ | |
 | FSSAI licence | FSSAI ಪರವಾನಗಿ | |

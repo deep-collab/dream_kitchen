@@ -6,7 +6,7 @@ import { useI18n } from '../../i18n/I18nProvider'
 import { useCart } from '../../context/CartProvider'
 import { useShopStatus } from '../../context/MenuProvider'
 import { brownieInfo, categories, limits, optionPrices } from '../../config/shop'
-import { site, telLink } from '../../config/site'
+import { site } from '../../config/site'
 import {
   courierFrom,
   defaultSelection,
@@ -85,22 +85,12 @@ export function ProductSheet({ open, product, line, focus, onClose }) {
       <Button size="lg" fullWidth onClick={onAdd} disabled={uploading} data-dk-add>
         {uploading ? t('sheet.photoUploading') : t(line ? 'sheet.update' : 'sheet.add', { price: formatINR(price ?? 0) })}
       </Button>
-      <p className="mt-1 text-center">
-        <a href={telLink} className="t-small inline-flex min-h-12 items-center text-brown-2 underline underline-offset-4 hover:text-brown">
-          {t('sheet.call', { phone: site.phone.short })}
-        </a>
-      </p>
     </div>
   ) : (
     <div>
       <Button size="lg" fullWidth disabled data-dk-add>
         {product.soldOut ? t('sheet.soldOut') : t('sheet.priceSoon')}
       </Button>
-      <p className="mt-1 text-center">
-        <a href={telLink} className="t-small inline-flex min-h-12 items-center text-brown-2 underline underline-offset-4 hover:text-brown">
-          {t('sheet.call', { phone: site.phone.short })}
-        </a>
-      </p>
     </div>
   )
 

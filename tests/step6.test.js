@@ -1,4 +1,4 @@
-// Step 6 site rules: the simpler navigation, no WhatsApp ordering, nothing left of the old menu,
+// Step 6 site rules: the simpler navigation, where WhatsApp and Call may appear, nothing left of the old menu,
 // old addresses redirect, and the Kannada split still keeps Kannada away from English visitors.
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -22,17 +22,23 @@ describe('navigation', () => {
   })
 })
 
-describe('no WhatsApp ordering', () => {
-  it('only the Contact page links to WhatsApp (plus the Button helper it could use)', () => {
-    // Hema's admin may WhatsApp a customer (brief 6.2); customer pages may not offer WhatsApp ordering
-    const customerFiles = srcFiles.filter((f) => !/[\\/]admin[\\/]/.test(f))
-    const users = customerFiles.filter((f) => /waLink\(|wa\.me/.test(read(f))).map((f) => f.replaceAll('\\', '/'))
-    expect(users.sort()).toEqual(['src/components/ui/Button.jsx', 'src/config/site.js', 'src/pages/Contact.jsx'])
+describe('WhatsApp and Call (Hema, 7 Oct 2026)', () => {
+  const customerFiles = srcFiles.filter((f) => !/[\\/]admin[\\/]/.test(f))
+  const using = (re) => customerFiles.filter((f) => re.test(read(f))).map((f) => f.replaceAll('\\', '/')).sort()
+
+  it('WhatsApp only on the home hero ("Order on WhatsApp") and the Contact page (plus the Button helper)', () => {
+    // Hema's admin may also WhatsApp a customer (brief 6.2)
+    expect(using(/waLink\(|wa\.me/)).toEqual(['src/components/home/Hero.jsx', 'src/components/ui/Button.jsx', 'src/config/site.js', 'src/pages/Contact.jsx'])
   })
 
-  it('no text speaks of sending orders on WhatsApp any more', () => {
-    const text = JSON.stringify(en)
-    expect(text).not.toMatch(/order on WhatsApp|Send order|WhatsApp order/i)
+  it('the hero types in exactly the message Hema asked for', async () => {
+    const { site } = await import('../src/config/site.js')
+    expect(site.whatsappOrderText).toBe("Hi Dream Kitchen, I'd like to place an order.")
+    expect(en.home.whatsappOrder).toBe('Order on WhatsApp')
+  })
+
+  it('no Call buttons or tel: links on customer pages (the number is plain text on Contact)', () => {
+    expect(using(/telLink|tel:|PhoneIcon|variant="call"/)).toEqual(['src/components/icon/PhoneIcon.jsx', 'src/components/icons.jsx', 'src/config/site.js'])
   })
 })
 

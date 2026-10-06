@@ -2,6 +2,12 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 7 Oct 2026: home hero buttons, no Call
+- [x] Hero: "Order now" (menu) + "Order on WhatsApp" (wa.me, "Hi Dream Kitchen, I'd like to place an order.") + "Book a class" (/classes#book lands on the enquiry form). Phones: Order now full width, the other two side by side (48px); desktop: one row. Hero height unchanged at 390px (466 EN / 468 KN) and 1280px
+- [x] Call buttons and tel: links removed from customer pages (header, footer, product sheet, Contact, order confirmed, 404); the number is plain text on Contact. Contact texts updated; tests and qa-step6 enforce the new rule
+- Known: at 360px in Kannada the two outline buttons stack (each full width, nothing clipped); they fit side by side from ~375px
+- New Kannada for Hema to check: ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಆರ್ಡರ್, ತರಗತಿ ಬುಕ್ ಮಾಡಿ, ಫೋನ್, the Contact lead and WhatsApp line
+
 ## Step 6: Hema's requests of 5 Oct 2026 (branch step6-hema-requests)
 Brief: docs/HEMA-REQUESTS-2026-10-05.md. Plan (product and page tables, data model, risks): docs/STEP6-PLAN.md.
 - [x] Phase 0: brief saved, plan, before screenshots and heights (docs/screenshots/step6/before)

@@ -31,12 +31,8 @@
     "newTab": "(opens in a new tab)",
     "loading": "Loading…",
     "copy": "Copy",
-    "callUs": "Call {phone}",
     "cartWithCount": "Cart, {count} items",
     "cartWithCountOne": "Cart, 1 item"
-  },
-  "header": {
-    "call": "Call"
   },
   "footer": {
     "links": "Useful links",
@@ -154,6 +150,8 @@
   },
   "home": {
     "orderNow": "Order now",
+    "whatsappOrder": "Order on WhatsApp",
+    "bookClass": "Book a class",
     "pick": "What would you like?"
   },
   "menu": {
@@ -196,7 +194,6 @@
     "priceSoonText": "Hema will add the sizes and prices soon. To order now, call {phone}.",
     "soldOut": "Sold out for now",
     "soldOutText": "To ask when it’s back, call {phone}.",
-    "call": "Prefer to talk? Call {phone}",
     "weight": "{grams} g",
     "errors": {
       "name": {
@@ -551,11 +548,10 @@
   },
   "contact": {
     "title": "Contact Dream Kitchen",
-    "lead": "Call Hema, or chat on WhatsApp.",
-    "call": "Call {phone}",
-    "callText": "Order, ask about a delivery or a class, on the phone.",
+    "lead": "Chat with Hema on WhatsApp, or find her on Instagram.",
+    "phone": "Phone",
     "whatsapp": "Chat on WhatsApp",
-    "whatsappText": "For questions. Orders are placed and paid on the website.",
+    "whatsappText": "For questions and orders.",
     "instagram": "Instagram",
     "email": "Email",
     "fssai": "FSSAI licence",

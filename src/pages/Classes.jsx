@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
 import { classInfo } from '../data/classInfo'
@@ -31,6 +32,16 @@ export default function Classes() {
   const errors = enquiryErrors(form)
   const msg = (k) => tried && errors[k] && t(`classes.errors.${k}.${errors[k]}`, { max: ENQUIRY_MAX[k] })
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }))
+
+  // /classes#book (the home page's "Book a class"): land on the booking form
+  const { hash } = useLocation()
+  useEffect(() => {
+    if (hash !== '#book') return
+    const land = () => document.getElementById('book')?.scrollIntoView({ block: 'start' })
+    requestAnimationFrame(land)
+    // the fonts can still change the layout: land again once they are in
+    document.fonts?.ready.then(land)
+  }, [hash])
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -69,7 +80,7 @@ export default function Classes() {
           </dl>
         </div>
 
-        <section aria-labelledby="ce-title" className="rounded-card bg-champagne p-4 sm:p-6">
+        <section id="book" aria-labelledby="ce-title" className="scroll-mt-[calc(var(--header-h)+1rem)] rounded-card bg-champagne p-4 sm:p-6">
           <h2 id="ce-title" className="t-h3">
             {t('classes.formTitle')}
           </h2>

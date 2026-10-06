@@ -238,14 +238,6 @@
   .on-dark .btn-secondary, .btn-secondary.btn-on-dark { border-color: var(--color-gold); color: var(--color-cream); }
   .on-dark .btn-secondary:hover, .btn-secondary.btn-on-dark:hover { background: rgb(201 162 39 / 0.12); }
 
-  /* Call: outline with phone icon. Gold on dark, ink on light */
-  .btn-call { background: var(--color-cream); border-color: var(--color-ink); color: var(--color-ink); }
-  .btn-call:hover { background: var(--color-champagne); }
-  .btn-call svg { color: var(--color-ink); }
-  .on-dark .btn-call, .btn-call.btn-on-dark { background: transparent; border-color: var(--color-gold); color: var(--color-cream); }
-  .on-dark .btn-call svg, .btn-call.btn-on-dark svg { color: var(--color-gold); }
-  .on-dark .btn-call:hover, .btn-call.btn-on-dark:hover { background: rgb(201 162 39 / 0.12); }
-
   .btn-whatsapp { background: var(--color-whatsapp); color: #fff; }
   .btn-whatsapp:hover { background: var(--color-whatsapp-dark); }
 

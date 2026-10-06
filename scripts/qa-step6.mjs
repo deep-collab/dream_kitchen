@@ -9,7 +9,6 @@
 // Report: docs/screenshots/step6/qa-report.json. Screenshots: docs/screenshots/step6/<width>-<lang>-<page>.png
 import { mkdirSync, readdirSync, writeFileSync, existsSync } from 'node:fs'
 import { chromium } from 'playwright'
-import { site } from '../src/config/site.js'
 import { dateChoices, dispatchRules } from '../src/lib/dates.js'
 
 const BASE = 'http://localhost:5173'
@@ -17,7 +16,6 @@ const OUT = 'docs/screenshots/step6'
 const WIDTHS = [360, 390, 768, 1280]
 const HEIGHT = { 360: 780, 390: 844, 768: 1024, 1280: 800 }
 const ADMIN = { email: process.env.DK_DEV_ADMIN_EMAIL || 'hema@example.com', password: process.env.DK_DEV_ADMIN_PASSWORD || 'dev-only-pass' }
-const TEL = `tel:${site.phone.tel}`
 const report = { overflow: [], textOverflow: [], smallTargets: [], focus: [], links: [], halfWritten: [], englishOnKannada: [], journey: [], security: [], loader: [], timing: {}, consoleErrors: [], failures: [] }
 const fail = (m) => report.failures.push(m)
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -67,7 +65,7 @@ async function go(page, path) {
   await sleep(500)
 }
 
-// Sideways scroll, clipped text, small targets, Call links
+// Sideways scroll, clipped text, small targets, Call / WhatsApp links
 async function audit(page, label) {
   const r = await page.evaluate(() => {
     const small = []
@@ -90,8 +88,9 @@ async function audit(page, label) {
   if (r.overflow) report.overflow.push(label)
   r.small.forEach((s) => report.smallTargets.push(`${label}: ${s}`))
   r.clipped.forEach((s) => report.textOverflow.push(`${label}: ${s}`))
-  r.tel.filter((h) => h !== TEL && !/^tel:\+91[6-9]\d{9}$/.test(h)).forEach((h) => report.links.push(`${label}: BAD ${h}`))
-  if (r.wa && !label.includes('contact')) report.links.push(`${label}: WhatsApp link outside Contact`)
+  // Hema, 7 Oct 2026: no Call links on customer pages; WhatsApp only on Home ("Order on WhatsApp") and Contact
+  r.tel.forEach((h) => report.links.push(`${label}: Call link ${h}`))
+  if (r.wa && !/-(home|contact)$/.test(label)) report.links.push(`${label}: WhatsApp link outside Home and Contact`)
 }
 
 // Half-written text, and English left on a Kannada page
