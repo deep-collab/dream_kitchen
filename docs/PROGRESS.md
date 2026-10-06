@@ -7,6 +7,7 @@ Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs
 - [x] Until the database keys are set (`/api/menu` → ready: false): Track Order shows "Order tracking coming soon. WhatsApp us for your order status." + WhatsApp; the class enquiry form is hidden; the cart and checkout review show "Online ordering opens soon – order on WhatsApp." and a WhatsApp button with the cart typed in (instead of Checkout / Place order)
 - [x] Checked with no database (390/1280 × EN/KN, every page: no errors, no failing /api calls, nothing clipped) and with the mock database (qa-step6 clean, enquiry form and Track Order work)
 - New Kannada for Hema to check: class days/slots/names, the cards, Track "coming soon", the "opens soon" line
+- [x] Every "call {phone}" text (sheet, errors, Track, FAQ, 404, SEO, customer emails) now says "WhatsApp us on {phone}"; "Call hours" is "Hours". Kept: the delivery-note example "please call before delivering" (the courier calling the customer)
 
 ## 7 Oct 2026: home hero buttons, no Call
 - [x] Hero: "Order now" (menu) + "Order on WhatsApp" (wa.me, "Hi Dream Kitchen, I'd like to place an order.") + "Book a class" (/classes#book lands on the enquiry form). Phones: Order now full width, the other two side by side (48px); desktop: one row. Hero height unchanged at 390px (466 EN / 468 KN) and 1280px

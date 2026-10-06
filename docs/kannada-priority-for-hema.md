@@ -33,7 +33,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | + courier from ₹90 | + ಕೊರಿಯರ್ ₹90 ರಿಂದ | |
 | Add to cart ₹1,700 | ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಿ ₹1,700 | |
 | Contains: egg, dairy, gluten, nuts where used. | ಇದರಲ್ಲಿ: ಮೊಟ್ಟೆ, ಹಾಲಿನ ಉತ್ಪನ್ನ, ಗ್ಲುಟೆನ್, ಬಳಸಿದಲ್ಲಿ ಬೀಜಗಳು. | |
-| Ragi version: not confirmed gluten-free yet. If you have an allergy, please call before ordering. | ರಾಗಿ ಆವೃತ್ತಿ ಗ್ಲುಟೆನ್ ರಹಿತ ಎಂದು ಇನ್ನೂ ಖಚಿತವಾಗಿಲ್ಲ. ಅಲರ್ಜಿ ಇದ್ದರೆ ಆರ್ಡರ್ ಮಾಡುವ ಮೊದಲು ದಯವಿಟ್ಟು ಕರೆ ಮಾಡಿ. | |
+| Ragi version: not confirmed gluten-free yet. If you have an allergy, please WhatsApp Hema before ordering. | ರಾಗಿ ಆವೃತ್ತಿ ಗ್ಲುಟೆನ್ ರಹಿತ ಎಂದು ಇನ್ನೂ ಖಚಿತವಾಗಿಲ್ಲ. ಅಲರ್ಜಿ ಇದ್ದರೆ ಆರ್ಡರ್ ಮಾಡುವ ಮೊದಲು ದಯವಿಟ್ಟು ಹೇಮಾ ಅವರಿಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | Tell Hema what to draw, in a few words. | ಏನು ಚಿತ್ರಿಸಬೇಕು ಎಂದು ಕೆಲವು ಪದಗಳಲ್ಲಿ ತಿಳಿಸಿ. | |
 | **Cart** | | |
 | Added to cart | ಕಾರ್ಟ್‌ಗೆ ಸೇರಿಸಲಾಗಿದೆ | |
@@ -127,7 +127,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Preferred dispatch date: Wed, 7 Oct | ಕಳುಹಿಸುವ ದಿನಾಂಕ: ಬುಧ, 7 ಅಕ್ಟೋಬರ್ | |
 | Delivery time depends on the courier after dispatch. | ಕಳುಹಿಸಿದ ನಂತರ ತಲುಪುವ ಸಮಯ ಕೊರಿಯರ್ ಮೇಲೆ ಅವಲಂಬಿತ. | |
 | Track your order: https://… | ನಿಮ್ಮ ಆರ್ಡರ್ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ: https://… | |
-| Questions? Call +91 95357 06956. | ಪ್ರಶ್ನೆಗಳಿವೆಯೇ? +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Questions? WhatsApp us on +91 95357 06956. | ಪ್ರಶ್ನೆಗಳಿವೆಯೇ? +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | Your order DK-261005-7Q4M is on its way | ನಿಮ್ಮ ಆರ್ಡರ್ DK-261005-7Q4M ಕಳುಹಿಸಲಾಗಿದೆ | |
 | Hi Asha, your order has been sent. | ನಮಸ್ಕಾರ Asha, ನಿಮ್ಮ ಆರ್ಡರ್ ಕಳುಹಿಸಲಾಗಿದೆ. | |
 | Courier: DTDC. Tracking number: D12345678 | ಕೊರಿಯರ್: DTDC. ಟ್ರ್ಯಾಕಿಂಗ್ ಸಂಖ್ಯೆ: D12345678 | |
@@ -239,7 +239,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 
 | English | ಕನ್ನಡ | Correct? |
 |---|---|---|
-| Call hours | ಕರೆ ಸಮಯ | |
+| Hours | ಸಮಯ | |
 | 10 am – 8 pm, 2 | 2, 10 – 8 | |
 | Monday to Saturday | ಸೋಮವಾರದಿಂದ ಶನಿವಾರ | |
 | 10 am | ಬೆಳಿಗ್ಗೆ 10 | |
@@ -253,7 +253,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | English | ಕನ್ನಡ | Correct? |
 |---|---|---|
 | Dream Kitchen \| Handmade chocolates, brownie tubs and delight boxes | Dream Kitchen \| ಕೈಯಾರೆ ಮಾಡಿದ ಚಾಕೊಲೇಟ್, ಬ್ರೌನಿ ಟಬ್ ಮತ್ತು ಡಿಲೈಟ್ ಬಾಕ್ಸ್‌ಗಳು | |
-| Handmade brownie tubs, delight boxes, brownies and chocolates by Hema, made fresh to order and sent all over India. Order online or call +91 95357 06956. | ಹೇಮಾ ಅವರು ಆರ್ಡರ್‌ಗೆ ತಕ್ಕಂತೆ ತಾಜಾವಾಗಿ ಮಾಡುವ ಬ್ರೌನಿ ಟಬ್, ಡಿಲೈಟ್ ಬಾಕ್ಸ್, ಬ್ರೌನಿ ಮತ್ತು ಚಾಕೊಲೇಟ್‌ಗಳು, ಭಾರತದಾದ್ಯಂತ ಕಳುಹಿಸುತ್ತೇವೆ. ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡಿ ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Handmade brownie tubs, delight boxes, brownies and chocolates by Hema, made fresh to order and sent all over India. Order online or on WhatsApp. | ಹೇಮಾ ಅವರು ಆರ್ಡರ್‌ಗೆ ತಕ್ಕಂತೆ ತಾಜಾವಾಗಿ ಮಾಡುವ ಬ್ರೌನಿ ಟಬ್, ಡಿಲೈಟ್ ಬಾಕ್ಸ್, ಬ್ರೌನಿ ಮತ್ತು ಚಾಕೊಲೇಟ್‌ಗಳು, ಭಾರತದಾದ್ಯಂತ ಕಳುಹಿಸುತ್ತೇವೆ. ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಅಥವಾ ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡಿ. | |
 | Menu \| Dream Kitchen | ಮೆನು \| Dream Kitchen | |
 | Brownie tubs, delight boxes, brownies and chocolates, made fresh to order. Order and pay on the website. | ಬ್ರೌನಿ ಟಬ್‌ಗಳು, ಡಿಲೈಟ್ ಬಾಕ್ಸ್‌ಗಳು, ಬ್ರೌನಿಗಳು ಮತ್ತು ಚಾಕೊಲೇಟ್‌ಗಳು, ಆರ್ಡರ್‌ಗೆ ತಕ್ಕಂತೆ ತಾಜಾವಾಗಿ. ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲೇ ಆರ್ಡರ್ ಮಾಡಿ, ಪಾವತಿಸಿ. | |
 | Customize \| Dream Kitchen | ಕಸ್ಟಮೈಸ್ \| Dream Kitchen | |
@@ -263,7 +263,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Our story \| Dream Kitchen | ನಮ್ಮ ಕಥೆ \| Dream Kitchen | |
 | How Hema started Dream Kitchen as a student with ₹2,500 and grew it into a loved home brand. | ಹೇಮಾ ಅವರು ವಿದ್ಯಾರ್ಥಿನಿಯಾಗಿದ್ದಾಗ ₹2,500 ರಿಂದ Dream Kitchen ಆರಂಭಿಸಿ ಜನಮೆಚ್ಚಿದ ಮನೆಯ ಬ್ರ್ಯಾಂಡ್ ಆಗಿ ಬೆಳೆಸಿದ ಕಥೆ. | |
 | Contact \| Dream Kitchen | ಸಂಪರ್ಕ \| Dream Kitchen | |
-| Call Dream Kitchen on +91 95357 06956, or chat on WhatsApp. | Dream Kitchen ಗೆ +91 95357 06956 ನಲ್ಲಿ ಕರೆ ಮಾಡಿ, ಅಥವಾ ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಮಾತನಾಡಿ. | |
+| WhatsApp Dream Kitchen on +91 95357 06956, or find us on Instagram. | Dream Kitchen ಗೆ +91 95357 06956 ನಲ್ಲಿ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ, ಅಥವಾ ಇನ್‌ಸ್ಟಾಗ್ರಾಮ್‌ನಲ್ಲಿ ನೋಡಿ. | |
 | FAQ \| Dream Kitchen | ಪ್ರಶ್ನೋತ್ತರ \| Dream Kitchen | |
 | Ordering, paying by UPI, courier charges, dispatch dates, names and drawings: your questions, answered. | ಆರ್ಡರ್ ಮಾಡುವುದು, ಯುಪಿಐ ಪಾವತಿ, ಕೊರಿಯರ್ ಶುಲ್ಕ, ಕಳುಹಿಸುವ ದಿನಾಂಕ, ಹೆಸರು ಮತ್ತು ಚಿತ್ರ: ನಿಮ್ಮ ಪ್ರಶ್ನೆಗಳಿಗೆ ಉತ್ತರ. | |
 | Track your order \| Dream Kitchen | ನಿಮ್ಮ ಆರ್ಡರ್ ಸ್ಥಿತಿ \| Dream Kitchen | |
@@ -313,9 +313,9 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Ingredients | ಪದಾರ್ಥಗಳು | |
 | Update cart ₹1,700 | ಕಾರ್ಟ್ ನವೀಕರಿಸಿ ₹1,700 | |
 | Price coming soon | ಬೆಲೆ ಶೀಘ್ರದಲ್ಲೇ | |
-| Hema will add the sizes and prices soon. To order now, call +91 95357 06956. | ಹೇಮಾ ಅವರು ಶೀಘ್ರದಲ್ಲೇ ಗಾತ್ರ ಮತ್ತು ಬೆಲೆ ಸೇರಿಸುತ್ತಾರೆ. ಈಗಲೇ ಆರ್ಡರ್ ಮಾಡಲು +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Hema will add the sizes and prices soon. To order now, WhatsApp us on +91 95357 06956. | ಹೇಮಾ ಅವರು ಶೀಘ್ರದಲ್ಲೇ ಗಾತ್ರ ಮತ್ತು ಬೆಲೆ ಸೇರಿಸುತ್ತಾರೆ. ಈಗಲೇ ಆರ್ಡರ್ ಮಾಡಲು +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | Sold out for now | ಸದ್ಯಕ್ಕೆ ಖಾಲಿಯಾಗಿದೆ | |
-| To ask when it’s back, call +91 95357 06956. | ಮತ್ತೆ ಯಾವಾಗ ಸಿಗುತ್ತದೆ ಎಂದು ಕೇಳಲು +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| To ask when it’s back, WhatsApp us on +91 95357 06956. | ಮತ್ತೆ ಯಾವಾಗ ಸಿಗುತ್ತದೆ ಎಂದು ಕೇಳಲು +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | 250 g | 250 ಗ್ರಾಂ | |
 | Please keep the name to 20 letters. | ದಯವಿಟ್ಟು ಹೆಸರನ್ನು 20 ಅಕ್ಷರಗಳೊಳಗೆ ಇಡಿ. | |
 | Please use only English or Kannada letters, numbers and simple punctuation. | ದಯವಿಟ್ಟು ಇಂಗ್ಲಿಷ್ ಅಥವಾ ಕನ್ನಡ ಅಕ್ಷರಗಳು, ಅಂಕಿಗಳು ಮತ್ತು ಸರಳ ಚಿಹ್ನೆಗಳನ್ನು ಮಾತ್ರ ಬಳಸಿ. | |
@@ -453,7 +453,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Track your order | ನಿಮ್ಮ ಆರ್ಡರ್ ಸ್ಥಿತಿ ನೋಡಿ | |
 | Enter the mobile number you ordered with to see this order. | ಈ ಆರ್ಡರ್ ನೋಡಲು ಆರ್ಡರ್ ಮಾಡಿದ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ. | |
 | Show my order | ನನ್ನ ಆರ್ಡರ್ ತೋರಿಸಿ | |
-| We couldn’t find this order with that number. Check both, or call +91 95357 06956. | ಆ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಈ ಆರ್ಡರ್ ಸಿಗಲಿಲ್ಲ. ಎರಡನ್ನೂ ಪರಿಶೀಲಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| We couldn’t find this order with that number. Check both, or WhatsApp us on +91 95357 06956. | ಆ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಈ ಆರ್ಡರ್ ಸಿಗಲಿಲ್ಲ. ಎರಡನ್ನೂ ಪರಿಶೀಲಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 
 ### Track Order
 
@@ -481,8 +481,8 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Waiting for your payment. | ನಿಮ್ಮ ಪಾವತಿಗಾಗಿ ಕಾಯಲಾಗುತ್ತಿದೆ. | |
 | Courier | ಕೊರಿಯರ್ | |
 | Track with the courier | ಕೊರಿಯರ್ ಬಳಿ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ | |
-| Questions? Call +91 95357 06956. | ಪ್ರಶ್ನೆಗಳಿವೆಯೇ? +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
-| We couldn’t find an order with that ID and number. Please check both, or call +91 95357 06956. | ಆ ಐಡಿ ಮತ್ತು ಸಂಖ್ಯೆಯ ಆರ್ಡರ್ ಸಿಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಎರಡನ್ನೂ ಪರಿಶೀಲಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Questions? WhatsApp us on +91 95357 06956. | ಪ್ರಶ್ನೆಗಳಿವೆಯೇ? +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
+| We couldn’t find an order with that ID and number. Please check both, or WhatsApp us on +91 95357 06956. | ಆ ಐಡಿ ಮತ್ತು ಸಂಖ್ಯೆಯ ಆರ್ಡರ್ ಸಿಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಎರಡನ್ನೂ ಪರಿಶೀಲಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | Enter your order ID. | ನಿಮ್ಮ ಆರ್ಡರ್ ಐಡಿ ನೀಡಿ. | |
 | Order IDs look like DK‑261007‑7Q4M. Please check and try again. | ಆರ್ಡರ್ ಐಡಿ DK‑261007‑7Q4M ರೀತಿ ಇರುತ್ತದೆ. ದಯವಿಟ್ಟು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. | |
 | Enter the mobile number you ordered with. | ಆರ್ಡರ್ ಮಾಡಿದ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ. | |
@@ -522,7 +522,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Write your name. | ನಿಮ್ಮ ಹೆಸರು ಬರೆಯಿರಿ. | |
 | Write your full name. | ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು ಬರೆಯಿರಿ. | |
 | Please shorten your name. | ದಯವಿಟ್ಟು ಹೆಸರನ್ನು ಚಿಕ್ಕದಾಗಿಸಿ. | |
-| Give your mobile number so Hema can call you. | ಹೇಮಾ ಅವರು ಕರೆ ಮಾಡಲು ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ. | |
+| Give your mobile number so Hema can contact you. | ಹೇಮಾ ಅವರು ಸಂಪರ್ಕಿಸಲು ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ. | |
 | Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210. | 6, 7, 8 ಅಥವಾ 9 ರಿಂದ ಆರಂಭವಾಗುವ 10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ, ಉದಾ: 98765 43210. | |
 | Tell Hema which class, or what you’d like to learn. | ಯಾವ ತರಗತಿ, ಅಥವಾ ಏನು ಕಲಿಯಲು ಇಷ್ಟ ಎಂದು ತಿಳಿಸಿ. | |
 | Please shorten this a little. | ದಯವಿಟ್ಟು ಇದನ್ನು ಸ್ವಲ್ಪ ಚಿಕ್ಕದಾಗಿಸಿ. | |
@@ -567,7 +567,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | English | ಕನ್ನಡ | Correct? |
 |---|---|---|
 | Questions & answers | ಪ್ರಶ್ನೆಗಳು ಮತ್ತು ಉತ್ತರಗಳು | |
-| Can’t find your answer? Call +91 95357 06956. | ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರ ಸಿಗಲಿಲ್ಲವೇ? +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Can’t find your answer? WhatsApp us on +91 95357 06956. | ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರ ಸಿಗಲಿಲ್ಲವೇ? +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | How do I order? | ಆರ್ಡರ್ ಮಾಡುವುದು ಹೇಗೆ? | |
 | Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay by UPI on the website. You get an order ID to track it. | ಮೆನುವಿನಲ್ಲಿ ನಿಮ್ಮ ಸಿಹಿಗಳನ್ನು ಆರಿಸಿ, ನಂತರ ಕಾರ್ಟ್‌ನಲ್ಲಿ ‘ಮುಂದುವರಿಯಿರಿ’ ಒತ್ತಿರಿ. ವಿಳಾಸ ತುಂಬಿಸಿ, ಆರ್ಡರ್ ಪರಿಶೀಲಿಸಿ, ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲೇ ಯುಪಿಐ ಮೂಲಕ ಪಾವತಿಸಿ. ಸ್ಥಿತಿ ನೋಡಲು ನಿಮಗೆ ಆರ್ಡರ್ ಐಡಿ ಸಿಗುತ್ತದೆ. | |
 | How do I pay? | ಪಾವತಿ ಹೇಗೆ? | |
@@ -583,7 +583,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | What is the Ragi version? | ರಾಗಿ ಆವೃತ್ತಿ ಎಂದರೇನು? | |
 | Our brownies made with ragi flour instead of maida. Tap “Make it Ragi” when you choose a brownie box. | ಮೈದಾ ಬದಲಿಗೆ ರಾಗಿ ಹಿಟ್ಟಿನಿಂದ ಮಾಡಿದ ನಮ್ಮ ಬ್ರೌನಿಗಳು. ಬ್ರೌನಿ ಬಾಕ್ಸ್ ಆರಿಸುವಾಗ “ರಾಗಿ ಆವೃತ್ತಿ ಮಾಡಿ” ಒತ್ತಿರಿ. | |
 | Can I change or cancel my order? | ನನ್ನ ಆರ್ಡರ್ ಬದಲಿಸಬಹುದೇ ಅಥವಾ ರದ್ದು ಮಾಡಬಹುದೇ? | |
-| Call +91 95357 06956 as soon as you can, and Hema will tell you what is possible. | ಆದಷ್ಟು ಬೇಗ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ, ಏನು ಸಾಧ್ಯ ಎಂದು ಹೇಮಾ ಅವರು ತಿಳಿಸುತ್ತಾರೆ. | |
+| WhatsApp us on +91 95357 06956 as soon as you can, and Hema will tell you what is possible. | ಆದಷ್ಟು ಬೇಗ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ, ಏನು ಸಾಧ್ಯ ಎಂದು ಹೇಮಾ ಅವರು ತಿಳಿಸುತ್ತಾರೆ. | |
 
 ### Page not found
 
@@ -593,20 +593,20 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | The page you’re looking for isn’t here. Maybe a brownie will cheer you up? | ನೀವು ಹುಡುಕುತ್ತಿರುವ ಪುಟ ಇಲ್ಲಿಲ್ಲ. ಒಂದು ಬ್ರೌನಿ ನಿಮ್ಮ ಮನಸ್ಸು ಹಗುರಮಾಡಬಹುದೇ? | |
 | Go to the home page | ಮುಖಪುಟಕ್ಕೆ ಹೋಗಿ | |
 | See the menu | ಮೆನು ನೋಡಿ | |
-| Looking for an order? Use Track Order, or call +91 95357 06956. | ಆರ್ಡರ್ ಹುಡುಕುತ್ತಿದ್ದೀರಾ? ಆರ್ಡರ್ ಸ್ಥಿತಿ ಪುಟ ಬಳಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Looking for an order? Use Track Order, or WhatsApp us on +91 95357 06956. | ಆರ್ಡರ್ ಹುಡುಕುತ್ತಿದ್ದೀರಾ? ಆರ್ಡರ್ ಸ್ಥಿತಿ ಪುಟ ಬಳಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 
 ### Error messages
 
 | English | ಕನ್ನಡ | Correct? |
 |---|---|---|
-| Something went wrong on our side. Please try again, or call +91 95357 06956. | ನಮ್ಮ ಕಡೆ ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
-| Too many tries in a short time. Please wait a few minutes, or call +91 95357 06956. | ಕಡಿಮೆ ಸಮಯದಲ್ಲಿ ತುಂಬಾ ಪ್ರಯತ್ನಗಳು. ದಯವಿಟ್ಟು ಕೆಲವು ನಿಮಿಷ ಕಾಯಿರಿ, ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Something went wrong on our side. Please try again, or WhatsApp us on +91 95357 06956. | ನಮ್ಮ ಕಡೆ ಏನೋ ತಪ್ಪಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
+| Too many tries in a short time. Please wait a few minutes, or WhatsApp us on +91 95357 06956. | ಕಡಿಮೆ ಸಮಯದಲ್ಲಿ ತುಂಬಾ ಪ್ರಯತ್ನಗಳು. ದಯವಿಟ್ಟು ಕೆಲವು ನಿಮಿಷ ಕಾಯಿರಿ, ಅಥವಾ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | Online ordering opens soon – order on WhatsApp. | ಆನ್‌ಲೈನ್ ಆರ್ಡರ್ ಶೀಘ್ರದಲ್ಲೇ ಆರಂಭ – ವಾಟ್ಸ್‌ಆ್ಯಪ್‌ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡಿ. | |
-| Orders are paused for now. Please try again later, or call +91 95357 06956. | ಸದ್ಯಕ್ಕೆ ಆರ್ಡರ್‌ಗಳನ್ನು ನಿಲ್ಲಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| Orders are paused for now. Please try again later, or WhatsApp us on +91 95357 06956. | ಸದ್ಯಕ್ಕೆ ಆರ್ಡರ್‌ಗಳನ್ನು ನಿಲ್ಲಿಸಲಾಗಿದೆ. ದಯವಿಟ್ಟು ನಂತರ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | Something in your cart can’t be ordered right now. Please check your cart. | ನಿಮ್ಮ ಕಾರ್ಟ್‌ನಲ್ಲಿರುವ ಒಂದು ವಸ್ತುವನ್ನು ಈಗ ಆರ್ಡರ್ ಮಾಡಲು ಆಗುವುದಿಲ್ಲ. ದಯವಿಟ್ಟು ಕಾರ್ಟ್ ಪರಿಶೀಲಿಸಿ. | |
 | That dispatch date isn’t available any more. Please pick another. | ಆ ಕಳುಹಿಸುವ ದಿನಾಂಕ ಈಗ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಬೇರೆ ಆರಿಸಿ. | |
 | Please check your details. | ದಯವಿಟ್ಟು ನಿಮ್ಮ ವಿವರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ. | |
-| We couldn’t accept this. Please call +91 95357 06956. | ಇದನ್ನು ಸ್ವೀಕರಿಸಲು ಆಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು +91 95357 06956 ಗೆ ಕರೆ ಮಾಡಿ. | |
+| We couldn’t accept this. Please WhatsApp us on +91 95357 06956. | ಇದನ್ನು ಸ್ವೀಕರಿಸಲು ಆಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | This order is already paid or closed. | ಈ ಆರ್ಡರ್‌ಗೆ ಈಗಾಗಲೇ ಪಾವತಿಸಲಾಗಿದೆ ಅಥವಾ ಮುಕ್ತಾಯವಾಗಿದೆ. | |
 
 ### Menu: categories

@@ -81,7 +81,7 @@
     "close": "Close this message"
   },
   "hours": {
-    "label": "Call hours",
+    "label": "Hours",
     "range": "{opens} – {closes}, {days}",
     "days": {
       "monSat": "Monday to Saturday"
@@ -97,7 +97,7 @@
   "seo": {
     "home": {
       "title": "Dream Kitchen | Handmade chocolates, brownie tubs and delight boxes",
-      "desc": "Handmade brownie tubs, delight boxes, brownies and chocolates by Hema, made fresh to order and sent all over India. Order online or call {phone}."
+      "desc": "Handmade brownie tubs, delight boxes, brownies and chocolates by Hema, made fresh to order and sent all over India. Order online or on WhatsApp."
     },
     "menu": {
       "title": "Menu | Dream Kitchen",
@@ -117,7 +117,7 @@
     },
     "contact": {
       "title": "Contact | Dream Kitchen",
-      "desc": "Call Dream Kitchen on {phone}, or chat on WhatsApp."
+      "desc": "WhatsApp Dream Kitchen on {phone}, or find us on Instagram."
     },
     "faq": {
       "title": "FAQ | Dream Kitchen",
@@ -186,14 +186,14 @@
     "photoAdded": "Photo added",
     "ingredients": "Ingredients",
     "contains": "Contains: egg, dairy, gluten, nuts where used.",
-    "ragiGluten": "Ragi version: not confirmed gluten-free yet. If you have an allergy, please call before ordering.",
+    "ragiGluten": "Ragi version: not confirmed gluten-free yet. If you have an allergy, please WhatsApp Hema before ordering.",
     "courierFrom": "+ courier from {price}",
     "add": "Add to cart {price}",
     "update": "Update cart {price}",
     "priceSoon": "Price coming soon",
-    "priceSoonText": "Hema will add the sizes and prices soon. To order now, call {phone}.",
+    "priceSoonText": "Hema will add the sizes and prices soon. To order now, WhatsApp us on {phone}.",
     "soldOut": "Sold out for now",
-    "soldOutText": "To ask when it’s back, call {phone}.",
+    "soldOutText": "To ask when it’s back, WhatsApp us on {phone}.",
     "weight": "{grams} g",
     "errors": {
       "name": {
@@ -413,7 +413,7 @@
     "track": "Track your order",
     "needPhone": "Enter the mobile number you ordered with to see this order.",
     "show": "Show my order",
-    "notFound": "We couldn’t find this order with that number. Check both, or call {phone}."
+    "notFound": "We couldn’t find this order with that number. Check both, or WhatsApp us on {phone}."
   },
   "track": {
     "title": "Track your order",
@@ -451,8 +451,8 @@
     "trackingNo": "Tracking number",
     "trackCourier": "Track with the courier",
     "cancelled": "This order was cancelled",
-    "cancelledText": "Questions? Call {phone}.",
-    "notFound": "We couldn’t find an order with that ID and number. Please check both, or call {phone}.",
+    "cancelledText": "Questions? WhatsApp us on {phone}.",
+    "notFound": "We couldn’t find an order with that ID and number. Please check both, or WhatsApp us on {phone}.",
     "errors": {
       "orderId": {
         "required": "Enter your order ID.",
@@ -511,7 +511,7 @@
         "long": "Please shorten your name."
       },
       "phone": {
-        "required": "Give your mobile number so Hema can call you.",
+        "required": "Give your mobile number so Hema can contact you.",
         "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
       },
       "interest": {
@@ -563,7 +563,7 @@
   },
   "faq": {
     "title": "Questions & answers",
-    "lead": "Can’t find your answer? Call {phone}.",
+    "lead": "Can’t find your answer? WhatsApp us on {phone}.",
     "items": {
       "order": {
         "q": "How do I order?",
@@ -595,7 +595,7 @@
       },
       "change": {
         "q": "Can I change or cancel my order?",
-        "a": "Call {phone} as soon as you can, and Hema will tell you what is possible."
+        "a": "WhatsApp us on {phone} as soon as you can, and Hema will tell you what is possible."
       }
     }
   },
@@ -604,20 +604,20 @@
     "text": "The page you’re looking for isn’t here. Maybe a brownie will cheer you up?",
     "home": "Go to the home page",
     "menu": "See the menu",
-    "help": "Looking for an order? Use Track Order, or call {phone}."
+    "help": "Looking for an order? Use Track Order, or WhatsApp us on {phone}."
   },
   "errors": {
     "network": "No internet connection. Please check it and try again.",
-    "server": "Something went wrong on our side. Please try again, or call {phone}.",
-    "tooMany": "Too many tries in a short time. Please wait a few minutes, or call {phone}.",
+    "server": "Something went wrong on our side. Please try again, or WhatsApp us on {phone}.",
+    "tooMany": "Too many tries in a short time. Please wait a few minutes, or WhatsApp us on {phone}.",
     "notReady": "Online ordering opens soon – order on WhatsApp.",
-    "storeClosed": "Orders are paused for now. Please try again later, or call {phone}.",
+    "storeClosed": "Orders are paused for now. Please try again later, or WhatsApp us on {phone}.",
     "paymentsClosed": "Online ordering opens soon – order on WhatsApp.",
     "priceChanged": "Some prices have just changed. Please check your cart.",
     "items": "Something in your cart can’t be ordered right now. Please check your cart.",
     "dispatchDate": "That dispatch date isn’t available any more. Please pick another.",
     "details": "Please check your details.",
-    "rejected": "We couldn’t accept this. Please call {phone}.",
+    "rejected": "We couldn’t accept this. Please WhatsApp us on {phone}.",
     "notPending": "This order is already paid or closed."
   }
 }

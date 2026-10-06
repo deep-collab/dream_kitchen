@@ -52,7 +52,7 @@ WhatsApp (Hema, 7 Oct 2026): the home hero's "Order on WhatsApp" (message typed 
 instead of its form, the class enquiry form is hidden, and the cart and checkout review say "Online ordering
 opens soon – order on WhatsApp" with a WhatsApp button carrying the cart (`src/lib/whatsappText.js`).
 No Call buttons or tel: links on customer pages; the number is plain text on Contact (Hema's admin keeps
-Call / WhatsApp-the-customer).
+Call / WhatsApp-the-customer). Help texts and emails say "WhatsApp us on {phone}", never "call".
 
 ## Brand and look (unchanged)
 Black #0F0F0F, gold #C9A227 + gradient (#EBD27A → #D4AF37 → #B8901E), champagne #F3E7CF, cream #FFF9EF,

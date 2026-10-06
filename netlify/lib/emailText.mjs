@@ -20,7 +20,7 @@ export const customerText = {
   dispatch: { en: 'Preferred dispatch date: {date}', kn: 'ಕಳುಹಿಸುವ ದಿನಾಂಕ: {date}' },
   courierNote: { en: 'Delivery time depends on the courier after dispatch.', kn: 'ಕಳುಹಿಸಿದ ನಂತರ ತಲುಪುವ ಸಮಯ ಕೊರಿಯರ್ ಮೇಲೆ ಅವಲಂಬಿತ.' },
   track: { en: 'Track your order: {link}', kn: 'ನಿಮ್ಮ ಆರ್ಡರ್ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ: {link}' },
-  questions: { en: 'Questions? Call {phone}.', kn: 'ಪ್ರಶ್ನೆಗಳಿವೆಯೇ? {phone} ಗೆ ಕರೆ ಮಾಡಿ.' },
+  questions: { en: 'Questions? WhatsApp us on {phone}.', kn: 'ಪ್ರಶ್ನೆಗಳಿವೆಯೇ? {phone} ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ.' },
   shippedSubject: { en: 'Your order {code} is on its way', kn: 'ನಿಮ್ಮ ಆರ್ಡರ್ {code} ಕಳುಹಿಸಲಾಗಿದೆ' },
   shippedHello: { en: 'Hi {name}, your order has been sent.', kn: 'ನಮಸ್ಕಾರ {name}, ನಿಮ್ಮ ಆರ್ಡರ್ ಕಳುಹಿಸಲಾಗಿದೆ.' },
   shippedCourier: { en: 'Courier: {courier}. Tracking number: {tracking}', kn: 'ಕೊರಿಯರ್: {courier}. ಟ್ರ್ಯಾಕಿಂಗ್ ಸಂಖ್ಯೆ: {tracking}' },
