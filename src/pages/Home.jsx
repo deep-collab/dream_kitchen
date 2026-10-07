@@ -5,6 +5,10 @@ import { useMenu } from '../context/MenuProvider'
 import Hero from '../components/home/Hero'
 import Container from '../components/ui/Container'
 import ProductPhoto from '../components/shop/ProductPhoto'
+import Button from '../components/ui/Button'
+import { BrushIcon } from '../components/icons'
+import { optionPrices } from '../config/shop'
+import { formatINR, fromPrice } from '../lib/pricing'
 import 'virtual:dk-strings/home'
 
 // Each tile shows the photo of one product from it (a gold drawing until real photos exist)
@@ -18,11 +22,13 @@ const TILE_PHOTO = {
 /**
  * Home is three parts (Hema's request): a compact hero, six big photo tiles, and the short
  * footer (from the layout). Tiles: 2 per row on phones, 3 on tablets and desktops (3 × 2).
+ * Under the tiles, one small card for her specialty, hand-drawn chocolates, linking to Customize.
  */
 export default function Home() {
   useSeo('home')
   const { t, pick } = useI18n()
   const menu = useMenu()
+  const bar = menu.productsById['drawing-chocolate-bar']
   const tiles = [
     ...menu.categories.map((c) => ({ key: c.id, to: `/menu#${c.id}`, label: pick(c.name), slug: TILE_PHOTO[c.id], art: c.art })),
     { key: 'customize', to: '/customize', label: t('nav.customize'), slug: 'drawing-chocolate-bar', art: 'drawing-bar' },
@@ -50,6 +56,24 @@ export default function Home() {
               </li>
             ))}
           </ul>
+          {bar && (
+            <section aria-labelledby="special-title" className="mt-3 flex items-center gap-3 rounded-card border border-line bg-[#fffcf5] p-3 sm:mt-5 sm:gap-4 sm:p-4">
+              <ProductPhoto slug={bar.slug} art={bar.art} sizes="96px" className="h-20 w-20 shrink-0 sm:h-24 sm:w-24" />
+              <div className="min-w-0 flex-1 sm:flex sm:items-center sm:gap-4">
+                <div className="min-w-0 flex-1">
+                  <h2 id="special-title" className="leading-snug font-bold">
+                    {t('home.special.title')}
+                  </h2>
+                  <p className="t-small mt-0.5 text-brown-2">
+                    {t('home.special.text', { drawingPrice: formatINR(optionPrices.drawing), barPrice: formatINR(fromPrice(bar) ?? 0) })}
+                  </p>
+                </div>
+                <Button to="/customize" icon={BrushIcon} className="mt-2 shrink-0 sm:mt-0">
+                  {t('nav.customize')}
+                </Button>
+              </div>
+            </section>
+          )}
         </Container>
       </section>
     </>

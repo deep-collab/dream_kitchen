@@ -152,7 +152,11 @@
     "orderNow": "Order now",
     "whatsappOrder": "Order on WhatsApp",
     "bookClass": "Book a class",
-    "pick": "What would you like?"
+    "pick": "What would you like?",
+    "special": {
+      "title": "Hand-drawn chocolates, our specialty",
+      "text": "Names and drawings on Delight Boxes (+{drawingPrice}) and drawing bars ({barPrice})"
+    }
   },
   "menu": {
     "title": "Menu",

@@ -138,7 +138,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Drawing | ಚಿತ್ರ | |
 | With love, Hema, Dream Kitchen | ಪ್ರೀತಿಯಿಂದ, ಹೇಮಾ, Dream Kitchen | |
 
-## Later, if you have time (421 more)
+## Later, if you have time (423 more)
 
 ### Logo and tagline
 
@@ -286,6 +286,8 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Order on WhatsApp | ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಆರ್ಡರ್ | |
 | Book a class | ತರಗತಿ ಬುಕ್ ಮಾಡಿ | |
 | What would you like? | ನಿಮಗೆ ಏನು ಬೇಕು? | |
+| Hand-drawn chocolates, our specialty | ಕೈಯಿಂದ ಚಿತ್ರಿಸಿದ ಚಾಕೊಲೇಟ್‌ಗಳು, ನಮ್ಮ ವಿಶೇಷತೆ | |
+| Names and drawings on Delight Boxes (+₹450) and drawing bars (₹950) | ಡಿಲೈಟ್ ಬಾಕ್ಸ್‌ಗಳ ಮೇಲೆ ಹೆಸರು ಮತ್ತು ಚಿತ್ರ (+₹450), ಡ್ರಾಯಿಂಗ್ ಬಾರ್‌ಗಳು (₹950) | |
 
 ### Menu page
 

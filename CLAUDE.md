@@ -62,7 +62,7 @@ unaltered. Gold line drawings until real photos (`public/products/<slug>.webp`, 
 Details and tokens: `docs/DESIGN.md`.
 
 ## Simple for everyone (top priority)
-- Home = compact hero + 6 photo tiles + short footer. Navigation: Home, Menu, Customize, Classes,
+- Home = compact hero + 6 photo tiles + a small "hand-drawn chocolates" card (to Customize) + short footer. Navigation: Home, Menu, Customize, Classes,
   Contact (tab bar on phones, header on desktop); Track Order, Our Story, FAQ in the footer.
 - 3 taps from opening the site to "Add to cart". Product sheet: only the options that product has.
 - Phone-first; 48px targets; 16px minimum text (tab labels the one exception, 14–15px); icons with words.
