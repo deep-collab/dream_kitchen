@@ -7,7 +7,7 @@ import { findPayableFor } from '../lib/lookup.mjs'
 import { paymentSignatureOk } from '../lib/razorpay.mjs'
 import { markPaid } from '../lib/paid.mjs'
 import { publicOrder } from '../lib/orders.mjs'
-import { publicBooking } from '../lib/bookings.mjs'
+import { classConfig, publicBooking } from '../lib/bookings.mjs'
 import { config as env } from '../lib/env.mjs'
 
 export default handle(async (req) => {
@@ -19,7 +19,7 @@ export default handle(async (req) => {
   const ok = row.razorpay_order_id && row.razorpay_order_id === body.razorpayOrderId && paymentSignatureOk({ orderId: body.razorpayOrderId, paymentId: body.razorpayPaymentId, signature: body.signature })
   if (!ok) throw new HttpError(400, 'signature')
   const { row: updated } = await markPaid(store, kind, row, String(body.razorpayPaymentId).slice(0, 40))
-  if (kind === 'booking') return json(200, { booking: publicBooking(updated) })
+  if (kind === 'booking') return json(200, { booking: publicBooking(updated, classConfig(await store.getSettings())) })
   return json(200, { order: publicOrder(updated, await store.getOrderEvents(updated.id)) })
 })
 

@@ -146,6 +146,14 @@
     "notFound": {
       "title": "Page not found | Dream Kitchen",
       "desc": "This page has melted away."
+    },
+    "book": {
+      "title": "Book a class | Dream Kitchen",
+      "desc": "Book a chocolate class with Hema: pick a class, a weekend and a time, and pay online."
+    },
+    "booking": {
+      "title": "Your class booking | Dream Kitchen",
+      "desc": "Your chocolate class booking with Dream Kitchen."
     }
   },
   "home": {
@@ -386,9 +394,7 @@
     "submit": "I’ve paid",
     "submitting": "Sending…",
     "check": "Hema will confirm your payment, usually within a few hours. You’ll see the status on Track Order.",
-    "online": "Pay by card, UPI or net banking",
-    "onlineOr": "Or pay online",
-    "onlineFailed": "The online payment didn’t finish. You can try again, or pay by UPI above.",
+    "onlineFailed": "The online payment couldn’t start. Check your internet and try again.",
     "later": "You can come back to this page later: it is saved on this phone, and on Track Order.",
     "errors": {
       "utr": {
@@ -396,7 +402,14 @@
         "format": "The UPI reference has exactly 12 numbers. Please check it."
       },
       "screenshot": "The screenshot didn’t upload. Try again, or send just the number."
-    }
+    },
+    "payNow": "Pay {price} now",
+    "secure": "Card, UPI or net banking, through Razorpay.",
+    "opening": "Opening the payment…",
+    "verifying": "Confirming your payment…",
+    "notFinished": "The payment wasn’t finished, so nothing was charged. You can try again.",
+    "failed": "The payment didn’t go through. Please try again, or use another card or UPI app.",
+    "checkLater": "If money has left your account, don’t pay again: the payment is confirmed within a few minutes. Refresh this page."
   },
   "order": {
     "title": "Thank you! Your order is placed",
@@ -528,6 +541,65 @@
       "message": {
         "long": "Please keep the message to {max} letters."
       }
+    },
+    "leadBook": "Learn with Hema in a 2-day class, every Saturday and Sunday. Pick a class and book your seat online.",
+    "bookNow": "Book now"
+  },
+  "book": {
+    "title": "Book a class",
+    "lead": "Pick your class, a weekend and a time. You pay online to book your seat.",
+    "stepClass": "1. Class",
+    "stepWeekend": "2. Weekend",
+    "stepWeekendHint": "Saturday and Sunday, at the same time both days.",
+    "stepSlot": "3. Time",
+    "stepDetails": "4. Your details",
+    "full": "Full",
+    "closed": "Not available",
+    "seatsLeft": "{n} seats left",
+    "seatsLeftOne": "1 seat left",
+    "name": "Your name",
+    "phone": "Mobile number",
+    "email": "Email",
+    "emailHint": "We’ll send your booking confirmation here.",
+    "pay": "Book and pay {price}",
+    "booking": "Booking…",
+    "summary": "{class} class · {weekend} · {slot}",
+    "chooseWeekend": "Choose a weekend.",
+    "chooseSlot": "Choose a time.",
+    "slotFull": "Sorry, that time has just filled up. Please choose another.",
+    "slotGone": "That weekend or time isn’t available any more. Please choose another.",
+    "feeChanged": "The class fee has just changed to {price}. Please check and try again.",
+    "noneOpen": "No weekends are open for booking right now. WhatsApp us and Hema will help.",
+    "codeLabel": "Booking ID",
+    "copyCode": "Copy booking ID {code}",
+    "codeCopied": "Booking ID copied",
+    "payTitle": "Pay {price} to book your seat",
+    "saved": "Booking {code} is saved. Pay to confirm your seat.",
+    "confirmed": "Your seat is booked!",
+    "confirmedText": "Keep your booking ID. Questions? WhatsApp us on {phone}.",
+    "submittedTitle": "Payment sent",
+    "submittedText": "Hema will check your payment, usually within a few hours. Your seat is kept for you meanwhile.",
+    "cancelledTitle": "This booking was cancelled",
+    "class": "Class",
+    "weekend": "Weekend",
+    "time": "Time (both days)",
+    "fee": "Fee",
+    "another": "Book another class",
+    "needPhone": "Enter the mobile number you booked with to see this booking.",
+    "notFound": "We couldn’t find this booking with that number. Check both, or WhatsApp us on {phone}.",
+    "errors": {
+      "name": {
+        "required": "Write your name.",
+        "short": "Write your full name.",
+        "long": "Please shorten your name."
+      },
+      "phone": {
+        "required": "Give your mobile number for the booking.",
+        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
+      },
+      "email": {
+        "invalid": "That email doesn’t look right. Check it, or leave it empty."
+      }
     }
   },
   "story": {
@@ -563,7 +635,31 @@
     "email": "Email",
     "fssai": "FSSAI licence",
     "track": "Track an order",
-    "faq": "Read the FAQ"
+    "faq": "Read the FAQ",
+    "formTitle": "Send us a message",
+    "name": "Your name",
+    "phoneField": "Mobile number",
+    "message": "Your message",
+    "send": "Send message",
+    "sending": "Sending…",
+    "sentTitle": "Thank you! Your message is sent",
+    "sentText": "Hema will contact you on {phone}.",
+    "another": "Send another message",
+    "errors": {
+      "name": {
+        "required": "Write your name.",
+        "short": "Write your full name.",
+        "long": "Please shorten your name."
+      },
+      "phone": {
+        "required": "Give your mobile number so Hema can contact you.",
+        "invalid": "Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210."
+      },
+      "message": {
+        "required": "Write your message.",
+        "long": "Please keep the message to {max} letters."
+      }
+    }
   },
   "faq": {
     "title": "Questions & answers",

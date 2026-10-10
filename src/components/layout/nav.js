@@ -19,4 +19,4 @@ export const FOOTER_NAV = [
 
 /** Pages where the bottom of the screen belongs to the order's own total bar (cart and checkout).
  *  An empty cart has no total bar, so it keeps the tab bar. */
-export const isCheckoutPath = (pathname, cartCount = 1) => /^\/(checkout|pay)(\/|$)/.test(pathname) || (pathname === '/cart' && cartCount > 0)
+export const isCheckoutPath = (pathname, cartCount = 1) => /^\/(checkout|pay|classes\/book|classes\/booking)(\/|$)/.test(pathname) || (pathname === '/cart' && cartCount > 0)

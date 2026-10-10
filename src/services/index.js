@@ -35,4 +35,12 @@ export const verifyRazorpay = (body) => api('razorpay-verify', body)
 
 /* ---------- classes ---------- */
 
+/** A class question (Classes page) or a general message (Contact page, kind: 'general') */
 export const sendClassEnquiry = (form) => api('class-enquiry', form)
+
+/** The booking page's data: classes, fees, slot times, the next 8 weekends and what is open */
+export const getClasses = () => api('classes', null, { method: 'GET', timeout: 10000 })
+/** { idempotencyKey, classId, weekend, slot, name, phone, email, expectedFee, lang } -> data.booking */
+export const createBooking = (body) => api('create-booking', body)
+/** One booking by code + phone -> data.booking */
+export const getBooking = (code, phone) => api('booking', { code, phone })

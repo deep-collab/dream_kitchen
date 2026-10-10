@@ -26,11 +26,11 @@ export default handle(async (req, context) => {
   const settings = await store.getSettings()
 
   if (kind === 'booking') {
-    if (row.status !== 'pending' || row.payment_status === 'confirmed') throw new HttpError(409, 'notPending', { booking: publicBooking(row) })
+    if (row.status !== 'pending' || row.payment_status === 'confirmed') throw new HttpError(409, 'notPending', { booking: publicBooking(row, classConfig(settings)) })
     const updated = await store.submitBookingPayment(row.booking_code, row.phone, utr)
     if (!updated) throw new HttpError(409, 'notPending')
     await sendAll([hemaBooking(updated, alertEmail(settings), classConfig(settings))])
-    return json(200, { booking: publicBooking(updated) })
+    return json(200, { booking: publicBooking(updated, classConfig(settings)) })
   }
 
   let screenshot = null

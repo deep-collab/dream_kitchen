@@ -17,7 +17,7 @@ const runtime = [
   'cart.added', 'cart.updated', 'sheet.add', 'sheet.update',
   ...codes('cart.unavailable', ['removed', 'soldOut', 'priceSoon', 'changed']),
   // useSeo(page) reads seo.<page>.title / .desc
-  ...['home', 'menu', 'customize', 'classes', 'story', 'contact', 'faq', 'track', 'cart', 'checkout', 'pay', 'order', 'notFound'].flatMap((p) => [`seo.${p}.title`, `seo.${p}.desc`]),
+  ...['home', 'menu', 'customize', 'classes', 'book', 'booking', 'story', 'contact', 'faq', 'track', 'cart', 'checkout', 'pay', 'order', 'notFound'].flatMap((p) => [`seo.${p}.title`, `seo.${p}.desc`]),
   // checkout: every code src/lib/checkout.js detailsErrors() returns, and the dispatch date
   ...codes('checkout.errors.name', ['required', 'short', 'long']),
   ...codes('checkout.errors.phone', ['required', 'invalid']),
@@ -43,6 +43,17 @@ const runtime = [
   ...codes('classes.errors.interest', ['required', 'long']),
   'classes.errors.dates.long', 'classes.errors.message.long',
   ...codes('classes.sections', ['when', 'duration', 'slots']),
+  // class booking: src/lib/classes.js bookingDetailsErrors(), the booking page's rows, the server's answers
+  ...codes('book.errors.name', ['required', 'short', 'long']),
+  ...codes('book.errors.phone', ['required', 'invalid']),
+  'book.errors.email.invalid',
+  ...codes('book', ['class', 'weekend', 'time', 'fee', 'slotFull', 'slotGone']),
+  // Contact message form: src/lib/enquiry.js enquiryErrors(form, 'general')
+  ...codes('contact.errors.name', ['required', 'short', 'long']),
+  ...codes('contact.errors.phone', ['required', 'invalid']),
+  ...codes('contact.errors.message', ['required', 'long']),
+  // Razorpay: src/components/pay/PayParts.jsx RazorpayNote
+  ...codes('pay', ['notFinished', 'failed', 'onlineFailed', 'checkLater']),
   ...['start', 'fresh', 'teach'].flatMap((k) => [`story.${k}.title`, `story.${k}.text`]),
   ...['order', 'pay', 'courier', 'when', 'track', 'name', 'ragi', 'change'].flatMap((k) => [`faq.items.${k}.q`, `faq.items.${k}.a`]),
   // src/lib/api.js errorText()

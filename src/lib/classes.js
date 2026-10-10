@@ -164,3 +164,13 @@ export const cleanBookingDetails = (form = {}) => ({
   phone: normalisePhone(form.phone),
   email: oneLine(form.email).toLowerCase().slice(0, BOOKING_MAX.email),
 })
+
+/** "Sat 17 – Sun 18 Oct" (or "Sat 31 Oct – Sun 1 Nov") with the page's day and month names (t('dates')) */
+export function weekendText(saturday, names) {
+  const sunday = addDaysISO(saturday, 1)
+  const [, m1, d1] = saturday.split('-').map(Number)
+  const [, m2, d2] = sunday.split('-').map(Number)
+  const sat = names.weekdays[6]
+  const sun = names.weekdays[0]
+  return m1 === m2 ? `${sat} ${d1} – ${sun} ${d2} ${names.months[m2 - 1]}` : `${sat} ${d1} ${names.months[m1 - 1]} – ${sun} ${d2} ${names.months[m2 - 1]}`
+}

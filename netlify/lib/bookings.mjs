@@ -61,8 +61,11 @@ export async function saveBooking(store, record, maxSeats, now = new Date()) {
 }
 
 /** What the customer sees (booking page): no phone, no admin notes, the UTR's last 4 only */
-export function publicBooking(row) {
+export function publicBooking(row, cfg = applyClassSettings()) {
+  const slot = cfg.slots.find((s) => s.id === row.slot)
   return {
+    slotStart: slot?.start || null,
+    slotEnd: slot?.end || null,
     code: row.booking_code,
     createdAt: row.created_at,
     status: row.status,

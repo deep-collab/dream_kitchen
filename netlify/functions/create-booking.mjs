@@ -28,7 +28,7 @@ export default handle(async (req, context) => {
   await limit(store, 'bookingPhone', record.phone)
   const { row, created } = await saveBooking(store, { ...record, payment_method: method }, cfg.seats)
   if (created && method === 'upi') await sendAll([customerBooking(row, cfg)])
-  return json(created ? 201 : 200, { booking: publicBooking(row), created })
+  return json(created ? 201 : 200, { booking: publicBooking(row, cfg), created })
 })
 
 export const config = { path: '/api/create-booking' }

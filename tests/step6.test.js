@@ -26,12 +26,13 @@ describe('WhatsApp and Call (Hema, 7 Oct 2026)', () => {
   const customerFiles = srcFiles.filter((f) => !/[\\/]admin[\\/]/.test(f))
   const using = (re) => customerFiles.filter((f) => re.test(read(f))).map((f) => f.replaceAll('\\', '/')).sort()
 
-  it('WhatsApp only where Hema asked: home hero, Contact, class cards, and Track / cart / review while the database is not connected', () => {
+  it('WhatsApp only where Hema asked: home hero, Contact, class cards, and Track / cart / review / class booking while online ordering isn’t open', () => {
     // Hema's admin may also WhatsApp a customer (brief 6.2)
     expect(using(/waLink\(|wa\.me/)).toEqual([
       'src/components/home/Hero.jsx',
       'src/components/ui/Button.jsx',
       'src/config/site.js',
+      'src/pages/BookClass.jsx',
       'src/pages/Cart.jsx',
       'src/pages/CheckoutReview.jsx',
       'src/pages/Classes.jsx',

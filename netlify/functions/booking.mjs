@@ -4,7 +4,7 @@
 import { checkOrigin, clientIp, handle, json, readJson } from '../lib/http.mjs'
 import { getStore } from '../lib/store/index.mjs'
 import { limit } from '../lib/limits.mjs'
-import { publicBooking } from '../lib/bookings.mjs'
+import { classConfig, publicBooking } from '../lib/bookings.mjs'
 import { findBookingFor } from '../lib/lookup.mjs'
 
 export default handle(async (req, context) => {
@@ -12,7 +12,8 @@ export default handle(async (req, context) => {
   const body = await readJson(req, 2_000)
   const store = getStore()
   await limit(store, 'lookupIp', clientIp(req, context))
-  return json(200, { booking: publicBooking(await findBookingFor(store, body.code, body.phone)) })
+  const row = await findBookingFor(store, body.code, body.phone)
+  return json(200, { booking: publicBooking(row, classConfig(await store.getSettings())) })
 })
 
 export const config = { path: '/api/booking' }
