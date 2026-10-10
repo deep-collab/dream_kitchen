@@ -34,3 +34,21 @@ describe('phone number: one place only (src/config/site.js)', () => {
     expect(offenders).toEqual([])
   })
 })
+
+describe('supabase/setup-all.sql (the one file the owner pastes into Supabase)', () => {
+  it('is up to date with the migrations and the seed (run: node scripts/setup-sql.mjs)', async () => {
+    const { setupSql } = await import('../scripts/setup-sql.mjs')
+    expect(readFileSync('supabase/setup-all.sql', 'utf8').replace(/\r\n/g, '\n')).toBe(setupSql())
+  })
+
+  it('runs in a fresh Postgres in one go, and again without errors', async () => {
+    const { PGlite } = await import('@electric-sql/pglite')
+    const { SHIM } = await import('./helpers/supabaseShim.js')
+    const db = new PGlite()
+    await db.exec(SHIM)
+    const sql = readFileSync('supabase/setup-all.sql', 'utf8')
+    await db.exec(sql)
+    await db.exec(sql)
+    expect((await db.query('select count(*)::int as n from public.products')).rows[0].n).toBe(17)
+  }, 60_000)
+})

@@ -19,11 +19,51 @@ const make = (responses) => {
 }
 
 describe('Supabase store', () => {
-  it('reads with the service key on every request', async () => {
+  it('reads with the service key on every request (a new "sb_secret_" key on the apikey header only)', async () => {
     const { store, calls } = make([[200, [{ id: 'almond-bar', price: 175 }]]])
     expect(await store.listProducts()).toEqual([{ id: 'almond-bar', price: 175 }])
     expect(calls[0].url).toBe('https://abc.supabase.co/rest/v1/products?select=*&order=category.asc,sort.asc')
-    expect(calls[0].headers).toMatchObject({ apikey: 'service-key', authorization: 'Bearer service-key' })
+    expect(calls[0].headers).toMatchObject({ apikey: 'service-key' })
+    expect(calls[0].headers.authorization).toBeUndefined()
+  })
+
+  it('a legacy service_role key (a JWT, "eyJ…") goes in both headers', async () => {
+    const f = fakeFetch([[200, []]])
+    const store = createSupabaseStore({ url: 'https://abc.supabase.co', serviceKey: 'eyJhbGciOi.legacy', anonKey: 'eyJanon', fetchImpl: f.impl })
+    await store.listProducts()
+    expect(f.calls[0].headers).toMatchObject({ apikey: 'eyJhbGciOi.legacy', authorization: 'Bearer eyJhbGciOi.legacy' })
+  })
+
+  it('class bookings: create_booking with the seat limit, and a full slot comes back as "slot_full"', async () => {
+    const { store, calls } = make([
+      [200, []],
+      [200, { id: 'b1', booking_code: 'DK-CL-261010-AB2C' }],
+      [200, []],
+      [400, { code: 'P0001', message: 'slot_full' }],
+    ])
+    expect(await store.createBooking({ idempotency_key: 'k'.repeat(20), booking_code: 'DK-CL-261010-AB2C' }, 8)).toEqual({ row: { id: 'b1', booking_code: 'DK-CL-261010-AB2C' }, created: true })
+    expect(JSON.parse(calls[1].body)).toEqual({ p: { idempotency_key: 'k'.repeat(20), booking_code: 'DK-CL-261010-AB2C' }, p_max_seats: 8 })
+    await expect(store.createBooking({ idempotency_key: 'j'.repeat(20) }, 8)).rejects.toMatchObject({ constraint: 'slot_full' })
+  })
+
+  it('search only sends letters, digits, spaces and dashes into the filter', async () => {
+    const { store, calls } = make([[200, []]])
+    await store.searchOrders('asha),status.eq.(x')
+    expect(decodeURIComponent(calls[0].url)).toContain('or=(order_code.ilike.*ashastatuseqx*,')
+  })
+
+  it('product photos go to the public bucket and come back as their public address', async () => {
+    const { store, calls } = make([[200, { Key: 'x' }]])
+    const url = await store.putPublicObject('almond-bar/1.webp', new Uint8Array([1]), 'image/webp')
+    expect(calls[0]).toMatchObject({ url: 'https://abc.supabase.co/storage/v1/object/product-photos/almond-bar/1.webp', method: 'POST' })
+    expect(url).toBe('https://abc.supabase.co/storage/v1/object/public/product-photos/almond-bar/1.webp')
+  })
+
+  it('"Forgot password" asks Supabase to email a link back to /admin/reset', async () => {
+    const { store, calls } = make([[200, {}]])
+    await store.auth.recover('hema@example.com', 'https://dk.example/admin/reset')
+    expect(calls[0].url).toBe('https://abc.supabase.co/auth/v1/recover?redirect_to=https%3A%2F%2Fdk.example%2Fadmin%2Freset')
+    expect(calls[0].headers).toMatchObject({ apikey: 'anon-key' })
   })
 
   it('creates orders through the create_order function and reports whether it was new', async () => {

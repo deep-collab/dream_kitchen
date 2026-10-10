@@ -3,7 +3,7 @@ import { categories as CATEGORIES, products as PRODUCTS } from '../config/shop'
 import { applyOverrides, applySettings } from '../lib/pricing'
 import { loadRemoteMenu } from '../services'
 
-const MenuContext = createContext(null)
+export const MenuContext = createContext(null)
 
 /**
  * The menu and Hema's settings, shared by every page:

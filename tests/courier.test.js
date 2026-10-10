@@ -10,18 +10,39 @@ const item = (id, selection = {}, qty = 1) => ({ product: P[id], selection: { ..
 const courierFor = (items, pin) => quote(items, zoneForPincode(pin)).courier
 
 describe('rates and tiers from config', () => {
-  it('small ₹90 / ₹100, large ₹100 / ₹150', () => {
-    expect(courier.rates).toEqual({ small: { karnataka: 90, outside: 100 }, large: { karnataka: 100, outside: 150 } })
+  it('small ₹90 / ₹100, large ₹100 / ₹150; 750 g (TO CONFIRM) pays the large rate until Hema sets one', () => {
+    expect(courier.rates).toEqual({ small: { karnataka: 90, outside: 100 }, large: { karnataka: 100, outside: 150 }, xl: { karnataka: 100, outside: 150 } })
     expect(courierFrom()).toBe(90)
   })
 
-  it('Delight Box 250 g is small; 500 g and 700 g are large; everything else is small', () => {
+  it('750 g tubs are the "750 g" tier; Hema’s 750 g rate applies to them', () => {
+    const tubs = products.filter((p) => p.category === 'brownie-tubs' && p.sizes.length)
+    for (const p of tubs) {
+      expect(itemCourierTier(p, { size: '750g' }), p.id).toBe('xl')
+      expect(itemCourierTier(p, { size: '500g' }), p.id).toBe('small')
+    }
+    const rates = { ...courier.rates, xl: { karnataka: 120, outside: 180 } }
+    const cfg = { ...courier, rates }
+    const cart = [item('oreo-overload-tub', { size: '750g' }), item('plain-brownies')]
+    expect(quote(cart, 'karnataka', cfg).courier).toBe(120)
+    expect(quote(cart, 'outside', cfg)).toMatchObject({ courierTier: 'xl', courier: 180 })
+  })
+
+  it('one charge per order = the highest rate among its tiers, even if Hema sets a heavier tier cheaper', () => {
+    const cfg = { ...courier, rates: { ...courier.rates, xl: { karnataka: 95, outside: 120 } } }
+    expect(courierCharge(['xl', 'large', 'small'], 'outside', cfg)).toBe(150)
+    expect(courierCharge(['xl', 'small'], 'karnataka', cfg)).toBe(95)
+    expect(courierCharge([], 'karnataka', cfg)).toBe(0)
+    expect(courierCharge(['small'], null, cfg)).toBeNull()
+  })
+
+  it('Delight Box 250 g is small; 500 g and 700 g are large; everything else is small (750 g tubs: xl)', () => {
     for (const id of ['red-velvet-delight-box', 'chocolate-delight-box', 'mango-delight-box', 'pista-delight-box']) {
       expect(itemCourierTier(P[id], { size: '250g' })).toBe('small')
       expect(itemCourierTier(P[id], { size: '500g' })).toBe('large')
       expect(itemCourierTier(P[id], { size: '700g' })).toBe('large')
     }
-    for (const p of products.filter((p) => p.category !== 'delight-boxes')) for (const s of p.sizes?.length ? p.sizes : [null]) expect(itemCourierTier(p, { size: s?.id }), p.id).toBe('small')
+    for (const p of products.filter((p) => p.category !== 'delight-boxes')) for (const s of p.sizes?.length ? p.sizes : [null]) expect(itemCourierTier(p, { size: s?.id }), p.id).toBe(s?.grams >= 750 ? 'xl' : 'small')
   })
 })
 

@@ -86,7 +86,7 @@ beforeEach(async () => {
 afterEach(() => setStore(null))
 
 describe('create-order', () => {
-  it('re-prices, saves and emails: ₹1,700 + ₹300 + ₹100 large courier = ₹2,100', async () => {
+  it('re-prices and saves: ₹1,700 + ₹300 + ₹100 large courier = ₹2,100; the UPI customer gets how to pay, Hema nothing yet', async () => {
     const r = await call(createOrder, orderBody())
     expect(r.status).toBe(201)
     const o = r.body.order
@@ -99,8 +99,9 @@ describe('create-order', () => {
     expect(saved.customer_phone).toBe('9845012345')
     expect(saved.zone).toBe('karnataka')
     expect(saved.courier_tier).toBe('large')
-    expect(outbox.map((m) => m.to).sort()).toEqual(['asha@example.com', 'hema@example.com'])
-    expect(outbox.find((m) => m.to === 'hema@example.com').text).toContain(`/admin/orders/${o.code}`)
+    // Hema hears about an order once it is paid or has a UPI reference to check (not abandoned ones)
+    expect(outbox.map((m) => m.to)).toEqual(['asha@example.com'])
+    expect(outbox[0].text).toContain('Please pay ₹2,100 by UPI')
   })
 
   it('a tampered unit price is rejected (409) with today’s price, and nothing is saved', async () => {
@@ -140,7 +141,7 @@ describe('create-order', () => {
     expect(new Set([a.body.order.code, b.body.order.code, c.body.order.code]).size).toBe(1)
     expect([a.status, b.status, c.status].sort()).toEqual([200, 200, 201])
     expect(await store.listOrders()).toHaveLength(1)
-    expect(outbox.filter((m) => m.to === 'hema@example.com')).toHaveLength(1)
+    expect(outbox.filter((m) => m.to === 'asha@example.com')).toHaveLength(1)
   })
 
   it.each([
@@ -259,7 +260,9 @@ describe('UPI payment', () => {
     expect(r.body.order.utrLast4).toBe('9012')
     expect((await store.getOrder(code)).utr).toBe('412356789012')
     expect(outbox[0]).toMatchObject({ to: 'hema@example.com' })
-    expect(outbox[0].subject).toContain('Payment to check')
+    expect(outbox[0].subject).toBe(`New order, payment to check ${code} – ₹2,100`)
+    expect(outbox[0].text).toContain('UPI reference 412356789012')
+    expect(outbox[0].text).toContain(`/admin/orders/${code}`)
     expect((await call(submitPayment, { code, phone: '9000000000', utr: '412356789012' })).status).toBe(404)
   })
 
@@ -313,13 +316,13 @@ describe('admin', () => {
     const h = await adminToken()
     const code = (await call(createOrder, orderBody())).body.order.code
     let list = await call(admin, { action: 'orders', tab: 'new' }, { headers: h })
-    expect(list.body.counts).toMatchObject({ new: 1, payment: 0 })
+    expect(list.body.counts).toMatchObject({ new: 1, paid: 0 })
     expect(list.body.orders[0]).toMatchObject({ code, total: 2100, paymentStatus: 'pending', hasDrawing: true })
     expect(list.body.orders[0].itemsText).toBe('Red Velvet Delight Box 500 g + drawing × 1, Almond Bar × 2')
 
     await call(submitPayment, { code, phone: '9845012345', utr: '412356789012' })
-    list = await call(admin, { action: 'orders', tab: 'payment' }, { headers: h })
-    expect(list.body.orders.map((o) => o.code)).toEqual([code])
+    list = await call(admin, { action: 'orders', tab: 'new' }, { headers: h })
+    expect(list.body.orders.map((o) => [o.code, o.paymentStatus])).toEqual([[code, 'submitted']])
 
     const step = (name, extra = {}) => call(admin, { action: 'orderAction', code, step: name, ...extra }, { headers: h })
     const track = async () => (await call(orderFn, { code, phone: '9845012345' })).body.order
@@ -331,8 +334,10 @@ describe('admin', () => {
     expect(r.body.order).toMatchObject({ status: 'payment_confirmed', paymentStatus: 'confirmed', actions: ['preparing', 'shipped', 'cancel'] })
     expect((await track()).status).toBe('payment_confirmed')
 
+    expect(outbox.at(-1)).toMatchObject({ to: 'asha@example.com', subject: `Payment received: order ${code}` })
     r = await step('preparing')
     expect((await track()).status).toBe('preparing')
+    expect(outbox.at(-1).subject).toBe(`Your order ${code} is being prepared`)
 
     // Shipping needs the courier and tracking number
     expect((await step('shipped')).body).toMatchObject({ error: 'fields', fields: { courierName: 'required', trackingNo: 'required' } })
@@ -347,6 +352,7 @@ describe('admin', () => {
     expect(t).toMatchObject({ status: 'shipped', courierName: 'DTDC', trackingNo: 'D1234567', trackingUrl: 'https://www.dtdc.in/tracking' })
 
     r = await step('delivered')
+    expect(outbox.at(-1).subject).toBe(`Your order ${code} has been delivered`)
     t = await track()
     expect(t.status).toBe('delivered')
     expect(Object.keys(t.timeline)).toEqual(['placed', 'payment_confirmed', 'preparing', 'shipped', 'delivered'])
@@ -361,7 +367,7 @@ describe('admin', () => {
       ['status', 'delivered', ADMIN.email],
     ])
     expect((await step('cancel', { reason: 'Too late' })).status).toBe(409)
-    expect((await call(admin, { action: 'orders', tab: 'done' }, { headers: h })).body.counts.done).toBe(1)
+    expect((await call(admin, { action: 'orders', tab: 'delivered' }, { headers: h })).body.counts.delivered).toBe(1)
   })
 
   it('cancel asks for a reason, and Track Order shows it separately', async () => {
@@ -437,7 +443,7 @@ describe('admin', () => {
   it('settings: UPI, QR, lead times, courier rates, store open, announcement; the red UPI warning', async () => {
     const h = await adminToken()
     await store.updateSettings({ upi_id: null })
-    expect((await call(admin, { action: 'me' }, { headers: h })).body.warnings).toContain('upiMissing')
+    expect((await call(admin, { action: 'me' }, { headers: h })).body.warnings).toContain('paymentsOff')
     expect((await call(admin, { action: 'updateSettings', upiId: 'not a upi' }, { headers: h })).body.fields).toEqual({ upiId: 'invalid' })
     const png = `data:image/png;base64,${Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 1]).toString('base64')}`
     const r = await call(
@@ -447,14 +453,14 @@ describe('admin', () => {
         upiId: 'dreamkitchen@okaxis',
         upiQr: png,
         leadStandard: 3,
-        courierRates: { small: { karnataka: 95, outside: 110 }, large: { karnataka: 105, outside: 160 } },
+        courierRates: { small: { karnataka: 95, outside: 110 }, large: { karnataka: 105, outside: 160 }, xl: { karnataka: 120, outside: 180 } },
         announcement: 'Diwali orders close on 25 Oct',
         storeOpen: true,
       },
       { headers: h },
     )
     expect(r.status).toBe(200)
-    expect(r.body.warnings).not.toContain('upiMissing')
+    expect(r.body.warnings).not.toContain('paymentsOff')
     expect(r.body.settings).toMatchObject({ effectiveUpiId: 'dreamkitchen@okaxis', hasQr: true, leadStandard: 3, announcement: 'Diwali orders close on 25 Oct' })
     const menu = (await call(menuFn, null, { method: 'GET' })).body
     expect(menu.settings).toMatchObject({ upiId: 'dreamkitchen@okaxis', leadStandard: 3, courierRates: { small: { karnataka: 95 } }, announcement: 'Diwali orders close on 25 Oct' })
@@ -473,8 +479,8 @@ describe('admin', () => {
     const h = await adminToken()
     const list = (await call(admin, { action: 'enquiries' }, { headers: h })).body.enquiries
     expect(list[0]).toMatchObject({ name: 'Ravi', phone: '9000012345', interest: 'Chocolate making', preferred_dates: 'Weekends in November', status: 'new', lang: 'kn' })
-    const upd = await call(admin, { action: 'updateEnquiry', id: list[0].id, status: 'contacted' }, { headers: h })
-    expect(upd.body.enquiry.status).toBe('contacted')
+    const upd = await call(admin, { action: 'updateEnquiry', id: list[0].id, status: 'handled' }, { headers: h })
+    expect(upd.body.enquiry).toMatchObject({ status: 'handled', handled: true, kind: 'class' })
     expect((await call(classEnquiry, { name: 'Bot', phone: '9000012345', interest: 'x x', website: 'spam' })).body.error).toBe('rejected')
   })
 })

@@ -24,6 +24,8 @@ export default function FAQ() {
     smallOut: formatINR(r.small.outside),
     largeKa: formatINR(r.large.karnataka),
     largeOut: formatINR(r.large.outside),
+    xlKa: formatINR(r.xl.karnataka),
+    xlOut: formatINR(r.xl.outside),
   }
   return (
     <Container className="py-6 lg:py-12">

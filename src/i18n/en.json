@@ -236,7 +236,7 @@
     "subtotal": "Items",
     "courier": "Courier",
     "courierRates": "{karnataka} within Karnataka, {outside} outside",
-    "courierHow": "Courier: {smallKa} within Karnataka, {smallOut} outside; {largeKa} / {largeOut} with a 500 g or 700 g Delight Box. One charge per order.",
+    "courierHow": "Courier: {smallKa} within Karnataka, {smallOut} outside; {largeKa} / {largeOut} with a 500 g or 700 g Delight Box; {xlKa} / {xlOut} with a 750 g tub. One charge per order.",
     "total": "Total",
     "totalPlusCourier": "{price} + courier",
     "checkout": "Continue",
@@ -579,7 +579,7 @@
       },
       "courier": {
         "q": "Where do you deliver, and what does courier cost?",
-        "a": "All over India. One courier charge per order: {smallKa} within Karnataka and {smallOut} outside, or {largeKa} / {largeOut} when the order has a 500 g or 700 g Delight Box."
+        "a": "All over India. One courier charge per order: {smallKa} within Karnataka and {smallOut} outside, or {largeKa} / {largeOut} when the order has a 500 g or 700 g Delight Box, or {xlKa} / {xlOut} with a 750 g tub."
       },
       "when": {
         "q": "When will my order be sent?",

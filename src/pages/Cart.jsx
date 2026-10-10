@@ -62,7 +62,7 @@ export default function Cart() {
           </h2>
           <TotalRows subtotal={q.subtotal} courier={null} rates={q.rates} live />
           <p className="t-small mt-3 text-brown-2">
-            {t('cart.courierHow', { smallKa: formatINR(r.small.karnataka), smallOut: formatINR(r.small.outside), largeKa: formatINR(r.large.karnataka), largeOut: formatINR(r.large.outside) })}
+            {t('cart.courierHow', { smallKa: formatINR(r.small.karnataka), smallOut: formatINR(r.small.outside), largeKa: formatINR(r.large.karnataka), largeOut: formatINR(r.large.outside), xlKa: formatINR(r.xl.karnataka), xlOut: formatINR(r.xl.outside) })}
           </p>
           <p className="t-small mt-2 text-brown-2">{t('cart.dispatch', { days: settings.leadTimes.standardBusinessDays })}</p>
           {remoteLoaded && !canOrder && (

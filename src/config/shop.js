@@ -16,13 +16,20 @@
 */
 
 /* ---------------- Courier (customer pays; Hema's exact rates) ---------------- */
-// One charge per order: the highest tier in the cart, for the destination zone.
+// One charge per order: the highest rate among the cart's tiers, for the destination zone.
+//   small = up to 250 g (everything by default), large = 500 g and 700 g Delight Boxes,
+//   xl = 750 g tubs.
 export const courier = {
-  tiers: ['small', 'large'], // lowest first
+  tiers: ['small', 'large', 'xl'], // lowest first
   rates: {
     small: { karnataka: 90, outside: 100 },
     large: { karnataka: 100, outside: 150 },
+    // TO CONFIRM: Hema hasn't given a 750 g rate yet; until she sets one in /admin -> Settings,
+    // 750 g tubs pay the 500-700 g rate.
+    xl: { karnataka: 100, outside: 150 },
   },
+  // Names in Hema's admin (English only)
+  tierNames: { small: '250 g', large: '500–700 g', xl: '750 g' },
   // Karnataka = pincodes starting with these two digits. Everything else ships "outside".
   karnatakaPrefixes: ['56', '57', '58', '59'],
 }
@@ -117,6 +124,8 @@ export const brownieInfo = {
 // ragiPrice: "Make it Ragi" extra. courierTier: 'small' unless a size says otherwise.
 // showWeight: the only weights shown (Hema's choice): Delight Box sizes and the Pista Bar.
 // menu: false = listed only on the Customize page.
+// A tub's courier tier from its weight: 750 g and more = xl, the rest small
+export const tubTier = (grams) => (grams >= 750 ? 'xl' : 'small')
 const tub = (id, sort, name, description, sizes, extra = {}) => ({
   id,
   slug: id,
@@ -130,7 +139,7 @@ const tub = (id, sort, name, description, sizes, extra = {}) => ({
   // diary didn't give them. Set priceStatus: 'coming-soon' to hide a price and turn off its Add to cart.
   priceStatus: sizes ? 'live' : 'coming-soon',
   toConfirm: 'Tub sizes and prices',
-  sizes: (sizes || []).map(([grams, price]) => ({ id: `${grams}g`, grams, price })),
+  sizes: (sizes || []).map(([grams, price]) => ({ id: `${grams}g`, grams, price, courierTier: tubTier(grams) })),
   showWeight: true, // TO CONFIRM: the old tub sizes are weights; Hema's new rule shows weights only for Delight Boxes and the Pista Bar
   ...extra,
 })

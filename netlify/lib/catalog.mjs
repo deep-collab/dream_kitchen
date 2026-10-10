@@ -16,6 +16,7 @@ export function rowToOverride(r) {
   if (has(r.sold_out)) o.soldOut = r.sold_out
   if (has(r.active)) o.active = r.active
   if (has(r.price_status)) o.priceStatus = r.price_status
+  if (r.photo_url) o.photo = r.photo_url
   return o
 }
 

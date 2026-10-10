@@ -41,7 +41,8 @@ describe('WhatsApp and Call (Hema, 7 Oct 2026)', () => {
   })
 
   it('class cards: Hema\'s three classes, prices and booking message', async () => {
-    const { classes, classSchedule } = await import('../src/data/classInfo.js')
+    const { classes } = await import('../src/data/classInfo.js')
+    const { applyClassSettings, slotLabel } = await import('../src/lib/classes.js')
     const { classBookingText } = await import('../src/lib/whatsappText.js')
     expect(classes.map((c) => [c.name.en, c.price, Boolean(c.beginnerFriendly)])).toEqual([
       ['Basic', 2500, false],
@@ -49,7 +50,8 @@ describe('WhatsApp and Call (Hema, 7 Oct 2026)', () => {
       ['Brownie', 3500, true],
     ])
     expect(classBookingText(classes[0])).toBe("Hi, I'd like to book the Basic class")
-    expect(classSchedule.slots.en).toBe('9–11 AM or 12–2 PM')
+    expect(applyClassSettings().slots.map((s) => slotLabel(s)).join(' or ')).toBe('9–11 AM or 12–2 PM')
+    expect(applyClassSettings().slots.map((s) => slotLabel(s, 'kn')).join(' ಅಥವಾ ')).toBe('ಬೆಳಿಗ್ಗೆ 9–11 ಅಥವಾ ಮಧ್ಯಾಹ್ನ 12–2')
     expect(en.checkout.paymentsSoonText).toBe('Online ordering opens soon – order on WhatsApp.')
   })
 
