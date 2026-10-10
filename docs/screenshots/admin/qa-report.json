@@ -1,0 +1,26 @@
+{
+  "consoleErrors": [],
+  "overflow": [],
+  "smallTargets": [],
+  "flows": [
+    "demo opens without a login, with the DEMO label",
+    "demo: \"Preparing\" works on sample data",
+    "demo made 0 calls to /api (it can’t touch real data)",
+    "a wrong password says so in plain words",
+    "Hema logs in and lands on Home",
+    "order: Payment received -> Preparing -> Shipped (courier + tracking), customer emailed",
+    "Track Order shows Shipped with the tracking number",
+    "search by name finds the order",
+    "price ₹175 and Sold out are live on /api/menu at once",
+    "a 1068 KB phone photo became a 1000×1000 webp of 278 KB, served to the website",
+    "class booking: Payment received -> Confirmed",
+    "a blocked slot can’t be booked on the website",
+    "orders CSV downloads (dream-kitchen-orders-2026-10-01-to-2026-10-10.csv)",
+    "an enquiry is marked handled",
+    "Log out returns to the login page",
+    "customer pages load 0 admin files",
+    "the admin API refuses anyone without a login (401)",
+    "admin page tells search engines: noindex"
+  ],
+  "failures": []
+}

@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
 import { classSchedule, classes } from '../data/classInfo'
+import { applyClassSettings, slotLabel } from '../lib/classes'
 import { waLink } from '../config/site'
 import { useShopStatus } from '../context/MenuProvider'
 import { formatINR } from '../lib/pricing'
@@ -82,7 +83,7 @@ export default function Classes() {
             {FACTS.map((k) => (
               <div key={k} className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr]">
                 <dt className="font-bold">{t(`classes.sections.${k}`)}</dt>
-                <dd>{pick(classSchedule[k])}</dd>
+                <dd>{k === 'slots' ? applyClassSettings().slots.map((s) => slotLabel(s, lang, pick)).join(lang === 'kn' ? ' ಅಥವಾ ' : ' or ') : pick(classSchedule[k])}</dd>
               </div>
             ))}
           </dl>
