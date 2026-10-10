@@ -4,7 +4,7 @@
 // signature checks out with our secret key, or Razorpay's webhook (signed with the webhook
 // secret) confirms it, for exactly that amount.
 import { createHmac, timingSafeEqual } from 'node:crypto'
-import { config } from './env.mjs'
+import { backendMode, config } from './env.mjs'
 import { HttpError } from './http.mjs'
 
 const same = (a, b) => {
@@ -21,11 +21,15 @@ export const paymentSignatureOk = ({ orderId, paymentId, signature }, secret = c
 export const webhookSignatureOk = (rawBody, signature, secret = config.razorpay.webhookSecret) =>
   Boolean(secret && signature) && same(createHmac('sha256', secret).update(rawBody).digest('hex'), signature)
 
+// Razorpay's API. Local QA only (practice store): DK_RAZORPAY_API points at a stand-in server
+// (scripts/qa-payments.mjs). Never used with the real database.
+const api = () => (backendMode() === 'mock' && process.env.DK_RAZORPAY_API) || 'https://api.razorpay.com'
+
 /** Creates a Razorpay order: amount in paise, receipt = our code (DK-… or DK-CL-…) */
 export async function createRazorpayOrder({ code, amount, kind }, { fetchImpl = globalThis.fetch } = {}) {
   const { keyId, keySecret, enabled } = config.razorpay
   if (!enabled) throw new HttpError(404, 'razorpayOff')
-  const res = await fetchImpl('https://api.razorpay.com/v1/orders', {
+  const res = await fetchImpl(`${api()}/v1/orders`, {
     method: 'POST',
     headers: { authorization: `Basic ${Buffer.from(`${keyId}:${keySecret}`).toString('base64')}`, 'content-type': 'application/json' },
     body: JSON.stringify({ amount: amount * 100, currency: 'INR', receipt: code, notes: { code, kind } }),
