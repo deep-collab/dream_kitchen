@@ -63,10 +63,10 @@ function Shell({ me, refreshMe }) {
         <div className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-3 px-4">
           <Link to="/" className="flex min-h-12 items-center gap-2 font-wordmark text-gold-light">
             Dream Kitchen
-            {demo ? <span className="rounded bg-gold-mid px-2 py-0.5 font-body text-sm font-bold text-ink">DEMO</span> : <span className="font-body text-sm text-cream/80">Admin</span>}
+            {demo ? <span data-admin-demo-badge className="rounded bg-gold-mid px-2 py-0.5 font-body text-sm font-bold text-ink">DEMO</span> : <span className="font-body text-sm text-cream/80">Admin</span>}
           </Link>
           {demo ? (
-            <a href="/admin" className="inline-flex min-h-12 items-center rounded-control border border-gold/60 px-3 font-bold text-cream">
+            <a href="/admin" className="inline-flex min-h-12 items-center rounded-control border border-gold/60 px-3 font-bold text-cream" data-admin-leave>
               Leave demo
             </a>
           ) : (
@@ -82,7 +82,7 @@ function Shell({ me, refreshMe }) {
         </p>
       )}
       {!demo && me?.warnings?.length > 0 && (
-        <div className="bg-error text-white">
+        <div className="bg-error text-white" data-admin-warnings>
           {me.warnings.map((w) => (
             <p key={w} className="mx-auto flex max-w-3xl items-start gap-2 px-4 py-2 font-bold">
               <AlertIcon className="mt-0.5 h-5 w-5 shrink-0" />

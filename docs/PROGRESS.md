@@ -2,6 +2,30 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 10 Oct 2026: the complete admin, connected end to end (branch admin-complete)
+- [x] Database: migration `20261010000001_admin_complete.sql` (class bookings + history, closed weekends/slots, seats under a lock in `create_booking`, product photos in a public bucket, refund note and paid_at, general messages, alert email and class settings hidden from the public, admin last activity, a 750 g courier tier). One file for the owner: `supabase/setup-all.sql` (tested: runs twice in a fresh Postgres)
+- [x] Login: Supabase Auth, only `admin_users` (Hema + owner); Forgot password (Supabase link → /admin/reset); 30 days unused → log in again (checked on the server and the phone); Log out; new Supabase `sb_secret_` keys supported
+- [x] Admin (`src/admin`, its own bundle, noindex): Home cards; Orders (New/Paid/Preparing/Shipped/Delivered/Cancelled + Today, search, Razorpay payment ID, WhatsApp with the order ID, refund note, history, packing slip); Classes (bookings by weekend/slot, who's coming, close weekends/slots, fees/times/seats); Menu (+ photos from the phone, resized to 1000 px WebP); Settings (3 courier weights, alert email, UPI as fallback); Enquiries (new/handled, WhatsApp reply); Reports (month + top 5, CSV); Setup check (no login needed, no secrets shown)
+- [x] Every admin action in `netlify/lib/adminCore.mjs`, shared by the real admin and `/admin/demo` (sample data in the browser, fixed IDs, 0 network calls)
+- [x] Payments: Razorpay is the main way when its keys exist (orders and bookings; retry reuses the Razorpay order; signature + webhook; amounts must match; repeats change nothing); UPI only as the fallback; neither → "Online ordering opens soon – WhatsApp us"
+- [x] Emails (Resend): Hema for every paid order / booking (or UPI reference to check) and every message; customers for the confirmation and every status change
+- [x] Website: /classes/book and /classes/booking/DK-CL-…; Book now on the Classes page; Contact message form; uploaded photos everywhere; all text in English and Kannada (new part in docs/kannada-priority-for-hema.md)
+- [x] Guides: docs/SETUP-BACKEND.md rewritten for a non-coder; docs/admin-guide-for-hema.md with new screenshots (docs/screenshots/admin/guide)
+
+### Tests and checks (10 Oct)
+- `npm test`: 302 unit/server/database tests, incl. 28 new admin tests (30-day login, forgot password, home cards, tabs/search, refund note, bookings end to end incl. a race for the last seat, blocks, fee changes, Razorpay success/failure/retry/duplicate/tampered, reports, photos, setup check) and database security for the new tables
+- `node scripts/qa-admin.mjs`: every admin screen at 390 px in the demo and on the practice database, the main flows, 0 console errors, 0 sideways scroll, every target ≥ 48 px, customers load 0 admin files: 18/18
+- `node scripts/qa-payments.mjs`: Razorpay test mode in the browser with stand-ins (closed window, failed card, retry, success, emails once, duplicate webhook, tampered amount, class booking): 9/9
+- `node scripts/qa-step6.mjs`: every customer page incl. the booking pages, 4 widths × EN/KN: 0 problems
+- check-i18n clean; check-secrets clean (no keys and no secret names in dist/)
+- Speed (first-visit JS, gzip): English 45.5–55.4 KB (was 44.4–52.6), Kannada 56.5–65.7 KB (was 54–62.2); Lighthouse mobile Home 95 / Menu 98 / Cart 99 / Checkout 100, the rest 100
+
+### Known and accepted
+- 750 g courier rate: Hema hasn't given one; it defaults to the 500–700 g rate (TO CONFIRM; she can set it in Settings)
+- Seats per slot are shared by the three classes (one Hema, one room). Not set = no limit and no seat count on the site
+- Razorpay usually asks for Terms, Privacy, Refund and Shipping pages before approving: they need Hema's own policies (not written here, not invented)
+- Customer emails need a verified domain in Resend (until then only Hema's arrive)
+
 ## 7 Oct 2026: classes, and the site without a database
 - [x] Classes: Hema's details (every Saturday and Sunday, 2-day class, 9–11 AM or 12–2 PM) and 3 cards: Basic ₹2,500, Advanced ₹3,500, Brownie ₹3,500 (beginner friendly), each "Book on WhatsApp" ("Hi, I'd like to book the <class> class"). Empty rows removed. "Book a class" on Home lands on the cards
 - [x] Until the database keys are set (`/api/menu` → ready: false): Track Order shows "Order tracking coming soon. WhatsApp us for your order status." + WhatsApp; the class enquiry form is hidden; the cart and checkout review show "Online ordering opens soon – order on WhatsApp." and a WhatsApp button with the cart typed in (instead of Checkout / Place order)

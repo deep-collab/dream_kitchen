@@ -2,21 +2,25 @@
 
 Tick each line once it is true. Lines already ticked were checked in Step 6 (see `docs/PROGRESS.md`).
 
-## Accounts and settings (`docs/SETUP-BACKEND.md`)
-- [ ] Supabase project created (Mumbai), `supabase/migrations/…_init.sql` and `supabase/seed.sql` run
-- [ ] Sign-ups switched off in Supabase Auth; Hema's admin user created and added to `admin_users`
-- [ ] Resend account (signed up with Hema's email), API key made
-- [ ] Netlify environment variables: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (secret), `RESEND_API_KEY` (secret), `HEMA_EMAIL`; redeployed
-- [ ] `https://<site>/api/menu` shows `"ready":true` (also proves Netlify sends /api to the functions, not the app)
-- [ ] Hema logs in at `/admin`, adds her UPI ID and QR in Settings; the red warning is gone
+## Accounts and settings (`docs/SETUP-BACKEND.md`, steps 1–9; `/admin/setup` shows what's left)
+- [ ] Supabase project (Mumbai); `supabase/setup-all.sql` run once (step 3)
+- [ ] Netlify variables `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (secret), `HEMA_EMAIL`; redeployed; `/api/menu` shows `"ready":true`
+- [ ] Sign-ups off; logins for Hema and the owner; both in `admin_users`; Auth URL Configuration (Site URL + `/admin/reset`)
+- [ ] Resend (signed up with the alert email), `RESEND_API_KEY` (secret); Supabase custom SMTP via Resend (Forgot password for Hema)
+- [ ] Razorpay test keys + webhook (`/api/razorpay-webhook`, payment.captured + order.paid) + `RAZORPAY_WEBHOOK_SECRET`; a test order and a test class booking paid with `success@razorpay`
+- [ ] Razorpay live keys + live webhook after approval (policy pages first, see below)
+- [ ] Optional meanwhile: Hema's UPI ID and QR in admin Settings
 - [ ] Optional: own email domain verified in Resend + `EMAIL_FROM`, so customers get emails too
+- [ ] Setup check all green
 
 ## Hema confirms (TO CONFIRM in `src/config/shop.js`, or set in /admin)
+- [ ] 750 g courier rate (admin Settings; until then it is the 500–700 g rate)
+- [ ] Seats per class slot (admin Classes → Fees & times; empty = no limit)
+- [ ] Her Terms, Privacy, Refund/Cancellation and Shipping rules (Razorpay asks for these pages)
 - [ ] Brownie Tub sizes and prices (the four old tubs show her first-menu prices and weights; Dream Cake Tub shows "Price coming soon")
 - [ ] Dream Cake Tub description (none yet)
 - [ ] Extra preparation days for drawings (placeholder: 2 business days, `leadTimes.drawingExtraBusinessDays` or /admin Settings)
 - [ ] Ragi brownies: gluten-free or not (`brownieInfo.ragiGlutenFree`; the site says "not confirmed")
-- [ ] Class details: what you'll learn, duration, fee, batch size, dates, what to bring (`src/data/classInfo.js`)
 - [ ] Her UPI ID and QR (in /admin)
 - [ ] Call hours, email, FSSAI number (`src/config/site.js`; hidden until filled)
 - [ ] Final web address (`site.url`) for Google and the sitemap

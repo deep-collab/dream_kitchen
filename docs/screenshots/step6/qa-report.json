@@ -8,11 +8,11 @@
   "englishOnKannada": [],
   "journey": [
     "taps from opening the site to Add to cart: 3",
-    "order DK-261010-CK7X: confirmation shows \"submitted\"",
-    "confirmation after reload: DK-261010-CK7X",
+    "order DK-261010-W7ZV: confirmation shows \"submitted\"",
+    "confirmation after reload: DK-261010-W7ZV",
     "Track Order (other browser) after Shipped shows the courier: true",
     "Track Order on another browser, step by step: placed -> payment_confirmed -> preparing -> shipped -> delivered",
-    "emails written to .dev-data/outbox: 1 (New-order-payment-to-check-DK-261010-CK7X-639)",
+    "emails written to .dev-data/outbox: 1 (New-order-payment-to-check-DK-261010-W7ZV-639)",
     "class enquiry appears in admin: true (lang kn)"
   ],
   "security": [
@@ -24,7 +24,7 @@
     "/admin/orders without a login shows: the login form (orders list visible: false)"
   ],
   "loader": [
-    "first visit: shown false, gone 13 ms after first check (page time 498 ms)",
+    "first visit: shown true, gone 571 ms after first check (page time 1012 ms)",
     "second visit shows it: false",
     "reduced motion shows it: false"
   ],

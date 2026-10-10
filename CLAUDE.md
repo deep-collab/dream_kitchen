@@ -17,9 +17,11 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 ## Stack
 - Vite 8 + React components running on **Preact** (preact/compat alias in vite.config.js) + react-router + Tailwind 4.
   Avoid React-only APIs that preact/compat lacks.
-- Two pages: the shop (`index.html`, `src/`) and Hema's admin (`admin/index.html`, `src/admin/`, its own bundle; customers download none of it).
+- Two pages: the shop (`index.html`, `src/`) and Hema's admin (`admin/index.html`, `src/admin/`, its own bundle; customers download none of it). `/admin/demo` = the same admin on sample data, in the browser only (`src/admin/demo`).
+- Every admin action lives in `netlify/lib/adminCore.mjs` (no Node-only code): the `admin` function runs it after the login check (Supabase Auth, `admin_users`, 30 days idle = log in again), and the demo runs it on `netlify/lib/store/memoryCore.mjs`. In the browser build `netlify/lib/env.mjs` is swapped for `src/admin/demo/browserEnv.js` (vite.config.js), so no secret's name reaches a browser.
 - Server: **Netlify Functions** (`netlify/functions/*.mjs`, each at `/api/<name>`) + **Supabase** (Postgres + Auth + private Storage), reached over REST with the service key. Mock store for local dev and tests (`DK_MOCK_BACKEND=1`, set by `scripts/dev-api.mjs`).
-- Email: Resend (or the dev outbox `.dev-data/outbox/`). Payments: on-site UPI (Phase 1, on); Razorpay (Phase 2, built, off until its keys exist).
+- Email: Resend (or the dev outbox `<DK_DEV_DATA_DIR>/outbox/`). Templates: `netlify/lib/emailTemplates.mjs`. Payments: **Razorpay is the main way** as soon as its keys exist (orders and class bookings); UPI (Hema checks the UTR) only as the fallback while it isn't; neither = "Online ordering opens soon – WhatsApp us".
+- Database setup for the owner: one file, `supabase/setup-all.sql` (`node scripts/setup-sql.mjs`; a test fails if it is stale). Owner's guide: `docs/SETUP-BACKEND.md`; Hema's: `docs/admin-guide-for-hema.md`.
 - Secrets only in Netlify environment variables (`.env.example`, `docs/SETUP-BACKEND.md`). Never in code or chat. `node scripts/check-secrets.mjs` checks every build.
 - Git: commit on the working branch; push only when the user says "push"; never merge without being asked.
 
@@ -28,7 +30,7 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - **`src/lib/pricing.js`**: the one pricing module (unit prices, options, courier zone/tier/charge, Hema's admin overrides and settings, UPI link, UTR). Imported by the website **and** every server function, so totals can never disagree.
 - `src/lib/dates.js` (dispatch dates, IST), `src/lib/checkout.js` (customer details), `src/lib/enquiry.js` (class enquiry): shared by site and server too.
 - Hema's admin changes live in Supabase (`products` / `settings` override columns, NULL = config) and are applied by `applyOverrides` / `applySettings` on both sides.
-- Text: `src/i18n/en.json` + `kn.json` (customer pages, both languages); `netlify/lib/emailText.mjs` (customer emails); admin text is English, in `src/admin`. Business details: `src/config/site.js`. Class details (days, slots, the three classes and prices): `src/data/classInfo.js`.
+- Text: `src/i18n/en.json` + `kn.json` (customer pages, both languages); `netlify/lib/emailText.mjs` (customer emails); admin text is English, in `src/admin`. Business details: `src/config/site.js`. Class details (days, slots, the three classes and prices, seats): `src/data/classInfo.js`; booking rules (weekends, seats, booking IDs `DK-CL-YYMMDD-XXXX`): `src/lib/classes.js` + `src/lib/classTimes.js`, shared by site and server.
 
 ## The menu (Hema's, exactly; never invent prices, weights, ingredients or claims)
 - Brownie Tubs: Ferrero Rocher Nutella, Lotus Biscoff, Red Velvet White Chocolate, Oreo Overload (prices kept from her first menu, TO CONFIRM), Dream Cake Tub ("Price coming soon").
@@ -37,15 +39,20 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - Chocolates: Pista Bar ₹450 (250 g shown), Almond Bar ₹150 (no weight).
 - Customize page only: Drawing Chocolate Bar ₹950.
 - Weights shown only for Delight Box sizes and the Pista Bar (tub sizes are TO CONFIRM).
-- Courier (customer pays, one charge per order, highest tier): Small ₹90 Karnataka / ₹100 outside; Large (Delight Box 500 g, 700 g) ₹100 / ₹150. Zone from the pincode (56–59 = Karnataka); a state mismatch warns, the pincode wins.
+- Courier (customer pays, one charge per order, the highest rate among its tiers): 250 g ₹90 Karnataka / ₹100 outside; 500–700 g (Delight Box 500 g, 700 g) ₹100 / ₹150; 750 g tubs (TO CONFIRM, defaults to the 500–700 g rate). Zone from the pincode (56–59 = Karnataka); a state mismatch warns, the pincode wins. Hema sets all six rates in admin Settings.
 
 ## Ordering and payment
 Cart → Details → Review & courier (dispatch date: lead time in business days, Mon–Sat, IST; drawings
-add the extra) → Place order (server re-prices; idempotent) → Pay by UPI (QR / upi:// link / UPI ID,
-then the 12-digit UTR, optional screenshot) → Confirmation (works after reload). Hema confirms the
-payment in /admin. Track Order works on any device with order ID + phone:
+add the extra) → Place order (server re-prices; idempotent) → Pay: Razorpay (one button; a closed
+window or failed card can simply try again, the same Razorpay order is reused; signature check +
+webhook mark it Paid) or, only while Razorpay isn't set up, UPI (QR / upi:// link / UPI ID, then the
+12-digit UTR; Hema confirms it in /admin) → Confirmation (works after reload). Track Order works on any device with order ID + phone:
 Placed → Payment confirmed → Preparing → Shipped (courier + tracking) → Delivered; Cancelled shown apart.
 Order IDs `DK-YYMMDD-XXXX` (IST date + 4 characters, unique in the database).
+Classes: Classes → Book now → /classes/book (class → one of the next 8 weekends → slot → details → pay)
+→ /classes/booking/DK-CL-YYMMDD-XXXX. Hema blocks weekends/slots and sets fees, times and seats in
+admin → Classes. Emails: Hema when an order/booking is paid (or has a UPI reference to check) and for
+every website message; the customer (if they gave an email) for the confirmation and every status change.
 WhatsApp (Hema, 7 Oct 2026): the home hero's "Order on WhatsApp" (message typed in: `site.whatsappOrderText`),
 "Chat on WhatsApp" on Contact, and "Book on WhatsApp" on each class card. While the database isn't connected
 (`/api/menu` → `ready: false`, `backendReady` in MenuProvider): Track Order shows "coming soon" + WhatsApp
@@ -72,11 +79,14 @@ Details and tokens: `docs/DESIGN.md`.
 
 ## Working rules
 Ask only if truly blocked. Keep chat replies short. Explain manual steps in plain words. Never put
-keys in code or chat. Run `npm test`, `node scripts/check-i18n.mjs` and `node scripts/qa-step6.mjs`
-(dev server as described in that file) after changes. Speed budget: first-visit JS ≤ ~66 KB gzip
+keys in code or chat. Run `npm test`, `node scripts/check-i18n.mjs`, `node scripts/qa-step6.mjs` and `node scripts/qa-admin.mjs`
+(dev server as described in those files; a fresh `DK_DEV_DATA_DIR` per run is best) and
+`node scripts/qa-payments.mjs` (starts its own server) after changes. Speed budget: first-visit JS ≤ ~66 KB gzip
 (`node scripts/bundle-report.mjs`), Lighthouse mobile Performance 90+, the rest 100.
 
 ## Build history
+Admin complete (10 Oct 2026, branch admin-complete): the full admin, class booking on the site,
+Razorpay as the main payment, the demo admin, the setup check, new guides. See `docs/PROGRESS.md`.
 Steps 1–5 (Oct 2026): foundation, menu and cart, WhatsApp checkout, classes and pages, launch prep and
 speed. Step 6 (5 Oct 2026): Hema's new menu, the simpler site, courier charges, orders and UPI payment
 on the website, Supabase + Netlify Functions, the admin. See `docs/PROGRESS.md`.
