@@ -288,7 +288,7 @@ describe('settings, UPI and UTR', () => {
   it('Hema’s settings win, bad values fall back', () => {
     const s = applySettings({ upiId: 'hema@okaxis', courierRates: { large: { outside: 160 }, small: { karnataka: -1 } }, storeOpen: false, leadDrawingExtra: 3 })
     expect(s.payment.upiId).toBe('hema@okaxis')
-    expect(s.courier.rates).toEqual({ small: { karnataka: 90, outside: 100 }, large: { karnataka: 100, outside: 160 } })
+    expect(s.courier.rates).toEqual({ small: { karnataka: 90, outside: 100 }, large: { karnataka: 100, outside: 160 }, xl: { karnataka: 100, outside: 150 } })
     expect(s.store.open).toBe(false)
     expect(s.leadTimes.drawingExtraBusinessDays).toBe(3)
     expect(applySettings({ upiId: 'not a upi' }).payment.upiId).toBe('')

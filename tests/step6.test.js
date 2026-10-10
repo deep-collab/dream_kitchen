@@ -26,12 +26,13 @@ describe('WhatsApp and Call (Hema, 7 Oct 2026)', () => {
   const customerFiles = srcFiles.filter((f) => !/[\\/]admin[\\/]/.test(f))
   const using = (re) => customerFiles.filter((f) => re.test(read(f))).map((f) => f.replaceAll('\\', '/')).sort()
 
-  it('WhatsApp only where Hema asked: home hero, Contact, class cards, and Track / cart / review while the database is not connected', () => {
+  it('WhatsApp only where Hema asked: home hero, Contact, class cards, and Track / cart / review / class booking while online ordering isn’t open', () => {
     // Hema's admin may also WhatsApp a customer (brief 6.2)
     expect(using(/waLink\(|wa\.me/)).toEqual([
       'src/components/home/Hero.jsx',
       'src/components/ui/Button.jsx',
       'src/config/site.js',
+      'src/pages/BookClass.jsx',
       'src/pages/Cart.jsx',
       'src/pages/CheckoutReview.jsx',
       'src/pages/Classes.jsx',
@@ -41,7 +42,8 @@ describe('WhatsApp and Call (Hema, 7 Oct 2026)', () => {
   })
 
   it('class cards: Hema\'s three classes, prices and booking message', async () => {
-    const { classes, classSchedule } = await import('../src/data/classInfo.js')
+    const { classes } = await import('../src/data/classInfo.js')
+    const { applyClassSettings, slotLabel } = await import('../src/lib/classes.js')
     const { classBookingText } = await import('../src/lib/whatsappText.js')
     expect(classes.map((c) => [c.name.en, c.price, Boolean(c.beginnerFriendly)])).toEqual([
       ['Basic', 2500, false],
@@ -49,7 +51,8 @@ describe('WhatsApp and Call (Hema, 7 Oct 2026)', () => {
       ['Brownie', 3500, true],
     ])
     expect(classBookingText(classes[0])).toBe("Hi, I'd like to book the Basic class")
-    expect(classSchedule.slots.en).toBe('9–11 AM or 12–2 PM')
+    expect(applyClassSettings().slots.map((s) => slotLabel(s)).join(' or ')).toBe('9–11 AM or 12–2 PM')
+    expect(applyClassSettings().slots.map((s) => slotLabel(s, 'kn')).join(' ಅಥವಾ ')).toBe('ಬೆಳಿಗ್ಗೆ 9–11 ಅಥವಾ ಮಧ್ಯಾಹ್ನ 12–2')
     expect(en.checkout.paymentsSoonText).toBe('Online ordering opens soon – order on WhatsApp.')
   })
 

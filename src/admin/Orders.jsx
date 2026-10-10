@@ -1,71 +1,80 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { adminCall, problem } from './api'
-import { Btn, day, formatINR, PAYMENT_WORDS, paymentTone, Pill, STATUS_WORDS, when } from './ui'
+import { adminCall } from './api'
+import { Btn, day, ErrorText, formatINR, input, Loading, PageTitle, PAYMENT_WORDS, paymentTone, Pill, STATUS_WORDS, Tabs, useAdminData, when } from './ui'
+import { SearchIcon } from '../components/icons'
 
 const TABS = [
   ['new', 'New'],
-  ['payment', 'Payment to check'],
+  ['paid', 'Paid'],
   ['preparing', 'Preparing'],
   ['shipped', 'Shipped'],
-  ['done', 'Done'],
+  ['delivered', 'Delivered'],
+  ['cancelled', 'Cancelled'],
 ]
+const HINTS = {
+  new: 'Not paid yet, or a UPI payment to check.',
+  paid: 'Paid. Make these next (soonest dispatch first).',
+  preparing: 'Being made. Mark “Shipped” when they leave.',
+  today: 'Every order placed today.',
+}
 
-/** Orders, newest first, in five tabs. Each card: code, name, total, payment and dispatch date. */
+/** Orders, newest first, in tabs by status, with search by order ID, name or phone */
 export default function Orders() {
   const [params, setParams] = useSearchParams()
-  const tab = TABS.some(([k]) => k === params.get('tab')) ? params.get('tab') : 'new'
-  const [data, setData] = useState(null)
-  const [error, setError] = useState('')
+  const q = params.get('q') || ''
+  const tab = [...TABS.map(([k]) => k), 'today'].includes(params.get('tab')) ? params.get('tab') : 'new'
+  const [typed, setTyped] = useState(q)
+  const { data, error, busy, reload } = useAdminData(() => adminCall('orders', q ? { q } : { tab }), [tab, q], { every: 60_000 })
 
-  const [busy, setBusy] = useState(false)
-  const load = useCallback(async () => {
-    setBusy(true)
-    const r = await adminCall('orders', { tab })
-    setBusy(false)
-    if (r.ok) {
-      setData(r.data)
-      setError('')
-    } else setError(problem(r))
-  }, [tab])
-  // New orders show up by themselves: on opening, when Hema comes back to the app, and every minute
-  useEffect(() => {
-    load()
-    const onVisible = () => document.visibilityState === 'visible' && load()
-    document.addEventListener('visibilitychange', onVisible)
-    const timer = setInterval(() => document.visibilityState === 'visible' && load(), 60_000)
-    return () => {
-      document.removeEventListener('visibilitychange', onVisible)
-      clearInterval(timer)
-    }
-  }, [load])
-
+  const search = (e) => {
+    e.preventDefault()
+    setParams(typed.trim() ? { q: typed.trim() } : {})
+  }
   return (
     <div>
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="t-h2">Orders</h1>
-        <Btn tone="light" onClick={load} disabled={busy}>
-          {busy ? 'Checking…' : 'Refresh'}
+      <PageTitle
+        action={
+          <Btn tone="light" onClick={reload} disabled={busy}>
+            {busy ? 'Checking…' : 'Refresh'}
+          </Btn>
+        }
+      >
+        Orders
+      </PageTitle>
+      <form role="search" onSubmit={search} className="mt-3 flex gap-2">
+        <label className="sr-only" htmlFor="order-search">
+          Search orders
+        </label>
+        <input id="order-search" className={`${input} flex-1`} type="search" placeholder="Order ID, name or phone" value={typed} onChange={(e) => setTyped(e.target.value)} />
+        <Btn type="submit" aria-label="Search">
+          <SearchIcon className="h-5 w-5" /> Search
         </Btn>
-      </div>
-      <div role="tablist" aria-label="Order lists" className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1">
-        {TABS.map(([k, label]) => (
+      </form>
+      {q ? (
+        <p className="mt-3 flex flex-wrap items-center gap-2">
+          Results for <strong>“{q}”</strong>
           <button
-            key={k}
-            role="tab"
-            aria-selected={tab === k}
-            onClick={() => setParams(k === 'new' ? {} : { tab: k })}
-            className={`inline-flex min-h-12 shrink-0 items-center gap-2 rounded-full px-4 font-bold ${tab === k ? 'bg-ink text-gold-light' : 'border border-line bg-[#fffcf5]'}`}
+            type="button"
+            className="inline-flex min-h-12 items-center font-bold underline underline-offset-4"
+            onClick={() => {
+              setTyped('')
+              setParams({})
+            }}
           >
-            {label}
-            {data?.counts?.[k] > 0 && <span className={`rounded-full px-2 text-sm ${tab === k ? 'bg-gold-mid text-ink' : 'bg-champagne'}`}>{data.counts[k]}</span>}
+            Clear search
           </button>
-        ))}
-      </div>
+        </p>
+      ) : (
+        <div className="mt-3">
+          <Tabs tabs={tab === 'today' ? [['today', 'Today'], ...TABS] : TABS} value={tab} onChange={(k) => setParams(k === 'new' ? {} : { tab: k })} label="Order lists" counts={data?.counts} />
+          {HINTS[tab] && <p className="t-small mt-2 text-brown-2">{HINTS[tab]}</p>}
+        </div>
+      )}
 
-      {error && <p className="mt-4 font-bold text-error">{error}</p>}
-      {!data && !error && <p className="mt-6 text-brown-2">Loading…</p>}
-      {data && data.orders.length === 0 && <p className="mt-6 text-brown-2">No orders here.</p>}
+      <ErrorText>{error}</ErrorText>
+      {!data && !error && <Loading />}
+      {data && data.orders.length === 0 && <p className="mt-6 text-brown-2">{q ? 'No order matches.' : 'No orders here.'}</p>}
 
       <ul className="mt-4 space-y-3">
         {data?.orders.map((o) => (
@@ -81,7 +90,7 @@ export default function Orders() {
               <p className="t-small text-brown-2">{o.itemsText}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <Pill tone={paymentTone(o.paymentStatus)}>{PAYMENT_WORDS[o.paymentStatus]}</Pill>
-                <Pill>{STATUS_WORDS[o.status]}</Pill>
+                {(q || tab === 'today') && <Pill tone={o.status === 'cancelled' ? 'bad' : 'plain'}>{STATUS_WORDS[o.status]}</Pill>}
                 {o.hasDrawing && <Pill tone="warn">Drawing</Pill>}
                 <span className="t-small text-brown-2">Dispatch {day(o.dispatchDate)}</span>
               </div>

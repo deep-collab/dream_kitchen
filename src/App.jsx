@@ -16,6 +16,8 @@ const Pay = lazy(pages.Pay)
 const OrderConfirmed = lazy(pages.OrderConfirmed)
 const Track = lazy(pages.Track)
 const Classes = lazy(pages.Classes)
+const BookClass = lazy(pages.BookClass)
+const Booking = lazy(pages.Booking)
 const Story = lazy(pages.Story)
 const Contact = lazy(pages.Contact)
 const FAQ = lazy(pages.FAQ)
@@ -41,6 +43,8 @@ export default function App() {
         <Route path="order/:code" element={<OrderConfirmed />} />
         <Route path="track" element={<Track />} />
         <Route path="classes" element={<Classes />} />
+        <Route path="classes/book" element={<BookClass />} />
+        <Route path="classes/booking/:code" element={<Booking />} />
         <Route path="our-story" element={<Story />} />
         <Route path="contact" element={<Contact />} />
         <Route path="faq" element={<FAQ />} />

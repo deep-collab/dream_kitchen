@@ -19,7 +19,7 @@ const get = (d, k) => k.split('.').reduce((n, p) => n?.[p], d)
 const exampleDate = (dates) => dates.format.replace('{weekday}', dates.weekdays[3]).replace('{day}', '7').replace('{month}', dates.months[9])
 
 // Example values for {placeholders}, per language, so every line reads as the customer sees it
-const common = { phone: site.phone.display, price: '₹1,700', count: '3', days: '2', max: '20', code: 'DK-261005-7Q4M', id: 'DK-261005-7Q4M', total: '₹2,100', grams: '250', n: '2', year: '2026', fssai: '12345678901234', h: '10', karnataka: '₹90', outside: '₹100', smallKa: '₹90', smallOut: '₹100', largeKa: '₹100', largeOut: '₹150', drawingPrice: '₹450', barPrice: '₹950', old: '₹999', new: '₹1,099', pincode: '400001', name: 'Asha', link: 'https://…', courier: 'DTDC', tracking: 'D12345678' }
+const common = { class: 'Basic', weekend: 'Sat 17 – Sun 18 Oct', slot: '9–11 AM', fee: '₹2,500', sat: '17', sun: '18', month2: 'Oct', reason: 'Customer asked to cancel', phone: site.phone.display, price: '₹1,700', count: '3', days: '2', max: '20', code: 'DK-261005-7Q4M', id: 'DK-261005-7Q4M', total: '₹2,100', grams: '250', n: '2', year: '2026', fssai: '12345678901234', h: '10', karnataka: '₹90', outside: '₹100', smallKa: '₹90', smallOut: '₹100', largeKa: '₹100', largeOut: '₹150', drawingPrice: '₹450', barPrice: '₹950', old: '₹999', new: '₹1,099', pincode: '400001', name: 'Asha', link: 'https://…', courier: 'DTDC', tracking: 'D12345678' }
 const EXAMPLES = {
   en: { ...common, date: exampleDate(en.dates), first: en.checkout.errors.name.required, zone: en.checkout.zone.outside, state: 'Karnataka', weekday: en.dates.weekdays[3], day: '7', month: en.dates.months[9], opens: '10 am', closes: '8 pm' },
   kn: { ...common, date: exampleDate(kn.dates), first: kn.checkout.errors.name.required, zone: kn.checkout.zone.outside, state: 'ಕರ್ನಾಟಕ', weekday: kn.dates.weekdays[3], day: '7', month: kn.dates.months[9], opens: '10', closes: '8' },
@@ -60,8 +60,30 @@ for (const [screen, keys] of PRIORITY) {
     inPart1.add(k)
   }
 }
+// Emails added on 10 Oct 2026 (status changes, class bookings) go in the "new" part below
+const NEW_EMAILS = new Set(['hello', 'paidSubject', 'paidText', 'preparingSubject', 'preparingText', 'deliveredSubject', 'deliveredText', 'cancelledSubject', 'cancelledText', 'cancelledPaid', 'bookingSubject', 'bookingConfirmedSubject', 'bookingHello', 'bookingClass', 'bookingWhen', 'bookingFee', 'bookingPaid', 'bookingPay', 'bookingLink', 'bookingCancelledSubject', 'bookingCancelledText', 'weekend', 'weekendAcross', 'months'])
 part1.push('| **Emails customers receive** | | |')
-for (const [k, v] of Object.entries(customerText)) part1.push(row(fill(v.en, 'en', k), fill(v.kn, 'kn', k)))
+for (const [k, v] of Object.entries(customerText)) if (!NEW_EMAILS.has(k)) part1.push(row(fill(v.en, 'en', k), fill(v.kn, 'kn', k)))
+
+// New on 10 Oct 2026: online class booking, paying through Razorpay, the Contact message form,
+// and the emails customers get when Hema moves an order along
+const NEW = [
+  ['Booking a class', ['classes.leadBook', 'classes.bookNow', 'book.title', 'book.lead', 'book.stepWeekend', 'book.stepWeekendHint', 'book.stepSlot', 'book.full', 'book.closed', 'book.seatsLeft', 'book.emailHint', 'book.pay', 'book.summary', 'book.slotFull', 'book.noneOpen']],
+  ['The booking page', ['book.payTitle', 'book.saved', 'book.confirmed', 'book.confirmedText', 'book.submittedTitle', 'book.submittedText', 'book.cancelledTitle', 'book.time', 'book.needPhone']],
+  ['Paying online (Razorpay)', ['pay.payNow', 'pay.secure', 'pay.opening', 'pay.verifying', 'pay.notFinished', 'pay.failed', 'pay.checkLater', 'pay.onlineFailed']],
+  ['Contact page message form', ['contact.formTitle', 'contact.message', 'contact.send', 'contact.sentTitle', 'contact.errors.message.required']],
+]
+const partNew = ['| English | ಕನ್ನಡ | Correct? |', '|---|---|---|']
+for (const [screen, keys] of NEW) {
+  partNew.push(`| **${screen}** | | |`)
+  for (const k of keys) {
+    if (get(en, k) == null || get(kn, k) == null) throw new Error(`kannada-list: ${k} is missing from en.json or kn.json`)
+    partNew.push(row(fill(get(en, k), 'en', k), fill(get(kn, k), 'kn', k)))
+    inPart1.add(k)
+  }
+}
+partNew.push('| **Emails customers receive (new)** | | |')
+for (const k of NEW_EMAILS) partNew.push(row(fill(customerText[k].en, 'en', k), fill(customerText[k].kn, 'kn', k)))
 
 // Part 2: everything else, grouped by where it appears
 const PLACES = {
@@ -112,6 +134,6 @@ const intro = [
 ]
 const head = [...intro, ...part1]
 if (head.length > MAX_PART1_LINES) throw new Error(`kannada-list: Part 1 is ${head.length} lines; keep it under ${MAX_PART1_LINES}`)
-const md = [...head, '', `## Later, if you have time (${part2Count} more)`, ...part2, ''].join('\n')
+const md = [...head, '', '## New on 10 October: class booking, paying online, and order emails', '', ...partNew, '', `## Later, if you have time (${part2Count} more)`, ...part2, ''].join('\n')
 writeFileSync(OUT, md)
-console.log(`${OUT}: Part 1 ${head.length} lines (${inPart1.size} texts + ${Object.keys(customerText).length} email lines), Part 2 ${part2Count} texts`)
+console.log(`${OUT}: Part 1 ${head.length} lines, new part ${partNew.length} lines (${inPart1.size} texts + ${Object.keys(customerText).length} email lines), Part 2 ${part2Count} texts`)

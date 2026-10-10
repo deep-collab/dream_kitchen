@@ -166,12 +166,15 @@ export function stateMismatch(stateId, zone) {
   return (stateId === 'karnataka') !== (zone === 'karnataka')
 }
 
-/** Courier for the whole order: the rate for its highest tier in that zone. 0 for an empty cart, null if the zone is unknown. */
+/**
+ * Courier for the whole order: the highest rate among its tiers in that zone (with Hema's rates
+ * in order that is the highest tier's rate; taking the highest rate keeps it right even if she
+ * sets a heavier tier cheaper). 0 for an empty cart, null if the zone is unknown.
+ */
 export function courierCharge(tiers, zone, cfg = COURIER) {
-  const tier = cartCourierTier(tiers, cfg)
-  if (!tier) return 0
+  if (!tiers.length) return 0
   if (!zone) return null
-  return cfg.rates[tier][zone]
+  return Math.max(...[...new Set(tiers)].map((t) => cfg.rates[t]?.[zone] ?? cfg.rates[cfg.tiers[0]][zone]))
 }
 
 /** The lowest courier charge anyone pays ("+ courier from ₹90") */
@@ -219,7 +222,7 @@ const money = (v) => (Number.isInteger(v) && v > 0 && v <= 100000 ? v : undefine
 /**
  * The config menu with Hema's admin changes on top. Both sides call this with the same rows,
  * so they price the same menu. Only known fields with sane values are taken.
- *   overrides: [{ id, price?, ragiPrice?, sizes?: [{ id, grams?, label?, price }], soldOut?, active?, priceStatus? }]
+ *   overrides: [{ id, price?, ragiPrice?, sizes?: [{ id, grams?, label?, price }], soldOut?, active?, priceStatus?, photo? }]
  * Sizes: a product with sizes gets new prices for them; a tub may get its sizes defined (Hema
  * sends tub sizes later). Courier tiers always come from the config.
  */
@@ -239,13 +242,17 @@ export function applyOverrides(products, overrides = []) {
           const base = sizeOf(p, s.id)
           const grams = Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? s.grams : base?.grams
           const label = typeof s.label === 'string' && clean(s.label) ? clean(s.label).slice(0, 24) : undefined
-          return { id: s.id, price: s.price, ...(grams ? { grams } : {}), ...(label ? { label } : {}), courierTier: base?.courierTier || p.courierTier }
+          // New tub sizes Hema adds get their tier from the weight (750 g and more = xl)
+          const tier = base?.courierTier || (p.category === 'brownie-tubs' && grams >= 750 ? 'xl' : p.courierTier)
+          return { id: s.id, price: s.price, ...(grams ? { grams } : {}), ...(label ? { label } : {}), courierTier: tier }
         })
       if (sizes.length) next.sizes = sizes
     }
     if (typeof o.soldOut === 'boolean') next.soldOut = o.soldOut
     if (typeof o.active === 'boolean') next.active = o.active
     if (o.priceStatus === 'live' || o.priceStatus === 'coming-soon') next.priceStatus = o.priceStatus
+    // A photo Hema uploaded in the admin (Supabase storage, or the practice store's /api/photo/)
+    if (typeof o.photo === 'string' && o.photo.length <= 500 && /^(https:\/\/|\/api\/photo\/)/.test(o.photo)) next.photo = o.photo
     return next
   })
 }

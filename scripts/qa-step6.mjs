@@ -10,9 +10,12 @@
 import { mkdirSync, readdirSync, writeFileSync, existsSync } from 'node:fs'
 import { chromium } from 'playwright'
 import { dateChoices, dispatchRules } from '../src/lib/dates.js'
+import { bookableSaturdays } from '../src/lib/classes.js'
 
 const BASE = 'http://localhost:5173'
 const OUT = 'docs/screenshots/step6'
+// The dev server's practice emails (DK_DEV_DATA_DIR, as the server was started)
+const OUTBOX = `${process.env.DK_DEV_DATA_DIR || '.dev-data'}/outbox`
 const WIDTHS = [360, 390, 768, 1280]
 const HEIGHT = { 360: 780, 390: 844, 768: 1024, 1280: 800 }
 const ADMIN = { email: process.env.DK_DEV_ADMIN_EMAIL || 'hema@example.com', password: process.env.DK_DEV_ADMIN_PASSWORD || 'dev-only-pass' }
@@ -49,7 +52,8 @@ async function newPage(browser, width, lang, { intro = false, reducedMotion = 'n
     ([l, skip, mine]) => {
       if (skip) localStorage.setItem('dk_intro_seen', '1')
       localStorage.setItem('dk_lang', l)
-      if (mine.length) localStorage.setItem('dk_my_orders', JSON.stringify(mine))
+      if (mine.length) localStorage.setItem('dk_my_orders', JSON.stringify(mine.filter((o) => !o.code.startsWith('DK-CL-'))))
+      if (mine.some((o) => o.code.startsWith('DK-CL-'))) localStorage.setItem('dk_my_bookings', JSON.stringify(mine.filter((o) => o.code.startsWith('DK-CL-'))))
     },
     [lang, !intro, orders],
   )
@@ -95,7 +99,7 @@ async function audit(page, label) {
 }
 
 // Half-written text, and English left on a Kannada page
-const ALLOWED_LATIN = /Dream Kitchen|Dream|Kitchen|Handmade|Chocolates|DREAM|KITCHEN|Ferrero Rocher|Nutella|Lotus Biscoff|Biscoff|Oreo|Google Pay|PhonePe|Paytm|UTR|UPI|FSSAI|JPG|PNG|WebP|English|EN|DK[‑-]\d{6}[‑-][A-Z0-9]{4}|DK|[\w.+-]+@[\w.-]+|dreamkitchen_01_homemade|Asha Rao|Jayanagar 4th Block|3rd Cross|Bengaluru|Amma|A small pink teddy bear|Karnataka|Instagram/g
+const ALLOWED_LATIN = /Dream Kitchen|Dream|Kitchen|Handmade|Chocolates|DREAM|KITCHEN|Ferrero Rocher|Nutella|Lotus Biscoff|Biscoff|Oreo|Google Pay|PhonePe|Paytm|UTR|UPI|FSSAI|JPG|PNG|WebP|English|EN|Razorpay|Meera K|DK[‑-]CL[‑-]\d{6}[‑-][A-Z0-9]{4}|DK[‑-]\d{6}[‑-][A-Z0-9]{4}|DK|[\w.+-]+@[\w.-]+|dreamkitchen_01_homemade|Asha Rao|Jayanagar 4th Block|3rd Cross|Bengaluru|Amma|A small pink teddy bear|Karnataka|Instagram/g
 async function contentChecks(page, label, lang) {
   const text = await page.evaluate(() => {
     document.querySelectorAll('details').forEach((d) => (d.open = true))
@@ -114,7 +118,7 @@ async function contentChecks(page, label, lang) {
     [/₹\s*(?![\d,]+)/, 'a ₹ with no amount'],
     [/\b(undefined|null|NaN)\b/, 'undefined/null/NaN'],
     [/\{[a-zA-Z]+\}/, 'an unfilled {placeholder}'],
-    [/\b(checkout|cart|sheet|menu|pay|order|track|classes|story|contact|faq|errors|common|nav|seo)\.[a-zA-Z]+\b/, 'a raw text key'],
+    [/\b(checkout|cart|sheet|menu|pay|order|track|classes|book|story|contact|faq|errors|common|nav|seo)\.[a-zA-Z]+\b/, 'a raw text key'],
   ]) {
     const m = text.match(new RegExp(`.{0,40}${re.source}.{0,30}`))
     if (m) report.halfWritten.push(`${label}: ${what}: "${m[0]}"`)
@@ -165,6 +169,11 @@ async function matrix(browser, codes) {
     ['order', `/order/${codes.order}`],
     ['track', `/track?id=${codes.order}`],
     ['classes', '/classes'],
+    ['book', '/classes/book?class=brownie', async (p) => {
+      await p.locator('label:has(input[name=bk-weekend]:not([disabled]))').first().click()
+      await p.locator('label:has(input[name=bk-slot]:not([disabled]))').first().click()
+    }],
+    ['booking', `/classes/booking/${codes.booking}`],
     ['contact', '/contact'],
     ['story', '/our-story'],
     ['faq', '/faq'],
@@ -172,7 +181,7 @@ async function matrix(browser, codes) {
   ]
   for (const width of WIDTHS)
     for (const lang of ['en', 'kn']) {
-      const { ctx, page } = await newPage(browser, width, lang, { orders: [codes.pay, codes.order].map((code) => ({ code, phone: customer.phone, at: Date.now() })) })
+      const { ctx, page } = await newPage(browser, width, lang, { orders: [codes.pay, codes.order, codes.booking].map((code) => ({ code, phone: code.startsWith('DK-CL-') ? '9000012345' : customer.phone, at: Date.now() })) })
       // A cart and a checkout draft, as a customer would have them
       await page.addInitScript((c) => {
         sessionStorage.setItem('dk_checkout_draft', JSON.stringify({ form: c, remember: true }))
@@ -223,7 +232,7 @@ async function addToCart(page, name, custom) {
 
 /* ---------------- 2. the whole journey, timed like a first-time customer ---------------- */
 async function journey(browser) {
-  const outboxBefore = existsSync('.dev-data/outbox') ? readdirSync('.dev-data/outbox').length : 0
+  const outboxBefore = existsSync(OUTBOX) ? readdirSync(OUTBOX).length : 0
   const { ctx, page } = await newPage(browser, 390, 'en')
   let steps = 0
   const tap = async (sel) => {
@@ -310,9 +319,10 @@ async function journey(browser) {
   if (seen.join() !== 'placed,payment_confirmed,preparing,shipped,delivered') fail(`track steps: ${seen.join()}`)
   await other.close()
   // Emails (dev outbox): Hema's new order, Hema's payment to check (no customer email given here)
-  const outbox = existsSync('.dev-data/outbox') ? readdirSync('.dev-data/outbox').slice(outboxBefore) : []
+  const outbox = existsSync(OUTBOX) ? readdirSync(OUTBOX).slice(outboxBefore) : []
   report.journey.push(`emails written to .dev-data/outbox: ${outbox.length} (${outbox.map((f) => f.replace(/^\d+-/, '').replace('.json', '')).join(', ')})`)
-  if (outbox.length < 2) fail('expected the new-order and payment emails to Hema')
+  // Hema hears about an order once it has a payment (or a UPI reference) to check, not when it is placed
+  if (outbox.length < 1) fail('expected the "new order, payment to check" email to Hema')
 
   // Class enquiry -> admin
   const before = (await post('admin', { action: 'enquiries' }, { authorization: auth })).body.enquiries.length
@@ -390,7 +400,9 @@ try {
   const auth = await adminLogin()
   for (const id of ['almond-bar', 'pista-bar', 'walnut-brownies']) await post('admin', { action: 'updateProduct', id, reset: true }, { authorization: auth })
   await post('admin', { action: 'updateSettings', announcement: '', storeOpen: true, closedMessage: '' }, { authorization: auth })
-  const codes = { pay: await apiOrder(), order: await apiOrder() }
+  const booking = await post('create-booking', { idempotencyKey: `qa6-b-${Date.now()}-abcdefgh`, classId: 'basic', weekend: bookableSaturdays(new Date())[1], slot: 'midday', name: 'Meera K', phone: '9000012345', email: '', expectedFee: 2500, lang: 'en' })
+  if (booking.status !== 201) throw new Error(`could not create a QA booking: ${JSON.stringify(booking.body)}`)
+  const codes = { pay: await apiOrder(), order: await apiOrder(), booking: booking.body.booking.code }
   await post('submit-payment', { code: codes.order, phone: customer.phone, utr: '412345678901' })
   await loader(browser)
   await journey(browser)

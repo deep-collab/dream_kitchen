@@ -1,4 +1,4 @@
-// Upload checks: the real image type from the first bytes (never the file name or the
+// Upload checks (no Node-only code: the demo admin runs these in the browser): the real image type from the first bytes (never the file name or the
 // Content-Type the browser claims), and the size limit.
 export const MAX_BYTES = 5 * 1024 * 1024
 export const MIME = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }
@@ -15,7 +15,7 @@ export function imageType(b) {
 export function fromDataUrl(value, max = 300_000) {
   const m = /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(value || ''))
   if (!m) return null
-  const bytes = Uint8Array.from(Buffer.from(m[2], 'base64'))
+  const bytes = typeof Buffer !== 'undefined' ? Uint8Array.from(Buffer.from(m[2], 'base64')) : Uint8Array.from(atob(m[2]), (c) => c.charCodeAt(0))
   if (!bytes.length || bytes.length > max) return null
   const type = imageType(bytes)
   return type ? { type, bytes } : null

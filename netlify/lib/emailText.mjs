@@ -29,5 +29,38 @@ export const customerText = {
   ragi: { en: 'Ragi version', kn: 'ರಾಗಿ ಆವೃತ್ತಿ' },
   nameOnBox: { en: 'Name on the box', kn: 'ಬಾಕ್ಸ್ ಮೇಲೆ ಹೆಸರು' },
   drawing: { en: 'Drawing', kn: 'ಚಿತ್ರ' },
+  hello: { en: 'Hi {name},', kn: 'ನಮಸ್ಕಾರ {name},' },
+  // Status changes Hema makes in the admin (each one is emailed, if the customer gave an email)
+  paidSubject: { en: 'Payment received: order {code}', kn: 'ಪಾವತಿ ತಲುಪಿದೆ: ಆರ್ಡರ್ {code}' },
+  paidText: { en: 'We have received your payment of {total}. Your order is confirmed.', kn: 'ನಿಮ್ಮ {total} ಪಾವತಿ ತಲುಪಿದೆ. ನಿಮ್ಮ ಆರ್ಡರ್ ಖಚಿತವಾಗಿದೆ.' },
+  preparingSubject: { en: 'Your order {code} is being prepared', kn: 'ನಿಮ್ಮ ಆರ್ಡರ್ {code} ತಯಾರಾಗುತ್ತಿದೆ' },
+  preparingText: { en: 'Hema has started preparing your order.', kn: 'ಹೇಮಾ ಅವರು ನಿಮ್ಮ ಆರ್ಡರ್ ತಯಾರಿಸಲು ಆರಂಭಿಸಿದ್ದಾರೆ.' },
+  deliveredSubject: { en: 'Your order {code} has been delivered', kn: 'ನಿಮ್ಮ ಆರ್ಡರ್ {code} ತಲುಪಿದೆ' },
+  deliveredText: { en: 'Your order has been delivered. We hope you enjoy it!', kn: 'ನಿಮ್ಮ ಆರ್ಡರ್ ತಲುಪಿದೆ. ನಿಮಗೆ ಇಷ್ಟವಾಗಲಿ ಎಂದು ಆಶಿಸುತ್ತೇವೆ!' },
+  cancelledSubject: { en: 'Your order {code} has been cancelled', kn: 'ನಿಮ್ಮ ಆರ್ಡರ್ {code} ರದ್ದಾಗಿದೆ' },
+  cancelledText: { en: 'Your order has been cancelled. Reason: {reason}', kn: 'ನಿಮ್ಮ ಆರ್ಡರ್ ರದ್ದಾಗಿದೆ. ಕಾರಣ: {reason}' },
+  cancelledPaid: { en: 'If you have already paid, Hema will contact you about the refund.', kn: 'ನೀವು ಈಗಾಗಲೇ ಪಾವತಿಸಿದ್ದರೆ, ಹಣ ಹಿಂದಿರುಗಿಸುವ ಬಗ್ಗೆ ಹೇಮಾ ಅವರು ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತಾರೆ.' },
+  // Class bookings
+  bookingSubject: { en: 'Your class booking {code}', kn: 'ನಿಮ್ಮ ತರಗತಿ ಬುಕಿಂಗ್ {code}' },
+  bookingConfirmedSubject: { en: 'Your class seat is confirmed: {code}', kn: 'ನಿಮ್ಮ ತರಗತಿ ಸೀಟು ಖಚಿತವಾಗಿದೆ: {code}' },
+  bookingHello: { en: 'Hi {name}, thank you for booking a class with Hema!', kn: 'ನಮಸ್ಕಾರ {name}, ಹೇಮಾ ಅವರ ತರಗತಿಗೆ ಬುಕ್ ಮಾಡಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದಗಳು!' },
+  bookingClass: { en: '{class} class', kn: '{class} ತರಗತಿ' },
+  bookingWhen: { en: 'Weekend: {weekend}, {slot} (both days)', kn: 'ವಾರಾಂತ್ಯ: {weekend}, {slot} (ಎರಡೂ ದಿನ)' },
+  bookingFee: { en: 'Fee: {fee}', kn: 'ಶುಲ್ಕ: {fee}' },
+  bookingPaid: { en: 'We have received your payment of {fee}. Your seat is confirmed.', kn: 'ನಿಮ್ಮ {fee} ಪಾವತಿ ತಲುಪಿದೆ. ನಿಮ್ಮ ಸೀಟು ಖಚಿತವಾಗಿದೆ.' },
+  bookingPay: {
+    en: 'Please pay {fee} by UPI and enter the 12-digit UPI reference on the website, if you haven’t already. Your seat is confirmed once Hema checks it.',
+    kn: 'ದಯವಿಟ್ಟು UPI ಮೂಲಕ {fee} ಪಾವತಿಸಿ ಮತ್ತು 12 ಅಂಕಿಯ UPI ರೆಫರೆನ್ಸ್ ಸಂಖ್ಯೆಯನ್ನು ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ನಮೂದಿಸಿ (ಈಗಾಗಲೇ ಮಾಡಿಲ್ಲದಿದ್ದರೆ). ಹೇಮಾ ಅವರು ಪರಿಶೀಲಿಸಿದ ನಂತರ ನಿಮ್ಮ ಸೀಟು ಖಚಿತವಾಗುತ್ತದೆ.',
+  },
+  bookingLink: { en: 'Your booking: {link}', kn: 'ನಿಮ್ಮ ಬುಕಿಂಗ್: {link}' },
+  bookingCancelledSubject: { en: 'Your class booking {code} has been cancelled', kn: 'ನಿಮ್ಮ ತರಗತಿ ಬುಕಿಂಗ್ {code} ರದ್ದಾಗಿದೆ' },
+  bookingCancelledText: { en: 'Your class booking has been cancelled. Reason: {reason}', kn: 'ನಿಮ್ಮ ತರಗತಿ ಬುಕಿಂಗ್ ರದ್ದಾಗಿದೆ. ಕಾರಣ: {reason}' },
+  // Dates in emails ("Sat 17 – Sun 18 Oct 2026"); months: 12 names, comma separated
+  weekend: { en: 'Sat {sat} – Sun {sun} {month} {year}', kn: 'ಶನಿ {sat} – ಭಾನು {sun} {month} {year}' },
+  weekendAcross: { en: 'Sat {sat} {month} – Sun {sun} {month2} {year}', kn: 'ಶನಿ {sat} {month} – ಭಾನು {sun} {month2} {year}' },
+  months: {
+    en: 'Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec',
+    kn: 'ಜನವರಿ,ಫೆಬ್ರವರಿ,ಮಾರ್ಚ್,ಏಪ್ರಿಲ್,ಮೇ,ಜೂನ್,ಜುಲೈ,ಆಗಸ್ಟ್,ಸೆಪ್ಟೆಂಬರ್,ಅಕ್ಟೋಬರ್,ನವೆಂಬರ್,ಡಿಸೆಂಬರ್',
+  },
   thanks: { en: 'With love, Hema, Dream Kitchen', kn: 'ಪ್ರೀತಿಯಿಂದ, ಹೇಮಾ, Dream Kitchen' },
 }

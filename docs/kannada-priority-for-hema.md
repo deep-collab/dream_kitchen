@@ -40,7 +40,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | View cart | ಕಾರ್ಟ್ ನೋಡಿ | |
 | Courier | ಕೊರಿಯರ್ | |
 | ₹90 within Karnataka, ₹100 outside | ಕರ್ನಾಟಕದೊಳಗೆ ₹90, ಹೊರಗೆ ₹100 | |
-| Courier: ₹90 within Karnataka, ₹100 outside; ₹100 / ₹150 with a 500 g or 700 g Delight Box. One charge per order. | ಕೊರಿಯರ್: ಕರ್ನಾಟಕದೊಳಗೆ ₹90, ಹೊರಗೆ ₹100; 500 ಗ್ರಾಂ ಅಥವಾ 700 ಗ್ರಾಂ ಡಿಲೈಟ್ ಬಾಕ್ಸ್ ಇದ್ದರೆ ₹100 / ₹150. ಪ್ರತಿ ಆರ್ಡರ್‌ಗೆ ಒಂದೇ ಶುಲ್ಕ. | |
+| Courier: ₹90 within Karnataka, ₹100 outside; ₹100 / ₹150 with a 500 g or 700 g Delight Box; {xlKa} / {xlOut} with a 750 g tub. One charge per order. | ಕೊರಿಯರ್: ಕರ್ನಾಟಕದೊಳಗೆ ₹90, ಹೊರಗೆ ₹100; 500 ಗ್ರಾಂ ಅಥವಾ 700 ಗ್ರಾಂ ಡಿಲೈಟ್ ಬಾಕ್ಸ್ ಇದ್ದರೆ ₹100 / ₹150; 750 ಗ್ರಾಂ ಟಬ್ ಇದ್ದರೆ {xlKa} / {xlOut}. ಪ್ರತಿ ಆರ್ಡರ್‌ಗೆ ಒಂದೇ ಶುಲ್ಕ. | |
 | ₹1,700 + courier | ₹1,700 + ಕೊರಿಯರ್ | |
 | Made fresh after you order. Dispatched after 2 business days. | ನೀವು ಆರ್ಡರ್ ಮಾಡಿದ ನಂತರ ತಾಜಾವಾಗಿ ತಯಾರಿ. 2 ಕೆಲಸದ ದಿನಗಳ ನಂತರ ಕಳುಹಿಸಲಾಗುತ್ತದೆ. | |
 | Continue | ಮುಂದುವರಿಯಿರಿ | |
@@ -138,7 +138,78 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Drawing | ಚಿತ್ರ | |
 | With love, Hema, Dream Kitchen | ಪ್ರೀತಿಯಿಂದ, ಹೇಮಾ, Dream Kitchen | |
 
-## Later, if you have time (423 more)
+## New on 10 October: class booking, paying online, and order emails
+
+| English | ಕನ್ನಡ | Correct? |
+|---|---|---|
+| **Booking a class** | | |
+| Learn with Hema in a 2-day class, every Saturday and Sunday. Pick a class and book your seat online. | ಹೇಮಾ ಅವರೊಂದಿಗೆ 2 ದಿನಗಳ ತರಗತಿ, ಪ್ರತಿ ಶನಿವಾರ ಮತ್ತು ಭಾನುವಾರ. ತರಗತಿಯನ್ನು ಆಯ್ಕೆಮಾಡಿ, ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಸೀಟು ಬುಕ್ ಮಾಡಿ. | |
+| Book now | ಈಗ ಬುಕ್ ಮಾಡಿ | |
+| Book a class | ತರಗತಿ ಬುಕ್ ಮಾಡಿ | |
+| Pick your class, a weekend and a time. You pay online to book your seat. | ನಿಮ್ಮ ತರಗತಿ, ವಾರಾಂತ್ಯ ಮತ್ತು ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ. ಸೀಟು ಬುಕ್ ಮಾಡಲು ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಪಾವತಿಸಿ. | |
+| 2. Weekend | 2. ವಾರಾಂತ್ಯ | |
+| Saturday and Sunday, at the same time both days. | ಶನಿವಾರ ಮತ್ತು ಭಾನುವಾರ, ಎರಡೂ ದಿನ ಒಂದೇ ಸಮಯ. | |
+| 3. Time | 3. ಸಮಯ | |
+| Full | ಭರ್ತಿಯಾಗಿದೆ | |
+| Not available | ಲಭ್ಯವಿಲ್ಲ | |
+| 2 seats left | 2 ಸೀಟುಗಳು ಉಳಿದಿವೆ | |
+| We’ll send your booking confirmation here. | ನಿಮ್ಮ ಬುಕಿಂಗ್ ದೃಢೀಕರಣವನ್ನು ಇಲ್ಲಿಗೆ ಕಳುಹಿಸುತ್ತೇವೆ. | |
+| Book and pay ₹1,700 | ಬುಕ್ ಮಾಡಿ, ₹1,700 ಪಾವತಿಸಿ | |
+| Basic class · Sat 17 – Sun 18 Oct · 9–11 AM | Basic ತರಗತಿ · Sat 17 – Sun 18 Oct · 9–11 AM | |
+| Sorry, that time has just filled up. Please choose another. | ಕ್ಷಮಿಸಿ, ಆ ಸಮಯ ಈಗಷ್ಟೇ ಭರ್ತಿಯಾಯಿತು. ದಯವಿಟ್ಟು ಬೇರೆ ಸಮಯ ಆಯ್ಕೆಮಾಡಿ. | |
+| No weekends are open for booking right now. WhatsApp us and Hema will help. | ಈಗ ಬುಕಿಂಗ್‌ಗೆ ಯಾವುದೇ ವಾರಾಂತ್ಯ ಲಭ್ಯವಿಲ್ಲ. ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ, ಹೇಮಾ ಅವರು ಸಹಾಯ ಮಾಡುತ್ತಾರೆ. | |
+| **The booking page** | | |
+| Pay ₹1,700 to book your seat | ಸೀಟು ಬುಕ್ ಮಾಡಲು ₹1,700 ಪಾವತಿಸಿ | |
+| Booking DK-261005-7Q4M is saved. Pay to confirm your seat. | ಬುಕಿಂಗ್ DK-261005-7Q4M ಉಳಿಸಲಾಗಿದೆ. ಸೀಟು ಖಚಿತಪಡಿಸಲು ಪಾವತಿಸಿ. | |
+| Your seat is booked! | ನಿಮ್ಮ ಸೀಟು ಬುಕ್ ಆಗಿದೆ! | |
+| Keep your booking ID. Questions? WhatsApp us on +91 95357 06956. | ನಿಮ್ಮ ಬುಕಿಂಗ್ ಐಡಿಯನ್ನು ಇಟ್ಟುಕೊಳ್ಳಿ. ಪ್ರಶ್ನೆಗಳಿವೆಯೇ? +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
+| Payment sent | ಪಾವತಿ ಕಳುಹಿಸಲಾಗಿದೆ | |
+| Hema will check your payment, usually within a few hours. Your seat is kept for you meanwhile. | ಹೇಮಾ ಅವರು ನಿಮ್ಮ ಪಾವತಿಯನ್ನು ಸಾಮಾನ್ಯವಾಗಿ ಕೆಲವು ಗಂಟೆಗಳಲ್ಲಿ ಪರಿಶೀಲಿಸುತ್ತಾರೆ. ಅಲ್ಲಿಯವರೆಗೆ ನಿಮ್ಮ ಸೀಟು ಕಾಯ್ದಿರಿಸಲಾಗಿದೆ. | |
+| This booking was cancelled | ಈ ಬುಕಿಂಗ್ ರದ್ದಾಗಿದೆ | |
+| Time (both days) | ಸಮಯ (ಎರಡೂ ದಿನ) | |
+| Enter the mobile number you booked with to see this booking. | ಈ ಬುಕಿಂಗ್ ನೋಡಲು ನೀವು ಬುಕ್ ಮಾಡಿದ ಮೊಬೈಲ್ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ. | |
+| **Paying online (Razorpay)** | | |
+| Pay ₹1,700 now | ಈಗ ₹1,700 ಪಾವತಿಸಿ | |
+| Card, UPI or net banking, through Razorpay. | ಕಾರ್ಡ್, UPI ಅಥವಾ ನೆಟ್ ಬ್ಯಾಂಕಿಂಗ್, Razorpay ಮೂಲಕ. | |
+| Opening the payment… | ಪಾವತಿ ತೆರೆಯುತ್ತಿದೆ… | |
+| Confirming your payment… | ನಿಮ್ಮ ಪಾವತಿಯನ್ನು ಖಚಿತಪಡಿಸಲಾಗುತ್ತಿದೆ… | |
+| The payment wasn’t finished, so nothing was charged. You can try again. | ಪಾವತಿ ಪೂರ್ಣಗೊಂಡಿಲ್ಲ, ಆದ್ದರಿಂದ ಹಣ ಕಡಿತವಾಗಿಲ್ಲ. ನೀವು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಬಹುದು. | |
+| The payment didn’t go through. Please try again, or use another card or UPI app. | ಪಾವತಿ ಯಶಸ್ವಿಯಾಗಲಿಲ್ಲ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ ಬೇರೆ ಕಾರ್ಡ್ ಅಥವಾ UPI ಆ್ಯಪ್ ಬಳಸಿ. | |
+| If money has left your account, don’t pay again: the payment is confirmed within a few minutes. Refresh this page. | ನಿಮ್ಮ ಖಾತೆಯಿಂದ ಹಣ ಕಡಿತವಾಗಿದ್ದರೆ ಮತ್ತೆ ಪಾವತಿಸಬೇಡಿ: ಕೆಲವು ನಿಮಿಷಗಳಲ್ಲಿ ಪಾವತಿ ಖಚಿತವಾಗುತ್ತದೆ. ಈ ಪುಟವನ್ನು ರಿಫ್ರೆಶ್ ಮಾಡಿ. | |
+| The online payment couldn’t start. Check your internet and try again. | ಆನ್‌ಲೈನ್ ಪಾವತಿ ಆರಂಭವಾಗಲಿಲ್ಲ. ನಿಮ್ಮ ಇಂಟರ್ನೆಟ್ ಪರಿಶೀಲಿಸಿ, ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. | |
+| **Contact page message form** | | |
+| Send us a message | ನಮಗೆ ಸಂದೇಶ ಕಳುಹಿಸಿ | |
+| Your message | ನಿಮ್ಮ ಸಂದೇಶ | |
+| Send message | ಸಂದೇಶ ಕಳುಹಿಸಿ | |
+| Thank you! Your message is sent | ಧನ್ಯವಾದಗಳು! ನಿಮ್ಮ ಸಂದೇಶ ಕಳುಹಿಸಲಾಗಿದೆ | |
+| Write your message. | ನಿಮ್ಮ ಸಂದೇಶವನ್ನು ಬರೆಯಿರಿ. | |
+| **Emails customers receive (new)** | | |
+| Hi Asha, | ನಮಸ್ಕಾರ Asha, | |
+| Payment received: order DK-261005-7Q4M | ಪಾವತಿ ತಲುಪಿದೆ: ಆರ್ಡರ್ DK-261005-7Q4M | |
+| We have received your payment of ₹2,100. Your order is confirmed. | ನಿಮ್ಮ ₹2,100 ಪಾವತಿ ತಲುಪಿದೆ. ನಿಮ್ಮ ಆರ್ಡರ್ ಖಚಿತವಾಗಿದೆ. | |
+| Your order DK-261005-7Q4M is being prepared | ನಿಮ್ಮ ಆರ್ಡರ್ DK-261005-7Q4M ತಯಾರಾಗುತ್ತಿದೆ | |
+| Hema has started preparing your order. | ಹೇಮಾ ಅವರು ನಿಮ್ಮ ಆರ್ಡರ್ ತಯಾರಿಸಲು ಆರಂಭಿಸಿದ್ದಾರೆ. | |
+| Your order DK-261005-7Q4M has been delivered | ನಿಮ್ಮ ಆರ್ಡರ್ DK-261005-7Q4M ತಲುಪಿದೆ | |
+| Your order has been delivered. We hope you enjoy it! | ನಿಮ್ಮ ಆರ್ಡರ್ ತಲುಪಿದೆ. ನಿಮಗೆ ಇಷ್ಟವಾಗಲಿ ಎಂದು ಆಶಿಸುತ್ತೇವೆ! | |
+| Your order DK-261005-7Q4M has been cancelled | ನಿಮ್ಮ ಆರ್ಡರ್ DK-261005-7Q4M ರದ್ದಾಗಿದೆ | |
+| Your order has been cancelled. Reason: Customer asked to cancel | ನಿಮ್ಮ ಆರ್ಡರ್ ರದ್ದಾಗಿದೆ. ಕಾರಣ: Customer asked to cancel | |
+| If you have already paid, Hema will contact you about the refund. | ನೀವು ಈಗಾಗಲೇ ಪಾವತಿಸಿದ್ದರೆ, ಹಣ ಹಿಂದಿರುಗಿಸುವ ಬಗ್ಗೆ ಹೇಮಾ ಅವರು ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತಾರೆ. | |
+| Your class booking DK-261005-7Q4M | ನಿಮ್ಮ ತರಗತಿ ಬುಕಿಂಗ್ DK-261005-7Q4M | |
+| Your class seat is confirmed: DK-261005-7Q4M | ನಿಮ್ಮ ತರಗತಿ ಸೀಟು ಖಚಿತವಾಗಿದೆ: DK-261005-7Q4M | |
+| Hi Asha, thank you for booking a class with Hema! | ನಮಸ್ಕಾರ Asha, ಹೇಮಾ ಅವರ ತರಗತಿಗೆ ಬುಕ್ ಮಾಡಿದ್ದಕ್ಕೆ ಧನ್ಯವಾದಗಳು! | |
+| Basic class | Basic ತರಗತಿ | |
+| Weekend: Sat 17 – Sun 18 Oct, 9–11 AM (both days) | ವಾರಾಂತ್ಯ: Sat 17 – Sun 18 Oct, 9–11 AM (ಎರಡೂ ದಿನ) | |
+| Fee: ₹2,500 | ಶುಲ್ಕ: ₹2,500 | |
+| We have received your payment of ₹2,500. Your seat is confirmed. | ನಿಮ್ಮ ₹2,500 ಪಾವತಿ ತಲುಪಿದೆ. ನಿಮ್ಮ ಸೀಟು ಖಚಿತವಾಗಿದೆ. | |
+| Please pay ₹2,500 by UPI and enter the 12-digit UPI reference on the website, if you haven’t already. Your seat is confirmed once Hema checks it. | ದಯವಿಟ್ಟು UPI ಮೂಲಕ ₹2,500 ಪಾವತಿಸಿ ಮತ್ತು 12 ಅಂಕಿಯ UPI ರೆಫರೆನ್ಸ್ ಸಂಖ್ಯೆಯನ್ನು ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲಿ ನಮೂದಿಸಿ (ಈಗಾಗಲೇ ಮಾಡಿಲ್ಲದಿದ್ದರೆ). ಹೇಮಾ ಅವರು ಪರಿಶೀಲಿಸಿದ ನಂತರ ನಿಮ್ಮ ಸೀಟು ಖಚಿತವಾಗುತ್ತದೆ. | |
+| Your booking: https://… | ನಿಮ್ಮ ಬುಕಿಂಗ್: https://… | |
+| Your class booking DK-261005-7Q4M has been cancelled | ನಿಮ್ಮ ತರಗತಿ ಬುಕಿಂಗ್ DK-261005-7Q4M ರದ್ದಾಗಿದೆ | |
+| Your class booking has been cancelled. Reason: Customer asked to cancel | ನಿಮ್ಮ ತರಗತಿ ಬುಕಿಂಗ್ ರದ್ದಾಗಿದೆ. ಕಾರಣ: Customer asked to cancel | |
+| Sat 17 – Sun 18 Oct 2026 | ಶನಿ 17 – ಭಾನು 18 ಅಕ್ಟೋಬರ್ 2026 | |
+| Sat 17 Oct – Sun 18 Oct 2026 | ಶನಿ 17 ಅಕ್ಟೋಬರ್ – ಭಾನು 18 Oct 2026 | |
+| Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec | ಜನವರಿ,ಫೆಬ್ರವರಿ,ಮಾರ್ಚ್,ಏಪ್ರಿಲ್,ಮೇ,ಜೂನ್,ಜುಲೈ,ಆಗಸ್ಟ್,ಸೆಪ್ಟೆಂಬರ್,ಅಕ್ಟೋಬರ್,ನವೆಂಬರ್,ಡಿಸೆಂಬರ್ | |
+
+## Later, if you have time (461 more)
 
 ### Logo and tagline
 
@@ -278,6 +349,10 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Your Dream Kitchen order. | ನಿಮ್ಮ Dream Kitchen ಆರ್ಡರ್. | |
 | Page not found \| Dream Kitchen | ಪುಟ ಸಿಗಲಿಲ್ಲ \| Dream Kitchen | |
 | This page has melted away. | ಈ ಪುಟ ಕರಗಿ ಹೋಗಿದೆ. | |
+| Book a class \| Dream Kitchen | ತರಗತಿ ಬುಕ್ ಮಾಡಿ \| Dream Kitchen | |
+| Book a chocolate class with Hema: pick a class, a weekend and a time, and pay online. | ಹೇಮಾ ಅವರ ಚಾಕೊಲೇಟ್ ತರಗತಿ ಬುಕ್ ಮಾಡಿ: ತರಗತಿ, ವಾರಾಂತ್ಯ ಮತ್ತು ಸಮಯ ಆಯ್ಕೆಮಾಡಿ, ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಪಾವತಿಸಿ. | |
+| Your class booking \| Dream Kitchen | ನಿಮ್ಮ ತರಗತಿ ಬುಕಿಂಗ್ \| Dream Kitchen | |
+| Your chocolate class booking with Dream Kitchen. | Dream Kitchen ನಲ್ಲಿ ನಿಮ್ಮ ಚಾಕೊಲೇಟ್ ತರಗತಿ ಬುಕಿಂಗ್. | |
 
 ### Home page
 
@@ -433,9 +508,6 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Optional, if it’s easier than finding the number. | ಐಚ್ಛಿಕ, ಸಂಖ್ಯೆ ಹುಡುಕುವುದಕ್ಕಿಂತ ಸುಲಭವಾದರೆ. | |
 | Add screenshot | ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಸೇರಿಸಿ | |
 | Sending… | ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ… | |
-| Pay by card, UPI or net banking | ಕಾರ್ಡ್, ಯುಪಿಐ ಅಥವಾ ನೆಟ್ ಬ್ಯಾಂಕಿಂಗ್ ಮೂಲಕ ಪಾವತಿಸಿ | |
-| Or pay online | ಅಥವಾ ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಪಾವತಿಸಿ | |
-| The online payment didn’t finish. You can try again, or pay by UPI above. | ಆನ್‌ಲೈನ್ ಪಾವತಿ ಪೂರ್ಣಗೊಳ್ಳಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ ಮೇಲಿನಂತೆ ಯುಪಿಐ ಮೂಲಕ ಪಾವತಿಸಿ. | |
 | You can come back to this page later: it is saved on this phone, and on Track Order. | ನಂತರವೂ ಈ ಪುಟಕ್ಕೆ ಮರಳಬಹುದು: ಇದು ಈ ಫೋನ್‌ನಲ್ಲಿ ಮತ್ತು ಆರ್ಡರ್ ಸ್ಥಿತಿ ಪುಟದಲ್ಲಿ ಉಳಿದಿರುತ್ತದೆ. | |
 | Enter the 12-digit UPI reference. | 12 ಅಂಕಿಯ ಯುಪಿಐ ರೆಫರೆನ್ಸ್ ನೀಡಿ. | |
 | The screenshot didn’t upload. Try again, or send just the number. | ಸ್ಕ್ರೀನ್‌ಶಾಟ್ ಅಪ್‌ಲೋಡ್ ಆಗಲಿಲ್ಲ. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ, ಅಥವಾ ಸಂಖ್ಯೆ ಮಾತ್ರ ಕಳುಹಿಸಿ. | |
@@ -530,6 +602,37 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Please shorten this a little. | ದಯವಿಟ್ಟು ಇದನ್ನು ಸ್ವಲ್ಪ ಚಿಕ್ಕದಾಗಿಸಿ. | |
 | Please shorten this a little. | ದಯವಿಟ್ಟು ಇದನ್ನು ಸ್ವಲ್ಪ ಚಿಕ್ಕದಾಗಿಸಿ. | |
 | Please keep the message to 20 letters. | ದಯವಿಟ್ಟು ಸಂದೇಶವನ್ನು 20 ಅಕ್ಷರಗಳೊಳಗೆ ಇಡಿ. | |
+|  or  |  ಅಥವಾ  | |
+
+### book
+
+| English | ಕನ್ನಡ | Correct? |
+|---|---|---|
+| 1. Class | 1. ತರಗತಿ | |
+| 4. Your details | 4. ನಿಮ್ಮ ವಿವರಗಳು | |
+| 1 seat left | 1 ಸೀಟು ಉಳಿದಿದೆ | |
+| Your name | ನಿಮ್ಮ ಹೆಸರು | |
+| Mobile number | ಮೊಬೈಲ್ ಸಂಖ್ಯೆ | |
+| Email | ಇಮೇಲ್ | |
+| Booking… | ಬುಕ್ ಆಗುತ್ತಿದೆ… | |
+| Choose a weekend. | ಒಂದು ವಾರಾಂತ್ಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ. | |
+| Choose a time. | ಒಂದು ಸಮಯವನ್ನು ಆಯ್ಕೆಮಾಡಿ. | |
+| That weekend or time isn’t available any more. Please choose another. | ಆ ವಾರಾಂತ್ಯ ಅಥವಾ ಸಮಯ ಈಗ ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ಬೇರೆಯದನ್ನು ಆಯ್ಕೆಮಾಡಿ. | |
+| The class fee has just changed to ₹1,700. Please check and try again. | ತರಗತಿ ಶುಲ್ಕ ಈಗ ₹1,700 ಆಗಿದೆ. ದಯವಿಟ್ಟು ಪರಿಶೀಲಿಸಿ, ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. | |
+| Booking ID | ಬುಕಿಂಗ್ ಐಡಿ | |
+| Copy booking ID DK-261005-7Q4M | ಬುಕಿಂಗ್ ಐಡಿ DK-261005-7Q4M ನಕಲಿಸಿ | |
+| Booking ID copied | ಬುಕಿಂಗ್ ಐಡಿ ನಕಲಿಸಲಾಗಿದೆ | |
+| Class | ತರಗತಿ | |
+| Weekend | ವಾರಾಂತ್ಯ | |
+| Fee | ಶುಲ್ಕ | |
+| Book another class | ಇನ್ನೊಂದು ತರಗತಿ ಬುಕ್ ಮಾಡಿ | |
+| We couldn’t find this booking with that number. Check both, or WhatsApp us on +91 95357 06956. | ಆ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಈ ಬುಕಿಂಗ್ ಸಿಗಲಿಲ್ಲ. ಎರಡನ್ನೂ ಪರಿಶೀಲಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
+| Write your name. | ನಿಮ್ಮ ಹೆಸರು ಬರೆಯಿರಿ. | |
+| Write your full name. | ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು ಬರೆಯಿರಿ. | |
+| Please shorten your name. | ದಯವಿಟ್ಟು ಹೆಸರನ್ನು ಚಿಕ್ಕದಾಗಿಸಿ. | |
+| Give your mobile number for the booking. | ಬುಕಿಂಗ್‌ಗಾಗಿ ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ. | |
+| Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210. | 6, 7, 8 ಅಥವಾ 9 ರಿಂದ ಆರಂಭವಾಗುವ 10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ, ಉದಾ: 98765 43210. | |
+| That email doesn’t look right. Check it, or leave it empty. | ಆ ಇಮೇಲ್ ಸರಿಯಿಲ್ಲ ಎನಿಸುತ್ತದೆ. ಪರಿಶೀಲಿಸಿ, ಅಥವಾ ಖಾಲಿ ಬಿಡಿ. | |
 
 ### Our story
 
@@ -563,6 +666,17 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | FSSAI licence | FSSAI ಪರವಾನಗಿ | |
 | Track an order | ಆರ್ಡರ್ ಸ್ಥಿತಿ ನೋಡಿ | |
 | Read the FAQ | ಪ್ರಶ್ನೋತ್ತರ ಓದಿ | |
+| Your name | ನಿಮ್ಮ ಹೆಸರು | |
+| Mobile number | ಮೊಬೈಲ್ ಸಂಖ್ಯೆ | |
+| Sending… | ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ… | |
+| Hema will contact you on +91 95357 06956. | ಹೇಮಾ ಅವರು +91 95357 06956 ಸಂಖ್ಯೆಗೆ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸುತ್ತಾರೆ. | |
+| Send another message | ಇನ್ನೊಂದು ಸಂದೇಶ ಕಳುಹಿಸಿ | |
+| Write your name. | ನಿಮ್ಮ ಹೆಸರು ಬರೆಯಿರಿ. | |
+| Write your full name. | ನಿಮ್ಮ ಪೂರ್ಣ ಹೆಸರು ಬರೆಯಿರಿ. | |
+| Please shorten your name. | ದಯವಿಟ್ಟು ಹೆಸರನ್ನು ಚಿಕ್ಕದಾಗಿಸಿ. | |
+| Give your mobile number so Hema can contact you. | ಹೇಮಾ ಅವರು ಸಂಪರ್ಕಿಸಲು ನಿಮ್ಮ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ. | |
+| Enter a 10-digit mobile number starting with 6, 7, 8 or 9, like 98765 43210. | 6, 7, 8 ಅಥವಾ 9 ರಿಂದ ಆರಂಭವಾಗುವ 10 ಅಂಕಿಯ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ, ಉದಾ: 98765 43210. | |
+| Please keep the message to 20 letters. | ದಯವಿಟ್ಟು ಸಂದೇಶವನ್ನು 20 ಅಕ್ಷರಗಳೊಳಗೆ ಇಡಿ. | |
 
 ### Questions and answers
 
@@ -575,7 +689,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | How do I pay? | ಪಾವತಿ ಹೇಗೆ? | |
 | By UPI on the website: scan the QR code or tap “Pay with a UPI app”, then enter the 12-digit UPI reference. Hema confirms your payment, usually within a few hours. | ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲೇ ಯುಪಿಐ ಮೂಲಕ: QR ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ಅಥವಾ “ಯುಪಿಐ ಆ್ಯಪ್‌ನಲ್ಲಿ ಪಾವತಿಸಿ” ಒತ್ತಿ, ನಂತರ 12 ಅಂಕಿಯ ಯುಪಿಐ ರೆಫರೆನ್ಸ್ ನೀಡಿ. ಹೇಮಾ ಅವರು ಸಾಮಾನ್ಯವಾಗಿ ಕೆಲವು ಗಂಟೆಗಳಲ್ಲಿ ಪಾವತಿ ಖಚಿತಪಡಿಸುತ್ತಾರೆ. | |
 | Where do you deliver, and what does courier cost? | ಎಲ್ಲಿಗೆ ಕಳುಹಿಸುತ್ತೀರಿ, ಕೊರಿಯರ್ ಶುಲ್ಕ ಎಷ್ಟು? | |
-| All over India. One courier charge per order: ₹90 within Karnataka and ₹100 outside, or ₹100 / ₹150 when the order has a 500 g or 700 g Delight Box. | ಭಾರತದಾದ್ಯಂತ. ಪ್ರತಿ ಆರ್ಡರ್‌ಗೆ ಒಂದೇ ಕೊರಿಯರ್ ಶುಲ್ಕ: ಕರ್ನಾಟಕದೊಳಗೆ ₹90, ಹೊರಗೆ ₹100; ಆರ್ಡರ್‌ನಲ್ಲಿ 500 ಗ್ರಾಂ ಅಥವಾ 700 ಗ್ರಾಂ ಡಿಲೈಟ್ ಬಾಕ್ಸ್ ಇದ್ದರೆ ₹100 / ₹150. | |
+| All over India. One courier charge per order: ₹90 within Karnataka and ₹100 outside, or ₹100 / ₹150 when the order has a 500 g or 700 g Delight Box, or {xlKa} / {xlOut} with a 750 g tub. | ಭಾರತದಾದ್ಯಂತ. ಪ್ರತಿ ಆರ್ಡರ್‌ಗೆ ಒಂದೇ ಕೊರಿಯರ್ ಶುಲ್ಕ: ಕರ್ನಾಟಕದೊಳಗೆ ₹90, ಹೊರಗೆ ₹100; ಆರ್ಡರ್‌ನಲ್ಲಿ 500 ಗ್ರಾಂ ಅಥವಾ 700 ಗ್ರಾಂ ಡಿಲೈಟ್ ಬಾಕ್ಸ್ ಇದ್ದರೆ ₹100 / ₹150; 750 ಗ್ರಾಂ ಟಬ್ ಇದ್ದರೆ {xlKa} / {xlOut}. | |
 | When will my order be sent? | ನನ್ನ ಆರ್ಡರ್ ಯಾವಾಗ ಕಳುಹಿಸಲಾಗುತ್ತದೆ? | |
 | Everything is made fresh after you order and dispatched after 2 business days (Monday to Saturday). Drawings need extra time. You pick the dispatch date at checkout; delivery time then depends on the courier. | ಎಲ್ಲವೂ ನೀವು ಆರ್ಡರ್ ಮಾಡಿದ ನಂತರ ತಾಜಾವಾಗಿ ತಯಾರಾಗಿ 2 ಕೆಲಸದ ದಿನಗಳ (ಸೋಮವಾರದಿಂದ ಶನಿವಾರ) ನಂತರ ಕಳುಹಿಸಲಾಗುತ್ತದೆ. ಚಿತ್ರಕ್ಕೆ ಹೆಚ್ಚು ಸಮಯ ಬೇಕು. ಕಳುಹಿಸುವ ದಿನಾಂಕವನ್ನು ಚೆಕ್‌ಔಟ್‌ನಲ್ಲಿ ನೀವು ಆರಿಸುತ್ತೀರಿ; ನಂತರ ತಲುಪುವ ಸಮಯ ಕೊರಿಯರ್ ಮೇಲೆ ಅವಲಂಬಿತ. | |
 | How do I track my order? | ನನ್ನ ಆರ್ಡರ್ ಸ್ಥಿತಿ ನೋಡುವುದು ಹೇಗೆ? | |

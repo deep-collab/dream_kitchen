@@ -1,27 +1,56 @@
 /*
-  Admin calls: POST /api/admin { action, ... } with Hema's login token. The token comes from
-  Supabase Auth (email + password); it is kept on her phone and refreshed when it runs out, so
-  she stays logged in. Every answer comes after the database saved, so "Saved" is always true.
+  Admin calls: POST /api/admin { action, ... } with the login token from Supabase Auth (email +
+  password). The login is kept on the phone and refreshed when it runs out, so Hema stays logged
+  in; after 30 days without using the admin she logs in again (checked here and on the server).
+  Every answer comes after the database saved, so "Saved" is always true.
+
+  The demo admin (/admin/demo) swaps in a backend that runs the same admin code in the browser on
+  sample data (src/admin/demo): no network, no login, nothing real is ever touched.
 */
 import { api } from '../lib/api'
 
 const KEY = 'dk_admin_session'
+export const IDLE_DAYS = 30
+const IDLE_MS = IDLE_DAYS * 86_400_000
+
+let demo = null // { call(action, body) } in demo mode
+export const setDemoBackend = (backend) => {
+  demo = backend
+}
+export const isDemo = () => Boolean(demo)
 
 export function loadSession() {
+  if (demo) return { accessToken: 'demo', email: 'demo@example.com', lastActive: Date.now() }
   try {
     const s = JSON.parse(localStorage.getItem(KEY))
-    return s?.accessToken ? s : null
+    if (!s?.accessToken) return null
+    // Not used for 30 days: log in again
+    if (s.lastActive && Date.now() - s.lastActive > IDLE_MS) {
+      localStorage.removeItem(KEY)
+      sessionExpired = true
+      return null
+    }
+    return s
   } catch {
     return null
   }
 }
 const saveSession = (s) => {
+  if (demo) return
   try {
-    if (s) localStorage.setItem(KEY, JSON.stringify(s))
+    if (s) localStorage.setItem(KEY, JSON.stringify({ ...s, lastActive: Date.now() }))
     else localStorage.removeItem(KEY)
   } catch {
     /* private mode: logged in for this visit only */
   }
+}
+
+// Why the login page is showing ("expired" after 30 days): read once by the login page
+let sessionExpired = false
+export const takeExpired = () => {
+  const e = sessionExpired
+  sessionExpired = false
+  return e
 }
 
 let onLoggedOut = () => {}
@@ -35,6 +64,11 @@ export async function login(email, password) {
   return r
 }
 
+/** "Forgot password": Supabase emails a link to /admin/reset */
+export const forgotPassword = (email) => api('admin', { action: 'forgot', email })
+/** From that link: the token in the address, and the new password */
+export const setPassword = (accessToken, password) => api('admin', { action: 'setPassword', accessToken, password })
+
 export function logout() {
   saveSession(null)
   onLoggedOut()
@@ -42,7 +76,10 @@ export function logout() {
 
 async function refresh(session) {
   const r = await api('admin', { action: 'refresh', refreshToken: session.refreshToken })
-  if (!r.ok) return null
+  if (!r.ok) {
+    if (r.error === 'expired') sessionExpired = true
+    return null
+  }
   const next = { ...r.data, email: r.data.email || session.email }
   saveSession(next)
   return next
@@ -50,6 +87,7 @@ async function refresh(session) {
 
 /** One admin action. A 401 refreshes the login once; if that fails, Hema is asked to log in again. */
 export async function adminCall(action, body = {}) {
+  if (demo) return demo.call(action, body)
   let session = loadSession()
   if (!session) {
     onLoggedOut()
@@ -59,16 +97,18 @@ export async function adminCall(action, body = {}) {
   const send = (s) => authed(s.accessToken, { action, ...body })
   let r = await send(session)
   if (!r.ok && r.status === 401) {
-    const next = await refresh(session)
+    if (r.error === 'expired') sessionExpired = true
+    const next = r.error === 'expired' ? null : await refresh(session)
     if (next) r = await send(next)
   }
   if (!r.ok && (r.status === 401 || r.status === 403)) logout()
+  else if (r.ok) saveSession(loadSession() || session) // remembers when she last used the admin
   return r
 }
 
 async function authed(token, body) {
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), 20000)
+  const timer = setTimeout(() => controller.abort(), 30000)
   try {
     const res = await fetch('/api/admin', {
       method: 'POST',
@@ -90,13 +130,16 @@ export function problem(r) {
   const words = {
     network: 'No internet connection. Check it and try again.',
     login: 'Please log in again.',
+    expired: 'You haven’t used the admin for 30 days, so please log in again.',
     credentials: 'That email or password is not right.',
     notAdmin: 'This account is not allowed into the admin.',
-    tooMany: 'Too many tries. Please wait a few minutes.',
-    transition: 'This order has moved on already. The page has been refreshed.',
+    tooMany: 'Too many tries. Please wait a few minutes and try again.',
+    transition: 'This has moved on already. The page has been refreshed.',
     notFound: 'Not found. It may have been removed.',
-    notReady: 'The database is not set up yet (see docs/SETUP-BACKEND.md).',
+    notReady: 'The database is not set up yet. Open "Setup check" to see what is missing.',
     fields: 'Please check the boxes marked in red.',
+    linkExpired: 'This reset link has expired or was already used. Ask for a new one.',
+    tooLarge: 'That photo is too big. Try another one.',
   }
   return words[r?.error] || 'Something went wrong. Please try again.'
 }

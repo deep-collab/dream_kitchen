@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -85,6 +86,8 @@ const ROUTE_FILES = [
   ['^/order/', 'src/pages/OrderConfirmed.jsx'],
   ['^/track$', 'src/pages/Track.jsx'],
   ['^/classes$', 'src/pages/Classes.jsx'],
+  ['^/classes/book$', 'src/pages/BookClass.jsx'],
+  ['^/classes/booking/', 'src/pages/Booking.jsx'],
   ['^/our-story$', 'src/pages/Story.jsx'],
   ['^/contact$', 'src/pages/Contact.jsx'],
   ['^/faq$', 'src/pages/FAQ.jsx'],
@@ -148,10 +151,15 @@ const PREACT = [
   { find: /^react$/, replacement: 'preact/compat' },
 ]
 
-export default defineConfig({
+// The demo admin (src/admin/demo) runs the server's admin rules in the browser. In the browser
+// build the server's settings file (netlify/lib/env.mjs: environment variables, secret names) is
+// replaced by an empty stand-in, so no secret's name can reach a browser (scripts/check-secrets.mjs).
+const BROWSER_ENV = { find: /^(\.\.?\/)+(lib\/)?env\.mjs$/, replacement: fileURLToPath(new URL('./src/admin/demo/browserEnv.js', import.meta.url)) }
+
+export default defineConfig(({ command }) => ({
   // Two pages: the shop (index.html) and Hema's admin (admin/index.html). The admin has its own
   // bundle, so customers download none of it.
   build: { rollupOptions: { input: { main: 'index.html', admin: 'admin/index.html' } } },
   plugins: [devApi(), dreamKitchenHtml(), kannadaSplit(), stringsSplit(), kannadaPreload(), routePreload(), seoFiles(), react(), tailwindcss()],
-  resolve: { alias: PREACT },
-})
+  resolve: { alias: command === 'build' ? [...PREACT, BROWSER_ENV] : PREACT },
+}))

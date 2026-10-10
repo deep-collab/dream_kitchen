@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
 import { classSchedule, classes } from '../data/classInfo'
+import { applyClassSettings, slotLabel } from '../lib/classTimes'
 import { waLink } from '../config/site'
 import { useShopStatus } from '../context/MenuProvider'
 import { formatINR } from '../lib/pricing'
@@ -31,7 +32,9 @@ const EMPTY = { name: '', phone: '', interest: '', dates: '', message: '', websi
 export default function Classes() {
   useSeo('classes')
   const { t, pick, lang } = useI18n()
-  const { remoteLoaded, backendReady } = useShopStatus()
+  const { remoteLoaded, backendReady, razorpay, settings } = useShopStatus()
+  // Online booking: the database is connected and there is a way to pay (Razorpay, or the UPI fallback)
+  const bookOnline = remoteLoaded && backendReady && (razorpay.enabled || Boolean(settings.payment.upiId))
   const [form, setForm] = useState(EMPTY)
   const [tried, setTried] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -75,14 +78,14 @@ export default function Classes() {
             <ProductArt kind="class" rounded="rounded-card" className="h-20 w-20 shrink-0" />
             <div>
               <h1 className="t-h2">{t('classes.title')}</h1>
-              <p className="mt-1 text-brown-2">{t('classes.lead')}</p>
+              <p className="mt-1 text-brown-2">{t(bookOnline ? 'classes.leadBook' : 'classes.lead')}</p>
             </div>
           </div>
           <dl className="mt-5 divide-y divide-line border-y border-line">
             {FACTS.map((k) => (
               <div key={k} className="grid gap-1 py-3 sm:grid-cols-[10rem_1fr]">
                 <dt className="font-bold">{t(`classes.sections.${k}`)}</dt>
-                <dd>{pick(classSchedule[k])}</dd>
+                <dd>{k === 'slots' ? applyClassSettings().slots.map((s) => slotLabel(s, lang, pick)).join(t('classes.slotsOr')) : pick(classSchedule[k])}</dd>
               </div>
             ))}
           </dl>
@@ -105,13 +108,20 @@ export default function Classes() {
                       {t('classes.beginner')}
                     </Badge>
                   )}
-                  <Button variant="whatsapp" href={waLink(classBookingText(c))} fullWidth className="mt-3">
-                    {t('classes.bookWhatsApp')}
-                    <span className="sr-only">
-                      {' '}
-                      {t('classes.cardTitle', { name: pick(c.name) })} {t('common.newTab')}
-                    </span>
-                  </Button>
+                  {bookOnline ? (
+                    <Button to={`/classes/book?class=${c.id}`} fullWidth className="mt-3" data-dk-book-class={c.id}>
+                      {t('classes.bookNow')}
+                      <span className="sr-only"> {t('classes.cardTitle', { name: pick(c.name) })}</span>
+                    </Button>
+                  ) : (
+                    <Button variant="whatsapp" href={waLink(classBookingText(c))} fullWidth className="mt-3">
+                      {t('classes.bookWhatsApp')}
+                      <span className="sr-only">
+                        {' '}
+                        {t('classes.cardTitle', { name: pick(c.name) })} {t('common.newTab')}
+                      </span>
+                    </Button>
+                  )}
                 </li>
               ))}
             </ul>

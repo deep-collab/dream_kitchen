@@ -60,6 +60,15 @@ export const myOrders = () => {
 export const rememberOrder = (code, phone) => set(ORDERS_KEY, [{ code, phone, at: Date.now() }, ...myOrders().filter((o) => o.code !== code)].slice(0, 20))
 export const phoneForOrder = (code) => myOrders().find((o) => o.code === code)?.phone || null
 
+/** Class bookings made on this phone (kept apart from orders, so Track Order only offers orders) */
+const BOOKINGS_KEY = 'dk_my_bookings'
+const myBookings = () => {
+  const list = get(BOOKINGS_KEY)
+  return Array.isArray(list) ? list.filter((b) => b && typeof b.code === 'string') : []
+}
+export const rememberBooking = (code, phone) => set(BOOKINGS_KEY, [{ code, phone, at: Date.now() }, ...myBookings().filter((b) => b.code !== code)].slice(0, 20))
+export const phoneForBooking = (code) => myBookings().find((b) => b.code === code)?.phone || null
+
 /**
  * The idempotency key for placing this exact order: the same key while nothing changes (a double
  * tap, a retry after a dropped signal), a new one as soon as the cart or the details change.

@@ -12,6 +12,11 @@ export const LIMITS = {
   enquiryIp: [3600, 6],
   enquiryPhone: [86400, 3],
   loginIp: [900, 10],
+  forgotIp: [3600, 5], // "Forgot password" emails
+  forgotEmail: [3600, 3],
+  setupIp: [600, 30], // the setup check page
+  bookingIp: [3600, 12],
+  bookingPhone: [3600, 6],
   razorpayIp: [3600, 20],
 }
 

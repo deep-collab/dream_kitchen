@@ -220,6 +220,11 @@ export function adminAction(row, input, by) {
     const notes = String(input.notes ?? '').trim().slice(0, 1000)
     return { patch: { admin_notes: notes }, event: null }
   }
+  // Refunds are made in the Razorpay dashboard; Hema writes down what she did, and it is logged
+  if (action === 'refundNote') {
+    const note = String(input.refundNote ?? '').replace(/\s+/g, ' ').trim().slice(0, 300)
+    return { patch: { refund_note: note }, event: { kind: 'note', to_status: row.status, by, note: note ? `Refund note: ${note}` : 'Refund note removed' } }
+  }
   if (!(NEXT_ACTIONS[row.status] || []).includes(action)) throw new HttpError(409, 'transition', { status: row.status })
   const event = (to, note = null, kind = 'status') => ({ kind, to_status: to, by, note })
   switch (action) {
@@ -253,14 +258,8 @@ export function adminAction(row, input, by) {
   }
 }
 
-/** Admin list tabs */
-export const TABS = {
-  new: (o) => o.status === 'placed' && o.payment_status === 'pending',
-  payment: (o) => o.status === 'placed' && o.payment_status === 'submitted',
-  preparing: (o) => o.status === 'payment_confirmed' || o.status === 'preparing',
-  shipped: (o) => o.status === 'shipped',
-  done: (o) => o.status === 'delivered' || o.status === 'cancelled',
-}
+/** Admin list tabs: the order's status. New = placed, not paid yet (or a UPI payment to check) */
+export const TAB_STATUS = { new: 'placed', paid: 'payment_confirmed', preparing: 'preparing', shipped: 'shipped', delivered: 'delivered', cancelled: 'cancelled' }
 
 /** The admin order card */
 export function adminSummary(row) {
@@ -273,6 +272,7 @@ export function adminSummary(row) {
     status: row.status,
     paymentStatus: row.payment_status,
     paymentMethod: row.payment_method,
+    paidAt: row.paid_at || null,
     dispatchDate: row.dispatch_date,
     hasDrawing: row.has_drawing,
     itemCount: (row.items || []).reduce((n, i) => n + (i.qty || 0), 0),
