@@ -543,7 +543,8 @@
       }
     },
     "leadBook": "Learn with Hema in a 2-day class, every Saturday and Sunday. Pick a class and book your seat online.",
-    "bookNow": "Book now"
+    "bookNow": "Book now",
+    "slotsOr": " or "
   },
   "book": {
     "title": "Book a class",

@@ -7,8 +7,8 @@ import { AlertIcon, CheckIcon } from '../components/icons'
 const FIX = {
   supabase: {
     noUrl: 'SUPABASE_URL is missing in Netlify. Setup guide, steps 1–4.',
-    noServiceKey: 'SUPABASE_SERVICE_ROLE_KEY (the secret key) is missing in Netlify. Setup guide, step 4.',
-    keyRefused: 'Supabase refused the secret key. Copy it again (setup guide, step 2) into SUPABASE_SERVICE_ROLE_KEY, then redeploy.',
+    noServiceKey: 'The Supabase secret key is missing in Netlify. Setup guide, step 4.',
+    keyRefused: 'Supabase refused the secret key. Copy it again (setup guide, step 2) into Netlify, then redeploy.',
     unreachable: 'Supabase doesn’t answer. Check SUPABASE_URL. If Supabase emailed you that the project is paused, open it and tap Restore.',
     noTables: 'The database setup hasn’t been run yet. Setup guide, step 3: run supabase/setup-all.sql.',
     noUpdate: 'Run supabase/setup-all.sql again (setup guide, step 3). It adds the class bookings and is safe to run twice.',
@@ -17,13 +17,13 @@ const FIX = {
     noAdmin: 'No admin login yet. Setup guide, step 5: make Hema’s login (and yours).',
   },
   resend: {
-    noKey: 'RESEND_API_KEY is missing in Netlify, so no emails are sent. Setup guide, step 6.',
-    badKey: 'RESEND_API_KEY doesn’t look right: it starts with re_. Copy it again from Resend.',
+    noKey: 'The Resend key is missing in Netlify, so no emails are sent. Setup guide, step 6.',
+    badKey: 'The Resend key doesn’t look right: it starts with re_. Copy it again from Resend (step 6).',
   },
   razorpay: {
     noKeys: 'Not set up yet. Until it is, customers pay by UPI (if set below) or order on WhatsApp. Setup guide, step 8, once Hema’s Razorpay account is approved.',
-    oneKey: 'Only one of the two Razorpay keys is in Netlify. Add both RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET.',
-    noWebhook: 'The keys are set, but the webhook isn’t. Setup guide, step 8.3: add the webhook and RAZORPAY_WEBHOOK_SECRET.',
+    oneKey: 'Only one of the two Razorpay keys is in Netlify. Add both (setup guide, step 8).',
+    noWebhook: 'The keys are set, but the webhook isn’t. Setup guide, step 8: add the webhook and its secret.',
   },
   email: { noEmail: 'No address for order alerts. Add it in Settings, or HEMA_EMAIL in Netlify.' },
   upi: { noUpi: 'Neither Razorpay nor UPI is set, so the website says “Online ordering opens soon – WhatsApp us”. Add the UPI ID in Settings, or set up Razorpay.' },
