@@ -10,3 +10,5 @@ dist
 # Photos waiting to be converted by scripts/photos.mjs
 photos-incoming/*
 !photos-incoming/README.md
+# Walkthrough videos for Hema (scripts/walkthrough-video.mjs): too big for git
+docs/video/

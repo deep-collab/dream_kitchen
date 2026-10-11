@@ -66,7 +66,8 @@ export async function seedDemo(store, setClock) {
   await store.upsertProducts([{ id: 'pista-bar', slug: 'pista-bar', category: 'chocolates', name_en: 'Pista Bar', sold_out: true }])
 
   const ref = await samplePhoto()
-  const refPath = 'refs/demo/0b0c8f5e-6a43-4f43-9a0e-2d6f2f1b7c11.png'
+  // Same shape as a real upload (DRAWING_REF_PATTERN), or the order would drop it
+  const refPath = 'refs/20261001/0b0c8f5e-6a43-4f43-9a0e-2d6f2f1b7c11.png'
   if (ref) await store.putObject(refPath, ref, 'image/png')
 
   /** One order: items [[productId, selection, qty]], placed `ago` ms before now, then moved along */
