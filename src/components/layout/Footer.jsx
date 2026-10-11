@@ -4,10 +4,11 @@ import { site } from '../../config/site'
 import { useCart } from '../../context/CartProvider'
 import Wordmark from '../brand/Wordmark'
 import LanguageToggle from '../ui/LanguageToggle'
-import { FOOTER_NAV, isCheckoutPath } from './nav'
+import BusinessDetails from './BusinessDetails'
+import { FOOTER_NAV, POLICY_NAV, isCheckoutPath } from './nav'
 
-// Short black footer: Track Order, Our Story, FAQ, Contact and the language switch.
-// Bottom padding clears the tab bar (plus the safe-area inset) below 1024px.
+// Black footer: Track Order, Our Story, FAQ, Contact, the four policies, the language switch and
+// the business's contact details. Bottom padding clears the tab bar (plus the safe-area inset) below 1024px.
 export default function Footer() {
   const { t } = useI18n()
   const year = new Date().getFullYear()
@@ -24,24 +25,34 @@ export default function Footer() {
           <Wordmark variant="stacked" size="sm" />
         </Link>
 
-        <nav aria-label={t('footer.links')}>
-          <ul className="grid grid-cols-2 gap-x-6 sm:flex sm:flex-wrap sm:justify-center sm:gap-x-8">
-            {FOOTER_NAV.map(({ to, key }) => (
-              <li key={to}>
-                <Link to={to} className={link}>
-                  {t(key)}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <div className="space-y-2">
+          {[
+            ['footer.links', FOOTER_NAV],
+            ['footer.policies', POLICY_NAV],
+          ].map(([label, items]) => (
+            <nav key={label} aria-label={t(label)}>
+              <ul className="grid grid-cols-2 gap-x-6 sm:flex sm:flex-wrap sm:justify-center sm:gap-x-8">
+                {items.map(({ to, key }) => (
+                  <li key={to}>
+                    <Link to={to} className={link}>
+                      {t(key)}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
 
         <LanguageToggle className="justify-self-center md:justify-self-end" />
       </div>
 
       <div className="dk-container">
         <hr className="rule-gold" />
-        <div className={`t-small flex flex-col gap-1 pt-4 text-center sm:flex-row sm:flex-wrap sm:justify-between sm:gap-x-8 sm:text-left lg:pb-6 ${clear}`}>
+        <section aria-label={t('footer.details')} className="t-small pt-4 text-center sm:text-left">
+          <BusinessDetails dark className="flex flex-col items-center sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6" />
+        </section>
+        <div className={`t-small flex flex-col gap-1 pt-3 text-center sm:flex-row sm:flex-wrap sm:justify-between sm:gap-x-8 sm:text-left lg:pb-6 ${clear}`}>
           <p>{t('footer.rights', { year })}</p>
           <p>{t('footer.shipping')}</p>
           {site.fssai && <p>{t('footer.fssai', { fssai: site.fssai })}</p>}

@@ -160,7 +160,10 @@ async function matrix(browser, codes) {
       await p.locator('[role=dialog] [role=switch]').first().click()
       await p.locator('[role=dialog] details summary').click()
     })],
-    ['sheet-tub-soon', '/menu#brownie-tubs', async (p) => openSheet(p, /Dream Cake|ಡ್ರೀಮ್ ಕೇಕ್/)],
+    // Products without a price (the Dream Cake Tub until Hema prices it) are not on the menu at all
+    ['menu-no-unpriced', '/menu#brownie-tubs', async (p) => {
+      if (await p.getByText(/Dream Cake|ಡ್ರೀಮ್ ಕೇಕ್/).count()) throw new Error('an unpriced product is on the menu')
+    }],
     ['customize', '/customize'],
     ['cart', '/cart'],
     ['checkout', '/checkout', async (p) => p.locator('[data-dk-next]').click()],

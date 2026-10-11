@@ -184,7 +184,7 @@ export default function CheckoutReview() {
               <span>{error}</span>
             </p>
           )}
-          <TotalBar label={t('cart.total')} total={formatINR(q.total ?? q.subtotal)} note={closed ? t('errors.storeClosed', { phone: site.phone.display }) : viaWhatsApp ? t('checkout.paymentsSoonText') : undefined}>
+          <TotalBar label={t('cart.total')} total={formatINR(q.total ?? q.subtotal)} note={closed ? t('errors.storeClosed', { phone: site.phone.display }) : viaWhatsApp ? t('checkout.paymentsSoonText') : undefined} noRefund>
             {viaWhatsApp ? (
               <Button variant="whatsapp" size="lg" fullWidth href={waLink(cartOrderText(cart.lines, menu.productsById))} data-dk-whatsapp-order>
                 {t('checkout.orderWhatsApp')}

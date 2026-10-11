@@ -91,6 +91,7 @@ const ROUTE_FILES = [
   ['^/our-story$', 'src/pages/Story.jsx'],
   ['^/contact$', 'src/pages/Contact.jsx'],
   ['^/faq$', 'src/pages/FAQ.jsx'],
+  ['^/(terms|refund|shipping|privacy)$', 'src/pages/Policy.jsx'],
 ]
 function routePreload() {
   return {

@@ -2,6 +2,14 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 11 Oct 2026: policy pages for Razorpay verification
+- [x] /terms, /refund, /shipping, /privacy (`src/pages/Policy.jsx`, text in `src/data/policies.js`, English only with a Kannada note; lead time and courier rates read live from config/admin). Refund rules are Hema's (no refunds; custom orders and classes non-refundable, class date can shift with 24 h notice; damaged/melted/incorrect/quality items replaced if reported within 24 h with photos/video)
+- [x] Footer on every page: the four policies + Contact, business name, owner, phone, email/address once filled, Instagram. Contact shows name, owner, phone, address
+- [x] "No refund on customized orders and classes." under Place order, Pay and Book & pay (`TotalBar noRefund`)
+- [x] Products without a price are left off the menu (MenuProvider), so every product shown has a price; they return once Hema prices them in admin
+- [x] TODO in `src/config/site.js`: email, address, jurisdictionCity, deliveryTime (empty = hidden or neutral wording)
+- [x] Checks: `node scripts/qa-policies.mjs` (5 pages × 390/1280 × EN/KN, opened directly and refreshed, on dev and on the production build), qa-step6 0 problems, qa-admin 18/18, qa-payments 9/9, 302 tests, check-i18n and check-secrets clean; first-visit JS +~0.5 KB
+
 ## 10 Oct 2026: the complete admin, connected end to end (branch admin-complete)
 - [x] Database: migration `20261010000001_admin_complete.sql` (class bookings + history, closed weekends/slots, seats under a lock in `create_booking`, product photos in a public bucket, refund note and paid_at, general messages, alert email and class settings hidden from the public, admin last activity, a 750 g courier tier). One file for the owner: `supabase/setup-all.sql` (tested: runs twice in a fresh Postgres)
 - [x] Login: Supabase Auth, only `admin_users` (Hema + owner); Forgot password (Supabase link → /admin/reset); 30 days unused → log in again (checked on the server and the phone); Log out; new Supabase `sb_secret_` keys supported

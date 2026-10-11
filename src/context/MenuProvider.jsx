@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { categories as CATEGORIES, products as PRODUCTS } from '../config/shop'
-import { applyOverrides, applySettings } from '../lib/pricing'
+import { applyOverrides, applySettings, hasPrice } from '../lib/pricing'
 import { loadRemoteMenu } from '../services'
 
 export const MenuContext = createContext(null)
@@ -30,7 +30,9 @@ export function MenuProvider({ children }) {
     return {
       menu: {
         categories: CATEGORIES.filter((c) => !c.hidden).sort((a, b) => a.sort - b.sort),
-        products: all.filter((p) => p.active !== false).sort((a, b) => a.sort - b.sort),
+        // Every product customers see has a clear price: one without (e.g. "price coming soon") stays
+        // off the menu until Hema sets its price in the admin
+        products: all.filter((p) => p.active !== false && hasPrice(p)).sort((a, b) => a.sort - b.sort),
         productsById: Object.fromEntries(all.map((p) => [p.id, p])),
       },
       settings,

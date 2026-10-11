@@ -2,7 +2,7 @@
   sitemap.xml and robots.txt, written at build time (vite.config.js). Only the pages people can
   land on from Google; cart, checkout, pay, order pages, the admin and the 404 are left out.
 */
-export const STATIC_PATHS = ['/', '/menu', '/customize', '/classes', '/our-story', '/contact', '/faq', '/track']
+export const STATIC_PATHS = ['/', '/menu', '/customize', '/classes', '/our-story', '/contact', '/faq', '/track', '/terms', '/refund', '/shipping', '/privacy']
 
 export const sitemapPaths = () => STATIC_PATHS
 

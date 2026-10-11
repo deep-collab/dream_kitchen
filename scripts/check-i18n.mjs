@@ -17,7 +17,7 @@ const runtime = [
   'cart.added', 'cart.updated', 'sheet.add', 'sheet.update',
   ...codes('cart.unavailable', ['removed', 'soldOut', 'priceSoon', 'changed']),
   // useSeo(page) reads seo.<page>.title / .desc
-  ...['home', 'menu', 'customize', 'classes', 'book', 'booking', 'story', 'contact', 'faq', 'track', 'cart', 'checkout', 'pay', 'order', 'notFound'].flatMap((p) => [`seo.${p}.title`, `seo.${p}.desc`]),
+  ...['home', 'menu', 'customize', 'classes', 'book', 'booking', 'story', 'contact', 'faq', 'track', 'cart', 'checkout', 'pay', 'order', 'notFound', 'terms', 'refund', 'shipping', 'privacy'].flatMap((p) => [`seo.${p}.title`, `seo.${p}.desc`]),
   // checkout: every code src/lib/checkout.js detailsErrors() returns, and the dispatch date
   ...codes('checkout.errors.name', ['required', 'short', 'long']),
   ...codes('checkout.errors.phone', ['required', 'invalid']),

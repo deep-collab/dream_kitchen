@@ -84,6 +84,11 @@ keys in code or chat. Run `npm test`, `node scripts/check-i18n.mjs`, `node scrip
 `node scripts/qa-payments.mjs` (starts its own server) after changes. Speed budget: first-visit JS ≤ ~66 KB gzip
 (`node scripts/bundle-report.mjs`), Lighthouse mobile Performance 90+, the rest 100.
 
+## Policy pages (Razorpay)
+/terms, /refund, /shipping, /privacy: one page (`src/pages/Policy.jsx`), English text in `src/data/policies.js`
+(Hema's refund rules; never add a policy she hasn't agreed to). Linked from every footer with the business
+details (`src/components/layout/BusinessDetails.jsx`). Unknown business details are TODO in `src/config/site.js`.
+
 ## Build history
 Admin complete (10 Oct 2026, branch admin-complete): the full admin, class booking on the site,
 Razorpay as the main payment, the demo admin, the setup check, new guides. See `docs/PROGRESS.md`.

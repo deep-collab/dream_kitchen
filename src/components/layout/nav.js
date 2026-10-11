@@ -17,6 +17,10 @@ export const FOOTER_NAV = [
   { to: '/contact', key: 'nav.contact' },
 ]
 
+// /terms, /refund, /shipping, /privacy (src/pages/Policy.jsx). Razorpay checks they are linked from every page.
+export const POLICY_PAGES = ['terms', 'refund', 'shipping', 'privacy']
+export const POLICY_NAV = POLICY_PAGES.map((page) => ({ to: `/${page}`, key: `nav.${page}` }))
+
 /** Pages where the bottom of the screen belongs to the order's own total bar (cart and checkout).
  *  An empty cart has no total bar, so it keeps the tab bar. */
 export const isCheckoutPath = (pathname, cartCount = 1) => /^\/(checkout|pay|classes\/book|classes\/booking)(\/|$)/.test(pathname) || (pathname === '/cart' && cartCount > 0)

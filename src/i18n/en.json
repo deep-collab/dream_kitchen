@@ -16,7 +16,11 @@
     "cart": "Cart",
     "skip": "Skip to main content",
     "main": "Main",
-    "language": "Language"
+    "language": "Language",
+    "terms": "Terms & Conditions",
+    "refund": "Refund & Cancellation",
+    "shipping": "Shipping & Delivery",
+    "privacy": "Privacy Policy"
   },
   "common": {
     "close": "Close",
@@ -32,13 +36,21 @@
     "loading": "Loading…",
     "copy": "Copy",
     "cartWithCount": "Cart, {count} items",
-    "cartWithCountOne": "Cart, 1 item"
+    "cartWithCountOne": "Cart, 1 item",
+    "noRefund": "No refund on customized orders and classes."
   },
   "footer": {
     "links": "Useful links",
     "rights": "© {year} Dream Kitchen",
     "fssai": "FSSAI licence no. {fssai}",
-    "shipping": "Made fresh to order. Sent all over India by courier."
+    "shipping": "Made fresh to order. Sent all over India by courier.",
+    "policies": "Policies",
+    "details": "Contact details",
+    "owner": "Owner: Hema",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "instagram": "Instagram"
   },
   "banner": {
     "closed": "Orders are paused for now.",
@@ -154,6 +166,22 @@
     "booking": {
       "title": "Your class booking | Dream Kitchen",
       "desc": "Your chocolate class booking with Dream Kitchen."
+    },
+    "terms": {
+      "title": "Terms & Conditions | Dream Kitchen",
+      "desc": "The terms for ordering handmade chocolates and brownies and booking classes with Dream Kitchen."
+    },
+    "refund": {
+      "title": "Refund & Cancellation Policy | Dream Kitchen",
+      "desc": "Dream Kitchen’s refund, replacement and cancellation policy for handmade orders and chocolate classes."
+    },
+    "shipping": {
+      "title": "Shipping & Delivery Policy | Dream Kitchen",
+      "desc": "How Dream Kitchen prepares, dispatches and delivers handmade orders across India, and the courier charges."
+    },
+    "privacy": {
+      "title": "Privacy Policy | Dream Kitchen",
+      "desc": "What Dream Kitchen collects when you order or book a class, and how it is used and protected."
     }
   },
   "home": {
@@ -699,6 +727,16 @@
         "a": "WhatsApp us on {phone} as soon as you can, and Hema will tell you what is possible."
       }
     }
+  },
+  "policy": {
+    "terms": "Terms & Conditions",
+    "refund": "Refund & Cancellation Policy",
+    "shipping": "Shipping & Delivery Policy",
+    "privacy": "Privacy Policy",
+    "updated": "Last updated: {date}",
+    "english": "This policy is written in English.",
+    "contactTitle": "Questions? Contact us",
+    "others": "Our other policies"
   },
   "notFound": {
     "title": "Oops! This page melted away",

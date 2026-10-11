@@ -70,9 +70,19 @@ export default function Contact() {
             )}
           </ul>
 
-          <p className="mt-5">
-            <span className="font-bold">{t('contact.phone')}:</span> {site.phone.display}
-          </p>
+          <address className="mt-5 space-y-1 not-italic" data-dk-business>
+            <p>
+              <span className="font-bold">{site.name}</span> · {t('footer.owner')}
+            </p>
+            <p>
+              <span className="font-bold">{t('contact.phone')}:</span> {site.phone.display}
+            </p>
+            {site.address && (
+              <p>
+                <span className="font-bold">{t('footer.address')}:</span> {site.address}
+              </p>
+            )}
+          </address>
           {hasCallHours() && (
             <p className="mt-5 flex gap-3">
               <ClockIcon className="mt-0.5 h-6 w-6 shrink-0" />
