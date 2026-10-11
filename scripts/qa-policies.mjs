@@ -88,7 +88,10 @@ try {
           if (a.small.length) fail(`${label}: small targets ${a.small.join(' | ')}`)
           const missing = FOOTER_PATHS.filter((p) => !a.footerLinks.includes(p))
           if (missing.length) fail(`${label}: footer has no link to ${missing.join(', ')}`)
-          for (const text of [site.name, site.phone.display, site.instagram.handle]) if (!a.footerText.includes(text)) fail(`${label}: footer lacks "${text}"`)
+          const details = [site.name, site.phone.display, site.instagram.handle, site.email, site.address].filter(Boolean)
+          for (const text of details) if (!a.footerText.includes(text)) fail(`${label}: footer lacks "${text}"`)
+          const mainText = await page.locator('main').innerText()
+          for (const text of [site.email, site.address].filter(Boolean)) if (!mainText.includes(text)) fail(`${label}: page lacks "${text}"`)
           if (!/Owner: Hema|ಮಾಲೀಕರು: ಹೇಮಾ/.test(a.footerText)) fail(`${label}: footer lacks the owner`)
           if (a.adminLinks) fail(`${label}: links to the admin`)
         }

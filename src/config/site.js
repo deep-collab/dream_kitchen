@@ -27,8 +27,8 @@ export const site = {
   // ---------- TODO before Razorpay verification ----------
   // Shown on Contact, in the footer and on the policy pages (/terms, /refund, /shipping, /privacy).
   // Empty = hidden (the pages still read naturally), so the site never shows a made-up value.
-  email: '', // TODO: Hema's business email, e.g. 'name@example.com'
-  address: '', // TODO: full postal address with pincode, e.g. 'House no., street, area, city, Karnataka 560000'
+  email: 'dreamkitchen.web01@gmail.com', // also the default order-alert address (netlify/lib/env.mjs)
+  address: 'Bengaluru, Karnataka', // city only, by choice: no street or pincode
   jurisdictionCity: '', // TODO: city for the "governing law" clause in the Terms, e.g. 'Bengaluru'. Empty = "the courts of India"
   deliveryTime: '', // TODO: courier time after dispatch, e.g. '3–7 business days'. Empty = "depends on your location"
   // Courier charges are NOT here: they are Hema's rates in src/config/shop.js (courier.rates), and she

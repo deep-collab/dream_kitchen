@@ -17,7 +17,8 @@ Tick each line once it is true. Lines already ticked were checked in Step 6 (see
 - [ ] 750 g courier rate (admin Settings; until then it is the 500–700 g rate)
 - [ ] Seats per class slot (admin Classes → Fees & times; empty = no limit)
 - [x] Policy pages /terms, /refund, /shipping, /privacy (text: `src/data/policies.js`; Hema reads them once before Razorpay)
-- [ ] Business email, postal address, court city and courier delivery time: the TODO lines in `src/config/site.js` (empty = hidden)
+- [x] Business email (dreamkitchen.web01@gmail.com, also the default order-alert address) and address (Bengaluru, Karnataka: city only) in `src/config/site.js`
+- [ ] Court city and courier delivery time: the TODO lines in `src/config/site.js` (empty = neutral wording)
 - [ ] Brownie Tub sizes and prices (the four old tubs show her first-menu prices and weights; the Dream Cake Tub stays off the menu until she prices it in admin → Menu)
 - [ ] Dream Cake Tub description (none yet)
 - [ ] Extra preparation days for drawings (placeholder: 2 business days, `leadTimes.drawingExtraBusinessDays` or /admin Settings)
