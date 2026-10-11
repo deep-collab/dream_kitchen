@@ -3,7 +3,7 @@
 Your admin is where you see orders and class bookings, and change prices, photos and settings.
 It works on your phone.
 
-**Open it:** your-website**/admin** (for example `dreamkitchen.netlify.app/admin`).
+**Open it:** your-website**/admin** (today `luminous-salmiakki-fa7e70.netlify.app/admin`).
 **Tip:** in Chrome tap **⋮** → **Add to Home screen**. Then it opens like an app.
 
 **Want to practise first?** your-website**/admin/demo** is the same admin with made-up orders.

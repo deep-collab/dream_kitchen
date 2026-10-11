@@ -24,6 +24,8 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - Database setup for the owner: one file, `supabase/setup-all.sql` (`node scripts/setup-sql.mjs`; a test fails if it is stale). Owner's guide: `docs/SETUP-BACKEND.md`; Hema's: `docs/admin-guide-for-hema.md`.
 - Secrets only in Netlify environment variables (`.env.example`, `docs/SETUP-BACKEND.md`). Never in code or chat. `node scripts/check-secrets.mjs` checks every build.
 - Git: commit on the working branch; push only when the user says "push"; never merge without being asked.
+- **Live site: https://luminous-salmiakki-fa7e70.netlify.app** (`site.url` in `src/config/site.js`). Netlify is connected
+  to `main`: every push to `main` deploys to the live site (about 2 minutes).
 
 ## Single sources of truth
 - **`src/config/shop.js`**: the menu, prices, options, courier rates and tiers, lead times, limits, UPI placeholders. TO CONFIRM marks what Hema hasn't given.

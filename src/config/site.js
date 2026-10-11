@@ -10,7 +10,7 @@ const PHONE = '9535706956'
 export const site = {
   name: 'Dream Kitchen',
   founder: 'Hema',
-  url: 'https://dreamkitchen.netlify.app', // TO CONFIRM: final domain (Netlify's own URL variable is used by the server)
+  url: 'https://luminous-salmiakki-fa7e70.netlify.app', // the live site (Netlify, deploys from main). Change here if a custom domain is added
 
   phone: {
     display: `+91 ${PHONE.slice(0, 5)} ${PHONE.slice(5)}`, // "+91 98765 43210" style
@@ -24,13 +24,12 @@ export const site = {
     handle: '@dreamkitchen_01_homemade',
     url: 'https://instagram.com/dreamkitchen_01_homemade',
   },
-  // ---------- TODO before Razorpay verification ----------
-  // Shown on Contact, in the footer and on the policy pages (/terms, /refund, /shipping, /privacy).
-  // Empty = hidden (the pages still read naturally), so the site never shows a made-up value.
+  // Business details for Razorpay: shown on Contact, in the footer and on the policy pages
+  // (/terms, /refund, /shipping, /privacy). Empty = hidden, so the site never shows a made-up value.
   email: 'dreamkitchen.web01@gmail.com', // also the default order-alert address (netlify/lib/env.mjs)
   address: 'Bengaluru, Karnataka', // city only, by choice: no street or pincode
-  jurisdictionCity: '', // TODO: city for the "governing law" clause in the Terms, e.g. 'Bengaluru'. Empty = "the courts of India"
-  deliveryTime: '', // TODO: courier time after dispatch, e.g. '3–7 business days'. Empty = "depends on your location"
+  jurisdictionCity: 'Bengaluru', // the "governing law" clause in the Terms. Empty = "the competent courts in India"
+  deliveryTime: '2–5 business days within Karnataka, 4–7 business days elsewhere in India', // courier time after dispatch (Shipping policy)
   // Courier charges are NOT here: they are Hema's rates in src/config/shop.js (courier.rates), and she
   // can change them in /admin -> Settings. Only the 750 g tub rate is still TO CONFIRM there.
   policiesUpdated: '2026-10-11', // "Last updated" on the policy pages (YYYY-MM-DD): change it whenever a policy changes

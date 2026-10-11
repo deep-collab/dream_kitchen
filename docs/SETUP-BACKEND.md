@@ -20,7 +20,7 @@ You can do every step on a phone, but steps 1 to 4 are easier on a laptop.
 **Your helper: the Setup check page.** Open `https://YOUR-SITE/admin/setup` at any time. It
 shows a green tick or a red cross for Supabase, Resend, Razorpay, the alert email and UPI, and
 tells you which step below fixes each red one. (Replace `YOUR-SITE` with your website's address,
-for example `dreamkitchen.netlify.app`.)
+today `luminous-salmiakki-fa7e70.netlify.app`.)
 
 **Want to show Hema first?** `https://YOUR-SITE/admin/demo` is the whole admin with made-up sample
 orders. It needs no setup, no login, and can't touch real data.

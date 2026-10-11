@@ -20,7 +20,7 @@ export function policyVars(settings) {
     where: site.address ? `, ${site.address}` : '',
     courts: site.jurisdictionCity ? `the courts at ${site.jurisdictionCity}` : 'the competent courts in India',
     transit: site.deliveryTime
-      ? `Once dispatched, courier delivery usually takes ${site.deliveryTime}, depending on your location.`
+      ? `Once dispatched, courier delivery usually takes ${site.deliveryTime}.`
       : 'Once dispatched, the delivery time depends on your location and the courier company.',
     rates: [
       `Brownies, chocolates, Brownie Tubs up to 500 g and 250 g Delight Boxes: ${rate('small')}.`,
