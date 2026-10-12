@@ -4,89 +4,89 @@
     {
       "path": "/",
       "landed": "/",
-      "firstLoadKb": 47.6,
-      "files": 7,
-      "withPrefetchKb": 71.5,
+      "firstLoadKb": 50.6,
+      "files": 9,
+      "withPrefetchKb": 75.7,
       "kannadaFiles": []
     },
     {
       "path": "/menu",
       "landed": "/menu",
-      "firstLoadKb": 48.3,
-      "files": 7,
-      "withPrefetchKb": 70.2,
+      "firstLoadKb": 50.8,
+      "files": 9,
+      "withPrefetchKb": 73.9,
       "kannadaFiles": []
     },
     {
       "path": "/customize",
       "landed": "/customize",
-      "firstLoadKb": 47.8,
-      "files": 8,
-      "withPrefetchKb": 71.4,
+      "firstLoadKb": 50.2,
+      "files": 10,
+      "withPrefetchKb": 75.1,
       "kannadaFiles": []
     },
     {
       "path": "/cart",
       "landed": "/cart",
-      "firstLoadKb": 52.6,
-      "files": 13,
-      "withPrefetchKb": 70.2,
+      "firstLoadKb": 55.7,
+      "files": 16,
+      "withPrefetchKb": 73.9,
       "kannadaFiles": []
     },
     {
       "path": "/checkout",
       "landed": "/checkout",
-      "firstLoadKb": 51.1,
-      "files": 11,
-      "withPrefetchKb": 70.2,
+      "firstLoadKb": 53.4,
+      "files": 13,
+      "withPrefetchKb": 73.9,
       "kannadaFiles": []
     },
     {
       "path": "/classes",
       "landed": "/classes",
-      "firstLoadKb": 49.2,
-      "files": 8,
-      "withPrefetchKb": 72.4,
+      "firstLoadKb": 55.1,
+      "files": 16,
+      "withPrefetchKb": 78,
       "kannadaFiles": []
     },
     {
       "path": "/our-story",
       "landed": "/our-story",
-      "firstLoadKb": 44.9,
-      "files": 5,
-      "withPrefetchKb": 71.4,
+      "firstLoadKb": 46.9,
+      "files": 6,
+      "withPrefetchKb": 75,
       "kannadaFiles": []
     },
     {
       "path": "/contact",
       "landed": "/contact",
-      "firstLoadKb": 44.5,
-      "files": 4,
-      "withPrefetchKb": 71.4,
+      "firstLoadKb": 49.6,
+      "files": 9,
+      "withPrefetchKb": 76.6,
       "kannadaFiles": []
     },
     {
       "path": "/faq",
       "landed": "/faq",
-      "firstLoadKb": 44.7,
-      "files": 4,
-      "withPrefetchKb": 71.7,
+      "firstLoadKb": 46.9,
+      "files": 5,
+      "withPrefetchKb": 75.4,
       "kannadaFiles": []
     },
     {
       "path": "/track",
       "landed": "/track",
-      "firstLoadKb": 51.9,
-      "files": 13,
-      "withPrefetchKb": 74.4,
+      "firstLoadKb": 55.1,
+      "files": 17,
+      "withPrefetchKb": 78.5,
       "kannadaFiles": []
     },
     {
       "path": "/no-such-page",
       "landed": "/no-such-page",
-      "firstLoadKb": 44.4,
-      "files": 5,
-      "withPrefetchKb": 70.8,
+      "firstLoadKb": 46.4,
+      "files": 6,
+      "withPrefetchKb": 74.5,
       "kannadaFiles": []
     }
   ],
@@ -94,111 +94,111 @@
     {
       "path": "/",
       "landed": "/",
-      "firstLoadKb": 57.3,
-      "files": 8,
-      "withPrefetchKb": 81.1,
+      "firstLoadKb": 62.1,
+      "files": 10,
+      "withPrefetchKb": 87.2,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/menu",
       "landed": "/menu",
-      "firstLoadKb": 57.9,
-      "files": 8,
-      "withPrefetchKb": 79.9,
+      "firstLoadKb": 62.3,
+      "files": 10,
+      "withPrefetchKb": 85.4,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/customize",
       "landed": "/customize",
-      "firstLoadKb": 57.4,
-      "files": 9,
-      "withPrefetchKb": 81,
+      "firstLoadKb": 61.7,
+      "files": 11,
+      "withPrefetchKb": 86.6,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/cart",
       "landed": "/cart",
-      "firstLoadKb": 62.2,
-      "files": 14,
-      "withPrefetchKb": 79.9,
+      "firstLoadKb": 67.2,
+      "files": 17,
+      "withPrefetchKb": 85.4,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/checkout",
       "landed": "/checkout",
-      "firstLoadKb": 60.7,
-      "files": 12,
-      "withPrefetchKb": 79.9,
+      "firstLoadKb": 64.9,
+      "files": 14,
+      "withPrefetchKb": 85.4,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/classes",
       "landed": "/classes",
-      "firstLoadKb": 58.8,
-      "files": 9,
-      "withPrefetchKb": 82.1,
+      "firstLoadKb": 66.6,
+      "files": 17,
+      "withPrefetchKb": 89.6,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/our-story",
       "landed": "/our-story",
-      "firstLoadKb": 54.5,
-      "files": 6,
-      "withPrefetchKb": 81,
+      "firstLoadKb": 58.4,
+      "files": 7,
+      "withPrefetchKb": 86.5,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/contact",
       "landed": "/contact",
-      "firstLoadKb": 54.1,
-      "files": 5,
-      "withPrefetchKb": 81,
+      "firstLoadKb": 61.1,
+      "files": 10,
+      "withPrefetchKb": 88.1,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/faq",
       "landed": "/faq",
-      "firstLoadKb": 54.4,
-      "files": 5,
-      "withPrefetchKb": 81.3,
+      "firstLoadKb": 58.4,
+      "files": 6,
+      "withPrefetchKb": 86.9,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/track",
       "landed": "/track",
-      "firstLoadKb": 61.5,
-      "files": 14,
-      "withPrefetchKb": 84,
+      "firstLoadKb": 66.6,
+      "files": 18,
+      "withPrefetchKb": 90,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     },
     {
       "path": "/no-such-page",
       "landed": "/no-such-page",
-      "firstLoadKb": 54,
-      "files": 6,
-      "withPrefetchKb": 80.5,
+      "firstLoadKb": 57.9,
+      "files": 7,
+      "withPrefetchKb": 86,
       "kannadaFiles": [
-        "/assets/kannada-66ce4bc438.json"
+        "/assets/kannada-ece04406d9.json"
       ]
     }
   ],
