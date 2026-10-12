@@ -32,7 +32,7 @@ export const site = {
   deliveryTime: '2–5 business days within Karnataka, 4–7 business days elsewhere in India', // courier time after dispatch (Shipping policy)
   // Courier charges are NOT here: they are Hema's rates in src/config/shop.js (courier.rates), and she
   // can change them in /admin -> Settings. Only the 750 g tub rate is still TO CONFIRM there.
-  policiesUpdated: '2026-10-11', // "Last updated" on the policy pages (YYYY-MM-DD): change it whenever a policy changes
+  policiesUpdated: '2026-10-12', // "Last updated" on the policy pages (YYYY-MM-DD): change it whenever a policy changes
 
   // UNCONFIRMED: call hours, 24-hour clock, e.g. { opens: 10, closes: 20, days: 'monSat' }
   // (10 am – 8 pm, Monday to Saturday). null = no hours are shown anywhere.

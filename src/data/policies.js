@@ -45,7 +45,7 @@ export function policyContent(page, v) {
             heading: 'Customized orders',
             body: [
               'Customized orders cannot be refunded or cancelled once the order is confirmed. This includes:',
-              ['Custom messages or names', 'Drawings and custom designs', 'Hampers', 'Any other personalized item'],
+              ['Custom messages or names', 'Drawings and custom designs', 'Any other personalized item'],
             ],
           },
           {

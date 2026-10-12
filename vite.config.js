@@ -10,6 +10,7 @@ import kannadaSplit, { kannadaFileName } from './scripts/kannada-split.mjs'
 import stringsSplit from './scripts/strings-split.mjs'
 import { robotsTxt, sitemapXml } from './scripts/sitemap.mjs'
 import devApi from './scripts/dev-api.mjs'
+import prerender from './scripts/prerender.mjs'
 import { redirectsFile } from './src/config/redirects.js'
 
 const readJson = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'))
@@ -161,6 +162,6 @@ export default defineConfig(({ command }) => ({
   // Two pages: the shop (index.html) and Hema's admin (admin/index.html). The admin has its own
   // bundle, so customers download none of it.
   build: { rollupOptions: { input: { main: 'index.html', admin: 'admin/index.html' } } },
-  plugins: [devApi(), dreamKitchenHtml(), kannadaSplit(), stringsSplit(), kannadaPreload(), routePreload(), seoFiles(), react(), tailwindcss()],
+  plugins: [devApi(), dreamKitchenHtml(), kannadaSplit(), stringsSplit(), kannadaPreload(), routePreload(), seoFiles(), prerender(), react(), tailwindcss()],
   resolve: { alias: command === 'build' ? [...PREACT, BROWSER_ENV] : PREACT },
 }))

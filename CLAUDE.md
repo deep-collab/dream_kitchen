@@ -90,6 +90,8 @@ keys in code or chat. Run `npm test`, `node scripts/check-i18n.mjs`, `node scrip
 /terms, /refund, /shipping, /privacy: one page (`src/pages/Policy.jsx`), English text in `src/data/policies.js`
 (Hema's refund rules; never add a policy she hasn't agreed to). Linked from every footer with the business
 details (`src/components/layout/BusinessDetails.jsx`). Unknown business details are TODO in `src/config/site.js`.
+Without JavaScript (Razorpay's check): `scripts/prerender.mjs` writes dist/terms|refund|shipping|privacy|contact|menu.html
+at build time (full text, title, footer details, config prices); `src/main.jsx` empties #root before the app renders.
 
 ## Build history
 Admin complete (10 Oct 2026, branch admin-complete): the full admin, class booking on the site,

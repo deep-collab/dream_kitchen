@@ -14,8 +14,13 @@ import './index.css'
 // a retry. English readers start straight away and never download it.
 const start = readStoredLang() === 'kn' ? loadKannada().then(() => ['kn', false], () => ['en', true]) : Promise.resolve(['en', false])
 
-start.then(([initialLang, initialFailed]) =>
-  createRoot(document.getElementById('root')).render(
+// /terms, /refund, /shipping, /privacy, /contact and /menu arrive with their content already in
+// the HTML, for readers without JavaScript (scripts/prerender.mjs). The app replaces it.
+const rootEl = document.getElementById('root')
+
+start.then(([initialLang, initialFailed]) => {
+  rootEl.replaceChildren()
+  createRoot(rootEl).render(
     <StrictMode>
       <BrowserRouter>
         <I18nProvider initialLang={initialLang} initialFailed={initialFailed}>
@@ -31,5 +36,5 @@ start.then(([initialLang, initialFailed]) =>
         </I18nProvider>
       </BrowserRouter>
     </StrictMode>,
-  ),
-)
+  )
+})
