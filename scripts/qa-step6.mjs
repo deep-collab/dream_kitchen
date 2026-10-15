@@ -381,7 +381,9 @@ async function security(browser) {
 /* ---------------- 4. loading screen ---------------- */
 async function loader(browser) {
   const { ctx, page } = await newPage(browser, 390, 'en', { intro: true })
-  await page.goto(BASE + '/')
+  // Look as soon as the page starts: on a fast machine the loading screen (1 s at most) can be gone by 'load'
+  await page.goto(BASE + '/', { waitUntil: 'commit' })
+  await page.waitForSelector('#root', { state: 'attached' })
   const shown = await page.evaluate(() => document.documentElement.classList.contains('dk-intro-on') || !!document.getElementById('dk-intro'))
   const t0 = Date.now()
   await page.waitForFunction(() => !document.getElementById('dk-intro'), null, { timeout: 5000 })

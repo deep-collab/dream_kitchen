@@ -3,7 +3,8 @@
 Your admin is where you see orders and class bookings, and change prices, photos and settings.
 It works on your phone.
 
-**Open it:** your-website**/admin** (today `luminous-salmiakki-fa7e70.netlify.app/admin`).
+**Open it:** your-website**/admin** (for example `dreamkitchenblr.in/admin`; until the new web address is
+ready, `luminous-salmiakki-fa7e70.netlify.app/admin`). Your login: **dreamkitchen.web01@gmail.com** and your password.
 **Tip:** in Chrome tap **⋮** → **Add to Home screen**. Then it opens like an app.
 
 **Want to practise first?** your-website**/admin/demo** is the same admin with made-up orders.
@@ -120,7 +121,7 @@ and everything in the parcel (no prices). Tap **Print**, or take a screenshot.
 
 ---
 
-## 4. Menu: prices, sold out, photos
+## 4. Menu: prices, sold out, photos, new products
 
 Every product has its own card.
 
@@ -135,13 +136,31 @@ again, tap **Back in stock**.
 
 - **Hide from menu** / **Show on menu**: takes a product off the website completely, or brings it
   back.
-- **Back to original**: undoes your price changes for that product.
+- **Back to original**: undoes your changes (prices, name, description) for that product.
 - **Change photo**: take a photo or pick one from your gallery. The admin makes it the right size
   by itself; wait for **"Photo saved"**. A square photo with the product in the middle looks best.
-  **Use the old photo** puts the previous one back.
+  **Use the old photo** puts the previous one back (**Remove photo** on products you added).
 - **Brownie Tubs** (for example the **Dream Cake Tub**): type each size (for example "500 g") and
   its price, tap **+ Add a size** for more, tick **Show prices and allow ordering**, then **Save**.
   Until then the website says "Price coming soon".
+- **Edit name and description** (under each product): change the name or the short description,
+  in English and (if you like) Kannada, then tap **Save name and description**. Leave the Kannada
+  empty and Kannada readers see your English.
+
+**Add a new product:** tap **+ Add a new product** at the top of Menu.
+1. **Where on the menu**: Brownie Tubs, Delight Boxes, Brownies or Chocolates.
+2. **Name in English** (needed), **Name in Kannada** (optional), a short **description** (optional).
+3. **Price**: **One price**, or **Different sizes**: type each size (for example "250 g") and its price;
+   **+ Add a size** for more.
+4. **Courier charge**: pick the parcel it is most like (small, medium or large). The customer pays
+   that courier charge.
+5. **Photo** (optional): take one or pick one from your gallery.
+6. Tap **Add to menu**. It is on the website within a minute, with an **Added by you** label here.
+
+![Add a new product](screenshots/admin/17c-add-product-filled.png)
+
+There is no Delete button, on purpose: old orders must keep their product. To take something off
+the website, tap **Hide from menu**.
 
 ---
 

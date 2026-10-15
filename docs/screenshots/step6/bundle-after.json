@@ -4,89 +4,89 @@
     {
       "path": "/",
       "landed": "/",
-      "firstLoadKb": 50.6,
+      "firstLoadKb": 51,
       "files": 9,
-      "withPrefetchKb": 75.7,
+      "withPrefetchKb": 76,
       "kannadaFiles": []
     },
     {
       "path": "/menu",
       "landed": "/menu",
-      "firstLoadKb": 50.8,
+      "firstLoadKb": 51.2,
       "files": 9,
-      "withPrefetchKb": 73.9,
+      "withPrefetchKb": 74.3,
       "kannadaFiles": []
     },
     {
       "path": "/customize",
       "landed": "/customize",
-      "firstLoadKb": 50.2,
+      "firstLoadKb": 50.6,
       "files": 10,
-      "withPrefetchKb": 75.1,
+      "withPrefetchKb": 75.4,
       "kannadaFiles": []
     },
     {
       "path": "/cart",
       "landed": "/cart",
-      "firstLoadKb": 55.7,
+      "firstLoadKb": 56.1,
       "files": 16,
-      "withPrefetchKb": 73.9,
+      "withPrefetchKb": 74.3,
       "kannadaFiles": []
     },
     {
       "path": "/checkout",
       "landed": "/checkout",
-      "firstLoadKb": 53.4,
+      "firstLoadKb": 53.8,
       "files": 13,
-      "withPrefetchKb": 73.9,
+      "withPrefetchKb": 74.3,
       "kannadaFiles": []
     },
     {
       "path": "/classes",
       "landed": "/classes",
-      "firstLoadKb": 55.1,
+      "firstLoadKb": 55.5,
       "files": 16,
-      "withPrefetchKb": 78,
+      "withPrefetchKb": 78.4,
       "kannadaFiles": []
     },
     {
       "path": "/our-story",
       "landed": "/our-story",
-      "firstLoadKb": 46.9,
+      "firstLoadKb": 47.3,
       "files": 6,
-      "withPrefetchKb": 75,
+      "withPrefetchKb": 75.4,
       "kannadaFiles": []
     },
     {
       "path": "/contact",
       "landed": "/contact",
-      "firstLoadKb": 49.6,
+      "firstLoadKb": 50,
       "files": 9,
-      "withPrefetchKb": 76.6,
+      "withPrefetchKb": 77,
       "kannadaFiles": []
     },
     {
       "path": "/faq",
       "landed": "/faq",
-      "firstLoadKb": 46.9,
+      "firstLoadKb": 47.4,
       "files": 5,
-      "withPrefetchKb": 75.4,
+      "withPrefetchKb": 75.9,
       "kannadaFiles": []
     },
     {
       "path": "/track",
       "landed": "/track",
-      "firstLoadKb": 55.1,
+      "firstLoadKb": 55.5,
       "files": 17,
-      "withPrefetchKb": 78.5,
+      "withPrefetchKb": 78.9,
       "kannadaFiles": []
     },
     {
       "path": "/no-such-page",
       "landed": "/no-such-page",
-      "firstLoadKb": 46.4,
+      "firstLoadKb": 46.8,
       "files": 6,
-      "withPrefetchKb": 74.5,
+      "withPrefetchKb": 74.8,
       "kannadaFiles": []
     }
   ],
@@ -94,111 +94,111 @@
     {
       "path": "/",
       "landed": "/",
-      "firstLoadKb": 62.1,
+      "firstLoadKb": 62.6,
       "files": 10,
-      "withPrefetchKb": 87.2,
+      "withPrefetchKb": 87.7,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/menu",
       "landed": "/menu",
-      "firstLoadKb": 62.3,
+      "firstLoadKb": 62.8,
       "files": 10,
-      "withPrefetchKb": 85.4,
+      "withPrefetchKb": 85.9,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/customize",
       "landed": "/customize",
-      "firstLoadKb": 61.7,
+      "firstLoadKb": 62.2,
       "files": 11,
-      "withPrefetchKb": 86.6,
+      "withPrefetchKb": 87,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/cart",
       "landed": "/cart",
-      "firstLoadKb": 67.2,
+      "firstLoadKb": 67.7,
       "files": 17,
-      "withPrefetchKb": 85.4,
+      "withPrefetchKb": 85.9,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/checkout",
       "landed": "/checkout",
-      "firstLoadKb": 64.9,
+      "firstLoadKb": 65.4,
       "files": 14,
-      "withPrefetchKb": 85.4,
+      "withPrefetchKb": 85.9,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/classes",
       "landed": "/classes",
-      "firstLoadKb": 66.6,
+      "firstLoadKb": 67.1,
       "files": 17,
-      "withPrefetchKb": 89.6,
+      "withPrefetchKb": 90,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/our-story",
       "landed": "/our-story",
-      "firstLoadKb": 58.4,
+      "firstLoadKb": 58.9,
       "files": 7,
-      "withPrefetchKb": 86.5,
+      "withPrefetchKb": 87,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/contact",
       "landed": "/contact",
-      "firstLoadKb": 61.1,
+      "firstLoadKb": 61.6,
       "files": 10,
-      "withPrefetchKb": 88.1,
+      "withPrefetchKb": 88.6,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/faq",
       "landed": "/faq",
-      "firstLoadKb": 58.4,
+      "firstLoadKb": 59,
       "files": 6,
-      "withPrefetchKb": 86.9,
+      "withPrefetchKb": 87.5,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/track",
       "landed": "/track",
-      "firstLoadKb": 66.6,
+      "firstLoadKb": 67.1,
       "files": 18,
-      "withPrefetchKb": 90,
+      "withPrefetchKb": 90.5,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     },
     {
       "path": "/no-such-page",
       "landed": "/no-such-page",
-      "firstLoadKb": 57.9,
+      "firstLoadKb": 58.4,
       "files": 7,
-      "withPrefetchKb": 86,
+      "withPrefetchKb": 86.5,
       "kannadaFiles": [
-        "/assets/kannada-ece04406d9.json"
+        "/assets/kannada-98bdd8b89b.json"
       ]
     }
   ],

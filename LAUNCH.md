@@ -1,5 +1,28 @@
 # Before going live
 
+## Final launch (15 Oct 2026): what is done, what is waiting
+
+Done in the code (tested):
+- [x] Every landing page pre-rendered as real HTML (/, menu, classes, customize, contact, faq, our-story, terms, refund, shipping, privacy); `scripts/qa-prerender.mjs`
+- [x] One site address (`site.url`) for canonical, share links, sitemap, robots; emails use Netlify's main domain
+- [x] Netlify badge: backup CSS (the real switch is in Netlify, step 0)
+- [x] Refund policy: no "Hampers" anywhere in the code or on the live page (nothing to remove)
+- [x] Admin: Add a new product, Edit name and description, no delete (Hide)
+- [x] Daily keep-alive + last run on /admin/setup; setup check also checks EMAIL_FROM and the site address
+- [x] Tests 307/307, strings, secrets, layout 4 widths × EN/KN, admin, policies, payments (test mode, stand-ins) all pass
+- [ ] Lighthouse home 88–89 on this laptop (target 90): to re-measure on the live site
+
+Waiting on Jashwanth (`docs/SETUP-BACKEND.md`, in order):
+- [ ] Step 0: Netlify is NOT publishing new pushes (live site older than 12 Oct). Fix, then badge off
+- [ ] Step 1: buy/connect the domain, DNS, HTTPS; set `site.url` + CLAUDE.md
+- [ ] Steps 2–6: Supabase (Mumbai), keys in Netlify, setup-all.sql, the one admin login, sign-ups off, URL config
+- [ ] Step 7: Resend domain, key, EMAIL_FROM, Supabase SMTP; test Forgot password
+- [ ] Step 8: keep-alive Run now
+- [ ] Step 9: Razorpay website, test keys + webhook, test order + class, then live keys + live webhook
+- [ ] Steps 10–11: one full real journey; setup check all green
+
+---
+
 Tick each line once it is true. Lines already ticked were checked in Step 6 (see `docs/PROGRESS.md`).
 
 ## Accounts and settings (`docs/SETUP-BACKEND.md`, steps 1–9; `/admin/setup` shows what's left)
