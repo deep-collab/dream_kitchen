@@ -50,6 +50,7 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
     bookingEvents: [],
     blocks: [],
     rateLimits: {},
+    heartbeat: { last_run_at: null, runs: 0 },
     objects: {},
     publicObjects: {},
     sessions: {},
@@ -76,6 +77,16 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
     kind: 'memory',
     /** The store's clock in ms (tests move it forward to check the 30-day rule) */
     clock: () => now().getTime(),
+
+    /* ---------- keep-alive ---------- */
+    async beat(at) {
+      db.heartbeat = { last_run_at: at, runs: (db.heartbeat?.runs || 0) + 1 }
+      save()
+      return clone(db.heartbeat)
+    },
+    async lastBeat() {
+      return clone(db.heartbeat || { last_run_at: null, runs: 0 })
+    },
 
     /* ---------- menu and settings ---------- */
     async listProducts() {

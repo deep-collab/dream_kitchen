@@ -146,7 +146,7 @@ export function ProductSheet({ open, product, line, focus, onClose }) {
             </div>
           )}
 
-          {product.category === 'brownies' && <Ingredients product={product} ragi={selection.ragi} />}
+          {product.category === 'brownies' && !product.custom && <Ingredients product={product} ragi={selection.ragi} />}
         </div>
       )}
     </Sheet>

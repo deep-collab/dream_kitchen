@@ -17,6 +17,10 @@ export function rowToOverride(r) {
   if (has(r.active)) o.active = r.active
   if (has(r.price_status)) o.priceStatus = r.price_status
   if (r.photo_url) o.photo = r.photo_url
+  if (r.display_name) o.name = r.display_name
+  if (r.description) o.description = r.description
+  // A product Hema added: the row is the whole product
+  if (r.custom) Object.assign(o, { custom: true, category: r.category, courierTier: r.courier_tier, sort: r.sort })
   return o
 }
 

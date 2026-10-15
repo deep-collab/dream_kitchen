@@ -19,6 +19,7 @@ const FIX = {
   resend: {
     noKey: 'The Resend key is missing in Netlify, so no emails are sent. Setup guide, step 6.',
     badKey: 'The Resend key doesn’t look right: it starts with re_. Copy it again from Resend (step 6).',
+    noFrom: 'Emails still come from Resend’s test sender, which only reaches the Resend account’s own inbox: customers get no emails. Verify the domain in Resend and set EMAIL_FROM (setup guide, step 6).',
   },
   razorpay: {
     noKeys: 'Not set up yet. Until it is, customers pay by UPI (if set below) or order on WhatsApp. Setup guide, step 8, once Hema’s Razorpay account is approved.',
@@ -27,6 +28,12 @@ const FIX = {
   },
   email: { noEmail: 'No address for order alerts. Add it in Settings, or HEMA_EMAIL in Netlify.' },
   upi: { noUpi: 'Neither Razorpay nor UPI is set, so the website says “Online ordering opens soon – WhatsApp us”. Add the UPI ID in Settings, or set up Razorpay.' },
+  keepAlive: {
+    never: 'It hasn’t run yet. It runs every morning at 9:00. To run it now: Netlify → Logs → Functions → keep-alive → Run now (setup guide, step 9).',
+    late: 'It hasn’t run for over 2 days. Open Netlify → Logs → Functions → keep-alive to see why, and tap Run now.',
+    noDatabase: 'Needs the database first (Supabase, above).',
+  },
+  address: { mismatch: 'Netlify’s main address is not the one in the website’s code (site.url in src/config/site.js). Links in Google, the sitemap and shared links use the code’s one. Setup guide, step 1.' },
 }
 
 const DEMO = {
@@ -36,6 +43,8 @@ const DEMO = {
   razorpay: { ok: false, problem: 'noKeys' },
   email: { ok: true, problem: null },
   upi: { ok: true, set: true, problem: null },
+  keepAlive: { ok: true, lastRunAt: new Date().toISOString(), problem: null },
+  address: { ok: true, url: 'https://your-domain.in', problem: null },
 }
 
 /**
@@ -75,13 +84,17 @@ export default function SetupCheck() {
     ['razorpay', 'Razorpay (online payments)', data.razorpay],
     ['email', 'Order alert email', data.email],
     ['upi', 'UPI (backup payment)', data.upi],
-  ]
+    ['keepAlive', 'Daily keep-alive (stops the free database pausing)', data.keepAlive],
+    ['address', 'Website address', data.address],
+  ].filter(([, , x]) => x)
   const note = (k, x) => {
     if (k === 'supabase' && x.practice) return 'Practice database on this computer (not the live one).'
     if (k === 'razorpay' && x.ok && x.testMode) return 'TEST keys: everything works, but real customers can’t pay. Swap in the live keys (step 8.4) when ready.'
     if (k === 'razorpay' && x.ok) return 'Live. Payments are confirmed automatically.'
     if (k === 'upi' && x.notNeeded) return 'Not needed: Razorpay is on.'
     if (k === 'upi' && x.set) return 'Set. Used only while Razorpay isn’t set up.'
+    if (k === 'keepAlive' && x.lastRunAt) return `Last run: ${new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(x.lastRunAt))}${x.runs ? ` (${x.runs} runs so far)` : ''}.`
+    if (k === 'address') return x.served && !x.ok ? `Code: ${x.url}. Netlify: ${x.served}.` : `${x.url}`
     return x.ok ? 'Ready.' : null
   }
   return (

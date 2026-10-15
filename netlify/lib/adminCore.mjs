@@ -5,7 +5,7 @@
 //   ctx: { send(messages), env: { hemaEmail, razorpay: { enabled, keyId }, resend, mode }, now() }
 // Every answer comes after the store has saved, so the page shows "Saved" only when it is true.
 import { products as CONFIG_PRODUCTS, courier as COURIER } from '../../src/config/shop.js'
-import { applyOverrides, applySettings, isUpiId } from '../../src/lib/pricing.js'
+import { applyOverrides, applySettings, CUSTOM_CATEGORIES, isUpiId, PRODUCT_TEXT_MAX } from '../../src/lib/pricing.js'
 import { sizeLabel } from '../../src/lib/weights.js'
 import { stateName } from '../../src/data/states.js'
 import { photos } from '../../src/data/photos.js'
@@ -127,6 +127,9 @@ async function orderAction(store, user, body, ctx) {
 
 const builtInPhoto = (slug) => (photos[slug] ? `/products/${slug}-600.webp?v=${photos[slug]}` : null)
 
+// What counts as "Changed by you" (and is undone by "Back to original"): everything but the photo
+const changedKeys = (row) => Object.keys(rowToOverride(row)).filter((k) => !['id', 'photo', 'custom', 'category', 'courierTier', 'sort'].includes(k))
+
 async function menu(store) {
   const rows = await store.listProducts()
   const byId = Object.fromEntries((rows || []).map((r) => [r.id, r]))
@@ -137,6 +140,11 @@ async function menu(store) {
     return {
       id: p.id,
       name: p.name.en,
+      nameKn: p.name.kn || '',
+      description: p.description?.en || '',
+      descriptionKn: p.description?.kn && p.description.kn !== p.description.en ? p.description.kn : '',
+      custom: Boolean(p.custom),
+      courierTier: p.courierTier,
       category: p.category,
       sizes: (p.sizes || []).map((s) => ({ id: s.id, label: sizeLabel(s).en, price: s.price, grams: s.grams || null })),
       price: p.price ?? null,
@@ -144,17 +152,45 @@ async function menu(store) {
       soldOut: Boolean(p.soldOut),
       active: p.active !== false,
       priceStatus: p.priceStatus,
-      toConfirm: base.toConfirm || null,
+      toConfirm: base?.toConfirm || null,
       photo: row?.photo_url || builtInPhoto(p.slug),
       ownPhoto: Boolean(row?.photo_url),
-      changed: Boolean(row && Object.keys(rowToOverride(row)).filter((k) => k !== 'photo').length > 1),
+      changed: Boolean(!p.custom && row && changedKeys(row).length),
     }
   })
 }
 
+/**
+ * Hema's name and description for a product: { name?: { en, kn }, description?: { en, kn } } ->
+ * the display_name / description columns. A product she added always keeps an English name; for
+ * the others an empty name or description means "back to the original" (null).
+ */
+function textPatch(body, custom, patch, fields) {
+  const pair = (v, max) => ({ en: clean(v?.en, max), kn: clean(v?.kn, max) })
+  if (body.name !== undefined) {
+    const name = pair(body.name, PRODUCT_TEXT_MAX.name)
+    if (!name.en && (custom || name.kn)) fields.name = 'required'
+    else patch.display_name = name.en ? { en: name.en, ...(name.kn ? { kn: name.kn } : {}) } : null
+  }
+  if (body.description !== undefined) {
+    const d = pair(body.description, PRODUCT_TEXT_MAX.description)
+    if (!d.en && d.kn) fields.description = 'required'
+    else patch.description = d.en ? { en: d.en, ...(d.kn ? { kn: d.kn } : {}) } : null
+  }
+}
+
+/** The product as it is now (config, or one Hema added), for an edit */
+async function productBase(store, id) {
+  const config = CONFIG_PRODUCTS.find((p) => p.id === id)
+  if (config) return config
+  const row = (await store.listProducts()).find((r) => r.id === id && r.custom)
+  const product = row && applyOverrides([], [rowToOverride(row)])[0]
+  if (!product) throw new HttpError(404, 'notFound')
+  return product
+}
+
 /** Hema's menu edit -> the override columns (null = back to the config value) */
-export function productPatch(body) {
-  const base = CONFIG_PRODUCTS.find((p) => p.id === body.id)
+export function productPatch(body, base = CONFIG_PRODUCTS.find((p) => p.id === body.id)) {
   if (!base) throw new HttpError(404, 'notFound')
   const patch = {}
   const fields = {}
@@ -164,23 +200,20 @@ export function productPatch(body) {
     if (!Number.isInteger(v) || v <= 0 || v > 100000) fields[key] = 'price'
     else patch[key] = v
   }
-  if (body.reset === true) return { sizes: null, price: null, ragi_price: null, sold_out: null, active: null, price_status: null }
+  if (body.reset === true && !base.custom) return { sizes: null, price: null, ragi_price: null, sold_out: null, active: null, price_status: null, display_name: null, description: null }
+  textPatch(body, base.custom, patch, fields)
   price(body.price, 'price')
   price(body.ragiPrice, 'ragi_price')
   if (Array.isArray(body.sizes)) {
-    const sizes = body.sizes.slice(0, 6).map((s, i) => ({
-      id: clean(s.id || `size-${i + 1}`, 20).toLowerCase().replace(/[^a-z0-9-]/g, '-') || `size-${i + 1}`,
-      ...(clean(s.label, 24) ? { label: clean(s.label, 24) } : {}),
-      ...(Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? { grams: s.grams } : {}),
-      price: s.price,
-    }))
+    const sizes = sizesFrom(body.sizes)
     if (!sizes.length || sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) fields.sizes = 'price'
+    else if (base.custom && sizes.some((s) => !s.label)) fields.sizes = 'needLabels'
     else if (new Set(sizes.map((s) => s.id)).size !== sizes.length) fields.sizes = 'duplicate'
     else patch.sizes = sizes
   }
   if (bool(body.soldOut) !== undefined) patch.sold_out = body.soldOut
   if (bool(body.active) !== undefined) patch.active = body.active
-  if (body.priceStatus === 'live' || body.priceStatus === 'coming-soon') patch.price_status = body.priceStatus
+  if (!base.custom && (body.priceStatus === 'live' || body.priceStatus === 'coming-soon')) patch.price_status = body.priceStatus
   if (Object.keys(fields).length) throw new HttpError(400, 'fields', { fields })
   // Turning a tub on needs prices for every size
   const after = applyOverrides([base], [rowToOverride({ id: base.id, ...patch })])[0]
@@ -188,9 +221,70 @@ export function productPatch(body) {
   return patch
 }
 
+/** Sizes from the admin page: [{ id?, label, grams?, price }] -> the sizes column */
+function sizesFrom(list) {
+  return list.slice(0, 6).map((s, i) => ({
+    id: clean(s.id || `size-${i + 1}`, 20).toLowerCase().replace(/[^a-z0-9-]/g, '-') || `size-${i + 1}`,
+    ...(clean(s.label, 24) ? { label: clean(s.label, 24) } : {}),
+    ...(Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? { grams: s.grams } : {}),
+    price: s.price,
+  }))
+}
+
+/**
+ * A product Hema adds: { category, name: { en, kn }, description?: { en, kn }, courierTier, price? | sizes? }.
+ * It goes on the menu straight away, after the config's products in its category. Its id comes
+ * from the English name (never the same as another product's, so old orders keep their names).
+ */
+async function addProduct(store, body) {
+  const fields = {}
+  const patch = {}
+  if (!CUSTOM_CATEGORIES.includes(body.category)) fields.category = 'required'
+  if (!COURIER.tiers.includes(body.courierTier)) fields.courierTier = 'required'
+  textPatch({ name: body.name || {}, description: body.description }, true, patch, fields)
+  const hasSizes = Array.isArray(body.sizes) && body.sizes.length > 0
+  if (hasSizes) {
+    const sizes = sizesFrom(body.sizes)
+    if (sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) fields.sizes = 'price'
+    else if (sizes.some((s) => !s.label)) fields.sizes = 'needLabels'
+    else if (new Set(sizes.map((s) => s.id)).size !== sizes.length) fields.sizes = 'duplicate'
+    else patch.sizes = sizes
+  } else if (!Number.isInteger(body.price) || body.price <= 0 || body.price > 100000) fields.price = 'price'
+  else patch.price = body.price
+  if (Object.keys(fields).length) throw new HttpError(400, 'fields', { fields })
+
+  const rows = await store.listProducts()
+  const taken = new Set([...CONFIG_PRODUCTS.map((p) => p.id), ...rows.map((r) => r.id)])
+  const stem = patch.display_name.en.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 50) || 'product'
+  let id = stem.length >= 2 ? stem : `product-${stem}`
+  for (let n = 2; taken.has(id); n++) id = `${stem}-${n}`
+  const sort = rows.filter((r) => r.custom && r.category === body.category).reduce((max, r) => Math.max(max, r.sort || 0), 0) + 1
+  await store.upsertProducts([
+    {
+      id,
+      slug: id,
+      category: body.category,
+      name_en: patch.display_name.en,
+      name_kn: patch.display_name.kn || '',
+      options: {},
+      courier_tier: body.courierTier,
+      sort,
+      image: null,
+      custom: true,
+      display_name: patch.display_name,
+      description: patch.description ?? null,
+      sizes: patch.sizes ?? null,
+      price: patch.price ?? null,
+      price_status: 'live',
+      active: true,
+      sold_out: false,
+    },
+  ])
+  return id
+}
+
 async function ensureProductRow(store, id) {
-  const base = CONFIG_PRODUCTS.find((p) => p.id === id)
-  if (!base) throw new HttpError(404, 'notFound')
+  const base = await productBase(store, id)
   if (!(await store.listProducts()).some((r) => r.id === base.id)) await store.upsertProducts([productRow(base)])
   return base
 }
@@ -418,8 +512,12 @@ export async function runAdminAction(store, user, action, body, ctx) {
 
     case 'menu':
       return { products: await menu(store) }
+    case 'addProduct': {
+      const id = await addProduct(store, body)
+      return { id, products: await menu(store) }
+    }
     case 'updateProduct': {
-      const patch = productPatch(body)
+      const patch = productPatch(body, await productBase(store, body.id))
       const base = await ensureProductRow(store, body.id)
       if (!(await store.updateProduct(base.id, patch))) throw new HttpError(500, 'server')
       return { products: await menu(store) }

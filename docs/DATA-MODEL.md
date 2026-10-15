@@ -1,7 +1,7 @@
 # Data model (Supabase)
 
-Created by `supabase/migrations/20261005000001_init.sql` and `20261010000001_admin_complete.sql`
-(both, plus the menu seed, in one file: `supabase/setup-all.sql`, written by
+Created by `supabase/migrations/20261005000001_init.sql`, `20261010000001_admin_complete.sql` and
+`20261015000001_launch.sql` (all three, plus the menu seed, in one file: `supabase/setup-all.sql`, written by
 `node scripts/setup-sql.mjs`). Tested in real Postgres (PGlite) by `tests/db.test.js` and
 `tests/config.test.js` with a small stand-in for what Supabase provides
 (`tests/helpers/supabaseShim.js`).
@@ -12,7 +12,9 @@ Created by `supabase/migrations/20261005000001_init.sql` and `20261010000001_adm
 |---|---|---|
 | Menu, prices, options, courier rates and tiers, lead times, limits | `src/config/shop.js` (one file, shared by website and server) | Developer |
 | Classes, fees, slot times, seats default | `src/data/classInfo.js` | Developer |
-| Hema's changes to prices, sold out, hidden, tub sizes, photos | `products` table (override columns) + `product-photos` bucket | Hema, admin → Menu |
+| Hema's changes to prices, sold out, hidden, tub sizes, photos, names, descriptions | `products` table (override columns) + `product-photos` bucket | Hema, admin → Menu |
+| Products Hema adds herself | `products` rows with `custom = true` (the row is the whole product) | Hema, admin → Menu → Add a new product |
+| The daily keep-alive's last run | `heartbeat` (one row) | `netlify/functions/keep-alive.mjs` |
 | UPI, QR, lead times, courier rates, banner, shop open, alert email | `settings` table (override columns) | Hema, admin → Settings |
 | Class fees, slot times, seats per slot | `settings.class_settings` | Hema, admin → Classes → Fees & times |
 | Closed weekends / slots | `class_blocks` | Hema, admin → Classes → Weekends |
@@ -41,6 +43,8 @@ A NULL override means "use the config value".
 | price_status | text, null | `live` / `coming-soon` (tubs) |
 | active, sold_out | bool, null | hidden / sold out |
 | photo_url | text, null | Hema's photo (public `product-photos` bucket, https only) |
+| custom | bool | true = Hema added it in the admin: category, names, description, sizes or price and courier_tier all come from the row. Never deleted (Hide = active false), so old orders keep their product. Categories: the four menu ones only |
+| display_name, description | jsonb, null | `{ en, kn? }`: Hema's name / description (Kannada falls back to the English). NULL = the config's |
 | sort, image, updated_at | | |
 
 Seeded by `supabase/seed.sql` (= `node scripts/seed-menu.mjs --sql`), which fills only the
@@ -107,6 +111,10 @@ Like `order_events`, for bookings.
 ### `admin_users`
 `user_id` (→ `auth.users`), `email`, `last_seen_at`. Only accounts listed here can use the admin.
 After 30 days without activity the admin function refuses the login until a fresh log in.
+
+### `heartbeat` (one row, id = 1)
+`last_run_at`, `runs`. Written once a day by the keep-alive scheduled function, so the free Supabase
+project never pauses; shown on /admin/setup. RLS on with no policies: only the service role reads it.
 
 ### `rate_limits`
 `key`, `window_start`, `hits`. Counted by `hit_rate_limit()`; old rows are cleaned up automatically.

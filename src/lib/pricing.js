@@ -6,7 +6,7 @@
   Inputs come from src/config/shop.js (with Hema's admin changes applied by applyOverrides /
   applySettings). All amounts are whole rupees.
 */
-import { courier as COURIER, leadTimes as LEAD_TIMES, limits as LIMITS, optionPrices as OPTION_PRICES, payment as PAYMENT } from '../config/shop.js'
+import { categories as CATEGORIES, courier as COURIER, leadTimes as LEAD_TIMES, limits as LIMITS, optionPrices as OPTION_PRICES, payment as PAYMENT } from '../config/shop.js'
 
 const inr = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 })
 
@@ -219,42 +219,103 @@ export const clampQty = (q, lim = LIMITS) => Math.max(1, Math.min(lim.maxQtyPerI
 
 const money = (v) => (Number.isInteger(v) && v > 0 && v <= 100000 ? v : undefined)
 
+/** Limits for Hema's own names and descriptions (the admin checks the same) */
+export const PRODUCT_TEXT_MAX = { name: 60, description: 300 }
+/** The categories Hema can add products to (the Customize page's items stay in the config) */
+export const CUSTOM_CATEGORIES = ['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates']
+export const PRODUCT_ID_PATTERN = /^[a-z0-9][a-z0-9-]{1,59}$/
+
+/** { en, kn } from Hema's text: the English is needed; the Kannada falls back to it */
+function textPair(v, max) {
+  if (!v || typeof v !== 'object') return undefined
+  const en = clean(v.en).slice(0, max)
+  if (!en) return undefined
+  return { en, kn: clean(v.kn).slice(0, max) || en }
+}
+
+/**
+ * A product Hema added in the admin (custom: true), before her prices are applied: everything
+ * comes from its row. null for anything incomplete, so a bad row never reaches the menu.
+ *   o: { id, custom: true, category, name: { en, kn }, description?, courierTier, sort?, price? | sizes? }
+ */
+function customProduct(o) {
+  const category = CATEGORIES.find((c) => c.id === o.category && CUSTOM_CATEGORIES.includes(c.id))
+  const name = textPair(o.name, PRODUCT_TEXT_MAX.name)
+  const tier = COURIER.tiers.includes(o.courierTier) ? o.courierTier : null
+  if (typeof o.id !== 'string' || !PRODUCT_ID_PATTERN.test(o.id) || !category || !name || !tier) return null
+  const sized = Array.isArray(o.sizes) && o.sizes.length > 0
+  return {
+    id: o.id,
+    slug: o.id,
+    category: category.id,
+    sort: 100 + (Number.isInteger(o.sort) ? o.sort : 0),
+    name,
+    art: category.art,
+    courierTier: tier,
+    priceStatus: 'live',
+    options: {},
+    active: true,
+    soldOut: false,
+    custom: true,
+    // The sizes' ids and tier; their prices and names come in with the rest of her changes
+    ...(sized ? { sizes: o.sizes.filter((s) => s && typeof s.id === 'string').map((s) => ({ id: s.id, courierTier: tier })) } : {}),
+  }
+}
+
 /**
  * The config menu with Hema's admin changes on top. Both sides call this with the same rows,
  * so they price the same menu. Only known fields with sane values are taken.
- *   overrides: [{ id, price?, ragiPrice?, sizes?: [{ id, grams?, label?, price }], soldOut?, active?, priceStatus?, photo? }]
+ *   overrides: [{ id, price?, ragiPrice?, sizes?: [{ id, grams?, label?, price }], soldOut?, active?, priceStatus?, photo?,
+ *                 name?: { en, kn }, description?: { en, kn } }]
+ *   plus the products Hema added: { id, custom: true, category, name, description?, courierTier, sort?, price? | sizes? },
+ *   listed after the config's, and only once they have a price (or sizes with prices).
  * Sizes: a product with sizes gets new prices for them; a tub may get its sizes defined (Hema
- * sends tub sizes later). Courier tiers always come from the config.
+ * sends tub sizes later). Courier tiers come from the config (her own products: the tier she chose).
  */
 export function applyOverrides(products, overrides = []) {
-  const byId = new Map((overrides || []).filter((o) => o && o.id).map((o) => [o.id, o]))
-  return products.map((p) => {
-    const o = byId.get(p.id)
-    if (!o) return p
-    const next = { ...p }
-    if (money(o.price) && !hasSizes(p)) next.price = o.price
-    if (money(o.ragiPrice) && hasRagi(p)) next.ragiPrice = o.ragiPrice
-    if (Array.isArray(o.sizes) && o.sizes.length && (hasSizes(p) || p.category === 'brownie-tubs')) {
-      const sizes = o.sizes
-        .filter((s) => s && typeof s.id === 'string' && /^[a-z0-9-]{1,20}$/.test(s.id) && money(s.price))
-        .slice(0, 6)
-        .map((s) => {
-          const base = sizeOf(p, s.id)
-          const grams = Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? s.grams : base?.grams
-          const label = typeof s.label === 'string' && clean(s.label) ? clean(s.label).slice(0, 24) : undefined
-          // New tub sizes Hema adds get their tier from the weight (750 g and more = xl)
-          const tier = base?.courierTier || (p.category === 'brownie-tubs' && grams >= 750 ? 'xl' : p.courierTier)
-          return { id: s.id, price: s.price, ...(grams ? { grams } : {}), ...(label ? { label } : {}), courierTier: tier }
-        })
-      if (sizes.length) next.sizes = sizes
-    }
-    if (typeof o.soldOut === 'boolean') next.soldOut = o.soldOut
-    if (typeof o.active === 'boolean') next.active = o.active
-    if (o.priceStatus === 'live' || o.priceStatus === 'coming-soon') next.priceStatus = o.priceStatus
-    // A photo Hema uploaded in the admin (Supabase storage, or the practice store's /api/photo/)
-    if (typeof o.photo === 'string' && o.photo.length <= 500 && /^(https:\/\/|\/api\/photo\/)/.test(o.photo)) next.photo = o.photo
-    return next
-  })
+  const list = (overrides || []).filter((o) => o && o.id)
+  const byId = new Map(list.map((o) => [o.id, o]))
+  const known = new Set(products.map((p) => p.id))
+  const added = list.filter((o) => o.custom === true && !known.has(o.id)).map(customProduct).filter(Boolean)
+  return [...products, ...added]
+    .map((p) => {
+      const o = byId.get(p.id)
+      return o ? withOverride(p, o) : p
+    })
+    .filter((p) => !p.custom || hasSizes(p) || money(p.price))
+}
+
+function withOverride(p, o) {
+  const next = { ...p }
+  if (money(o.price) && !hasSizes(p)) next.price = o.price
+  if (money(o.ragiPrice) && hasRagi(p)) next.ragiPrice = o.ragiPrice
+  if (Array.isArray(o.sizes) && o.sizes.length && (hasSizes(p) || p.category === 'brownie-tubs')) {
+    const sizes = o.sizes
+      .filter((s) => s && typeof s.id === 'string' && /^[a-z0-9-]{1,20}$/.test(s.id) && money(s.price))
+      .slice(0, 6)
+      .map((s) => {
+        const base = sizeOf(p, s.id)
+        const grams = Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? s.grams : base?.grams
+        const label = typeof s.label === 'string' && clean(s.label) ? clean(s.label).slice(0, 24) : undefined
+        // New tub sizes Hema adds get their tier from the weight (750 g and more = xl)
+        const tier = base?.courierTier || (p.category === 'brownie-tubs' && grams >= 750 ? 'xl' : p.courierTier)
+        return { id: s.id, price: s.price, ...(grams ? { grams } : {}), ...(label ? { label } : {}), courierTier: tier }
+      })
+      // Her own products' sizes need a name (there is no weight in the config to name them)
+      .filter((s) => !p.custom || s.label || s.grams)
+    if (sizes.length || p.custom) next.sizes = sizes
+  }
+  if (typeof o.soldOut === 'boolean') next.soldOut = o.soldOut
+  if (typeof o.active === 'boolean') next.active = o.active
+  if (o.priceStatus === 'live' || o.priceStatus === 'coming-soon') next.priceStatus = o.priceStatus
+  // A photo Hema uploaded in the admin (Supabase storage, or the practice store's /api/photo/)
+  if (typeof o.photo === 'string' && o.photo.length <= 500 && /^(https:\/\/|\/api\/photo\/)/.test(o.photo)) next.photo = o.photo
+  // Her name and description (both languages; the Kannada falls back to her English)
+  const name = textPair(o.name, PRODUCT_TEXT_MAX.name)
+  if (name) next.name = name
+  const description = textPair(o.description, PRODUCT_TEXT_MAX.description)
+  if (description) next.description = description
+  return next
 }
 
 const rate = (v) => (Number.isInteger(v) && v >= 0 && v <= 2000 ? v : undefined)

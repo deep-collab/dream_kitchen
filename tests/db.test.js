@@ -153,7 +153,7 @@ describe('the database’s own rules', () => {
   it('RLS is on for every table', async () => {
     const r = await db.query(`select relname, relrowsecurity from pg_class where relnamespace = 'public'::regnamespace and relkind = 'r' order by relname`)
     expect(r.rows.every((x) => x.relrowsecurity)).toBe(true)
-    expect(r.rows.map((x) => x.relname)).toEqual(['admin_users', 'booking_events', 'class_blocks', 'class_bookings', 'class_enquiries', 'order_events', 'orders', 'products', 'rate_limits', 'settings'])
+    expect(r.rows.map((x) => x.relname)).toEqual(['admin_users', 'booking_events', 'class_blocks', 'class_bookings', 'class_enquiries', 'heartbeat', 'order_events', 'orders', 'products', 'rate_limits', 'settings'])
   })
 })
 
@@ -232,5 +232,25 @@ describe('the complete admin (migration 20261010000001)', () => {
   it('the product-photos bucket is public, images only, 2 MB', async () => {
     const b = await db.query(`select public, file_size_limit from storage.buckets where id = 'product-photos'`)
     expect(b.rows[0]).toEqual({ public: true, file_size_limit: 2097152 })
+  })
+})
+
+describe('final launch (20261015000001_launch.sql)', () => {
+  it('a product Hema adds needs a name and a price or sizes, in a menu category', async () => {
+    const add = (cols) => db.query(`insert into public.products (id, slug, category, name_en, custom, display_name, price, sizes) values ($1, $1, $2, 'x', true, $3::jsonb, $4, $5::jsonb)`, cols)
+    await expect(add(['no-price', 'chocolates', '{"en":"No price"}', null, null])).rejects.toThrow(/check constraint/)
+    await expect(add(['no-name', 'chocolates', null, 200, null])).rejects.toThrow(/check constraint/)
+    await expect(add(['wrong-place', 'customize', '{"en":"Wrong place"}', 200, null])).rejects.toThrow(/check constraint/)
+    await add(['coconut-bar-2', 'chocolates', '{"en":"Coconut Bar","kn":"ತೆಂಗಿನ ಬಾರ್"}', 200, null])
+    await add(['big-tub', 'brownie-tubs', '{"en":"Big Tub"}', null, '[{"id":"s1","label":"1 kg","price":1999}]'])
+    const r = await asRole(db, 'anon', null, (tx) => tx.query(`select display_name from public.products where id = 'coconut-bar-2'`))
+    expect(r.rows[0].display_name).toEqual({ en: 'Coconut Bar', kn: 'ತೆಂಗಿನ ಬಾರ್' })
+  })
+
+  it('the keep-alive row exists and only the server can read it', async () => {
+    await expect(asRole(db, 'anon', null, (tx) => tx.query('select * from public.heartbeat'))).rejects.toThrow(/permission denied/)
+    await expect(asRole(db, 'authenticated', STRANGER, (tx) => tx.query('select * from public.heartbeat'))).rejects.toThrow(/permission denied/)
+    const r = await asRole(db, 'service_role', null, (tx) => tx.query(`update public.heartbeat set last_run_at = now(), runs = runs + 1 where id = 1 returning runs`))
+    expect(r.rows[0].runs).toBe(1)
   })
 })
