@@ -23,9 +23,15 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - Email: Resend (or the dev outbox `<DK_DEV_DATA_DIR>/outbox/`). Templates: `netlify/lib/emailTemplates.mjs`. Payments: **Razorpay is the main way** as soon as its keys exist (orders and class bookings); UPI (Hema checks the UTR) only as the fallback while it isn't; neither = "Online ordering opens soon – WhatsApp us".
 - Database setup for the owner: one file, `supabase/setup-all.sql` (`node scripts/setup-sql.mjs`; a test fails if it is stale). Owner's guide: `docs/SETUP-BACKEND.md`; Hema's: `docs/admin-guide-for-hema.md`.
 - Secrets only in Netlify environment variables (`.env.example`, `docs/SETUP-BACKEND.md`). Never in code or chat. `node scripts/check-secrets.mjs` checks every build.
-- Git: commit on the working branch; push only when the user says "push"; never merge without being asked.
-- **Live site: https://luminous-salmiakki-fa7e70.netlify.app** (`site.url` in `src/config/site.js`). Netlify is connected
-  to `main`: every push to `main` deploys to the live site (about 2 minutes).
+- Git: commit on the working branch; push only when the user says "push" (final launch, 15 Oct 2026: the owner asked
+  for a commit + push to `main` after each part); never merge without being asked.
+- **Live site: https://luminous-salmiakki-fa7e70.netlify.app** until the custom domain is bought (then https://<domain>).
+  The address lives in ONE place, `site.url` in `src/config/site.js`: canonical and og:url links, the share
+  image, JSON-LD, sitemap.xml and robots.txt are built from it; emails use Netlify's `URL` (the primary
+  domain) and fall back to it. Hosting stays on **Netlify** (Vercel Hobby forbids commercial sites). Netlify
+  is connected to `main`: every push to `main` deploys to the live site (about 2 minutes).
+- Netlify's "Powered by Netlify" badge is injected by Netlify (`/.netlify/scripts/hud`), not our code: off in
+  Project configuration → General → Powered by Netlify badge; `#nl-badge-frame` is also hidden in index.html as a backup.
 
 ## Single sources of truth
 - **`src/config/shop.js`**: the menu, prices, options, courier rates and tiers, lead times, limits, UPI placeholders. TO CONFIRM marks what Hema hasn't given.
@@ -90,8 +96,10 @@ keys in code or chat. Run `npm test`, `node scripts/check-i18n.mjs`, `node scrip
 /terms, /refund, /shipping, /privacy: one page (`src/pages/Policy.jsx`), English text in `src/data/policies.js`
 (Hema's refund rules; never add a policy she hasn't agreed to). Linked from every footer with the business
 details (`src/components/layout/BusinessDetails.jsx`). Unknown business details are TODO in `src/config/site.js`.
-Without JavaScript (Razorpay's check): `scripts/prerender.mjs` writes dist/terms|refund|shipping|privacy|contact|menu.html
-at build time (full text, title, footer details, config prices); `src/main.jsx` empties #root before the app renders.
+Without JavaScript (Razorpay's check): `scripts/prerender.mjs` writes / (dist/index.html), menu, classes, customize,
+contact, faq, our-story, terms, refund, shipping and privacy as real HTML at build time (full text, title, canonical,
+footer details, config prices); every other address gets the empty app, dist/app.html (`/* /app.html 200`).
+`src/main.jsx` empties #root before the app renders. Check: `node scripts/qa-prerender.mjs` (with `serve-http2.mjs`).
 
 ## Build history
 Admin complete (10 Oct 2026, branch admin-complete): the full admin, class booking on the site,

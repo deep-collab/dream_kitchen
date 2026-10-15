@@ -15,7 +15,9 @@
     <meta property="og:site_name" content="Dream Kitchen" />
     <meta property="og:title" content="Dream Kitchen | Handmade chocolates" />
     <meta property="og:description" content="Turning your cravings into sweet memories. Handmade chocolates, loaded brownie tubs and delight boxes, made fresh to order." />
-    <meta property="og:image" content="/og-image.png" />
+    <link rel="canonical" href="{{dk:url}}/" />
+    <meta property="og:url" content="{{dk:url}}/" />
+    <meta property="og:image" content="{{dk:url}}/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -100,6 +102,9 @@
       }
     </style>
 
+    <!-- Backup only: the "Powered by Netlify" badge is switched off in Netlify (Project configuration -> General ->
+         Powered by Netlify badge). Should it come back, this keeps it off customers' screens. -->
+    <style>#nl-badge-frame{display:none!important}</style>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -107,8 +112,9 @@
         "name": "Dream Kitchen",
         "description": "Home-based handmade brownie tubs, delight boxes, brownies and chocolates, made fresh to order and sent all over India.",
         "telephone": "{{dk:telephone}}",
-        "image": "/og-image.png",
-        "logo": "/icon-512.png",
+        "url": "{{dk:url}}/",
+        "image": "{{dk:url}}/og-image.png",
+        "logo": "{{dk:url}}/icon-512.png",
         "founder": { "@type": "Person", "name": "Hema" },
         "address": { "@type": "PostalAddress", "addressRegion": "Karnataka", "addressCountry": "IN" },
         "areaServed": { "@type": "Country", "name": "India" },

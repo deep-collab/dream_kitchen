@@ -78,8 +78,9 @@ export function redirectsFile() {
     '# Hema’s admin is its own page',
     '/admin  /admin/index.html  200',
     '/admin/*  /admin/index.html  200',
-    '# Every other address opens the site (it shows its own 404 page)',
-    '/*  /index.html  200',
+    '# Every other address opens the site (it shows its own 404 page). app.html is the app without',
+    '# a page in it; the pages that have their own file (index.html = home, menu.html, …) come first.',
+    '/*  /app.html  200',
   ]
   return `${lines.join('\n')}\n`
 }

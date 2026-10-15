@@ -696,11 +696,13 @@
     "items": {
       "order": {
         "q": "How do I order?",
-        "a": "Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay by UPI on the website. You get an order ID to track it."
+        "a": "Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay by UPI on the website. You get an order ID to track it.",
+        "aOnline": "Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay online on the website. You get an order ID to track it."
       },
       "pay": {
         "q": "How do I pay?",
-        "a": "By UPI on the website: scan the QR code or tap “Pay with a UPI app”, then enter the 12-digit UPI reference. Hema confirms your payment, usually within a few hours."
+        "a": "By UPI on the website: scan the QR code or tap “Pay with a UPI app”, then enter the 12-digit UPI reference. Hema confirms your payment, usually within a few hours.",
+        "aOnline": "Online on the website, through Razorpay: UPI, debit or credit card, or net banking. Your order is confirmed as soon as the payment goes through."
       },
       "courier": {
         "q": "Where do you deliver, and what does courier cost?",

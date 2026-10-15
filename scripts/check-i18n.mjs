@@ -56,6 +56,7 @@ const runtime = [
   ...codes('pay', ['notFinished', 'failed', 'onlineFailed', 'checkLater']),
   ...['start', 'fresh', 'teach'].flatMap((k) => [`story.${k}.title`, `story.${k}.text`]),
   ...['order', 'pay', 'courier', 'when', 'track', 'name', 'ragi', 'change'].flatMap((k) => [`faq.items.${k}.q`, `faq.items.${k}.a`]),
+  'faq.items.order.aOnline', 'faq.items.pay.aOnline',
   // src/lib/api.js errorText()
   ...codes('errors', ['network', 'server', 'tooMany', 'notReady', 'storeClosed', 'paymentsClosed', 'priceChanged', 'items', 'dispatchDate', 'details', 'rejected', 'notPending']),
   'dates.weekdays', 'dates.months', 'dates.format', 'dates.formatYear', 'units.g', 'units.kg',
