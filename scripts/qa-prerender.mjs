@@ -67,6 +67,9 @@ try {
       await page.goto(BASE + path)
       await page.waitForFunction(() => !document.querySelector('[data-dk-prerendered]') && document.querySelector('#main'), null, { timeout: 15000 }).catch(() => {})
       await page.waitForTimeout(first ? 1500 : 300)
+      // Over the internet (DK_BASE = the live site) the page's own code can arrive a little later: wait for its text
+      const expected = path === '/faq' ? /How do I pay\?/ : text
+      await page.waitForFunction((src) => new RegExp(src).test(document.body.innerText), expected.source, { timeout: 8000 }).catch(() => {})
       const left = await page.locator('[data-dk-prerendered]').count()
       const body = await page.locator('body').innerText()
       const intro = await page.locator('#dk-intro').count()
