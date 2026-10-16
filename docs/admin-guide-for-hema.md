@@ -4,7 +4,7 @@ Your admin is where you see orders and class bookings, and change prices, photos
 It works on your phone.
 
 **Open it:** your-website**/admin** (for example `dreamkitchenblr.in/admin`; until the new web address is
-ready, `luminous-salmiakki-fa7e70.netlify.app/admin`). Your login: **dreamkitchen.web01@gmail.com** and your password.
+ready, `dreamkitcheno1.netlify.app/admin`). Your login: **dreamkitchen.web01@gmail.com** and your password.
 **Tip:** in Chrome tap **⋮** → **Add to Home screen**. Then it opens like an app.
 
 **Want to practise first?** your-website**/admin/demo** is the same admin with made-up orders.

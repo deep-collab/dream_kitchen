@@ -7,18 +7,21 @@ Plain words; nothing here needs any coding.
 
 | What | Address |
 |---|---|
-| **The website** | `https://YOUR-DOMAIN` (until the domain is connected: `https://luminous-salmiakki-fa7e70.netlify.app`) |
-| **Hema's admin** (orders, classes, menu, settings) | `https://YOUR-DOMAIN/admin` |
-| **Practice admin** (made-up orders, nothing is real) | `https://YOUR-DOMAIN/admin/demo` |
-| **Setup check** (is everything working?) | `https://YOUR-DOMAIN/admin/setup` |
+| **The website** | `https://dreamkitcheno1.netlify.app` |
+| **Hema's admin** (orders, classes, menu, settings) | `https://dreamkitcheno1.netlify.app/admin` |
+| **Practice admin** (made-up orders, nothing is real) | `https://dreamkitcheno1.netlify.app/admin/demo` |
+| **Setup check** (is everything working?) | `https://dreamkitcheno1.netlify.app/admin/setup` |
 | Hema's guide to the admin, with pictures | `docs/admin-guide-for-hema.md` |
 | Jashwanth's step-by-step setup guide | `docs/SETUP-BACKEND.md` |
 
-`YOUR-DOMAIN` = the web address you bought, for example `dreamkitchenblr.in`.
+**Your own domain** (bought, not connected yet): once Jashwanth connects it (step 1 of
+`docs/SETUP-BACKEND.md`), every link above starts with your domain instead, for example
+`https://dreamkitchenblr.in/admin`. The old links keep working: they move you to the new address.
+`YOUR-DOMAIN` below means that domain.
 
 ## How Hema logs in
 
-1. Open `https://YOUR-DOMAIN/admin` on her phone. (Tip: in Chrome, **⋮** → **Add to Home screen**,
+1. Open `https://dreamkitcheno1.netlify.app/admin` on her phone. (Tip: in Chrome, **⋮** → **Add to Home screen**,
    then it opens like an app.)
 2. Email: **dreamkitchen.web01@gmail.com**. Password: the one she and Jashwanth chose (never sent in a
    chat or email).
@@ -29,7 +32,9 @@ Plain words; nothing here needs any coding.
 1. On the log in page tap **Forgot password?**
 2. Type **dreamkitchen.web01@gmail.com** → **Send me the link**.
 3. Open the email (from `orders@YOUR-DOMAIN`; look in Spam the first time) → tap the link.
-4. Type a new password two times → done, she is logged in.
+4. Type a new password two times → **Save new password** → **Log in with the new password**.
+5. The link works once, for one hour. If it says "This link has expired or was already used", go back
+   to step 1 and ask for a new one.
 
 If no email comes within 10 minutes: Jashwanth can send a new link from Supabase (→ **Authentication**
 → **Users** → the user → **Send password recovery**), or set a password there (see "Good to know" in

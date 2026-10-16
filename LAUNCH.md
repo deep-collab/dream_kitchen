@@ -1,20 +1,23 @@
 # Before going live
 
-## Final launch (15 Oct 2026): what is done, what is waiting
+## Final launch (15–16 Oct 2026): what is done, what is waiting
+
+Live site: **https://dreamkitcheno1.netlify.app** (Netlify project dreamkitcheno1, deploys from GitHub `main`).
+The address is in ONE place, `site.url` in `src/config/site.js`.
 
 Done in the code (tested):
 - [x] Every landing page pre-rendered as real HTML (/, menu, classes, customize, contact, faq, our-story, terms, refund, shipping, privacy); `scripts/qa-prerender.mjs`
-- [x] One site address (`site.url`) for canonical, share links, sitemap, robots; emails use Netlify's main domain
-- [x] Netlify badge: backup CSS (the real switch is in Netlify, step 0)
-- [x] Refund policy: no "Hampers" anywhere in the code or on the live page (nothing to remove)
+- [x] One site address (`site.url` = https://dreamkitcheno1.netlify.app) for canonical, share links, sitemap, robots; emails use Netlify's main domain; no old address left in code or guides
+- [x] Netlify badge: off in Netlify for dreamkitcheno1 (16 Oct, checked on the live pages) + backup CSS
+- [x] Refund policy, customized orders: names/messages, drawings and designs, any other personalized item (the text in `src/data/policies.js` since 12 Oct)
 - [x] Admin: Add a new product, Edit name and description, no delete (Hide)
 - [x] Daily keep-alive + last run on /admin/setup; setup check also checks EMAIL_FROM and the site address
 - [x] Tests 307/307, strings, secrets, layout 4 widths × EN/KN, admin, policies, payments (test mode, stand-ins) all pass
 - [ ] Lighthouse home 88–89 on this laptop (target 90): to re-measure on the live site
 
 Waiting on Jashwanth (`docs/SETUP-BACKEND.md`, in order):
-- [ ] Step 0: Netlify is NOT publishing new pushes (live site older than 12 Oct). Fix, then badge off
-- [ ] Step 1: buy/connect the domain, DNS, HTTPS; set `site.url` + CLAUDE.md
+- [ ] Step 0: link dreamkitcheno1 to the GitHub repo (`main`) so every push publishes (on 16 Oct it still served 11 Oct code). Badge: done
+- [ ] Step 1 (later): the domain is bought; connect it, DNS, HTTPS; set `site.url` + CLAUDE.md; then step 1.5 (Supabase URLs, Razorpay website + webhooks)
 - [ ] Steps 2–6: Supabase (Mumbai), keys in Netlify, setup-all.sql, the one admin login, sign-ups off, URL config
 - [ ] Step 7: Resend domain, key, EMAIL_FROM, Supabase SMTP; test Forgot password
 - [ ] Step 8: keep-alive Run now
@@ -41,14 +44,14 @@ Tick each line once it is true. Lines already ticked were checked in Step 6 (see
 - [ ] Seats per class slot (admin Classes → Fees & times; empty = no limit)
 - [x] Policy pages /terms, /refund, /shipping, /privacy (text: `src/data/policies.js`; Hema reads them once before Razorpay)
 - [x] Business email (dreamkitchen.web01@gmail.com, also the default order-alert address) and address (Bengaluru, Karnataka: city only) in `src/config/site.js`
-- [ ] Court city and courier delivery time: the TODO lines in `src/config/site.js` (empty = neutral wording)
+- [x] Court city (Bengaluru) and courier delivery time (2–5 / 4–7 business days) in `src/config/site.js` (11 Oct)
 - [ ] Brownie Tub sizes and prices (the four old tubs show her first-menu prices and weights; the Dream Cake Tub stays off the menu until she prices it in admin → Menu)
 - [ ] Dream Cake Tub description (none yet)
 - [ ] Extra preparation days for drawings (placeholder: 2 business days, `leadTimes.drawingExtraBusinessDays` or /admin Settings)
 - [ ] Ragi brownies: gluten-free or not (`brownieInfo.ragiGlutenFree`; the site says "not confirmed")
 - [ ] Her UPI ID and QR (in /admin)
-- [ ] Call hours, email, FSSAI number (`src/config/site.js`; hidden until filled)
-- [ ] Final web address (`site.url`) for Google and the sitemap
+- [ ] Call hours and FSSAI number (`src/config/site.js`; hidden until filled). Email: done
+- [x] Web address for Google and the sitemap: https://dreamkitcheno1.netlify.app for now (`site.url`; change it when the domain is connected)
 - [ ] She reads the Kannada list `docs/kannada-priority-for-hema.md` (Part 1 first)
 - [ ] Real product photos (or AI ones from `docs/photo-prompts.md`; check Pista is green and Mango is yellow), then `node scripts/photos.mjs`
 

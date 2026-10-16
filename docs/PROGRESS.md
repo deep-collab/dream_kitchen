@@ -2,6 +2,14 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 16 Oct 2026: final launch, after the power cut
+- Checked after the power cut: nothing lost. All 15 Oct work (3 commits) was committed and pushed; no lock files, no half-written files, node_modules complete
+- [x] The live site is the Netlify project **dreamkitcheno1**: `site.url` = https://dreamkitcheno1.netlify.app (the one config value); every old luminous-salmiakki address replaced in CLAUDE.md, LAUNCH.md and the guides. The domain is bought, to connect later (SETUP-BACKEND step 1, then 1.5: Supabase URLs, Razorpay website + webhooks)
+- [x] SETUP-BACKEND: dreamkitcheno1 throughout; step 0 links the project to GitHub `main`; step 7 works before the domain is connected (Resend DNS at the domain company); Forgot password: Supabase SMTP via Resend, a Dream Kitchen reset email template, and what to do if no email comes
+- [x] HANDOVER.md: dreamkitcheno1 links; the forgot-password steps match the screens
+- [x] LAUNCH.md: the refund-policy line corrected (the live site on 16 Oct still ran 11 Oct code with the old list; the code has had the corrected list since 12 Oct); court city, delivery time and web address ticked
+- [x] Checks: build, 307 tests, check-i18n, check-secrets; qa-step6 0 problems (4 widths × EN/KN); qa-policies, qa-admin 21/21 (incl. add, rename, hide a product), qa-payments 9/9, qa-prerender; no-JavaScript text check of all 11 pre-rendered pages
+
 ## 11 Oct 2026: policy pages for Razorpay verification
 - [x] /terms, /refund, /shipping, /privacy (`src/pages/Policy.jsx`, text in `src/data/policies.js`, English only with a Kannada note; lead time and courier rates read live from config/admin). Refund rules are Hema's (no refunds; custom orders and classes non-refundable, class date can shift with 24 h notice; damaged/melted/incorrect/quality items replaced if reported within 24 h with photos/video)
 - [x] Footer on every page: the four policies + Contact, business name, owner, phone, email/address once filled, Instagram. Contact shows name, owner, phone, address

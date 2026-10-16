@@ -25,7 +25,7 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - Secrets only in Netlify environment variables (`.env.example`, `docs/SETUP-BACKEND.md`). Never in code or chat. `node scripts/check-secrets.mjs` checks every build.
 - Git: commit on the working branch; push only when the user says "push" (final launch, 15 Oct 2026: the owner asked
   for a commit + push to `main` after each part); never merge without being asked.
-- **Live site: https://luminous-salmiakki-fa7e70.netlify.app** until the custom domain is bought (then https://<domain>).
+- **Live site: https://dreamkitcheno1.netlify.app** (Netlify project **dreamkitcheno1**). The domain is bought but not connected yet (then https://<domain>).
   The address lives in ONE place, `site.url` in `src/config/site.js`: canonical and og:url links, the share
   image, JSON-LD, sitemap.xml and robots.txt are built from it; emails use Netlify's `URL` (the primary
   domain) and fall back to it. Hosting stays on **Netlify** (Vercel Hobby forbids commercial sites). Netlify

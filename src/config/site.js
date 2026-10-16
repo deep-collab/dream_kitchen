@@ -10,7 +10,7 @@ const PHONE = '9535706956'
 export const site = {
   name: 'Dream Kitchen',
   founder: 'Hema',
-  url: 'https://luminous-salmiakki-fa7e70.netlify.app', // the live site (Netlify, deploys from main). Change here if a custom domain is added
+  url: 'https://dreamkitcheno1.netlify.app', // THE site address (Netlify project dreamkitcheno1, deploys from main). When the domain is connected, change only this line
 
   phone: {
     display: `+91 ${PHONE.slice(0, 5)} ${PHONE.slice(5)}`, // "+91 98765 43210" style

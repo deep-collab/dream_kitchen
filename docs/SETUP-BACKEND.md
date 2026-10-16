@@ -2,10 +2,15 @@
 
 Do the steps **in this order**. Each one ends with **✅ Check**: don't go on until it is true.
 All free except the domain (already bought) and Razorpay's small fee per payment.
-A laptop is easiest. Plan about **3 hours**, plus waiting time for the domain (up to a day).
+A laptop is easiest. Plan about **3 hours**, plus waiting time for the email check (up to a day).
 
-**In this guide, `YOUR-DOMAIN` means your web address without `https://` or `www`**, for example
-`dreamkitchenblr.in`. Type yours wherever you see `YOUR-DOMAIN`.
+**The website's address for now: `https://dreamkitcheno1.netlify.app`** (the Netlify project
+**dreamkitcheno1**). Every step below uses it. Connecting your own domain to the website is
+**step 1, and it can wait**: steps 2–11 work without it.
+
+**`YOUR-DOMAIN`** means the domain you bought, without `https://` or `www`, for example
+`dreamkitchenblr.in`. Before step 1 it is used only for the email sender (step 7: emails come from
+`orders@YOUR-DOMAIN`). Type yours wherever you see `YOUR-DOMAIN`.
 
 **Four rules for every step:**
 1. **Never paste a key into a chat, an email or the code.** Keys go only into Netlify (step 5).
@@ -13,9 +18,8 @@ A laptop is easiest. Plan about **3 hours**, plus waiting time for the domain (u
 2. When a step says **copy**, copy the whole thing: no spaces before or after.
 3. After you change anything in Netlify's environment variables, **redeploy** (step 5.5). The
    website only reads new values after a redeploy.
-4. **Your helper: the Setup check page**, `https://YOUR-DOMAIN/admin/setup` (before the domain
-   works: `https://luminous-salmiakki-fa7e70.netlify.app/admin/setup`). It shows a green tick or a
-   red cross for each part, and which step fixes each red one. **At the end, every row is green.**
+4. **Your helper: the Setup check page**, `https://dreamkitcheno1.netlify.app/admin/setup`. It shows
+   a green tick or a red cross for each part, and which step fixes each red one. **At the end, every row is green.**
 
 **What you're setting up:**
 - **Netlify**: hosts the website (we stay on Netlify: Vercel's free plan doesn't allow shops)
@@ -29,10 +33,19 @@ A laptop is easiest. Plan about **3 hours**, plus waiting time for the domain (u
 ## Step 0. Netlify: make sure new versions go live, and switch off the badge (10 minutes)
 
 The website updates itself when new code is saved on GitHub, but **only if Netlify's automatic
-publishing is working**. On 15 Oct 2026 the live site was still an older version than GitHub, so
-check this first.
+publishing is working**. On 16 Oct 2026 the live site was still an older version (11 Oct) than
+GitHub, so check this first.
 
-1. Go to **app.netlify.com** and log in. Open your site (**luminous-salmiakki-fa7e70**).
+1. Go to **app.netlify.com** and log in. Open the project **dreamkitcheno1**.
+   - **Is it linked to GitHub?** Left menu **Project configuration** → **Build & deploy** →
+     **Continuous deployment** → **Repository**. It must say
+     `github.com/dreamkitchenweb01-sudo/dream-kitchen`, branch **main**. If it says "no repository"
+     (the site was uploaded by hand): **Link repository** → **GitHub** → allow access →
+     **dreamkitchenweb01-sudo/dream-kitchen** → Branch to deploy **main** → leave the build command
+     and publish directory empty (they come from `netlify.toml` in the code) → **Deploy**.
+   - Only **dreamkitcheno1** is used. The older project **luminous-salmiakki-fa7e70** is not; you
+     can delete it (Project configuration → General → **Delete project**) so nobody lands on an old
+     copy.
 2. Left menu: **Deploys**. Look at the list:
    - The top line should say **Published** and mention the newest change (for example "Admin: add
      new products…"). ✅ Then go to point 4.
@@ -50,13 +63,16 @@ check this first.
    **Powered by Netlify badge** → turn it **off** → **Save**. It takes effect at once; no redeploy.
    (The website also hides it by itself as a backup, but switch it off here anyway.)
 
-✅ **Check:** open `https://luminous-salmiakki-fa7e70.netlify.app/faq` and scroll down: it says
+✅ **Check:** open `https://dreamkitcheno1.netlify.app/faq` and scroll down: it says
 **"Online on the website, through Razorpay"** under "How do I pay?". No "Powered by Netlify" card
 at the bottom of the page.
 
 ---
 
-## Step 1. Connect your domain (20 minutes, then up to a day of waiting)
+## Step 1. Connect your domain (later, whenever you're ready: 20 minutes, then up to a day of waiting)
+
+**You can skip this step for now** and do steps 2–11 on `https://dreamkitcheno1.netlify.app`.
+When you do it, finish with 1.5 (four addresses that must change with it).
 
 ### 1.1 Tell Netlify about the domain
 1. Netlify → your site → left menu **Domain management** → **Add a domain** (or **Add domain**).
@@ -78,7 +94,7 @@ at the bottom of the page.
    | Type | Host / Name | Value / Points to | TTL |
    |---|---|---|---|
    | **A** | `@` | `75.2.60.5` | default (or 1 hour) |
-   | **CNAME** | `www` | `luminous-salmiakki-fa7e70.netlify.app` | default |
+   | **CNAME** | `www` | `dreamkitcheno1.netlify.app` | default |
 
    (If your company offers a record type **ALIAS** or **ANAME** for `@`, you may use that instead
    of the A record, with the value `apex-loadbalancer.netlify.com`. Either works.)
@@ -98,7 +114,7 @@ people share). Either ask Claude ("set site.url to https://YOUR-DOMAIN, update C
 push"), or do it on GitHub yourself:
 1. Open **github.com/dreamkitchenweb01-sudo/dream-kitchen** → folder **src** → **config** →
    **site.js** → the **pencil** (Edit) button.
-2. Find the line starting with `url: 'https://luminous-salmiakki-fa7e70.netlify.app'`. Change only
+2. Find the line starting with `url: 'https://dreamkitcheno1.netlify.app'`. Change only
    the address inside the quotes to `https://YOUR-DOMAIN` (no `/` at the end). Keep the quotes and
    the comma.
 3. **Commit changes…** → **Commit changes**. Netlify publishes it in about 2 minutes (step 0).
@@ -110,6 +126,17 @@ push"), or do it on GitHub yourself:
   `http://YOUR-DOMAIN` land on `https://YOUR-DOMAIN`.
 - `https://YOUR-DOMAIN/sitemap.xml` lists addresses starting with `https://YOUR-DOMAIN`.
 - Setup check: **Website address: OK** and it shows `https://YOUR-DOMAIN`.
+
+### 1.5 Four addresses that must change with the domain
+Once the domain is the primary one, the old `dreamkitcheno1.netlify.app` address only **redirects**.
+Browsers follow that, but Supabase's links and Razorpay's webhook should point at the new address
+directly. Change these (only those you have already set up):
+1. Supabase → **Authentication** → **URL Configuration**: **Site URL** `https://YOUR-DOMAIN`, and add
+   the Redirect URL `https://YOUR-DOMAIN/admin/reset` (step 6.4). Remove the netlify.app one a week later.
+2. Razorpay → **Business website detail**: `https://YOUR-DOMAIN` (step 9.1).
+3. Razorpay → **Webhooks**, in **Test Mode** and in **Live Mode**: edit the URL to
+   `https://YOUR-DOMAIN/api/razorpay-webhook` (steps 9.3 and 9.5). Keep the same secret.
+4. Then do step 7's **Forgot password** check once more.
 
 ---
 
@@ -181,7 +208,7 @@ developer says the database changed.)
    **Published** (about 2 minutes).
 
 ✅ **Check:**
-- `https://YOUR-DOMAIN/api/menu` shows text starting with `{"ready":true`. (`{"ready":false}` =
+- `https://dreamkitcheno1.netlify.app/api/menu` shows text starting with `{"ready":true`. (`{"ready":false}` =
   Netlify can't see the Supabase keys: check the Keys' spelling, then redeploy.)
 - Setup check: **Supabase** is red with **"No admin login yet"**. That's right: next step.
 
@@ -204,12 +231,11 @@ needs a different email: repeat 6.2 and 6.3 with it.
    ```
    It says **"Success. 1 row"**. ("0 rows" = the email in step 6.2 is spelled differently.)
 4. **Where "Forgot password" emails send people.** **Authentication** → **URL Configuration**:
-   - **Site URL**: `https://YOUR-DOMAIN`
-   - **Redirect URLs** → **Add URL**: `https://YOUR-DOMAIN/admin/reset` → **Save URLs**.
-     (Until the domain works, add `https://luminous-salmiakki-fa7e70.netlify.app/admin/reset` too;
-     remove it later.)
+   - **Site URL**: `https://dreamkitcheno1.netlify.app`
+   - **Redirect URLs** → **Add URL**: `https://dreamkitcheno1.netlify.app/admin/reset` → **Save URLs**.
+     (When the domain is connected, step 1.5 changes both to `https://YOUR-DOMAIN`.)
 
-✅ **Check:** `https://YOUR-DOMAIN/admin` → log in with the email and password → the **Home** screen
+✅ **Check:** `https://dreamkitcheno1.netlify.app/admin` → log in with the email and password → the **Home** screen
 opens. Setup check: **Supabase: OK**.
 
 ## Step 7. Resend: the emails (30 minutes, plus waiting for the domain check)
@@ -219,7 +245,8 @@ opens. Setup check: **Supabase: OK**.
 2. Left menu **Domains** → **Add domain** → type `YOUR-DOMAIN` → Region: **Tokyo (ap-northeast-1)**
    (the closest to India; any region works) → **Add**.
 3. Resend shows **3 or 4 records** (types **MX**, **TXT**, and maybe a **DMARC** TXT). At your domain
-   company's **DNS** page (step 1.2), **add each one exactly as Resend shows it**: same Type, same
+   company's **DNS** page (log in where you bought the domain → **My domains** → `YOUR-DOMAIN` →
+   **DNS** / **Manage DNS**; this works even before step 1), **add each one exactly as Resend shows it**: same Type, same
    Host/Name (for example `send` or `resend._domainkey`; some companies add `.YOUR-DOMAIN` by
    themselves, so type only the part Resend shows before your domain), same Value, and for the MX
    the same Priority (usually 10). Use Resend's copy buttons.
@@ -248,16 +275,35 @@ through Resend:
    - **Password**: the same `re_…` key from 7.2
    - **Save changes**.
 2. Same page, **Rate limits** (if shown): leave the default.
+3. **The words in the email** (optional, but friendlier than Supabase's): **Authentication** →
+   **Emails** → **Templates** → **Reset Password**:
+   - **Subject**: `Reset your Dream Kitchen password`
+   - **Body** (replace everything, keep `{{ .ConfirmationURL }}` exactly as it is: Supabase fills in
+     the link):
+     ```html
+     <h2>Dream Kitchen admin</h2>
+     <p>Someone asked to reset the admin password. If it was you, tap the button and choose a new password.</p>
+     <p><a href="{{ .ConfirmationURL }}" style="background:#C9A227;color:#0F0F0F;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:bold">Choose a new password</a></p>
+     <p>The link works once, for one hour. If you didn't ask, ignore this email: nothing changes.</p>
+     ```
+   - **Save changes**.
+
+**If the reset email doesn't come:** look in **Spam**. In Resend → **Emails** you see every email
+Supabase sent through it: no line there = the SMTP settings in 7.3.1 are wrong (most often the
+password is not the `re_…` key, or the sender is not `@YOUR-DOMAIN`, or the domain is not
+**Verified** yet in 7.1). If the email comes from **"Supabase Auth"** instead of Dream Kitchen,
+custom SMTP is not switched on. If the link opens a page that says the link has expired, ask for a
+new one: each link works once, for one hour.
 
 ✅ **Check (all three):**
 - Setup check: **Resend (emails): OK** (red "test sender" means `EMAIL_FROM` is missing).
 - On the website, **Contact** → send a message with your own number. Hema's inbox
   (dreamkitchen.web01@gmail.com) gets **"Message: …"** within a minute. First time: check **Spam**
   and tap **Not spam**.
-- **Forgot password, all the way:** open `https://YOUR-DOMAIN/admin` in a private window → **Forgot
+- **Forgot password, all the way:** open `https://dreamkitcheno1.netlify.app/admin` in a private window → **Forgot
   password?** → `dreamkitchen.web01@gmail.com` → **Send me the link**. The email arrives from
-  `orders@YOUR-DOMAIN`. Tap the link: it opens `https://YOUR-DOMAIN/admin/reset`. Type a new password
-  twice → you are logged in. (Then tell Hema the new password in person, or let her do this herself.)
+  `orders@YOUR-DOMAIN`. Tap the link: it opens `https://dreamkitcheno1.netlify.app/admin/reset`. Type a new password
+  twice → **Save new password** → **Log in with the new password** works. (Then tell Hema the new password in person, or let her do this herself.)
 
 ## Step 8. The daily keep-alive (2 minutes)
 
@@ -280,11 +326,11 @@ need to read you an OTP).
 
 ### 9.1 The website address in Razorpay
 1. **Account & Settings** → **Business website detail** (under "Website and app settings").
-2. **Add / Edit website** (the pencil) → type `https://YOUR-DOMAIN` → **Proceed** / **Submit**.
+2. **Add / Edit website** (the pencil) → type `https://dreamkitcheno1.netlify.app` → **Proceed** / **Submit**.
    Razorpay checks the website and its policy pages by itself: Contact, Terms, Privacy, Refund &
    Cancellation, Shipping are all on the site, readable without JavaScript, and linked in every
    page's footer. If it asks for the pages' addresses:
-   `https://YOUR-DOMAIN/contact`, `/terms`, `/privacy`, `/refund`, `/shipping`, prices on `/menu`.
+   `https://dreamkitcheno1.netlify.app/contact`, `/terms`, `/privacy`, `/refund`, `/shipping`, prices on `/menu`.
 3. A changed website can take Razorpay 1–2 days to approve. Test mode (9.2 to 9.4) works meanwhile.
 
 ### 9.2 Test keys (no real money)
@@ -300,7 +346,7 @@ need to read you an OTP).
 
 ### 9.3 Test webhook (confirms payments even if the customer closes the page)
 1. Still in **Test Mode**: **Account & Settings** → **Webhooks** → **+ Add New Webhook**.
-2. **Webhook URL**: `https://YOUR-DOMAIN/api/razorpay-webhook`
+2. **Webhook URL**: `https://dreamkitcheno1.netlify.app/api/razorpay-webhook`
 3. **Secret**: make up a long password (30 random letters and numbers from your password manager).
 4. **Alert email**: `dreamkitchen.web01@gmail.com`.
 5. **Active events**: tick **payment.captured** and **order.paid** (nothing else needed).
@@ -346,7 +392,7 @@ pay with your own UPI). It arrives as **Paid**. Then in the admin: open it → *
 
 ## Step 11. Setup check: all green
 
-Open `https://YOUR-DOMAIN/admin/setup`. Every row green: Supabase, Resend, Razorpay (Live), Order
+Open `https://dreamkitcheno1.netlify.app/admin/setup`. Every row green: Supabase, Resend, Razorpay (Live), Order
 alert email, UPI (shows "Not needed: Razorpay is on"), Daily keep-alive, Website address.
 
 ---
