@@ -18,18 +18,18 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - Vite 8 + React components running on **Preact** (preact/compat alias in vite.config.js) + react-router + Tailwind 4.
   Avoid React-only APIs that preact/compat lacks.
 - Two pages: the shop (`index.html`, `src/`) and Hema's admin (`admin/index.html`, `src/admin/`, its own bundle; customers download none of it). `/admin/demo` = the same admin on sample data, in the browser only (`src/admin/demo`).
-- Every admin action lives in `netlify/lib/adminCore.mjs` (no Node-only code): the `admin` function runs it after the login check (Supabase Auth, `admin_users`, 30 days idle = log in again), and the demo runs it on `netlify/lib/store/memoryCore.mjs`. In the browser build `netlify/lib/env.mjs` is swapped for `src/admin/demo/browserEnv.js` (vite.config.js), so no secret's name reaches a browser.
-- Server: **Netlify Functions** (`netlify/functions/*.mjs`, each at `/api/<name>`) + **Supabase** (Postgres + Auth + private Storage), reached over REST with the service key. Mock store for local dev and tests (`DK_MOCK_BACKEND=1`, set by `scripts/dev-api.mjs`).
+- Every admin action lives in `netlify/lib/adminCore.mjs` (no Node-only code): the `admin` function runs it after the login check (Admin session tokens, `admin_users`, 30 days idle = log in again), and the demo runs it on `netlify/lib/store/memoryCore.mjs`. In the browser build `netlify/lib/env.mjs` is swapped for `src/admin/demo/browserEnv.js` (vite.config.js), so no secret's name reaches a browser.
+- Server: **Cloudflare Workers** (`src/worker/index.mjs`) + **Cloudflare D1 Database** (`d1/migrations/0001_init.sql`, `d1/setup-all.sql`), with native edge routing, static asset serving via Cloudflare Assets, and local testing via `wrangler` and SQLite. (Also supports mock memory store for demo/tests, and legacy Supabase adapter).
 - Email: Resend (or the dev outbox `<DK_DEV_DATA_DIR>/outbox/`). Templates: `netlify/lib/emailTemplates.mjs`. Payments: **Razorpay is the main way** as soon as its keys exist (orders and class bookings); UPI (Hema checks the UTR) only as the fallback while it isn't; neither = "Online ordering opens soon – WhatsApp us".
-- Database setup for the owner: one file, `supabase/setup-all.sql` (`node scripts/setup-sql.mjs`; a test fails if it is stale). Owner's guide: `docs/SETUP-BACKEND.md`; Hema's: `docs/admin-guide-for-hema.md`.
-- Secrets only in Netlify environment variables (`.env.example`, `docs/SETUP-BACKEND.md`). Never in code or chat. `node scripts/check-secrets.mjs` checks every build.
+- Database setup for Cloudflare D1: `npm run d1:setup` (or `npx wrangler d1 migrations apply DB` and `npx wrangler d1 execute DB --file=d1/seed.sql`). Admin user management: `npm run d1:admin <email> <password>`.
+- Secrets configured via `wrangler secret put <NAME>`. Never in code or chat. `node scripts/check-secrets.mjs` checks every build.
 - Git: commit on the working branch; push only when the user says "push"; never merge without being asked.
 
 ## Single sources of truth
 - **`src/config/shop.js`**: the menu, prices, options, courier rates and tiers, lead times, limits, UPI placeholders. TO CONFIRM marks what Hema hasn't given.
 - **`src/lib/pricing.js`**: the one pricing module (unit prices, options, courier zone/tier/charge, Hema's admin overrides and settings, UPI link, UTR). Imported by the website **and** every server function, so totals can never disagree.
 - `src/lib/dates.js` (dispatch dates, IST), `src/lib/checkout.js` (customer details), `src/lib/enquiry.js` (class enquiry): shared by site and server too.
-- Hema's admin changes live in Supabase (`products` / `settings` override columns, NULL = config) and are applied by `applyOverrides` / `applySettings` on both sides.
+- Hema's admin changes live in database (`products` / `settings` override columns, NULL = config) and are applied by `applyOverrides` / `applySettings` on both sides.
 - Text: `src/i18n/en.json` + `kn.json` (customer pages, both languages); `netlify/lib/emailText.mjs` (customer emails); admin text is English, in `src/admin`. Business details: `src/config/site.js`. Class details (days, slots, the three classes and prices, seats): `src/data/classInfo.js`; booking rules (weekends, seats, booking IDs `DK-CL-YYMMDD-XXXX`): `src/lib/classes.js` + `src/lib/classTimes.js`, shared by site and server.
 
 ## The menu (Hema's, exactly; never invent prices, weights, ingredients or claims)
