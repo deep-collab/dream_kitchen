@@ -76,6 +76,10 @@ function header(t) {
 </header>`
 }
 
+/** An Instagram link as the app renders it: the config address, a new tab, and the spoken label */
+const instagramAttrs = (t, label = fill(t.common.instagramLabel, { handle: `@${site.instagramHandle}` })) =>
+  `href="${esc(site.instagramUrl)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(label)}"`
+
 /** The same lines as src/components/layout/BusinessDetails.jsx */
 function businessDetails(t, dark) {
   const label = dark ? 'text-cream' : 'font-bold'
@@ -85,7 +89,7 @@ function businessDetails(t, dark) {
   <p><span class="${label}">${esc(t.footer.phone)}:</span> ${esc(site.phone.display)}</p>
   ${site.email ? `<p><span class="${label}">${esc(t.footer.email)}:</span> <a href="mailto:${esc(site.email)}" class="${a}">${esc(site.email)}</a></p>` : ''}
   ${site.address ? `<p><span class="${label}">${esc(t.footer.address)}:</span> ${esc(site.address)}</p>` : ''}
-  <p><span class="${label}">${esc(t.footer.instagram)}:</span> <a href="${esc(site.instagram.url)}" class="${a}" rel="noopener noreferrer">${esc(site.instagram.handle)}</a></p>
+  <p><span class="${label}">${esc(t.footer.instagram)}:</span> <a ${instagramAttrs(t)} class="${a}">@${esc(site.instagramHandle)}</a></p>
 </address>`
 }
 
@@ -149,14 +153,14 @@ function policyMain(t, page, settings) {
 function contactMain(t) {
   const row = 'flex min-h-16 items-center gap-4 rounded-card border border-line bg-[#fffcf5] p-4'
   const item = (href, title, text, external) =>
-    `<li><a href="${esc(href)}" class="${row}"${external ? ' rel="noopener noreferrer"' : ''}><span><span class="block font-bold">${esc(title)}</span><span class="t-small block break-all text-brown-2">${esc(text)}</span></span></a></li>`
+    `<li><a ${href === site.instagramUrl ? instagramAttrs(t) : `href="${esc(href)}"${external ? ' rel="noopener noreferrer"' : ''}`} class="${row}"><span><span class="block font-bold">${esc(title)}</span><span class="t-small block break-all text-brown-2">${esc(text)}</span></span></a></li>`
   return `<div class="dk-container py-6 lg:py-12">
   <div class="max-w-xl">
     <h1 class="t-h2">${esc(t.contact.title)}</h1>
     <p class="mt-1 text-brown-2">${esc(t.contact.lead)}</p>
     <ul class="mt-5 space-y-3">
       ${item(`https://wa.me/${site.whatsapp}`, t.contact.whatsapp, t.contact.whatsappText, true)}
-      ${item(site.instagram.url, t.contact.instagram, site.instagram.handle, true)}
+      ${item(site.instagramUrl, t.contact.instagram, `@${site.instagramHandle}`, true)}
       ${site.email ? item(`mailto:${site.email}`, t.contact.email, site.email, false) : ''}
     </ul>
     <address class="mt-5 space-y-1 not-italic" data-dk-business>
@@ -348,7 +352,7 @@ function storyMain(t) {
     </div>
     <p class="mt-6 flex flex-wrap gap-x-6">
       <a href="/classes" class="${link}">${esc(t.story.teach.cta)}</a>
-      <a href="${esc(site.instagram.url)}" class="${link}" rel="noopener noreferrer">${esc(t.story.instagram.cta)}</a>
+      <a ${instagramAttrs(t, `${t.story.instagram.cta}: ${fill(t.common.instagramLabel, { handle: `@${site.instagramHandle}` })}`)} class="${link}">${esc(t.story.instagram.cta)}</a>
       <a href="/menu" class="${link}">${esc(t.story.cta)}</a>
     </p>
   </div>

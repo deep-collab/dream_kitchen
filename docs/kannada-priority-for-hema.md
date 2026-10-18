@@ -209,7 +209,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Sat 17 Oct – Sun 18 Oct 2026 | ಶನಿ 17 ಅಕ್ಟೋಬರ್ – ಭಾನು 18 Oct 2026 | |
 | Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec | ಜನವರಿ,ಫೆಬ್ರವರಿ,ಮಾರ್ಚ್,ಏಪ್ರಿಲ್,ಮೇ,ಜೂನ್,ಜುಲೈ,ಆಗಸ್ಟ್,ಸೆಪ್ಟೆಂಬರ್,ಅಕ್ಟೋಬರ್,ನವೆಂಬರ್,ಡಿಸೆಂಬರ್ | |
 
-## Later, if you have time (461 more)
+## Later, if you have time (462 more)
 
 ### Logo and tagline
 
@@ -245,6 +245,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | , 1 item | , 1 ವಸ್ತು | |
 | , empty | , ಖಾಲಿ | |
 | (opens in a new tab) | (ಹೊಸ ಟ್ಯಾಬ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ) | |
+| Dream Kitchen on Instagram, @dreamkitchen_01_homemade (opens in a new tab) | ಇನ್‌ಸ್ಟಾಗ್ರಾಮ್‌ನಲ್ಲಿ Dream Kitchen, @dreamkitchen_01_homemade (ಹೊಸ ಟ್ಯಾಬ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ) | |
 | Loading… | ತೆರೆಯುತ್ತಿದೆ… | |
 | Copy | ನಕಲಿಸಿ | |
 | Cart, 3 items | ಕಾರ್ಟ್, 3 ವಸ್ತುಗಳು | |

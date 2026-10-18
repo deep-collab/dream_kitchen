@@ -20,10 +20,11 @@ export const site = {
   whatsapp: `91${PHONE}`, // wa.me format: country code + number, no "+"
   // Typed in for the customer by the home page's "Order on WhatsApp" button
   whatsappOrderText: "Hi Dream Kitchen, I'd like to place an order.",
-  instagram: {
-    handle: '@dreamkitchen_01_homemade',
-    url: 'https://instagram.com/dreamkitchen_01_homemade',
-  },
+  // Instagram: every link on the site, the prerendered pages and index.html read these two lines
+  // (tests/config.test.js checks that no other file spells the address out). The exact profile
+  // address, www and trailing slash included, so a phone opens the Instagram app with no redirect.
+  instagramHandle: 'dreamkitchen_01_homemade', // shown as "@dreamkitchen_01_homemade" in both languages
+  instagramUrl: 'https://www.instagram.com/dreamkitchen_01_homemade/',
   // Business details for Razorpay: shown on Contact, in the footer and on the policy pages
   // (/terms, /refund, /shipping, /privacy). Empty = hidden, so the site never shows a made-up value.
   email: 'dreamkitchen.web01@gmail.com', // also the default order-alert address (netlify/lib/env.mjs)

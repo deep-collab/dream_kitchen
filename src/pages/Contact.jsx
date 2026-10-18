@@ -49,11 +49,17 @@ export default function Contact() {
               </a>
             </li>
             <li>
-              <a href={site.instagram.url} target="_blank" rel="noopener noreferrer" className={row}>
+              <a
+                href={site.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t('common.instagramLabel', { handle: `@${site.instagramHandle}` })}
+                className={row}
+              >
                 <InstagramIcon className="h-7 w-7 shrink-0" />
                 <span>
                   <span className="block font-bold">{t('contact.instagram')}</span>
-                  <span className="t-small block break-all text-brown-2">{site.instagram.handle}</span>
+                  <span className="t-small block break-all text-brown-2">@{site.instagramHandle}</span>
                 </span>
               </a>
             </li>

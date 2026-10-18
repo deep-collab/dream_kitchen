@@ -9,7 +9,7 @@ Dream Kitchen: home-based handmade brownie tubs, delight boxes, brownies and cho
 to order and sent all over India by courier. Founder: Hema. She started as a student with ₹2,500
 and grew it into a loved home brand. She also teaches chocolate classes (details coming).
 - Phone: one place only, `PHONE` in `src/config/site.js` (a test fails if the digits appear anywhere else)
-- Instagram: @dreamkitchen_01_homemade
+- Instagram: @dreamkitchen_01_homemade, one place only: `instagramHandle` / `instagramUrl` in `src/config/site.js` (a test fails if the address appears anywhere else)
 - Tagline: "Turning your cravings into sweet memories."
 - Customers: mostly on phones, all ages across Karnataka and beyond, including people who are not
   comfortable typing. Keep everything simple, big and plain.

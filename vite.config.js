@@ -22,7 +22,8 @@ const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace
 // src/assets/symbol.svg) and the loading-screen tagline (from the i18n files), so the
 // inline loading screen has one source for its artwork and its words. Font URLs come
 // from src/config/fonts.js; the phone number in the description and JSON-LD, and the site
-// address in the canonical / share links ({{dk:url}}), from src/config/site.js.
+// address in the canonical / share links ({{dk:url}}) and the Instagram profile in the JSON-LD
+// ({{dk:instagram}}), from src/config/site.js.
 function dreamKitchenHtml() {
   return {
     name: 'dream-kitchen-html',
@@ -44,6 +45,7 @@ function dreamKitchenHtml() {
           .replace('{{dk:meta-desc}}', escapeHtml(en.seo.home.desc.replace('{phone}', site.phone.display)))
           .replace('{{dk:telephone}}', site.phone.tel)
           .replaceAll('{{dk:url}}', site.url.replace(/\/$/, ''))
+          .replace('{{dk:instagram}}', site.instagramUrl)
       },
     },
   }

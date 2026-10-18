@@ -33,9 +33,14 @@ export default function BusinessDetails({ dark = false, className = '' }) {
       )}
       <p>
         <span className={label}>{t('footer.instagram')}:</span>{' '}
-        <a href={site.instagram.url} target="_blank" rel="noopener noreferrer" className={link}>
-          {site.instagram.handle}
-          <span className="sr-only"> {t('common.newTab')}</span>
+        <a
+          href={site.instagramUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t('common.instagramLabel', { handle: `@${site.instagramHandle}` })}
+          className={link}
+        >
+          @{site.instagramHandle}
         </a>
       </p>
     </address>

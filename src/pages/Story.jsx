@@ -47,9 +47,14 @@ export default function Story() {
           {t('story.instagram.title')}
         </h2>
         <p className="mt-2 text-muted">{t('story.instagram.text')}</p>
-        <Button href={site.instagram.url} icon={InstagramIcon} variant="secondary" className="mt-4">
+        <Button
+          href={site.instagramUrl}
+          icon={InstagramIcon}
+          variant="secondary"
+          className="mt-4"
+          aria-label={`${t('story.instagram.cta')}: ${t('common.instagramLabel', { handle: `@${site.instagramHandle}` })}`}
+        >
           {t('story.instagram.cta')}
-          <span className="sr-only"> {t('common.newTab')}</span>
         </Button>
       </section>
 
