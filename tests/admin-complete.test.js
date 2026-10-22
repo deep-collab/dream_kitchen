@@ -11,6 +11,7 @@ import { createMemoryStore } from '../netlify/lib/store/memory.mjs'
 import { setStore } from '../netlify/lib/store/index.mjs'
 import { outbox } from '../netlify/lib/email.mjs'
 import { csvCell } from '../netlify/lib/reports.mjs'
+import { smallPhoto, uploadedPhotoFiles } from '../src/lib/productPhoto.js'
 import createOrder from '../netlify/functions/create-order.mjs'
 import orderFn from '../netlify/functions/order.mjs'
 import submitPayment from '../netlify/functions/submit-payment.mjs'
@@ -414,6 +415,48 @@ describe('menu photos, settings, enquiries, reports, setup check', () => {
     expect((await act(s, 'productPhoto', { id: 'almond-bar', image: 'data:image/png;base64,PGh0bWw+' })).body.fields).toEqual({ photo: 'image' })
     const back = await act(s, 'productPhoto', { id: 'almond-bar', image: null })
     expect(back.body.products.find((x) => x.id === 'almond-bar').ownPhoto).toBe(false)
+  })
+
+  const webpOf = (n) => `data:image/webp;base64,${Buffer.from([...new TextEncoder().encode('RIFF'), 0, 0, 0, 0, ...new TextEncoder().encode('WEBPVP8 '), n, n]).toString('base64')}`
+
+  it('Change photo stores the 1200px and the 600px file, and the website finds both', async () => {
+    const s = await login()
+    const r = await act(s, 'productPhoto', { id: 'pista-bar', image: webpOf(1), imageSmall: webpOf(2) })
+    const p = r.body.products.find((x) => x.id === 'pista-bar')
+    expect(p.photo).toMatch(/^\/api\/photo\/pista-bar\/\d+-1200\.webp$/)
+    expect((await call(menuFn, null, { method: 'GET' })).body.overrides).toContainEqual({ id: 'pista-bar', photo: p.photo })
+    const big = await call(photoFn, null, { method: 'GET', path: p.photo })
+    const small = await call(photoFn, null, { method: 'GET', path: smallPhoto(p.photo) })
+    expect([big.status, small.status]).toEqual([200, 200])
+    expect(new Uint8Array(big.body).at(-1)).toBe(1)
+    expect(new Uint8Array(small.body).at(-1)).toBe(2)
+    // Two sizes of different kinds (or a small one that isn't a photo) are refused, nothing changes
+    expect((await act(s, 'productPhoto', { id: 'pista-bar', image: webpOf(3), imageSmall: 'data:image/png;base64,PGh0bWw+' })).body.fields).toEqual({ photo: 'image' })
+    expect((await act(s, 'menu')).body.products.find((x) => x.id === 'pista-bar').photo).toBe(p.photo)
+  })
+
+  it('if the upload fails, the current photo stays on the website', async () => {
+    const s = await login()
+    const first = (await act(s, 'productPhoto', { id: 'walnut-brownies', image: webpOf(1), imageSmall: webpOf(2) })).body.products.find((x) => x.id === 'walnut-brownies').photo
+    const put = store.putPublicObject
+    let n = 0
+    store.putPublicObject = (...a) => (++n === 2 ? Promise.reject(new Error('storage down')) : put(...a)) // the 1200px file fails
+    try {
+      const r = await act(s, 'productPhoto', { id: 'walnut-brownies', image: webpOf(5), imageSmall: webpOf(6) })
+      expect(r.status).toBe(500)
+    } finally {
+      store.putPublicObject = put
+    }
+    expect((await act(s, 'menu')).body.products.find((x) => x.id === 'walnut-brownies').photo).toBe(first)
+    expect((await call(menuFn, null, { method: 'GET' })).body.overrides).toContainEqual(expect.objectContaining({ id: 'walnut-brownies', photo: first }))
+  })
+
+  it('the 600px address of a photo (older one-size photos keep their own address)', () => {
+    expect(smallPhoto('https://x.supabase.co/storage/v1/object/public/product-photos/a/17-1200.webp')).toBe('https://x.supabase.co/storage/v1/object/public/product-photos/a/17-600.webp')
+    expect(smallPhoto('/api/photo/a/17-1200.jpg')).toBe('/api/photo/a/17-600.jpg')
+    expect(smallPhoto('/api/photo/a/17.webp')).toBe('/api/photo/a/17.webp')
+    expect(uploadedPhotoFiles('/api/photo/a/17-1200.webp', '50vw')).toEqual({ src: '/api/photo/a/17-600.webp', srcSet: '/api/photo/a/17-600.webp 600w, /api/photo/a/17-1200.webp 1200w', sizes: '50vw' })
+    expect(uploadedPhotoFiles('/api/photo/a/17.webp', '50vw')).toEqual({ src: '/api/photo/a/17.webp' })
   })
 
   it('settings: the order-alert email and the 750 g courier rate', async () => {

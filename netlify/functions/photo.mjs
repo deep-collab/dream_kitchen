@@ -9,7 +9,7 @@ export default handle(
   async (req) => {
     if (backendMode() !== 'mock') throw new HttpError(404, 'notFound')
     const path = decodeURIComponent(new URL(req.url).pathname.replace(/^\/api\/photo\//, ''))
-    if (!/^[a-z0-9-]+\/\d+\.(webp|jpg|png)$/.test(path)) throw new HttpError(404, 'notFound')
+    if (!/^[a-z0-9-]+\/\d+(-600|-1200)?\.(webp|jpg|png)$/.test(path)) throw new HttpError(404, 'notFound')
     const file = await getStore().getPublicObject(path)
     if (!file) throw new HttpError(404, 'notFound')
     return new Response(file.bytes, { status: 200, headers: { 'content-type': file.contentType, 'cache-control': 'public, max-age=86400', 'x-content-type-options': 'nosniff' } })

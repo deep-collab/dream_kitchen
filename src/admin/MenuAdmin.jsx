@@ -1,16 +1,19 @@
 import { useEffect, useId, useState } from 'react'
 import { adminCall } from './api'
-import { Btn, card, ErrorText, Field, formatINR, input, Loading, PageTitle, Pill, SaveMessage, useAdminData, useSave } from './ui'
-import { ImageIcon } from '../components/icons'
+import { Btn, btnClass, card, ErrorText, Field, formatINR, input, Loading, PageTitle, Pill, SaveMessage, useAdminData, useSave } from './ui'
+import { AlertIcon, ImageIcon } from '../components/icons'
+import { smallPhoto } from '../lib/productPhoto'
 
 const CATEGORY_WORDS = { 'brownie-tubs': 'Brownie Tubs', 'delight-boxes': 'Delight Boxes', brownies: 'Brownies', chocolates: 'Chocolates', customize: 'Customize page' }
 
 /**
- * A photo from Hema's phone (camera or gallery), made ready for the website on the phone itself:
- * cut to a square from the middle, 1000 × 1000, WebP (or JPEG on older phones), shrunk until it is
- * under about 300 KB. -> a data URL, or null when the file isn't a picture.
+ * A photo from Hema's phone (camera or gallery), made ready for the website on the phone itself,
+ * the same two sizes as the built-in photos: cut to a square from the middle, 1200 × 1200 and
+ * 600 × 600, WebP (JPEG on phones that can't make WebP), each shrunk until it is small enough
+ * (at most about 650 KB and 150 KB; a real photo is about 100 KB and 40 KB).
+ * -> { image, imageSmall } (data URLs), or null when the file isn't a picture.
  */
-export async function productPhotoDataUrl(file) {
+export async function productPhotoFiles(file) {
   let bitmap
   try {
     bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' })
@@ -18,18 +21,29 @@ export async function productPhotoDataUrl(file) {
     return null
   }
   const side = Math.min(bitmap.width, bitmap.height)
-  const out = Math.min(1000, side)
-  const canvas = document.createElement('canvas')
-  canvas.width = out
-  canvas.height = out
-  canvas.getContext('2d').drawImage(bitmap, (bitmap.width - side) / 2, (bitmap.height - side) / 2, side, side, 0, 0, out, out)
-  bitmap.close?.()
-  const webp = canvas.toDataURL('image/webp', 0.8).startsWith('data:image/webp')
-  for (const q of [0.8, 0.7, 0.6, 0.5, 0.4]) {
-    const url = canvas.toDataURL(webp ? 'image/webp' : 'image/jpeg', q)
-    if (url.length < 400_000) return url
+  const square = (from, sx, sy, sSide, out) => {
+    const canvas = document.createElement('canvas')
+    canvas.width = out
+    canvas.height = out
+    const g = canvas.getContext('2d')
+    g.imageSmoothingQuality = 'high'
+    g.drawImage(from, sx, sy, sSide, sSide, 0, 0, out, out)
+    return canvas
   }
-  return null
+  const big = square(bitmap, (bitmap.width - side) / 2, (bitmap.height - side) / 2, side, 1200)
+  bitmap.close?.()
+  const small = square(big, 0, 0, 1200, 600) // from the 1200px one: smoother than straight from a 4000px photo
+  const type = big.toDataURL('image/webp', 0.8).startsWith('data:image/webp') ? 'image/webp' : 'image/jpeg'
+  const encode = (canvas, max) => {
+    for (const q of [0.82, 0.72, 0.62, 0.52, 0.42, 0.32, 0.22]) {
+      const url = canvas.toDataURL(type, q)
+      if (url.length < max) return url
+    }
+    return null
+  }
+  const image = encode(big, 900_000)
+  const imageSmall = image && encode(small, 200_000)
+  return image && imageSmall ? { image, imageSmall } : null
 }
 
 // Courier charge groups in Hema's words (the six rates themselves are in Settings)
@@ -135,8 +149,8 @@ function AddProduct({ onAdded }) {
       let products = r.data.products
       let photoOk = true
       if (photo) {
-        const image = await productPhotoDataUrl(photo)
-        const p = image ? await adminCall('productPhoto', { id: r.data.id, image }) : null
+        const files = await productPhotoFiles(photo)
+        const p = files ? await adminCall('productPhoto', { id: r.data.id, ...files }) : null
         if (p?.ok) products = p.data.products
         else photoOk = false
       }
@@ -362,19 +376,20 @@ function ProductEditor({ product: p, onSaved }) {
     e.target.value = ''
     if (!file) return
     photoSave.run(async () => {
-      const image = await productPhotoDataUrl(file)
-      if (!image) return { ok: false, error: 'fields', fields: { photo: 'image' } }
-      const r = await adminCall('productPhoto', { id: p.id, image })
+      const files = await productPhotoFiles(file)
+      if (!files) return { ok: false, error: 'fields', fields: { photo: 'image' } }
+      const r = await adminCall('productPhoto', { id: p.id, ...files })
       if (r.ok) onSaved(r.data.products)
       return r
-    }, 'Photo saved. It shows on the website within a minute.')
+    }, 'Photo saved. It is on the website now.')
   }
+  const uploading = photoSave.status === 'saving'
 
   return (
     <div className={`rounded-card border p-4 ${p.active ? 'border-line bg-[#fffcf5]' : 'border-dashed border-control-line bg-cream opacity-80'}`} data-admin-product={p.id}>
       <div className="flex gap-3">
         {p.photo ? (
-          <img src={p.photo} alt="" width="80" height="80" className="h-20 w-20 shrink-0 rounded-control bg-ink object-cover" />
+          <img src={smallPhoto(p.photo)} alt="" width="80" height="80" className="h-20 w-20 shrink-0 rounded-control bg-ink object-cover" />
         ) : (
           <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-control bg-ink text-gold">
             <ImageIcon className="h-8 w-8" />
@@ -457,20 +472,27 @@ function ProductEditor({ product: p, onSaved }) {
 
       <TextEditor product={p} onSaved={onSaved} />
 
-      <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-line pt-3">
-        <label htmlFor={fileId} className={`inline-flex min-h-12 cursor-pointer items-center gap-2 rounded-control border-[1.5px] border-brown px-4 font-bold ${photoSave.status === 'saving' ? 'pointer-events-none opacity-60' : ''}`}>
-          <ImageIcon className="h-5 w-5" /> {photoSave.status === 'saving' ? 'Uploading…' : 'Change photo'}
+      <div className="mt-3 space-y-2 border-t border-line pt-3">
+        {/* One big button: the phone opens its gallery (or camera). While it uploads the website keeps the current photo */}
+        <label htmlFor={fileId} className={`${btnClass('dark')} min-h-14 w-full cursor-pointer text-lg ${uploading ? 'pointer-events-none opacity-60' : ''}`} aria-busy={uploading}>
+          <ImageIcon className="h-6 w-6" /> {uploading ? 'Uploading photo…' : 'Change photo'}
         </label>
-        <input id={fileId} type="file" accept="image/*" className="sr-only" onChange={onPhoto} data-admin-photo={p.id} />
+        <input id={fileId} type="file" accept="image/*" className="sr-only" onChange={onPhoto} disabled={uploading} data-admin-photo={p.id} />
         {p.ownPhoto && (
-          <Btn tone="light" onClick={() => send({ image: null }, photoSave)} disabled={photoSave.status === 'saving'}>
+          <Btn tone="light" className="w-full" onClick={() => send({ image: null }, photoSave)} disabled={uploading}>
             {p.custom ? 'Remove photo' : 'Use the old photo'}
           </Btn>
         )}
-        <div className="w-full">
+        {photoSave.status === 'error' ? (
+          <p role="alert" className="flex items-start gap-2 font-bold text-error" data-admin-photo-error>
+            <AlertIcon className="mt-0.5 h-5 w-5 shrink-0" />
+            {photoSave.fields?.photo
+              ? 'That file isn’t a photo the website can use. Try another one.'
+              : `${photoSave.message.startsWith('No internet') ? 'No internet connection. ' : ''}The photo was not uploaded, so the website still shows the current photo. Please try again.`}
+          </p>
+        ) : (
           <SaveMessage save={photoSave} />
-          {photoSave.fields?.photo && <p className="t-small text-error">That file isn’t a photo the website can use. Try another one.</p>}
-        </div>
+        )}
       </div>
     </div>
   )

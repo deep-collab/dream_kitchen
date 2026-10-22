@@ -137,9 +137,13 @@ again, tap **Back in stock**.
 - **Hide from menu** / **Show on menu**: takes a product off the website completely, or brings it
   back.
 - **Back to original**: undoes your changes (prices, name, description) for that product.
-- **Change photo**: take a photo or pick one from your gallery. The admin makes it the right size
-  by itself; wait for **"Photo saved"**. A square photo with the product in the middle looks best.
+- **Change photo** (the big black button on each product): take a photo or pick one from your
+  gallery. The admin makes it the right size by itself; wait for **"Photo saved. It is on the
+  website now."** A square photo with the product in the middle looks best. If it says in red that
+  the photo was not uploaded, nothing has changed on the website: just try again.
   **Use the old photo** puts the previous one back (**Remove photo** on products you added).
+
+![Photo saved](screenshots/admin/17g-photo-saved.png)
 - **Brownie Tubs** (for example the **Dream Cake Tub**): type each size (for example "500 g") and
   its price, tap **+ Add a size** for more, tick **Show prices and allow ordering**, then **Save**.
   Until then the website says "Price coming soon".

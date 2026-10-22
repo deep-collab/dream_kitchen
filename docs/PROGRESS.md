@@ -2,6 +2,13 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 22 Oct 2026: product photo change in two sizes
+- [x] Admin → Menu → **Change photo** (one big button, 56px, full width on a phone): the phone cuts the middle square and makes 1200px + 600px WebP (`productPhotoFiles`, src/admin/MenuAdmin.jsx); both go to the public bucket `product-photos` as `<product>/<time>-1200.webp` + `-600.webp`; `products.photo_url` = the 1200px address, set only after both are stored (a failed upload changes nothing). The 600px address is worked out from it (`src/lib/productPhoto.js`); older one-file photos still work
+- [x] Website (`ProductPhoto`): srcset 600w/1200w for Hema's photos; a photo that fails to load falls back to the built-in photo, then the drawing
+- [x] At once, no redeploy: `/api/menu` has the Netlify cache tag `menu`; the admin function purges it after addProduct / updateProduct / productPhoto / updateSettings (`netlify/lib/cdn.mjs`, `@netlify/functions` purgeCache; a failed purge only means up to a minute's delay)
+- [x] RLS: migration `20261022000001_product_photos.sql`, storage.objects policies for `product-photos`, admin (`is_admin()`) only; tested in tests/db.test.js. Owner: run setup-all.sql again (HANDOVER.md)
+- [x] Checks: 318 tests, check-secrets, check-i18n; qa-admin 24/24 at 390px (button size, failed upload keeps the photo, 1200 + 600 webp served, the menu shows it at once); qa-step6 0 problems; qa-payments all passed; first-visit JS 46.8–56.3 KB (EN)
+
 ## 16 Oct 2026: final launch, after the power cut
 - Checked after the power cut: nothing lost. All 15 Oct work (3 commits) was committed and pushed; no lock files, no half-written files, node_modules complete
 - [x] The live site is the Netlify project **dreamkitcheno1**: `site.url` = https://dreamkitcheno1.netlify.app (the one config value); every old luminous-salmiakki address replaced in CLAUDE.md, LAUNCH.md and the guides. The domain is bought, to connect later (SETUP-BACKEND step 1, then 1.5: Supabase URLs, Razorpay website + webhooks)

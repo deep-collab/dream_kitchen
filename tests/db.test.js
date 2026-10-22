@@ -235,6 +235,30 @@ describe('the complete admin (migration 20261010000001)', () => {
   })
 })
 
+describe('product photos (20261022000001_product_photos.sql): only Hema’s admin account may change them', () => {
+  const add = (tx, bucket = 'product-photos') => tx.query(`insert into storage.objects (bucket_id, name) values ($1, 'almond-bar/1-1200.webp') returning id`, [bucket])
+
+  it('the public can’t add, list, replace or remove product photos', async () => {
+    await expect(asRole(db, 'anon', null, (tx) => add(tx))).rejects.toThrow(/row-level security/)
+    await asRole(db, 'service_role', null, (tx) => add(tx))
+    expect((await asRole(db, 'anon', null, (tx) => tx.query(`select * from storage.objects`))).rows).toEqual([])
+    expect((await asRole(db, 'anon', null, (tx) => tx.query(`update storage.objects set name = 'x' returning id`))).rows).toEqual([])
+    expect((await asRole(db, 'anon', null, (tx) => tx.query(`delete from storage.objects returning id`))).rows).toEqual([])
+  })
+
+  it('another logged-in account can’t either', async () => {
+    await expect(asRole(db, 'authenticated', STRANGER, (tx) => add(tx))).rejects.toThrow(/row-level security/)
+    expect((await asRole(db, 'authenticated', STRANGER, (tx) => tx.query(`delete from storage.objects returning id`))).rows).toEqual([])
+  })
+
+  it('Hema can, in the product-photos bucket only', async () => {
+    const r = await asRole(db, 'authenticated', HEMA, (tx) => add(tx))
+    expect(r.rows).toHaveLength(1)
+    await expect(asRole(db, 'authenticated', HEMA, (tx) => add(tx, 'uploads'))).rejects.toThrow(/row-level security/)
+    expect((await asRole(db, 'authenticated', HEMA, (tx) => tx.query(`delete from storage.objects where id = $1 returning id`, [r.rows[0].id]))).rows).toHaveLength(1)
+  })
+})
+
 describe('final launch (20261015000001_launch.sql)', () => {
   it('a product Hema adds needs a name and a price or sizes, in a menu category', async () => {
     const add = (cols) => db.query(`insert into public.products (id, slug, category, name_en, custom, display_name, price, sizes) values ($1, $1, $2, 'x', true, $3::jsonb, $4, $5::jsonb)`, cols)

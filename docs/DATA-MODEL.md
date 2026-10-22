@@ -42,7 +42,7 @@ A NULL override means "use the config value".
 | courier_tier | text | reference: `small` / `large` / `xl` (the config decides; sizes can be heavier) |
 | price_status | text, null | `live` / `coming-soon` (tubs) |
 | active, sold_out | bool, null | hidden / sold out |
-| photo_url | text, null | Hema's photo (public `product-photos` bucket, https only) |
+| photo_url | text, null | Hema's photo, the 1200px file (public `product-photos` bucket, https only); the 600px file is the same address with `-600` (src/lib/productPhoto.js) |
 | custom | bool | true = Hema added it in the admin: category, names, description, sizes or price and courier_tier all come from the row. Never deleted (Hide = active false), so old orders keep their product. Categories: the four menu ones only |
 | display_name, description | jsonb, null | `{ en, kn? }`: Hema's name / description (Kannada falls back to the English). NULL = the config's |
 | sort, image, updated_at | | |
@@ -136,8 +136,9 @@ Storage:
 - `uploads`: private (no public URL, no policies), images only, 5 MB. `refs/YYYYMMDD/<uuid>.webp`
   (drawing references), `payments/<order>/<uuid>.webp` (payment screenshots). The admin sees them
   through 10-minute signed links.
-- `product-photos`: public (they are on the menu), images only, 2 MB, written only by the admin
-  function. `<product>/<timestamp>.webp`.
+- `product-photos`: public (they are on the menu), images only, 2 MB, written by the admin
+  function; RLS on storage.objects lets only an admin login (`is_admin()`) add, list, replace or remove
+  them. `<product>/<timestamp>-1200.webp` + `<product>/<timestamp>-600.webp` (older: `<product>/<timestamp>.webp`).
 
 ## Server functions (`netlify/functions`, each at `/api/<name>`)
 

@@ -289,13 +289,23 @@ async function ensureProductRow(store, id) {
   return base
 }
 
-/** A new photo from Hema's phone (already shrunk by the admin page to about 1000px) */
+/**
+ * A new photo from Hema's phone, made on the phone in two sizes (image 1200px, imageSmall 600px;
+ * src/lib/productPhoto.js names them). Both files are stored first and photo_url changes last, so
+ * if anything fails the website keeps the current photo. Each upload has its own name (the time),
+ * so no cache anywhere can show an old picture under a new address. A page from before the two
+ * sizes may still send one image alone: it is kept as one file, as before.
+ */
 async function productPhoto(store, body, ctx) {
   const base = await ensureProductRow(store, body.id)
   if (body.image === null) return store.updateProduct(base.id, { photo_url: null })
-  const image = fromDataUrl(body.image, 700_000)
-  if (!image) throw new HttpError(400, 'fields', { fields: { photo: 'image' } })
-  const url = await store.putPublicObject(`${base.id}/${ctx.now().getTime()}.${image.type}`, image.bytes, MIME[image.type])
+  const image = fromDataUrl(body.image, 680_000)
+  const small = body.imageSmall === undefined ? null : fromDataUrl(body.imageSmall, 160_000)
+  if (!image || (body.imageSmall !== undefined && small?.type !== image.type)) throw new HttpError(400, 'fields', { fields: { photo: 'image' } })
+  const stem = `${base.id}/${ctx.now().getTime()}`
+  if (!small) return store.updateProduct(base.id, { photo_url: await store.putPublicObject(`${stem}.${image.type}`, image.bytes, MIME[image.type]) })
+  await store.putPublicObject(`${stem}-600.${small.type}`, small.bytes, MIME[small.type])
+  const url = await store.putPublicObject(`${stem}-1200.${image.type}`, image.bytes, MIME[image.type])
   return store.updateProduct(base.id, { photo_url: url })
 }
 

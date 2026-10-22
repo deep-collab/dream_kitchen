@@ -137,6 +137,9 @@ const TONES = {
 }
 const BTN = 'inline-flex min-h-12 items-center justify-center gap-2 rounded-control px-4 font-bold disabled:opacity-50'
 
+/** The button look, for things that aren't a <button> (e.g. the <label> of a photo picker) */
+export const btnClass = (tone = 'dark') => `${BTN} ${TONES[tone]}`
+
 export function Btn({ tone = 'dark', className = '', ...props }) {
   return <button type="button" className={`${BTN} ${TONES[tone]} ${className}`} {...props} />
 }
