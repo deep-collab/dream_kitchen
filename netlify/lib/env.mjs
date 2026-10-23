@@ -19,8 +19,8 @@ export function getWorkerEnv() {
 }
 
 const env = (name) => {
-  if (workerEnv && workerEnv[name] !== undefined) return String(workerEnv[name] || '')
-  return (typeof process !== 'undefined' ? process.env[name] : undefined) || ''
+  if (workerEnv && workerEnv[name] !== undefined) return String(workerEnv[name] || '').trim()
+  return ((typeof process !== 'undefined' ? process.env[name] : undefined) || '').trim()
 }
 
 export function backendMode() {
