@@ -13,7 +13,7 @@ Tap anything you like there: nothing is real and nothing is saved.
 A few things to know:
 - **"Saved"** in green means it is really saved on the website. If something goes wrong, it says
   so in plain words. Just try again.
-- The website shows your changes **within a minute**.
+- The website shows your changes **straight away** (pull down to refresh a page that is already open).
 - A **red bar** at the top means something needs attention. Tap it to go to the right place.
 - After **30 days** without opening the admin, it asks you to log in again. That keeps your shop
   safe if your phone is lost.
@@ -39,7 +39,7 @@ Open the email on your phone, tap the link, and type a new password two times.
 
 ![Home](screenshots/admin/guide/03-home.png)
 
-At the bottom are five buttons: **Home**, **Orders**, **Classes**, **Menu**, **More**.
+At the bottom are six buttons: **Home**, **Orders**, **Offers**, **Classes**, **Menu**, **More**.
 
 Home shows big cards. **Tap a card** to see the list behind it:
 
@@ -147,28 +147,71 @@ again, tap **Back in stock**.
 - **Brownie Tubs** (for example the **Dream Cake Tub**): type each size (for example "500 g") and
   its price, tap **+ Add a size** for more, tick **Show prices and allow ordering**, then **Save**.
   Until then the website says "Price coming soon".
-- **Edit name and description** (under each product): change the name or the short description,
-  in English and (if you like) Kannada, then tap **Save name and description**. Leave the Kannada
-  empty and Kannada readers see your English.
 
-**Add a new product:** tap **+ Add a new product** at the top of Menu.
-1. **Where on the menu**: Brownie Tubs, Delight Boxes, Brownies or Chocolates.
+![The buttons on a product](screenshots/offers/02-menu-card-buttons.png)
+
+- **Edit name** (next to Save and Mark sold out): the name in English and (if you like) Kannada, then
+  **Save name**. Leave the Kannada empty and Kannada readers see your English.
+- **Description**: the short text customers see when they tap the product, above the choices. At most
+  200 letters: the counter under the box shows how many you have used. Then **Save description**.
+- Changing a name never changes the product itself: its price, photo and old orders stay as they are.
+
+![Description saved](screenshots/offers/04-description-saved.png)
+
+**Add a new product:** scroll to the section it belongs in (Brownie Tubs, Delight Boxes, Brownies or
+Chocolates) and tap the big gold **+ Add new product** at the bottom of it.
+1. **Where on the menu** is already that section (you can change it).
 2. **Name in English** (needed), **Name in Kannada** (optional), a short **description** (optional).
 3. **Price**: **One price**, or **Different sizes**: type each size (for example "250 g") and its price;
    **+ Add a size** for more.
-4. **Courier charge**: pick the parcel it is most like (small, medium or large). The customer pays
+4. **Ragi version**: **No**, or **Yes** and the extra price for ragi (for example 60). Customers then
+   see "Make it ragi".
+5. **Courier charge**: pick the parcel it is most like (small, medium or large). The customer pays
    that courier charge.
-5. **Photo** (optional): take one or pick one from your gallery.
-6. Tap **Add to menu**. It is on the website within a minute, with an **Added by you** label here.
+6. **Photo** (optional): take one or pick one from your gallery.
+7. Tap **Add to menu**. It is on the website at once, with an **Added by you** label here.
 
-![Add a new product](screenshots/admin/17c-add-product-filled.png)
+![Add a new product](screenshots/offers/08-add-product-form.png)
+
+**Photos on the Customize page:** the last section of Menu, **Customize page**, has the photos of the
+Customize page's two tiles ("Delight Box with a name or a drawing" and "Drawing Chocolate Bar") and
+of the Customize tile on Home. Tap **Change photo** under one. **Use the product photo again** undoes it.
+
+![Customize page photos](screenshots/offers/06-customize-tile-changed.png)
 
 There is no Delete button, on purpose: old orders must keep their product. To take something off
 the website, tap **Hide from menu**.
 
 ---
 
-## 5. Classes
+## 5. Offers: a banner on the website
+
+![Offers](screenshots/offers/13-offers-list.png)
+
+An offer is a black-and-gold banner at the very top of the website's Home page (and a slim strip on
+the Menu page). **Offers do not change prices.** If your offer has a special price, change it yourself
+in **Menu**, and change it back when the offer ends.
+
+**Add an offer:** tap **+ Add new offer**, then:
+1. **Title** in English (Kannada if you like), and a **short message** (optional).
+2. **Where the button goes**: a menu section, the Customize page or one product. The **button text**
+   is optional ("See offer" if empty).
+3. **Start date** and **end date**. Both days count: it shows from the morning of the start date to
+   the night of the end date.
+4. A **banner photo** if you like, and **On**.
+5. Check **How it looks on the website**, then tap **Add offer**.
+
+![A new offer](screenshots/offers/12-offer-form-filled.png)
+
+Each offer in the list says **Live** (on the website now), **Scheduled** (it starts by itself on its
+start date), **Ended** or **Off**. **Edit** changes it, **Turn off** takes it off the website at once,
+**Delete** asks first and then removes it for good.
+
+![The banner on the website](screenshots/offers/20-home-banner-390-en.png)
+
+---
+
+## 6. Classes
 
 At the top: **Bookings** · **Who's coming** · **Weekends** · **Fees & times**.
 
@@ -198,7 +241,7 @@ received**.)
 
 ---
 
-## 6. More: Settings, Enquiries, Reports
+## 7. More: Settings, Enquiries, Reports
 
 ![More](screenshots/admin/guide/18-more.png)
 

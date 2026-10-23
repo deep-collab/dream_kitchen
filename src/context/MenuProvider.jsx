@@ -1,9 +1,29 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { categories as CATEGORIES, products as PRODUCTS } from '../config/shop'
 import { applyOverrides, applySettings, hasPrice } from '../lib/pricing'
+import { cleanPagePhotos, istToday, liveOffers } from '../lib/offers'
 import { loadRemoteMenu } from '../services'
 
 export const MenuContext = createContext(null)
+
+// The last offers this phone saw, so a returning visitor's banner is there in the first paint
+// (no jump when /api/menu arrives). Only the dates decide what shows; the fresh list replaces it.
+const OFFERS_KEY = 'dk_offers'
+const savedOffers = () => {
+  try {
+    return JSON.parse(localStorage.getItem(OFFERS_KEY)) || []
+  } catch {
+    return []
+  }
+}
+const saveOffers = (list) => {
+  try {
+    if (list.length) localStorage.setItem(OFFERS_KEY, JSON.stringify(list))
+    else localStorage.removeItem(OFFERS_KEY)
+  } catch {
+    /* storage blocked: the banner just comes with the menu */
+  }
+}
 
 /**
  * The menu and Hema's settings, shared by every page:
@@ -14,8 +34,17 @@ export const MenuContext = createContext(null)
  */
 export function MenuProvider({ children }) {
   const [remote, setRemote] = useState(undefined) // undefined = loading, null = unavailable
+  const [cachedOffers] = useState(savedOffers)
+  const [today, setToday] = useState(istToday)
 
-  const fetchRemote = useCallback((fresh = false) => loadRemoteMenu({ fresh }).then((r) => setRemote(r)), [])
+  const fetchRemote = useCallback(
+    (fresh = false) =>
+      loadRemoteMenu({ fresh }).then((r) => {
+        if (r) saveOffers(r.ready && Array.isArray(r.offers) ? r.offers : [])
+        setRemote(r)
+      }),
+    [],
+  )
   useEffect(() => {
     const go = () => fetchRemote()
     if (window.__dkReady) go()
@@ -23,6 +52,15 @@ export function MenuProvider({ children }) {
     return () => window.removeEventListener('dk:ready', go)
   }, [fetchRemote])
   const refresh = useCallback(() => fetchRemote(true), [fetchRemote])
+
+  // An offer starts and ends at midnight, Indian time, even on a page left open
+  const offerList = remote === undefined ? cachedOffers : remote?.offers
+  const hasOffers = Array.isArray(offerList) && offerList.length > 0
+  useEffect(() => {
+    if (!hasOffers) return undefined
+    const timer = setInterval(() => setToday(istToday()), 60_000)
+    return () => clearInterval(timer)
+  }, [hasOffers])
 
   const value = useMemo(() => {
     const all = applyOverrides(PRODUCTS, remote?.overrides || [])
@@ -36,6 +74,9 @@ export function MenuProvider({ children }) {
         productsById: Object.fromEntries(all.map((p) => [p.id, p])),
       },
       settings,
+      // Hema's offers showing today, and the Customize tiles' photos she changed
+      offers: liveOffers(offerList, today),
+      pagePhotos: cleanPagePhotos(remote?.pagePhotos),
       refresh,
       remoteLoaded: remote !== undefined,
       // The database is connected (/api/menu says ready). Until then, forms that need it are hidden
@@ -44,12 +85,18 @@ export function MenuProvider({ children }) {
       canOrder: Boolean(remote?.ready && settings.store.open && (settings.payment.upiId || remote?.razorpay?.enabled)),
       razorpay: remote?.razorpay || { enabled: false },
     }
-  }, [remote, refresh])
+  }, [remote, refresh, offerList, today])
   return <MenuContext.Provider value={value}>{children}</MenuContext.Provider>
 }
 
 /** { categories, products (on the menu, in order), productsById (all, for the cart check) } */
 export const useMenu = () => useContext(MenuContext).menu
+
+/** The offers to show now (src/lib/offers.js liveOffers), [] when none */
+export const useOffers = () => useContext(MenuContext).offers
+
+/** The Customize tiles' photos Hema changed: { [tile id]: address } (src/lib/offers.js PAGE_PHOTOS) */
+export const usePagePhotos = () => useContext(MenuContext).pagePhotos
 
 /** Hema's settings (courier rates, lead times, UPI, store open, banner), whether the database is connected, and whether ordering is open */
 export function useShopStatus() {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
-import { useMenu } from '../context/MenuProvider'
+import { useMenu, useShopStatus } from '../context/MenuProvider'
 import Container from '../components/ui/Container'
 import ProductCard from '../components/shop/ProductCard'
 import { useShopSheets } from '../components/shop/ShopSheets'
@@ -34,6 +34,7 @@ export default function Menu() {
   useSeo('menu')
   const { t, pick } = useI18n()
   const menu = useMenu()
+  const { remoteLoaded } = useShopStatus()
   const { hash, search } = useLocation()
   const navigate = useNavigate()
   const { openProduct } = useShopSheets()
@@ -41,27 +42,35 @@ export default function Menu() {
   const tabsRef = useRef(null)
   const spyPaused = useRef(false)
 
-  // Deep links, once on arrival
+  // Deep links: on arrival, and when a link on this page (the offer strip) points to a section
   useEffect(() => {
     const params = new URLSearchParams(search)
     const target = decodeURIComponent(hash.slice(1)) || params.get('c')
-    const item = params.get('item')
     if (target && menu.categories.some((c) => c.id === target)) {
       setActive(target)
       requestAnimationFrame(() => scrollToCategory(target, false))
       // the fonts can still change the layout: land again once they are in
       document.fonts?.ready.then(() => scrollToCategory(target, false))
     }
-    if (item) {
-      const product = menu.products.find((p) => p.slug === item)
-      if (product) {
-        requestAnimationFrame(() => scrollToCategory(product.category, false))
-        openProduct(product)
-      }
-      navigate({ hash: product ? `#${product.category}` : '' }, { replace: true })
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [hash])
+  // ?item=<slug> (e.g. from an offer): a product Hema added in the admin is known only once her
+  // menu has arrived, so wait for it (a config product opens at once)
+  const itemDone = useRef(null)
+  useEffect(() => {
+    const item = new URLSearchParams(search).get('item')
+    if (!item) return void (itemDone.current = null)
+    if (itemDone.current === search) return
+    const product = menu.products.find((p) => p.slug === item)
+    if (!product && !remoteLoaded) return
+    itemDone.current = search
+    if (product) {
+      requestAnimationFrame(() => scrollToCategory(product.category, false))
+      openProduct(product)
+    }
+    navigate({ hash: product ? `#${product.category}` : '' }, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [search, menu, remoteLoaded])
 
   // Scroll-spy: the last category whose top has passed under the tabs
   useEffect(() => {

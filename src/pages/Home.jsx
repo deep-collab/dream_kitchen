@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useSeo } from '../hooks/useSeo'
 import { useI18n } from '../i18n/I18nProvider'
-import { useMenu } from '../context/MenuProvider'
+import { useMenu, usePagePhotos } from '../context/MenuProvider'
 import Hero from '../components/home/Hero'
 import Container from '../components/ui/Container'
 import ProductPhoto from '../components/shop/ProductPhoto'
@@ -23,15 +23,17 @@ const TILE_PHOTO = {
  * Home is three parts (Hema's request): a compact hero, six big photo tiles, and the short
  * footer (from the layout). Tiles: 2 per row on phones, 3 on tablets and desktops (3 × 2).
  * Under the tiles, one small card for her specialty, hand-drawn chocolates, linking to Customize.
+ * Above everything, her live offers (admin -> Offers; shown by the layout, components/layout/OfferBanner).
  */
 export default function Home() {
   useSeo('home')
   const { t, pick } = useI18n()
   const menu = useMenu()
+  const pagePhotos = usePagePhotos()
   const bar = menu.productsById['drawing-chocolate-bar']
   const tiles = [
     ...menu.categories.map((c) => ({ key: c.id, to: `/menu#${c.id}`, label: pick(c.name), slug: TILE_PHOTO[c.id], art: c.art })),
-    { key: 'customize', to: '/customize', label: t('nav.customize'), slug: 'drawing-chocolate-bar', art: 'drawing-bar' },
+    { key: 'customize', to: '/customize', label: t('nav.customize'), slug: 'drawing-chocolate-bar', art: 'drawing-bar', photo: pagePhotos['home-customize'] },
     { key: 'classes', to: '/classes', label: t('nav.classes'), slug: 'classes', art: 'class' },
   ]
   return (
@@ -50,7 +52,7 @@ export default function Home() {
                   data-dk-tile
                   className="group block overflow-hidden rounded-card border border-line bg-[#fffcf5] transition-shadow hover:shadow-[0_6px_24px_-12px_rgb(42_29_22/0.35)]"
                 >
-                  <ProductPhoto slug={tile.slug} art={tile.art} eager={i < 2} rounded="rounded-none" sizes="(min-width: 640px) 33vw, 50vw" className="aspect-[4/3] w-full" />
+                  <ProductPhoto slug={tile.slug} photo={tile.photo} art={tile.art} eager={i < 2} rounded="rounded-none" sizes="(min-width: 640px) 33vw, 50vw" className="aspect-[4/3] w-full" />
                   <span className="flex min-h-12 items-center px-3 py-2 leading-snug font-bold group-hover:underline sm:px-4">{tile.label}</span>
                 </Link>
               </li>
@@ -58,7 +60,7 @@ export default function Home() {
           </ul>
           {bar && (
             <section aria-labelledby="special-title" className="mt-3 flex items-center gap-3 rounded-card border border-line bg-[#fffcf5] p-3 sm:mt-5 sm:gap-4 sm:p-4">
-              <ProductPhoto slug={bar.slug} art={bar.art} sizes="96px" className="h-20 w-20 shrink-0 sm:h-24 sm:w-24" />
+              <ProductPhoto slug={bar.slug} photo={pagePhotos['home-customize']} art={bar.art} sizes="96px" className="h-20 w-20 shrink-0 sm:h-24 sm:w-24" />
               <div className="min-w-0 flex-1 sm:flex sm:items-center sm:gap-4">
                 <div className="min-w-0 flex-1">
                   <h2 id="special-title" className="leading-snug font-bold">

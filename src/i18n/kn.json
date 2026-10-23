@@ -55,7 +55,10 @@
   },
   "banner": {
     "closed": "ಸದ್ಯಕ್ಕೆ ಆರ್ಡರ್‌ಗಳನ್ನು ನಿಲ್ಲಿಸಲಾಗಿದೆ.",
-    "label": "Dream Kitchen ನಿಂದ ಸೂಚನೆ"
+    "label": "Dream Kitchen ನಿಂದ ಸೂಚನೆ",
+    "offers": "ಆಫರ್‌ಗಳು",
+    "offerCta": "ಆಫರ್ ನೋಡಿ",
+    "offerShow": "ಆಫರ್ {n} / {count} ತೋರಿಸಿ"
   },
   "units": {
     "g": "{n} ಗ್ರಾಂ",

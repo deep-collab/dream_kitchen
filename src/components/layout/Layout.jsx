@@ -1,10 +1,11 @@
 import { Suspense, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { useI18n } from '../../i18n/I18nProvider'
 import { prefetchOrderPath } from '../../routes'
 import ScrollToTop from '../ScrollToTop'
 import Header from './Header'
 import Banner from './Banner'
+import OfferBanner from './OfferBanner'
 import LanguageError from './LanguageError'
 import Footer from './Footer'
 import TabBar from './TabBar'
@@ -20,6 +21,15 @@ function FirstPaint() {
     window.dispatchEvent(new Event('dk:ready'))
     prefetchOrderPath()
   }, [])
+  return null
+}
+
+// Hema's live offers: the banner at the very top of Home, a slim strip on the Menu page. Part of
+// the main bundle (not the pages' own files), so the page never waits for one more file to draw.
+function PageOffers() {
+  const { pathname } = useLocation()
+  if (pathname === '/') return <OfferBanner />
+  if (pathname === '/menu') return <OfferBanner variant="strip" />
   return null
 }
 
@@ -42,6 +52,7 @@ export default function Layout() {
       <Banner />
       <LanguageError />
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
+        <PageOffers />
         <Suspense fallback={<PageLoading />}>
           <Outlet />
           <FirstPaint />

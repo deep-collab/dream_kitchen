@@ -38,6 +38,7 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - **`src/lib/pricing.js`**: the one pricing module (unit prices, options, courier zone/tier/charge, Hema's admin overrides and settings, UPI link, UTR). Imported by the website **and** every server function, so totals can never disagree.
 - `src/lib/dates.js` (dispatch dates, IST), `src/lib/checkout.js` (customer details), `src/lib/enquiry.js` (class enquiry): shared by site and server too.
 - Hema's admin changes live in Supabase (`products` / `settings` override columns, NULL = config) and are applied by `applyOverrides` / `applySettings` on both sides.
+- **Offers** (23 Oct 2026): admin → Offers (bottom nav Home · Orders · Offers · Classes · Menu · More). Rules in `src/lib/offers.js` (IST dates, both days included; live / scheduled / ended / off; link `category:` / `product:` / `page:customize`), table `offers`; shown by `src/components/layout/OfferBanner.jsx` from the layout (banner on Home, strip on Menu; in the main bundle so pages don't wait for it). Display-only: offers NEVER change a price. Customize tile photos: `page_photos` + `PAGE_PHOTOS` in the same file, admin → Menu → Customize page.
 - Text: `src/i18n/en.json` + `kn.json` (customer pages, both languages); `netlify/lib/emailText.mjs` (customer emails); admin text is English, in `src/admin`. Business details: `src/config/site.js`. Class details (days, slots, the three classes and prices, seats): `src/data/classInfo.js`; booking rules (weekends, seats, booking IDs `DK-CL-YYMMDD-XXXX`): `src/lib/classes.js` + `src/lib/classTimes.js`, shared by site and server.
 
 ## The menu (Hema's, exactly; never invent prices, weights, ingredients or claims)
@@ -87,7 +88,7 @@ Details and tokens: `docs/DESIGN.md`.
 
 ## Working rules
 Ask only if truly blocked. Keep chat replies short. Explain manual steps in plain words. Never put
-keys in code or chat. Run `npm test`, `node scripts/check-i18n.mjs`, `node scripts/qa-step6.mjs` and `node scripts/qa-admin.mjs`
+keys in code or chat. Run `npm test`, `node scripts/check-i18n.mjs`, `node scripts/qa-step6.mjs`, `node scripts/qa-admin.mjs` and `node scripts/qa-offers.mjs`
 (dev server as described in those files; a fresh `DK_DEV_DATA_DIR` per run is best) and
 `node scripts/qa-payments.mjs` (starts its own server) after changes. Speed budget: first-visit JS ≤ ~66 KB gzip
 (`node scripts/bundle-report.mjs`), Lighthouse mobile Performance 90+, the rest 100.

@@ -153,7 +153,7 @@ describe('the database’s own rules', () => {
   it('RLS is on for every table', async () => {
     const r = await db.query(`select relname, relrowsecurity from pg_class where relnamespace = 'public'::regnamespace and relkind = 'r' order by relname`)
     expect(r.rows.every((x) => x.relrowsecurity)).toBe(true)
-    expect(r.rows.map((x) => x.relname)).toEqual(['admin_users', 'booking_events', 'class_blocks', 'class_bookings', 'class_enquiries', 'heartbeat', 'order_events', 'orders', 'products', 'rate_limits', 'settings'])
+    expect(r.rows.map((x) => x.relname)).toEqual(['admin_users', 'booking_events', 'class_blocks', 'class_bookings', 'class_enquiries', 'heartbeat', 'offers', 'order_events', 'orders', 'page_photos', 'products', 'rate_limits', 'settings'])
   })
 })
 
@@ -276,5 +276,67 @@ describe('final launch (20261015000001_launch.sql)', () => {
     await expect(asRole(db, 'authenticated', STRANGER, (tx) => tx.query('select * from public.heartbeat'))).rejects.toThrow(/permission denied/)
     const r = await asRole(db, 'service_role', null, (tx) => tx.query(`update public.heartbeat set last_run_at = now(), runs = runs + 1 where id = 1 returning runs`))
     expect(r.rows[0].runs).toBe(1)
+  })
+})
+
+describe('offers and Customize tile photos (20261023000001_offers_and_page_photos.sql)', () => {
+  // Today in India, and days around it, as the database sees them
+  const ist = async (days) => (await db.query(`select ((now() at time zone 'Asia/Kolkata')::date + $1::int)::text as d`, [days])).rows[0].d
+  const offer = async (title, from, to, active = true) =>
+    (
+      await asRole(db, 'service_role', null, (tx) =>
+        tx.query(`insert into public.offers (title, starts_on, ends_on, active) values ($1::jsonb, $2, $3, $4) returning id`, [JSON.stringify({ en: title }), from, to, active]),
+      )
+    ).rows[0].id
+  const titles = (rows) => rows.map((r) => r.title.en).sort()
+
+  beforeAll(async () => {
+    await offer('Live', await ist(-1), await ist(1))
+    await offer('Today only', await ist(0), await ist(0))
+    await offer('Later', await ist(3), await ist(9))
+    await offer('Over', await ist(-9), await ist(-2))
+    await offer('Switched off', await ist(-1), await ist(1), false)
+  })
+
+  it('the public reads only the offers live today (switched on, between the dates)', async () => {
+    const r = await asRole(db, 'anon', null, (tx) => tx.query('select * from public.offers'))
+    expect(titles(r.rows)).toEqual(['Live', 'Today only'])
+    const s = await asRole(db, 'authenticated', STRANGER, (tx) => tx.query('select * from public.offers'))
+    expect(titles(s.rows)).toEqual(['Live', 'Today only'])
+  })
+
+  it('Hema reads all of them', async () => {
+    const r = await asRole(db, 'authenticated', HEMA, (tx) => tx.query('select * from public.offers'))
+    expect(titles(r.rows)).toEqual(['Later', 'Live', 'Over', 'Switched off', 'Today only'])
+  })
+
+  it('only Hema may add, change or delete an offer', async () => {
+    const add = (tx) => tx.query(`insert into public.offers (title, starts_on, ends_on) values ('{"en":"Mine"}', current_date, current_date) returning id`)
+    await expect(asRole(db, 'anon', null, add)).rejects.toThrow(/permission denied/)
+    await expect(asRole(db, 'authenticated', STRANGER, add)).rejects.toThrow(/row-level security/)
+    await expect(asRole(db, 'anon', null, (tx) => tx.query(`update public.offers set active = false`))).rejects.toThrow(/permission denied/)
+    expect((await asRole(db, 'authenticated', STRANGER, (tx) => tx.query(`update public.offers set active = false returning id`))).rows).toEqual([])
+    expect((await asRole(db, 'authenticated', STRANGER, (tx) => tx.query(`delete from public.offers returning id`))).rows).toEqual([])
+    const mine = await asRole(db, 'authenticated', HEMA, add)
+    const id = mine.rows[0].id
+    expect((await asRole(db, 'authenticated', HEMA, (tx) => tx.query(`update public.offers set active = false where id = $1 returning id`, [id]))).rows).toHaveLength(1)
+    expect((await asRole(db, 'authenticated', HEMA, (tx) => tx.query(`delete from public.offers where id = $1 returning id`, [id]))).rows).toHaveLength(1)
+  })
+
+  it('refuses an offer without an English title, ending before it starts, or with an unknown link', async () => {
+    const add = (title, from, to, link = '') => db.query(`insert into public.offers (title, starts_on, ends_on, link) values ($1::jsonb, $2, $3, $4)`, [title, from, to, link])
+    await expect(add('{"kn":"ಕೇವಲ ಕನ್ನಡ"}', '2026-11-01', '2026-11-02')).rejects.toThrow(/check constraint/)
+    await expect(add('{"en":"Backwards"}', '2026-11-05', '2026-11-01')).rejects.toThrow(/check constraint/)
+    await expect(add('{"en":"Bad link"}', '2026-11-01', '2026-11-02', 'https://example.com')).rejects.toThrow(/check constraint/)
+    await add('{"en":"Good"}', '2026-11-01', '2026-11-02', 'product:walnut-brownies')
+  })
+
+  it('tile photos: anyone may read them, only Hema may change them', async () => {
+    await asRole(db, 'service_role', null, (tx) => tx.query(`insert into public.page_photos (id, photo_url) values ('customize-box', 'https://abc.supabase.co/x-1200.webp')`))
+    expect((await asRole(db, 'anon', null, (tx) => tx.query('select id from public.page_photos'))).rows).toEqual([{ id: 'customize-box' }])
+    await expect(asRole(db, 'anon', null, (tx) => tx.query(`update public.page_photos set photo_url = null`))).rejects.toThrow(/permission denied/)
+    expect((await asRole(db, 'authenticated', STRANGER, (tx) => tx.query(`update public.page_photos set photo_url = null returning id`))).rows).toEqual([])
+    await expect(asRole(db, 'authenticated', STRANGER, (tx) => tx.query(`insert into public.page_photos (id) values ('home-customize')`))).rejects.toThrow(/row-level security/)
+    expect((await asRole(db, 'authenticated', HEMA, (tx) => tx.query(`update public.page_photos set photo_url = null returning id`))).rows).toHaveLength(1)
   })
 })

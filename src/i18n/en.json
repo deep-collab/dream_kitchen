@@ -55,7 +55,10 @@
   },
   "banner": {
     "closed": "Orders are paused for now.",
-    "label": "Notice from Dream Kitchen"
+    "label": "Notice from Dream Kitchen",
+    "offers": "Offers",
+    "offerCta": "See offer",
+    "offerShow": "Show offer {n} of {count}"
   },
   "units": {
     "g": "{n} g",

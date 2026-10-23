@@ -271,10 +271,10 @@ try {
 
   // Flow: add a new product (sizes, courier group, photo), edit its name, see it on the website, hide it
   await page.goto(`${BASE}/admin/menu`)
-  await page.click('[data-admin-add-product]')
+  await page.click('[data-admin-add-product=chocolates]')
   const form = page.locator('[data-admin-add-form]')
   await form.locator('[data-admin-add-save]').click()
-  await form.locator('text=Choose where it goes on the menu.').waitFor()
+  await form.locator('text=Write the name in English.').waitFor() // the section is already chosen: the one where she tapped
   await audit(page, 'menu-add-form')
   await shot(page, '17b-add-product-errors', true)
   const stamp = Date.now().toString(36).slice(-4)
@@ -291,15 +291,15 @@ try {
   await page.setInputFiles('[data-admin-add-form] input[type=file]', { name: 'coconut.jpg', mimeType: 'image/jpeg', buffer: jpg })
   await shot(page, '17c-add-product-filled', true)
   await form.locator('[data-admin-add-save]').click()
-  await page.locator('text=Added. It shows on the website menu within a minute.').waitFor({ timeout: 15000 })
+  await page.locator('text=Added. It is on the website menu now.').waitFor({ timeout: 15000 })
   const newId = `coconut-bar-${stamp}`
   const added = page.locator(`[data-admin-product="${newId}"]`)
   await added.locator('text=Added by you').waitFor()
   if (!(await added.locator('img').count())) fail('new product: its photo is not shown in the admin')
-  await added.locator('summary:has-text("Edit name and description")').click()
+  await added.locator('[data-admin-edit-name]').click()
   await added.locator('[data-admin-name-en]').fill(`Coconut Dream Bar ${stamp}`)
-  await added.locator('[data-admin-save-text]').click()
-  await added.locator('text=Saved').first().waitFor()
+  await added.locator('[data-admin-save-name]').click()
+  await added.locator('text=Name saved').first().waitFor()
   await shot(page, '17d-new-product')
   const menu3 = await fetch(`${BASE}/api/menu?t=${Date.now()}`).then((r) => r.json())
   const o = menu3.overrides.find((x) => x.id === newId)

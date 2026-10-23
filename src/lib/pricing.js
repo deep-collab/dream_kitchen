@@ -220,7 +220,7 @@ export const clampQty = (q, lim = LIMITS) => Math.max(1, Math.min(lim.maxQtyPerI
 const money = (v) => (Number.isInteger(v) && v > 0 && v <= 100000 ? v : undefined)
 
 /** Limits for Hema's own names and descriptions (the admin checks the same) */
-export const PRODUCT_TEXT_MAX = { name: 60, description: 300 }
+export const PRODUCT_TEXT_MAX = { name: 60, description: 200 }
 /** The categories Hema can add products to (the Customize page's items stay in the config) */
 export const CUSTOM_CATEGORIES = ['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates']
 export const PRODUCT_ID_PATTERN = /^[a-z0-9][a-z0-9-]{1,59}$/
@@ -236,7 +236,7 @@ function textPair(v, max) {
 /**
  * A product Hema added in the admin (custom: true), before her prices are applied: everything
  * comes from its row. null for anything incomplete, so a bad row never reaches the menu.
- *   o: { id, custom: true, category, name: { en, kn }, description?, courierTier, sort?, price? | sizes? }
+ *   o: { id, custom: true, category, name: { en, kn }, description?, courierTier, sort?, price? | sizes?, ragiPrice? }
  */
 function customProduct(o) {
   const category = CATEGORIES.find((c) => c.id === o.category && CUSTOM_CATEGORIES.includes(c.id))
@@ -257,6 +257,8 @@ function customProduct(o) {
     active: true,
     soldOut: false,
     custom: true,
+    // A ragi version, if she gave it an extra price
+    ...(money(o.ragiPrice) ? { ragiPrice: o.ragiPrice } : {}),
     // The sizes' ids and tier; their prices and names come in with the rest of her changes
     ...(sized ? { sizes: o.sizes.filter((s) => s && typeof s.id === 'string').map((s) => ({ id: s.id, courierTier: tier })) } : {}),
   }

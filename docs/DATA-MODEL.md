@@ -13,7 +13,9 @@ Created by `supabase/migrations/20261005000001_init.sql`, `20261010000001_admin_
 | Menu, prices, options, courier rates and tiers, lead times, limits | `src/config/shop.js` (one file, shared by website and server) | Developer |
 | Classes, fees, slot times, seats default | `src/data/classInfo.js` | Developer |
 | Hema's changes to prices, sold out, hidden, tub sizes, photos, names, descriptions | `products` table (override columns) + `product-photos` bucket | Hema, admin → Menu |
-| Products Hema adds herself | `products` rows with `custom = true` (the row is the whole product) | Hema, admin → Menu → Add a new product |
+| Products Hema adds herself | `products` rows with `custom = true` (the row is the whole product) | Hema, admin → Menu → + Add new product |
+| Offers (banners on Home and Menu; display-only, never a price) | `offers` + `product-photos` bucket (`offer-<id>/…`) | Hema, admin → Offers |
+| Photos of the Customize tiles (and Home's Customize tile) | `page_photos` + `product-photos` bucket (`page-<tile>/…`) | Hema, admin → Menu → Customize page |
 | The daily keep-alive's last run | `heartbeat` (one row) | `netlify/functions/keep-alive.mjs` |
 | UPI, QR, lead times, courier rates, banner, shop open, alert email | `settings` table (override columns) | Hema, admin → Settings |
 | Class fees, slot times, seats per slot | `settings.class_settings` | Hema, admin → Classes → Fees & times |
@@ -43,8 +45,8 @@ A NULL override means "use the config value".
 | price_status | text, null | `live` / `coming-soon` (tubs) |
 | active, sold_out | bool, null | hidden / sold out |
 | photo_url | text, null | Hema's photo, the 1200px file (public `product-photos` bucket, https only); the 600px file is the same address with `-600` (src/lib/productPhoto.js) |
-| custom | bool | true = Hema added it in the admin: category, names, description, sizes or price and courier_tier all come from the row. Never deleted (Hide = active false), so old orders keep their product. Categories: the four menu ones only |
-| display_name, description | jsonb, null | `{ en, kn? }`: Hema's name / description (Kannada falls back to the English). NULL = the config's |
+| custom | bool | true = Hema added it in the admin: category, names, description, sizes or price, ragi_price (a ragi version, optional) and courier_tier all come from the row. Never deleted (Hide = active false), so old orders keep their product. Categories: the four menu ones only |
+| display_name, description | jsonb, null | `{ en, kn? }`: Hema's name / description (Kannada falls back to the English). Name up to 60 letters, description up to 200 (the website and the admin cut at the same lengths). NULL = the config's |
 | sort, image, updated_at | | |
 
 Seeded by `supabase/seed.sql` (= `node scripts/seed-menu.mjs --sql`), which fills only the
@@ -112,6 +114,27 @@ Like `order_events`, for bookings.
 `user_id` (→ `auth.users`), `email`, `last_seen_at`. Only accounts listed here can use the admin.
 After 30 days without activity the admin function refuses the login until a fresh log in.
 
+### `offers` (23 Oct 2026)
+| Column | Type | Meaning |
+|---|---|---|
+| id | uuid | |
+| title | jsonb `{ en, kn? }` | English needed (60 letters); Kannada optional (the English shows instead) |
+| message | jsonb, null | the short line under the title (120 letters) |
+| button | jsonb, null | button words (24 letters); null = "See offer" / "ಆಫರ್ ನೋಡಿ" |
+| link | text | `''` (no button), `category:<id>`, `product:<id>` or `page:customize` (checked against the menu by the admin) |
+| photo_url | text, null | banner photo, 1200px file (600px = same address with `-600`) |
+| starts_on, ends_on | date | Indian calendar dates, both days included; `ends_on >= starts_on` |
+| active | bool | the On/Off switch |
+
+Live = `active` and today in India between the two dates (`src/lib/offers.js`, the same rule as the
+RLS policy). `/api/menu` sends the switched-on offers that haven't ended and start today (or within
+10 minutes, for a cached copy at midnight); the website shows the live ones by today's Indian date,
+so an offer also starts and ends on time on a page left open. Offers never change a price.
+
+### `page_photos` (23 Oct 2026)
+`id` (the tile: `customize-box`, `customize-bar`, `home-customize`; `src/lib/offers.js` PAGE_PHOTOS),
+`photo_url` (1200px file, null = the product photo the tile always had), `updated_at`.
+
 ### `heartbeat` (one row, id = 1)
 `last_run_at`, `runs`. Written once a day by the keep-alive scheduled function, so the free Supabase
 project never pauses; shown on /admin/setup. RLS on with no policies: only the service role reads it.
@@ -123,9 +146,9 @@ project never pauses; shown on /admin/setup. RLS on with no policies: only the s
 
 | Who | Can |
 |---|---|
-| Public (anon / publishable key) | read `products` and the public columns of `settings`. Nothing else: no orders, bookings, events, blocks, messages, rate limits or admin users. |
+| Public (anon / publishable key) | read `products`, `page_photos`, the public columns of `settings`, and only the **live** rows of `offers`. Nothing else: no orders, bookings, events, blocks, messages, rate limits or admin users; no scheduled, ended or switched-off offers. |
 | Logged-in user who is not an admin | the same as the public (RLS policies need `is_admin()`); sign-ups are switched off anyway |
-| Admin (in `admin_users`) | read and update orders, bookings, blocks, messages, menu and settings |
+| Admin (in `admin_users`) | read and update orders, bookings, blocks, messages, menu and settings; add, change and delete offers and tile photos |
 | Netlify Functions (secret / service role key, server only) | everything, after checking and re-pricing the request |
 
 SQL functions `create_order`, `submit_payment`, `admin_update_order`, `create_booking`,
@@ -144,7 +167,7 @@ Storage:
 
 | Function | Who | What |
 |---|---|---|
-| `menu` (GET) | everyone | Hema's overrides (incl. photos) + public settings + whether Razorpay is on; cached 60 s at Netlify's edge |
+| `menu` (GET) | everyone | Hema's overrides (incl. photos) + public settings + whether Razorpay is on + her offers (switched on, not ended) and tile photos; cached 60 s at Netlify's edge, cleared after every admin change. If the offers can't be read (SQL not run yet) the menu still answers, without them |
 | `create-order` | customers | checks details, re-prices every item and the courier with `src/lib/pricing.js`, refuses tampered prices/totals, sold-out items, bad pincodes, too-early dates; idempotent; Razorpay order if its keys exist, else UPI |
 | `order` | customers | one order by code + phone (confirmation page, Track Order) |
 | `classes` (GET) | everyone | fees, slot times, the next 8 weekends and what is open (counts only); cached 30 s |

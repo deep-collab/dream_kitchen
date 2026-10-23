@@ -312,6 +312,10 @@
   from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: none; }
 }
+@keyframes dk-offer-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
 @keyframes dk-twinkle {
   0%, 100% { opacity: 0.15; transform: scale(0.7); }
   50% { opacity: 0.9; transform: scale(1); }
@@ -322,6 +326,7 @@
 @media (prefers-reduced-motion: no-preference) {
   .pop { animation: dk-pop 0.35s ease; }
   .dk-toast { animation: dk-toast-in 0.25s var(--ease-out-soft); }
+  .dk-offer-in { animation: dk-offer-in 0.35s var(--ease-out-soft); }
   .dk-drift { animation: dk-drift 48s ease-in-out infinite; will-change: transform; }
   .dk-sparkle { animation: dk-twinkle var(--dur, 6s) ease-in-out var(--delay, 0s) infinite; }
 }

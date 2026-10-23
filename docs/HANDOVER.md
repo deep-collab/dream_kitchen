@@ -58,6 +58,90 @@ Good to know:
 the photo storage. Changing photos already works before this; this writes the rule into the
 database itself as well.
 
+## Changing a product's name or description (23 Oct 2026)
+
+Admin → **Menu** → find the product. Under the prices are the buttons **Save**, **Mark sold out**,
+**Edit name**, **Description** and **Hide from menu**.
+
+- **Edit name**: type the English name (and the Kannada name if you like; empty = Kannada readers see
+  the English) → **Save name** → green **"Name saved. It is on the website now."**
+- **Description**: the short text customers see when they tap the product, above the choices. English,
+  and Kannada if you like. At most **200 letters**: the counter under the box shows how many are used
+  (it turns red when full) → **Save description**.
+- The product keeps its place, price, photo and old orders. Old orders keep the name they were
+  ordered under.
+- **Back to original** (on products from the first menu) puts the old name, description and prices back.
+
+## Adding a new product
+
+1. Admin → **Menu** → scroll to the section (Brownie Tubs, Delight Boxes, Brownies or Chocolates) →
+   at the bottom tap the big gold **+ Add new product**.
+2. Fill in: the name (English; Kannada optional), a short description, **one price** or **different
+   sizes, each with its price**, **ragi version** (No, or Yes and the extra price), the **courier
+   charge** (small or medium parcel), and a photo if you have one (no photo = the gold drawing).
+3. Tap **Add to menu** → **"Added. It is on the website menu now."**
+
+The website checks every price again on the server for every order, so a customer can never pay a
+wrong price. There is no Delete for products: **Hide from menu** takes one off the website and keeps
+old orders whole.
+
+## Photos on the Customize page
+
+Admin → **Menu** → the **Customize page** section (last, or tap **Customize page** at the top). Three
+photos, each with its own **Change photo** button:
+- the **"Delight Box with a name or a drawing"** tile on the Customize page,
+- the **"Drawing Chocolate Bar"** tile on the Customize page,
+- the **Customize** tile and the hand-drawn chocolates card on the **Home** page.
+
+Until you change one it shows the product photo it always had. **Use the product photo again** undoes
+it. Same as product photos: two sizes, live at once, only your admin login can change them.
+
+## Offers (new tab, 23 Oct 2026)
+
+The bottom bar of the admin is now **Home · Orders · Offers · Classes · Menu · More**.
+
+An offer is a black-and-gold banner at the **very top of the Home page** (and a slim strip at the top
+of the Menu page). **Offers only show a banner. They do not change prices.** If an offer has a special
+price, change the price yourself in **Menu** (and change it back when the offer ends).
+
+**Add an offer**
+1. Admin → **Offers** → **+ Add new offer**.
+2. **Title** (English; Kannada optional), a **short message** (optional, up to 120 letters).
+3. **Where the button goes**: a menu section (e.g. Delight Boxes), the Customize page, or one product.
+   **Button text** is optional (empty = "See offer"). Choose **No button** for a message only.
+4. **Start date** and **end date** (Indian time, both days included: from midnight at the start of the
+   first day to midnight at the end of the last).
+5. **Banner photo** (optional) and the **On** switch.
+6. Look at **How it looks on the website**, then **Add offer**.
+
+**The list** shows each offer with its state:
+- **Live**: on the website now. **Scheduled**: it starts on its start date by itself.
+- **Ended**: its end date has passed (it left the website by itself). **Off**: switched off.
+
+**Edit** changes anything. **Turn off** takes it off the website at once (Turn on puts it back).
+**Delete** asks "Are you sure?" first and cannot be undone.
+
+On the website: with more than one live offer they take turns every 6 seconds, with dots to pick one;
+tapping goes to the section or product. With no live offer, nothing shows.
+
+**Try it first** in the practice admin (`/admin/demo` → **Offers**): it has sample offers in every state.
+
+## One-time step for Jashwanth (23 Oct 2026): run the new database part
+
+Offers and the Customize photos need two new tables. **Until this is done the website works as
+before, just without offers** (and the admin's Offers page shows an error).
+
+1. Open **supabase.com** → log in → the **Dream Kitchen** project.
+2. Left menu → **SQL Editor** → **New query**.
+3. Open `supabase/setup-all.sql` (in the GitHub repository: the file → **Raw** → select all → copy).
+   Paste **all** of it into the editor.
+4. Tap **Run** (bottom right). It should say **Success. No rows returned**. It is safe to run again: it
+   never deletes orders or undoes Hema's prices.
+5. Check: open `/admin/setup`; every row should be green. Then admin → **Offers** opens without an error.
+
+(The new part alone is `supabase/migrations/20261023000001_offers_and_page_photos.sql`; running the
+whole `setup-all.sql` is simpler and does the same.)
+
 ## Forgot password
 
 1. On the log in page tap **Forgot password?**
@@ -106,7 +190,8 @@ Nothing breaks the orders already saved: they are in the database, and Hema can 
 
 **Hema does, in the admin (no developer needed):**
 - Orders and class bookings: every step, emails go out by themselves
-- Prices, sold out, hide/show, photos, names and descriptions, **new products**
+- Prices, sold out, hide/show, photos, names and descriptions, **new products**, the Customize page photos
+- **Offers**: banners on the website with start and end dates (they never change prices)
 - Courier charges, preparation days, class fees, times, seats and closed weekends
 - The order-alert email, a short notice on the website, closing the shop for a holiday
 

@@ -1,6 +1,6 @@
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
-import { useMenu } from '../context/MenuProvider'
+import { useMenu, usePagePhotos } from '../context/MenuProvider'
 import { optionPrices } from '../config/shop'
 import { formatINR, fromPrice, isForSale } from '../lib/pricing'
 import Container from '../components/ui/Container'
@@ -14,11 +14,13 @@ import 'virtual:dk-strings/menu'
 /**
  * The two ways to personalise (Hema): a Delight Box with a name or a drawing (opens that box's
  * sheet with the options in view), and the Drawing Chocolate Bar, which is listed only here.
+ * Each tile's photo can be changed in admin -> Menu -> Customize page (until then: the product photo).
  */
 export default function Customize() {
   useSeo('customize')
   const { t, pick } = useI18n()
   const menu = useMenu()
+  const pagePhotos = usePagePhotos()
   const { openProduct } = useShopSheets()
   const boxes = menu.products.filter((p) => p.category === 'delight-boxes')
   const bar = menu.productsById['drawing-chocolate-bar']
@@ -31,7 +33,7 @@ export default function Customize() {
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
         <section aria-labelledby="cz-box" className="rounded-card border border-line bg-[#fffcf5] p-4 sm:p-5">
           <div className="flex gap-4">
-            <ProductPhoto slug="red-velvet-delight-box" art="delight-box" eager sizes="112px" className="h-24 w-24 shrink-0 sm:h-28 sm:w-28" />
+            <ProductPhoto slug="red-velvet-delight-box" photo={pagePhotos['customize-box']} art="delight-box" eager sizes="112px" className="h-24 w-24 shrink-0 sm:h-28 sm:w-28" />
             <div className="min-w-0">
               <h2 id="cz-box" className="t-h3">
                 {t('customize.box.title')}
@@ -60,7 +62,7 @@ export default function Customize() {
         {bar && (
           <section aria-labelledby="cz-bar" className="rounded-card border border-line bg-[#fffcf5] p-4 sm:p-5">
             <div className="flex gap-4">
-              <ProductPhoto slug={bar.slug} art={bar.art} eager sizes="112px" className="h-24 w-24 shrink-0 sm:h-28 sm:w-28" />
+              <ProductPhoto slug={bar.slug} photo={pagePhotos['customize-bar']} art={bar.art} eager sizes="112px" className="h-24 w-24 shrink-0 sm:h-28 sm:w-28" />
               <div className="min-w-0">
                 <h2 id="cz-bar" className="t-h3">
                   {t('customize.bar.title')}
