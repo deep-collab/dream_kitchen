@@ -129,7 +129,16 @@ tapping goes to the section or product. With no live offer, nothing shows.
 ## One-time step for Jashwanth (23 Oct 2026): run the new database part
 
 Offers and the Customize photos need two new tables. **Until this is done the website works as
-before, just without offers** (and the admin's Offers page shows an error).
+before, just without offers** (and the admin's Offers page shows an error). Do it **before** the new
+code goes live. There are two ways, depending on where the website runs:
+
+**If the website runs on Cloudflare (Workers + D1, the new GitHub repo's `main`):** on the computer
+with the code, in the project folder, run `npm run d1:migrate -- --remote` (log in to Cloudflare first
+with `npx wrangler login` if it asks). It adds only the new part (`d1/migrations/0002_…`); orders and
+Hema's prices stay. Check `/admin/setup`: the database row is green. Details:
+`docs/CLOUDFLARE-D1-SETUP.md`, step 2.4b.
+
+**If the website runs on Netlify + Supabase:**
 
 1. Open **supabase.com** → log in → the **Dream Kitchen** project.
 2. Left menu → **SQL Editor** → **New query**.

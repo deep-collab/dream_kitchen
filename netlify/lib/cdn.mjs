@@ -2,8 +2,8 @@
 // edge for a minute (tag "menu", functions/menu.mjs), and the admin function clears that copy after
 // every change to the menu or the settings. Clearing is a bonus: if it fails, the change is saved
 // anyway and the edge copy runs out within a minute, as before. Netlify gives every function the
-// key it needs (NETLIFY_PURGE_API_TOKEN, SITE_ID); nothing to set up.
-import { purgeCache } from '@netlify/functions'
+// key it needs (NETLIFY_PURGE_API_TOKEN, SITE_ID); nothing to set up. On Cloudflare (D1) there is
+// no such edge copy of /api/menu, and the Netlify library is loaded only when it is needed.
 import { backendMode } from './env.mjs'
 
 export const MENU_CACHE_TAG = 'menu'
@@ -11,6 +11,7 @@ export const MENU_CACHE_TAG = 'menu'
 export async function menuChanged() {
   if (backendMode() !== 'supabase') return false // local dev and tests: there is no edge copy
   try {
+    const { purgeCache } = await import('@netlify/functions')
     await purgeCache({ tags: [MENU_CACHE_TAG] })
     return true
   } catch (e) {

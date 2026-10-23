@@ -1,4 +1,8 @@
-# Data model (Supabase)
+# Data model (Supabase, and the same on Cloudflare D1)
+
+On Cloudflare the same tables live in D1 (SQLite): `d1/migrations/0001_init.sql` + `0002_products_text_offers_page_photos.sql`,
+JSON columns as JSON text, booleans as 1/0. There is no Row Level Security in D1: nothing reaches it except through the Worker,
+which checks Hema's admin login for every admin action (`netlify/lib/store/d1.mjs`).
 
 Created by `supabase/migrations/20261005000001_init.sql`, `20261010000001_admin_complete.sql` and
 `20261015000001_launch.sql` (all three, plus the menu seed, in one file: `supabase/setup-all.sql`, written by

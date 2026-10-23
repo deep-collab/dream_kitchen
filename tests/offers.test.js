@@ -184,6 +184,14 @@ describe('admin -> Offers', () => {
     expect(m.status).toBe(200)
     expect(m.body).toMatchObject({ ready: true, offers: [], pagePhotos: {} })
   })
+
+  it('…and also on a database whose store has no offers at all yet (it must never take the menu down)', async () => {
+    store.listOffers = undefined
+    store.listPagePhotos = undefined
+    const m = await call(menuFn, null, { method: 'GET' })
+    expect(m.status).toBe(200)
+    expect(m.body).toMatchObject({ ready: true, offers: [], pagePhotos: {} })
+  })
 })
 
 describe('admin -> Menu -> Customize page photos', () => {

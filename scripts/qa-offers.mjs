@@ -270,7 +270,8 @@ try {
       await ready(p)
       const img = p.locator(`img[src*="page-customize-box"]`)
       await img.waitFor({ state: 'attached', timeout: 10000 })
-      check(await img.evaluate((i) => i.complete && i.naturalWidth > 0), `${tag}: the Customize tile shows Hema's photo`, `${tag}: Customize tile photo not loaded`)
+      const loaded = await p.waitForFunction(() => [...document.querySelectorAll('img[src*="page-customize-box"]')].some((i) => i.complete && i.naturalWidth > 0), null, { timeout: 10000 }).then(() => true, () => false)
+      check(loaded, `${tag}: the Customize tile shows Hema's photo`, `${tag}: Customize tile photo not loaded`)
       await audit(p, `site ${tag} customize`)
       await shot(p, `22-customize-${tag}`)
       if (width === 390 && lang === 'en') {

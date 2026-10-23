@@ -7,6 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "deploy": "npm run build && node -e \"import('node:fs').then(fs => { if (fs.existsSync('dist/_redirects')) fs.unlinkSync('dist/_redirects') })\" && wrangler deploy",
+    "dev:worker": "wrangler dev",
+    "d1:setup": "node scripts/d1-setup.mjs",
+    "d1:migrate": "wrangler d1 migrations apply DB",
+    "d1:migrate:local": "wrangler d1 migrations apply DB --local",
+    "d1:admin": "node scripts/d1-admin.mjs",
     "brand": "node scripts/make-brand-assets.mjs",
     "test": "vitest run"
   },
@@ -22,11 +28,13 @@
     "@electric-sql/pglite": "^0.5.8",
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.1.1",
+    "better-sqlite3": "^12.11.1",
     "playwright": "^1.63.0",
     "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
     "vite": "^8.3.2",
-    "vitest": "^5.0.3"
+    "vitest": "^5.0.3",
+    "wrangler": "^4.86.0"
   },
   "optionalDependencies": {
     "ffmpeg-static": "^5.3.0"

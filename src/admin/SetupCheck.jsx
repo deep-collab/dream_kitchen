@@ -3,8 +3,16 @@ import { isDemo, adminCall } from './api'
 import { Btn, card, ErrorText, Loading, PageTitle } from './ui'
 import { AlertIcon, CheckIcon } from '../components/icons'
 
-// What to do for each problem, in plain words. "Step N" = docs/SETUP-BACKEND.md.
+// What to do for each problem, in plain words. "Step N" = docs/SETUP-BACKEND.md (Supabase + Netlify);
+// the Cloudflare D1 steps are in docs/CLOUDFLARE-D1-SETUP.md.
 const FIX = {
+  database: {
+    unreachable: 'Cloudflare D1 doesn’t answer. Check the DB binding in wrangler.toml (docs/CLOUDFLARE-D1-SETUP.md).',
+    noTables: 'The database setup hasn’t been run yet: npm run d1:migrate -- --remote, then the menu seed (docs/CLOUDFLARE-D1-SETUP.md).',
+    noUpdate: 'The newest database part is missing: npm run d1:migrate -- --remote (it runs only the new parts).',
+    noBucket: 'Photo storage is missing (docs/CLOUDFLARE-D1-SETUP.md).',
+    noAdmin: 'No admin login yet: npm run d1:admin <email> <password> (docs/CLOUDFLARE-D1-SETUP.md).',
+  },
   supabase: {
     noUrl: 'SUPABASE_URL is missing in Netlify. Setup guide, steps 2–5.',
     noServiceKey: 'The Supabase secret key is missing in Netlify. Setup guide, step 5.',
@@ -31,9 +39,9 @@ const FIX = {
   keepAlive: {
     never: 'It hasn’t run yet. It runs every morning at 9:00. To run it now: Netlify → Logs → Functions → keep-alive → Run now (setup guide, step 8).',
     late: 'It hasn’t run for over 2 days. Open Netlify → Logs → Functions → keep-alive to see why, and tap Run now.',
-    noDatabase: 'Needs the database first (Supabase, above).',
+    noDatabase: 'Needs the database first (above).',
   },
-  address: { mismatch: 'Netlify’s main address is not the one in the website’s code (site.url in src/config/site.js). Links in Google, the sitemap and shared links use the code’s one. Setup guide, step 1.' },
+  address: { mismatch: 'The address the website is served from (Netlify’s main domain, or SITE_URL on Cloudflare) is not the one in the website’s code (site.url in src/config/site.js). Links in Google, the sitemap and shared links use the code’s one. Setup guide, step 1.' },
 }
 
 const DEMO = {
@@ -79,7 +87,7 @@ export default function SetupCheck() {
   }, [load])
 
   const rows = data && [
-    ['supabase', 'Supabase (database, logins, photos)', data.supabase],
+    data.database?.d1 ? ['database', 'Cloudflare D1 (database, logins, photos)', data.database] : ['supabase', 'Supabase (database, logins, photos)', data.supabase],
     ['resend', 'Resend (emails)', data.resend],
     ['razorpay', 'Razorpay (online payments)', data.razorpay],
     ['email', 'Order alert email', data.email],
@@ -88,13 +96,14 @@ export default function SetupCheck() {
     ['address', 'Website address', data.address],
   ].filter(([, , x]) => x)
   const note = (k, x) => {
-    if (k === 'supabase' && x.practice) return 'Practice database on this computer (not the live one).'
+    if ((k === 'supabase' || k === 'database') && x.practice) return 'Practice database on this computer (not the live one).'
+    if (k === 'keepAlive' && x.notNeeded) return 'Not needed: Cloudflare D1 never pauses.'
     if (k === 'razorpay' && x.ok && x.testMode) return 'TEST keys: everything works, but real customers can’t pay. Swap in the live keys (step 9.5) when ready.'
     if (k === 'razorpay' && x.ok) return 'Live. Payments are confirmed automatically.'
     if (k === 'upi' && x.notNeeded) return 'Not needed: Razorpay is on.'
     if (k === 'upi' && x.set) return 'Set. Used only while Razorpay isn’t set up.'
     if (k === 'keepAlive' && x.lastRunAt) return `Last run: ${new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(x.lastRunAt))}${x.runs ? ` (${x.runs} runs so far)` : ''}.`
-    if (k === 'address') return x.served && !x.ok ? `Code: ${x.url}. Netlify: ${x.served}.` : `${x.url}`
+    if (k === 'address') return x.served && !x.ok ? `Code: ${x.url}. Served from: ${x.served}.` : `${x.url}`
     return x.ok ? 'Ready.' : null
   }
   return (

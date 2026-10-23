@@ -1,15 +1,30 @@
 // Which backend the functions use, and the few settings that live in environment variables.
-// Every secret is a Netlify environment variable (docs/SETUP-BACKEND.md); none is in the code.
+// In Cloudflare Workers, bindings and secrets come from env; in Node/local dev they come from process.env.
 //
-//   supabase  SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are set: the real database
+//   d1        DB binding (Cloudflare D1) is set: Cloudflare Workers + D1 database
+//   supabase  SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are set: Supabase database
 //   mock      DK_MOCK_BACKEND=1 (local dev and tests only): an in-memory / file store
 //   missing   anything else (e.g. deployed before setup): ordering answers "not set up yet",
 //             so orders are never silently kept in memory and lost
 import { site } from '../../src/config/site.js'
 
-const env = (name) => (typeof process !== 'undefined' ? process.env[name] : undefined) || ''
+let workerEnv = null
+
+export function setWorkerEnv(env) {
+  workerEnv = env
+}
+
+export function getWorkerEnv() {
+  return workerEnv
+}
+
+const env = (name) => {
+  if (workerEnv && workerEnv[name] !== undefined) return String(workerEnv[name] || '').trim()
+  return ((typeof process !== 'undefined' ? process.env[name] : undefined) || '').trim()
+}
 
 export function backendMode() {
+  if (workerEnv?.DB || (typeof process !== 'undefined' && process.env?.DK_D1_DATABASE)) return 'd1'
   if (env('SUPABASE_URL') && env('SUPABASE_SERVICE_ROLE_KEY')) return 'supabase'
   if (env('DK_MOCK_BACKEND') === '1') return 'mock'
   return 'missing'
@@ -25,9 +40,9 @@ export const config = {
   get anonKey() {
     return env('SUPABASE_ANON_KEY')
   },
-  /** The live site address: Netlify's own URL variable, else the config */
+  /** The live site address: SITE_URL, Netlify's URL variable, or site config */
   get siteUrl() {
-    return (env('URL') || site.url).replace(/\/$/, '')
+    return (env('SITE_URL') || env('URL') || site.url).replace(/\/$/, '')
   },
   /** Where new-order and enquiry emails go (admin Settings can override it): HEMA_EMAIL, else the site's email */
   get hemaEmail() {
@@ -48,7 +63,7 @@ export const config = {
     const keySecret = env('RAZORPAY_KEY_SECRET')
     return { enabled: Boolean(keyId && keySecret), keyId, keySecret, webhookSecret: env('RAZORPAY_WEBHOOK_SECRET') }
   },
-  /** Local dev only: the mock store's admin login (never used with Supabase) */
+  /** Local dev only: the mock store's admin login (never used with Supabase or D1) */
   get devAdmin() {
     return { email: env('DK_DEV_ADMIN_EMAIL'), password: env('DK_DEV_ADMIN_PASSWORD') }
   },

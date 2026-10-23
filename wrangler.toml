@@ -1,0 +1,28 @@
+name = "dream-kitchen"
+main = "src/worker/index.mjs"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+html_handling = "none"
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dream-kitchen-db"
+database_id = "cea7c10e-43e7-4200-9845-8fcd86be29eb"
+migrations_dir = "d1/migrations"
+
+[vars]
+SITE_URL = "https://dream-kitchen.workers.dev"
+
+# Production secrets: set via `npx wrangler secret put <NAME>`:
+# - RESEND_API_KEY: Resend API key (re_...)
+# - EMAIL_FROM: e.g. "Dream Kitchen <orders@dreamkitchen.in>"
+# - HEMA_EMAIL: email address to receive order and enquiry notifications
+# - UPI_ID: fallback UPI ID (e.g. dreamkitchen@okaxis)
+# - RAZORPAY_KEY_ID: Razorpay Key ID
+# - RAZORPAY_KEY_SECRET: Razorpay Key Secret
+# - RAZORPAY_WEBHOOK_SECRET: Razorpay Webhook Secret

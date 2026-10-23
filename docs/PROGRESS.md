@@ -2,6 +2,22 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 23 Oct 2026 (later): the new repo, and everything on Cloudflare D1 too (branch pre-main)
+The repo moved to github.com/deep-collab/dream_kitchen. Its `main` had split off on 10 Oct and moved to a Cloudflare Worker +
+D1 (deep-collab, 16 Oct), without the 11–23 Oct work. `pre-main` = all of our work + that `main`, merged:
+- [x] Conflicts (CLAUDE.md, package.json/-lock, setup-check function and page) resolved keeping both: D1 row + our keep-alive
+  (not needed on D1) and address rows; our Setup check page (theirs called `card()` as a function and would not open)
+- [x] package.json: `@cloudflare/workerd-darwin-arm64` was a required dependency (Apple Mac only: `npm install` fails elsewhere);
+  removed, wrangler brings the right one. `@netlify/functions` kept (loaded only on Netlify, `netlify/lib/cdn.mjs`)
+- [x] D1 had only the 10 Oct features: `d1/migrations/0002_products_text_offers_page_photos.sql` (Hema's own products,
+  names, descriptions, offers, tile photos, with CHECK rules like Supabase's) and the store methods in `d1.mjs`. Also fixed in
+  D1: saving a name or photo no longer wipes the other columns (upsert sets only the given ones), and a Razorpay payment
+  now keeps its payment ID and method (they were dropped)
+- [x] `/api/menu` can't be taken down by a missing offers part (it crashed with 500 on D1 before the store had offers)
+- [x] Checks: 369 tests (tests/d1-features.test.js: the whole admin flow through the Worker on real SQLite; 0002 on a
+  database in use keeps orders and prices); `wrangler deploy --dry-run` builds; in Cloudflare's local runtime
+  (`wrangler dev`, local D1 with both migrations): qa-offers 54/54, qa-admin 24/24; on Netlify-style dev: qa-offers 54/54
+
 ## 23 Oct 2026: offers, Edit name / Description, + Add new product, Customize photos (branch hema-admin-offers)
 Hema's requests via the owner. Found first: commit 8fa479b already had name/description editing (folded away in "Edit name and description" under each card, no counter) and one "Add a new product" button at the top of Menu (no ragi); the Customize page's Delight Box tile borrowed the Red Velvet Delight Box photo, so it couldn't be changed on its own.
 - [x] Menu cards: **Edit name** and **Description** buttons next to Save / Mark sold out (own small editors, English + Kannada, counters; description max 200, was 300; `PRODUCT_TEXT_MAX`). The product ID never changes
