@@ -16,9 +16,10 @@ a `.env` (see `.env.example`) with `DK_DEV_ADMIN_EMAIL`, `DK_DEV_ADMIN_PASSWORD`
 
 ## Checks
 ```
-npm test                          # 251 tests: prices, courier, cart, server, database security
+npm test                          # 355 tests: prices, courier, cart, server, database security, offers
 node scripts/check-i18n.mjs       # English/Kannada strings
 node scripts/qa-step6.mjs         # browser QA (dev server running; see the top of the file)
+node scripts/qa-offers.mjs        # browser QA: names, new products, tile photos, offers (fresh practice database)
 npm run build && node scripts/check-secrets.mjs
 node scripts/bundle-report.mjs after    # with `npx vite preview --port 4173` running
 ```

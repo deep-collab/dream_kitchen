@@ -6,7 +6,7 @@
   Inputs come from src/config/shop.js (with Hema's admin changes applied by applyOverrides /
   applySettings). All amounts are whole rupees.
 */
-import { courier as COURIER, leadTimes as LEAD_TIMES, limits as LIMITS, optionPrices as OPTION_PRICES, payment as PAYMENT } from '../config/shop.js'
+import { categories as CATEGORIES, courier as COURIER, leadTimes as LEAD_TIMES, limits as LIMITS, optionPrices as OPTION_PRICES, payment as PAYMENT } from '../config/shop.js'
 
 const inr = new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 })
 
@@ -218,23 +218,63 @@ export const clampQty = (q, lim = LIMITS) => Math.max(1, Math.min(lim.maxQtyPerI
 /* ======================= Hema's admin changes ======================= */
 
 const money = (v) => (Number.isInteger(v) && v > 0 && v <= 100000 ? v : undefined)
+const text = (v, max) => (typeof v === 'string' ? clean(v).slice(0, max) : '')
+
+// Hema's own words for a product: names up to 80 letters, descriptions up to 200
+export const textLimits = { name: 80, description: 200 }
+// Products Hema adds herself: id = letters, digits and dashes (made from the name by the admin)
+export const ADDED_ID = /^[a-z0-9][a-z0-9-]{1,79}$/
+
+/** The start of a product Hema added in the admin (prices, sizes and the rest come from the override) */
+function addedBase(o, configIds) {
+  const category = CATEGORIES.find((c) => c.id === o.category)
+  if (o.added !== true || !category || typeof o.id !== 'string' || !ADDED_ID.test(o.id) || configIds.has(o.id)) return null
+  if (text(o.name?.en, textLimits.name).length < 2) return null
+  return {
+    id: o.id,
+    slug: o.id,
+    category: category.id,
+    sort: Number.isInteger(o.sort) ? o.sort : 100,
+    name: { en: text(o.name.en, textLimits.name) },
+    art: category.art, // the gold drawing until she adds a photo
+    courierTier: COURIER.tiers.includes(o.courierTier) ? o.courierTier : COURIER.tiers[0],
+    priceStatus: 'live',
+    options: {},
+    active: true,
+    soldOut: false,
+    added: true,
+    ...(category.id === 'customize' ? { menu: false } : {}),
+  }
+}
 
 /**
  * The config menu with Hema's admin changes on top. Both sides call this with the same rows,
  * so they price the same menu. Only known fields with sane values are taken.
- *   overrides: [{ id, price?, ragiPrice?, sizes?: [{ id, grams?, label?, price }], soldOut?, active?, priceStatus?, photo? }]
+ *   overrides: [{ id, price?, ragiPrice?, sizes?: [{ id, grams?, label?, price }], soldOut?, active?, priceStatus?, photo?,
+ *                 name?: { en, kn }, description?: { en, kn } }]
  * Sizes: a product with sizes gets new prices for them; a tub may get its sizes defined (Hema
  * sends tub sizes later). Courier tiers always come from the config.
+ * Products Hema added herself come as overrides with { added: true, category, courierTier, sort }:
+ * they are put after the config products and priced by exactly the same rules.
  */
 export function applyOverrides(products, overrides = []) {
-  const byId = new Map((overrides || []).filter((o) => o && o.id).map((o) => [o.id, o]))
-  return products.map((p) => {
+  const list = (overrides || []).filter((o) => o && o.id)
+  const byId = new Map(list.map((o) => [o.id, o]))
+  const configIds = new Set(products.map((p) => p.id))
+  const added = list.map((o) => addedBase(o, configIds)).filter(Boolean)
+  return [...products, ...added].map((p) => {
     const o = byId.get(p.id)
     if (!o) return p
     const next = { ...p }
+    // Hema's name (the id stays the same) and description; an empty description hides it
+    if (o.name && text(o.name.en, textLimits.name).length >= 2) next.name = { en: text(o.name.en, textLimits.name), kn: text(o.name.kn, textLimits.name) }
+    if (o.description && typeof o.description.en === 'string') {
+      const en = text(o.description.en, textLimits.description)
+      next.description = en ? { en, kn: text(o.description.kn, textLimits.description) } : null
+    }
     if (money(o.price) && !hasSizes(p)) next.price = o.price
-    if (money(o.ragiPrice) && hasRagi(p)) next.ragiPrice = o.ragiPrice
-    if (Array.isArray(o.sizes) && o.sizes.length && (hasSizes(p) || p.category === 'brownie-tubs')) {
+    if (money(o.ragiPrice) && (hasRagi(p) || p.added)) next.ragiPrice = o.ragiPrice
+    if (Array.isArray(o.sizes) && o.sizes.length && (hasSizes(p) || p.category === 'brownie-tubs' || p.added)) {
       const sizes = o.sizes
         .filter((s) => s && typeof s.id === 'string' && /^[a-z0-9-]{1,20}$/.test(s.id) && money(s.price))
         .slice(0, 6)

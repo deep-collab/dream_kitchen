@@ -98,6 +98,13 @@ export const categories = [
   { id: 'customize', sort: 9, art: 'drawing-bar', name: { en: 'Customize', kn: 'ಕಸ್ಟಮೈಸ್' }, hidden: true },
 ]
 
+/* ---------------- Customize page tiles (Hema can change their photos in admin -> Menu) ---------------- */
+// photoOf: the product whose photo the tile shows until Hema gives the tile its own.
+export const customizeTiles = [
+  { id: 'delight-box', photoOf: 'red-velvet-delight-box', art: 'delight-box', adminName: 'Delight Box with a name or a drawing' },
+  { id: 'drawing-bar', photoOf: 'drawing-chocolate-bar', art: 'drawing-bar', adminName: 'Drawing Chocolate Bar' },
+]
+
 /* ---------------- Brownie ingredients (Hema confirmed; names only, never quantities) ---------------- */
 const BROWNIE_BASE = [
   { en: 'Maida (refined flour)', kn: 'ಮೈದಾ (ಸಂಸ್ಕರಿಸಿದ ಹಿಟ್ಟು)' },

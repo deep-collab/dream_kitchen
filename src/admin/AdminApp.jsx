@@ -9,12 +9,13 @@ import PackingSlip from './PackingSlip'
 import Classes from './Classes'
 import BookingDetail from './BookingDetail'
 import MenuAdmin from './MenuAdmin'
+import OffersAdmin from './OffersAdmin'
 import SettingsAdmin from './SettingsAdmin'
 import Enquiries from './Enquiries'
 import Reports from './Reports'
 import More from './More'
 import SetupCheck from './SetupCheck'
-import { AlertIcon, ClassesIcon, HomeIcon, MenuIcon, ShopIcon, TruckIcon } from '../components/icons'
+import { AlertIcon, ClassesIcon, HomeIcon, MenuIcon, ShopIcon, TagIcon, TruckIcon } from '../components/icons'
 
 const WARNINGS = {
   paymentsOff: { text: 'Customers can’t pay online yet: add the Razorpay keys (see Setup check), or your UPI ID in Settings.', to: '/setup' },
@@ -102,6 +103,7 @@ function Shell({ me, refreshMe }) {
           <Route index element={<Home />} />
           <Route path="orders" element={<Orders />} />
           <Route path="orders/:code" element={<OrderDetail />} />
+          <Route path="offers" element={<OffersAdmin />} />
           <Route path="classes" element={<Classes />} />
           <Route path="classes/bookings/:code" element={<BookingDetail />} />
           <Route path="menu" element={<MenuAdmin />} />
@@ -115,10 +117,11 @@ function Shell({ me, refreshMe }) {
         </Routes>
       </main>
       <nav aria-label="Admin" className="fixed inset-x-0 bottom-0 z-30 border-t border-gold/45 bg-ink pb-[env(safe-area-inset-bottom)]">
-        <ul className="mx-auto grid h-16 max-w-3xl grid-cols-5">
+        <ul className="mx-auto grid h-16 max-w-3xl grid-cols-6">
           {[
             ['/', 'Home', HomeIcon],
             ['/orders', 'Orders', TruckIcon],
+            ['/offers', 'Offers', TagIcon],
             ['/classes', 'Classes', ClassesIcon],
             ['/menu', 'Menu', ShopIcon],
             ['/more', 'More', MenuIcon],

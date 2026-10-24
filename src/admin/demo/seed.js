@@ -64,6 +64,9 @@ export async function seedDemo(store, setClock) {
 
   await store.updateSettings({ upi_id: 'dreamkitchen@okaxis', upi_name: 'Dream Kitchen', alert_email: 'hema@example.com', class_settings: { seats: 8 } })
   await store.upsertProducts([{ id: 'pista-bar', slug: 'pista-bar', category: 'chocolates', name_en: 'Pista Bar', sold_out: true }])
+  // Two sample offers: one live this week, one that starts later
+  await store.insertOffer({ title_en: 'Diwali gift boxes', title_kn: 'ದೀಪಾವಳಿ ಉಡುಗೊರೆ ಬಾಕ್ಸ್‌ಗಳು', message_en: 'Any Delight Box can carry a name for free, or a drawing.', button_en: 'See Delight Boxes', link_type: 'category', link_id: 'delight-boxes', starts_on: today, ends_on: addDaysISO(today, 7), active: true })
+  await store.insertOffer({ title_en: 'Christmas brownies', message_en: 'Assorted Brownies, 5 pieces in every box.', button_en: 'Order now', link_type: 'product', link_id: 'assorted-brownies', starts_on: addDaysISO(today, 30), ends_on: addDaysISO(today, 40), active: true })
 
   const ref = await samplePhoto()
   const refPath = 'refs/demo/0b0c8f5e-6a43-4f43-9a0e-2d6f2f1b7c11.png'

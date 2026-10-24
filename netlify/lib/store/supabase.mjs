@@ -46,6 +46,9 @@ export function createSupabaseStore({ url, serviceKey, anonKey, fetchImpl = glob
   const term = (q) => String(q).replace(/[^\p{L}\p{N} -]/gu, '').trim().slice(0, 40)
   // PostgREST answers a function that returns a row type with its fields all null when nothing matched
   const rowOrNull = (r) => (r && r.id ? r : null)
+  const unsupported = () => {
+    throw new DbError('0A000', 'not available on the Supabase backend (Cloudflare D1 only)')
+  }
 
   return {
     kind: 'supabase',
@@ -53,7 +56,19 @@ export function createSupabaseStore({ url, serviceKey, anonKey, fetchImpl = glob
     /* ---------- menu and settings ---------- */
     listProducts: () => rest('products?select=*&order=category.asc,sort.asc'),
     upsertProducts: (rows) => rest('products?on_conflict=id', { method: 'POST', body: rows, headers: { prefer: 'resolution=merge-duplicates,return=minimal' } }),
-    updateProduct: async (id, patch) => one(await rest(`products?id=${eq(id)}`, { method: 'PATCH', body: patch, headers: returning })),
+    updateProduct: async (id, patch) => {
+      if (patch.extras) unsupported()
+      return one(await rest(`products?id=${eq(id)}`, { method: 'PATCH', body: patch, headers: returning }))
+    },
+    // Names, descriptions, added products, offers and tile photos (24 Oct 2026) exist only on
+    // Cloudflare D1 (d1/migrations/0002_menu_text_offers.sql). Here the shop simply has none.
+    insertProduct: async () => unsupported(),
+    listOffers: async () => [],
+    insertOffer: async () => unsupported(),
+    updateOffer: async () => unsupported(),
+    deleteOffer: async () => unsupported(),
+    listTilePhotos: async () => [],
+    setTilePhoto: async () => unsupported(),
     getSettings: async () => one(await rest('settings?id=eq.1&select=*')),
     updateSettings: async (patch) => one(await rest('settings?id=eq.1', { method: 'PATCH', body: patch, headers: returning })),
 

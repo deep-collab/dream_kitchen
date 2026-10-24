@@ -2,6 +2,24 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 24 Oct 2026: names, descriptions, new products, tile photos, offers (branch pre-main)
+- [x] Database: `d1/migrations/0002_menu_text_offers.sql`, new tables only (`product_extras`, `tile_photos`, `offers`); nothing existing altered or deleted. Must run on the live D1 before deploying (the D1 store falls back to "none yet" if it hasn't)
+- [x] Admin → Menu: **Edit name** and **Description** (EN + KN, 80 / 200 letters with a counter) on every product; the id never changes, old orders keep their snapshot name; "Back to original" also resets them
+- [x] Admin → Menu: **+ Add new product** under each category (name, description, one price or up to 6 sizes, ragi + extra, courier Small/Large, optional photo, gold drawing otherwise). Added products are overrides with `added: true`, built by the shared `applyOverrides`, so `/api/create-order` prices them from the database like any other
+- [x] Admin → Menu → Customize page: **Change photo** for the Delight Box and Drawing Chocolate Bar tiles; products added to "Customize page" show there as their own tiles
+- [x] Admin → **Offers** tab (between Orders and Classes): add / edit / on-off / delete (with a confirm); title, message, wide banner photo, button + target (category or product), start/end dates in IST. Home: rotating banner under the hero (6 s, pauses on touch/hover/focus, none with reduced motion); Menu: slim strip. Display only
+- [x] Cart: a product Hema added isn't treated as "removed" before `/api/menu` arrives; `/menu?item=<added product>` waits for it too
+
+### Tests and checks (24 Oct)
+- `npm test`: 355 (28 new in `tests/menu-offers.test.js`: shared pricing, rename/description, add product incl. server re-pricing and tampered/stale prices, tile photos, offers incl. IST end-of-day, migration 0002 on a live-like D1 run twice with orders/prices/settings unchanged, the store before the migration)
+- `node scripts/qa-offers.mjs` (new): admin flows at 390 px + shop at 390 / 1280 × EN / KN: 23 flows, 0 problems
+- `node scripts/qa-step6.mjs`: 0 problems. `node scripts/qa-admin.mjs`: all flows ok, but it can't finish on `main` either: the Setup check page crashes (`card is not a function` in `src/admin/SetupCheck.jsx`, from the D1 migration commit) and lost its `data-admin-setup` marker. Not fixed here
+- check-i18n clean; build + check-secrets clean
+
+### Known and accepted
+- The offer banner sits right under the hero (not above it): it arrives with `/api/menu` after the first paint, and above the hero it would push the logo and the loading screen's hand-off
+- Kannada for the new admin-made text is whatever Hema types; the 6 new website strings (offers, "Choose {price}") need her proofreading
+
 ## 10 Oct 2026: the complete admin, connected end to end (branch admin-complete)
 - [x] Database: migration `20261010000001_admin_complete.sql` (class bookings + history, closed weekends/slots, seats under a lock in `create_booking`, product photos in a public bucket, refund note and paid_at, general messages, alert email and class settings hidden from the public, admin last activity, a 750 g courier tier). One file for the owner: `supabase/setup-all.sql` (tested: runs twice in a fresh Postgres)
 - [x] Login: Supabase Auth, only `admin_users` (Hema + owner); Forgot password (Supabase link → /admin/reset); 30 days unused → log in again (checked on the server and the phone); Log out; new Supabase `sb_secret_` keys supported

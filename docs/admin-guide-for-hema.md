@@ -135,13 +135,44 @@ again, tap **Back in stock**.
 
 - **Hide from menu** / **Show on menu**: takes a product off the website completely, or brings it
   back.
-- **Back to original**: undoes your price changes for that product.
+- **Back to original**: undoes your changes for that product (prices, name and description).
+- **Edit name**: the name in English and in Kannada. Tap **Save name**. Old orders keep the name
+  they were ordered with; photos and prices stay as they are.
+- **Description**: a short line shown on the product's page, in English and Kannada (up to 200
+  letters; the counter under the box shows how many you have used). Leave it empty for none. If
+  the Kannada box is empty, Kannada readers see the English.
 - **Change photo**: take a photo or pick one from your gallery. The admin makes it the right size
   by itself; wait for **"Photo saved"**. A square photo with the product in the middle looks best.
   **Use the old photo** puts the previous one back.
 - **Brownie Tubs** (for example the **Dream Cake Tub**): type each size (for example "500 g") and
   its price, tap **+ Add a size** for more, tick **Show prices and allow ordering**, then **Save**.
   Until then the website says "Price coming soon".
+
+**A new product:** at the bottom of each category, tap **+ Add new product**. Fill in the name
+(Kannada is optional), a description if you like, then either **One price** or **Sizes with
+prices**, whether it **can be made with ragi** (and the ragi extra), and the **Courier size**
+(Small for up to 250 g, Large for 500–700 g). A photo is optional: without one the website shows a
+gold drawing. Tap **Add to the menu**: it is on the website straight away. You can change it later
+like any other product, or **Hide from menu**.
+
+**Customize page tiles:** under **Customize page** you can **Change photo** for the "Delight Box
+with a name or a drawing" tile and the "Drawing Chocolate Bar" tile. **Use the old photo** goes
+back. A product you add to "Customize page" shows there as its own tile.
+
+---
+
+## 4b. Offers
+
+The **Offers** tab (between Orders and Classes). An offer is a banner at the top of the home page
+(several take turns) and a slim strip on the menu page. **Offers never change a price.**
+
+- **+ Add new offer**: a title, a short message (Kannada optional for both), a banner photo if you
+  like (a wide photo works best), the **button text** and **where it goes** (a category or a
+  product), the **start and end dates** (Indian time; both days included) and **On**. Tap
+  **Add offer**.
+- **Edit** changes it; **Turn off** / **Turn on** hides or shows it without deleting it.
+- **Delete** asks "Delete this offer?" first. **Yes, delete it** removes it for good.
+- Each offer says **Live now**, **Starts later**, **Ended** or **Off**. No live offers = no banner.
 
 ---
 

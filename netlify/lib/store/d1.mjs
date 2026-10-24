@@ -41,16 +41,31 @@ export async function verifyPassword(password, saltHex, expectedHashHex) {
   return timingSafeEqualStr(hash, expectedHashHex)
 }
 
+const EXTRA_COLUMNS = ['name_en', 'name_kn', 'description_en', 'description_kn']
+
 function parseProduct(row) {
   if (!row) return null
+  // product_extras columns come joined in as x_*: Hema's name and description, and `added`
+  const { x_id, x_name_en, x_name_kn, x_description_en, x_description_kn, x_added, ...rest } = row
   return {
-    ...row,
+    ...rest,
     sizes: row.sizes ? JSON.parse(row.sizes) : null,
     options: row.options ? JSON.parse(row.options) : {},
     active: row.active === null || row.active === undefined ? null : Boolean(row.active),
     sold_out: row.sold_out === null || row.sold_out === undefined ? null : Boolean(row.sold_out),
+    extras: x_id ? { name_en: x_name_en ?? null, name_kn: x_name_kn ?? null, description_en: x_description_en ?? null, description_kn: x_description_kn ?? null, added: Boolean(x_added) } : null,
   }
 }
+
+const OFFER_COLUMNS = ['title_en', 'title_kn', 'message_en', 'message_kn', 'photo_url', 'button_en', 'button_kn', 'link_type', 'link_id', 'starts_on', 'ends_on', 'active']
+
+function parseOffer(row) {
+  if (!row) return null
+  return { ...row, active: Boolean(row.active) }
+}
+
+// Until migration 0002 has run, the new tables don't exist: the shop keeps working without them
+const missingTable = (err) => /no such table/i.test(String(err?.message || err))
 
 function parseSettings(row) {
   if (!row) return null
@@ -86,8 +101,57 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
 
     /* ---------- menu & catalog ---------- */
     async listProducts() {
-      const res = await db.prepare('SELECT * FROM products ORDER BY sort ASC, id ASC').all()
+      let res
+      try {
+        res = await db
+          .prepare(
+            `SELECT p.*, x.product_id AS x_id, x.name_en AS x_name_en, x.name_kn AS x_name_kn, x.description_en AS x_description_en,
+                    x.description_kn AS x_description_kn, x.added AS x_added
+             FROM products p LEFT JOIN product_extras x ON x.product_id = p.id ORDER BY p.sort ASC, p.id ASC`,
+          )
+          .all()
+      } catch (err) {
+        if (!missingTable(err)) throw err
+        res = await db.prepare('SELECT * FROM products ORDER BY sort ASC, id ASC').all()
+      }
       return (res.results || []).map(parseProduct)
+    },
+
+    /** A product Hema added in the admin: its products row and its product_extras row (added = 1). null if the id is taken */
+    async insertProduct(row, extras) {
+      const taken = await db.prepare('SELECT id FROM products WHERE id = ? OR slug = ?').bind(row.id, row.slug).first()
+      if (taken) return null
+      const now = isoNow()
+      await db.batch([
+        db
+          .prepare(
+            `INSERT INTO products (id, slug, category, name_en, name_kn, sizes, price, ragi_price, options, courier_tier, price_status, active, sold_out, sort, image, photo_url, updated_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          )
+          .bind(
+            row.id,
+            row.slug,
+            row.category,
+            row.name_en,
+            row.name_kn || '',
+            row.sizes ? JSON.stringify(row.sizes) : null,
+            row.price ?? null,
+            row.ragi_price ?? null,
+            JSON.stringify(row.options || {}),
+            row.courier_tier || 'small',
+            row.price_status || null,
+            row.active == null ? null : row.active ? 1 : 0,
+            row.sold_out == null ? null : row.sold_out ? 1 : 0,
+            row.sort ?? 0,
+            row.image || null,
+            row.photo_url || null,
+            now,
+          ),
+        db
+          .prepare('INSERT INTO product_extras (product_id, name_en, name_kn, description_en, description_kn, added, updated_at) VALUES (?, ?, ?, ?, ?, 1, ?)')
+          .bind(row.id, extras.name_en ?? null, extras.name_kn ?? null, extras.description_en ?? null, extras.description_kn ?? null, now),
+      ])
+      return (await store.listProducts()).find((p) => p.id === row.id) || null
     },
 
     async upsertProducts(rows) {
@@ -136,6 +200,9 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
         if (['price', 'ragi_price', 'price_status', 'sort', 'image', 'photo_url'].includes(k)) {
           fields.push(`${k} = ?`)
           values.push(v ?? null)
+        } else if (['name_en', 'name_kn', 'courier_tier'].includes(k) && typeof v === 'string') {
+          fields.push(`${k} = ?`)
+          values.push(v)
         } else if (['active', 'sold_out'].includes(k)) {
           fields.push(`${k} = ?`)
           values.push(v == null ? null : v ? 1 : 0)
@@ -148,9 +215,79 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
       values.push(isoNow())
       values.push(id)
 
-      await db.prepare(`UPDATE products SET ${fields.join(', ')} WHERE id = ?`).bind(...values).run()
-      const updated = await db.prepare('SELECT * FROM products WHERE id = ?').bind(id).first()
-      return parseProduct(updated)
+      const stmts = [db.prepare(`UPDATE products SET ${fields.join(', ')} WHERE id = ?`).bind(...values)]
+      // Hema's name / description: product_extras (NULL = the config's)
+      const extraCols = EXTRA_COLUMNS.filter((k) => patch.extras && k in patch.extras)
+      if (extraCols.length) {
+        stmts.push(
+          db
+            .prepare(
+              `INSERT INTO product_extras (product_id, ${extraCols.join(', ')}, updated_at) VALUES (?, ${extraCols.map(() => '?').join(', ')}, ?)
+               ON CONFLICT (product_id) DO UPDATE SET ${extraCols.map((k) => `${k} = excluded.${k}`).join(', ')}, updated_at = excluded.updated_at`,
+            )
+            .bind(id, ...extraCols.map((k) => patch.extras[k] ?? null), isoNow()),
+        )
+      }
+      await db.batch(stmts)
+      return (await store.listProducts()).find((p) => p.id === id) || null
+    },
+
+    /* ---------- offers (display only) ---------- */
+    async listOffers() {
+      try {
+        const res = await db.prepare('SELECT * FROM offers ORDER BY starts_on DESC, created_at DESC').all()
+        return (res.results || []).map(parseOffer)
+      } catch (err) {
+        if (missingTable(err)) return []
+        throw err
+      }
+    },
+
+    async insertOffer(row) {
+      const id = row.id || crypto.randomUUID()
+      const cols = OFFER_COLUMNS.filter((k) => k in row)
+      const now = isoNow()
+      await db
+        .prepare(`INSERT INTO offers (id, ${cols.join(', ')}, created_at, updated_at) VALUES (?, ${cols.map(() => '?').join(', ')}, ?, ?)`)
+        .bind(id, ...cols.map((k) => (k === 'active' ? (row[k] ? 1 : 0) : (row[k] ?? null))), now, now)
+        .run()
+      return parseOffer(await db.prepare('SELECT * FROM offers WHERE id = ?').bind(id).first())
+    },
+
+    async updateOffer(id, patch) {
+      const cols = OFFER_COLUMNS.filter((k) => k in patch)
+      const values = cols.map((k) => (k === 'active' ? (patch[k] ? 1 : 0) : (patch[k] ?? null)))
+      const res = await db
+        .prepare(`UPDATE offers SET ${[...cols.map((k) => `${k} = ?`), 'updated_at = ?'].join(', ')} WHERE id = ?`)
+        .bind(...values, isoNow(), id)
+        .run()
+      if (!res.meta?.changes) return null
+      return parseOffer(await db.prepare('SELECT * FROM offers WHERE id = ?').bind(id).first())
+    },
+
+    async deleteOffer(id) {
+      const res = await db.prepare('DELETE FROM offers WHERE id = ?').bind(id).run()
+      return Boolean(res.meta?.changes)
+    },
+
+    /* ---------- Customize page tile photos ---------- */
+    async listTilePhotos() {
+      try {
+        return (await db.prepare('SELECT tile, photo_url, updated_at FROM tile_photos ORDER BY tile').all()).results || []
+      } catch (err) {
+        if (missingTable(err)) return []
+        throw err
+      }
+    },
+
+    async setTilePhoto(tile, photoUrl) {
+      if (!photoUrl) await db.prepare('DELETE FROM tile_photos WHERE tile = ?').bind(tile).run()
+      else
+        await db
+          .prepare('INSERT INTO tile_photos (tile, photo_url, updated_at) VALUES (?, ?, ?) ON CONFLICT (tile) DO UPDATE SET photo_url = excluded.photo_url, updated_at = excluded.updated_at')
+          .bind(tile, photoUrl, isoNow())
+          .run()
+      return store.listTilePhotos()
     },
 
     /* ---------- settings ---------- */

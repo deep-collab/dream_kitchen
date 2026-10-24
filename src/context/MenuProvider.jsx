@@ -41,10 +41,16 @@ export function MenuProvider({ children }) {
       // Orders can be placed: the server is set up, the shop is open, and there is a way to pay
       canOrder: Boolean(remote?.ready && settings.store.open && (settings.payment.upiId || remote?.razorpay?.enabled)),
       razorpay: remote?.razorpay || { enabled: false },
+      // Hema's offers live today (display only) and her Customize page tile photos
+      showcase: { offers: Array.isArray(remote?.offers) ? remote.offers : [], tilePhotos: remote?.tilePhotos || {} },
     }
   }, [remote, refresh])
   return <MenuContext.Provider value={value}>{children}</MenuContext.Provider>
 }
+
+const NO_SHOWCASE = { offers: [], tilePhotos: {} }
+/** { offers: [{ id, title, message, photo, button, link }], tilePhotos: { 'delight-box': url, … } } */
+export const useShowcase = () => useContext(MenuContext)?.showcase || NO_SHOWCASE
 
 /** { categories, products (on the menu, in order), productsById (all, for the cart check) } */
 export const useMenu = () => useContext(MenuContext).menu

@@ -5,6 +5,7 @@ import { useMenu } from '../context/MenuProvider'
 import Hero from '../components/home/Hero'
 import Container from '../components/ui/Container'
 import ProductPhoto from '../components/shop/ProductPhoto'
+import { OfferBanner } from '../components/shop/Offers'
 import Button from '../components/ui/Button'
 import { BrushIcon } from '../components/icons'
 import { optionPrices } from '../config/shop'
@@ -23,6 +24,7 @@ const TILE_PHOTO = {
  * Home is three parts (Hema's request): a compact hero, six big photo tiles, and the short
  * footer (from the layout). Tiles: 2 per row on phones, 3 on tablets and desktops (3 × 2).
  * Under the tiles, one small card for her specialty, hand-drawn chocolates, linking to Customize.
+ * Hema's live offers (admin -> Offers) come first, right under the hero; none = nothing there.
  */
 export default function Home() {
   useSeo('home')
@@ -37,6 +39,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <OfferBanner />
       <section aria-labelledby="pick-title" className="py-6 md:py-10">
         <Container>
           <h2 id="pick-title" className="sr-only">

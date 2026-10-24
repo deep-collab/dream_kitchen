@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { addLine, cartCount, CART_STORAGE_KEY, LEGACY_CART_KEYS, parseStoredCart, removeLine, restoreLine, serialiseCart, setLineQty, updateLine } from '../lib/cart'
 import { repriceCart } from '../lib/reprice'
-import { useMenu } from './MenuProvider'
+import { useMenu, useShopStatus } from './MenuProvider'
 
 const CartContext = createContext(null)
 
@@ -21,6 +21,7 @@ function readCart() {
  */
 export function CartProvider({ children }) {
   const menu = useMenu()
+  const { remoteLoaded } = useShopStatus()
   const [stored, setStored] = useState(readCart)
 
   useEffect(() => {
@@ -61,7 +62,13 @@ export function CartProvider({ children }) {
   /** After the server said prices changed: store today's prices so the notice can go */
   const acceptPrices = useCallback((lines) => setStored(lines.map(({ priceWas: _p, unavailable: _u, ...l }) => l)), [])
 
-  const checked = useMemo(() => (menu ? repriceCart(stored, menu.productsById) : null), [stored, menu])
+  const checked = useMemo(() => {
+    if (!menu) return null
+    const r = repriceCart(stored, menu.productsById)
+    if (remoteLoaded) return r
+    // Until Hema's changes arrive, a product she added herself isn't known yet: that is not "removed"
+    return { ...r, lines: r.lines.map((l, i) => (l.unavailable === 'removed' && !menu.productsById[l.productId] ? stored[i] : l)) }
+  }, [stored, menu, remoteLoaded])
   const value = useMemo(() => {
     const lines = checked ? checked.lines : stored
     const available = lines.filter((l) => !l.unavailable)

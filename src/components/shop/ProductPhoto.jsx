@@ -10,10 +10,12 @@ import ProductArt from '../art/ProductArt'
  * broken image.
  *   sizes: how wide it shows, for the browser to pick the 600px or 1200px file
  *   eager: for the first images on screen (not lazy)
+ *   photo: a photo Hema chose for this place in particular (a Customize page tile); wins over the product's
  */
-export default function ProductPhoto({ slug, art, sizes = '(min-width: 1024px) 380px, 50vw', eager = false, rounded = 'rounded-control', className = '', alt = '' }) {
+export default function ProductPhoto({ slug, art, photo = null, sizes = '(min-width: 1024px) 380px, 50vw', eager = false, rounded = 'rounded-control', className = '', alt = '' }) {
   const [failed, setFailed] = useState(false)
-  const uploaded = useContext(MenuContext)?.menu.productsById[slug]?.photo
+  const productPhoto = useContext(MenuContext)?.menu.productsById[slug]?.photo
+  const uploaded = photo || productPhoto
   const v = photos[slug]
   if ((!v && !uploaded) || failed) return <ProductArt kind={art} rounded={rounded} className={className} label={alt || undefined} />
   const src = (suffix) => `/products/${slug}${suffix}.webp?v=${v}`

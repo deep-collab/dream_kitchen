@@ -42,6 +42,9 @@ const between = (iso, from, to) => (!from || iso >= from) && (!to || iso < to)
 export function createMemoryCore({ initial = null, now = () => new Date(), admin = {}, admins = null, persist = () => {}, writeFile = null, readFile = null, publicUrl = (path) => `/api/photo/${path}` } = {}) {
   const empty = () => ({
     products: {},
+    productExtras: {},
+    offers: [],
+    tilePhotos: {},
     settings: { id: 1, store_open: true },
     orders: [],
     events: [],
@@ -79,7 +82,7 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
 
     /* ---------- menu and settings ---------- */
     async listProducts() {
-      return clone(Object.values(db.products))
+      return clone(Object.values(db.products).map((p) => ({ ...p, extras: db.productExtras[p.id] || null })))
     },
     async upsertProducts(rows) {
       for (const r of rows) db.products[r.id] = { ...db.products[r.id], ...clone(r), updated_at: iso() }
@@ -87,9 +90,51 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
     },
     async updateProduct(id, patch) {
       if (!db.products[id]) return null
-      db.products[id] = { ...db.products[id], ...clone(patch), updated_at: iso() }
+      const { extras, ...columns } = clone(patch)
+      db.products[id] = { ...db.products[id], ...columns, updated_at: iso() }
+      if (extras) db.productExtras[id] = { name_en: null, name_kn: null, description_en: null, description_kn: null, added: false, ...db.productExtras[id], ...extras }
       save()
-      return clone(db.products[id])
+      return (await store.listProducts()).find((p) => p.id === id)
+    },
+    async insertProduct(row, extras) {
+      if (db.products[row.id] || Object.values(db.products).some((p) => p.slug === row.slug)) return null
+      db.products[row.id] = { ...clone(row), updated_at: iso() }
+      db.productExtras[row.id] = { name_en: null, name_kn: null, description_en: null, description_kn: null, ...clone(extras), added: true }
+      save()
+      return (await store.listProducts()).find((p) => p.id === row.id)
+    },
+
+    /* ---------- offers and Customize page photos ---------- */
+    async listOffers() {
+      return clone(db.offers).sort((a, b) => (a.starts_on < b.starts_on ? 1 : a.starts_on > b.starts_on ? -1 : newest(a, b)))
+    },
+    async insertOffer(row) {
+      const offer = { id: row.id || uuid(), title_kn: null, message_en: null, message_kn: null, photo_url: null, button_en: null, button_kn: null, link_type: null, link_id: null, active: true, ...clone(row), created_at: iso(), updated_at: iso() }
+      db.offers.push(offer)
+      save()
+      return clone(offer)
+    },
+    async updateOffer(id, patch) {
+      const offer = db.offers.find((o) => o.id === id)
+      if (!offer) return null
+      Object.assign(offer, clone(patch), { updated_at: iso() })
+      save()
+      return clone(offer)
+    },
+    async deleteOffer(id) {
+      const before = db.offers.length
+      db.offers = db.offers.filter((o) => o.id !== id)
+      save()
+      return db.offers.length < before
+    },
+    async listTilePhotos() {
+      return Object.entries(db.tilePhotos).map(([tile, r]) => ({ tile, ...clone(r) }))
+    },
+    async setTilePhoto(tile, photoUrl) {
+      if (photoUrl) db.tilePhotos[tile] = { photo_url: photoUrl, updated_at: iso() }
+      else delete db.tilePhotos[tile]
+      save()
+      return store.listTilePhotos()
     },
     async getSettings() {
       return clone(db.settings)

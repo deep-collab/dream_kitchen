@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useI18n } from '../i18n/I18nProvider'
 import { useSeo } from '../hooks/useSeo'
-import { useMenu } from '../context/MenuProvider'
+import { useMenu, useShopStatus } from '../context/MenuProvider'
 import Container from '../components/ui/Container'
 import ProductCard from '../components/shop/ProductCard'
 import { useShopSheets } from '../components/shop/ShopSheets'
+import { OfferStrip } from '../components/shop/Offers'
 import 'virtual:dk-strings/menu'
 
 const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -37,31 +38,40 @@ export default function Menu() {
   const { hash, search } = useLocation()
   const navigate = useNavigate()
   const { openProduct } = useShopSheets()
+  const { remoteLoaded } = useShopStatus()
   const [active, setActive] = useState(menu.categories[0]?.id)
   const tabsRef = useRef(null)
   const spyPaused = useRef(false)
+  const pendingItem = useRef(new URLSearchParams(search).get('item'))
 
   // Deep links, once on arrival
   useEffect(() => {
     const params = new URLSearchParams(search)
     const target = decodeURIComponent(hash.slice(1)) || params.get('c')
-    const item = params.get('item')
     if (target && menu.categories.some((c) => c.id === target)) {
       setActive(target)
       requestAnimationFrame(() => scrollToCategory(target, false))
       // the fonts can still change the layout: land again once they are in
       document.fonts?.ready.then(() => scrollToCategory(target, false))
     }
-    if (item) {
-      const product = menu.products.find((p) => p.slug === item)
-      if (product) {
-        requestAnimationFrame(() => scrollToCategory(product.category, false))
-        openProduct(product)
-      }
-      navigate({ hash: product ? `#${product.category}` : '' }, { replace: true })
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // ?item=<slug>: open that product. A product Hema added herself is known only once her
+  // changes have arrived, so an unknown one waits for them before giving up.
+  useEffect(() => {
+    const item = pendingItem.current
+    if (!item) return
+    const product = menu.products.find((p) => p.slug === item)
+    if (!product && !remoteLoaded) return
+    pendingItem.current = null
+    if (product) {
+      requestAnimationFrame(() => scrollToCategory(product.category, false))
+      openProduct(product)
+    }
+    navigate({ hash: product ? `#${product.category}` : '' }, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menu, remoteLoaded])
 
   // Scroll-spy: the last category whose top has passed under the tabs
   useEffect(() => {
@@ -104,11 +114,29 @@ export default function Menu() {
     setTimeout(() => (spyPaused.current = false), reduceMotion() ? 50 : 700)
   }, [])
 
+  // The offer strip's button, when it points at this page: scroll to the category or open the product
+  const onOfferGo = (link) => {
+    const url = new URL(link, window.location.origin)
+    if (url.pathname !== '/menu') return false
+    const item = url.searchParams.get('item')
+    const product = item && menu.products.find((p) => p.slug === item)
+    if (product) {
+      scrollToCategory(product.category)
+      openProduct(product)
+      return true
+    }
+    const id = decodeURIComponent(url.hash.slice(1))
+    if (!menu.categories.some((c) => c.id === id)) return false
+    goTo({ preventDefault() {} }, id)
+    return true
+  }
+
   return (
     <>
       <Container className="pt-5 pb-3 lg:pt-8">
         <h1 className="t-h2">{t('menu.title')}</h1>
         <p className="t-small mt-1 text-brown-2">{t('menu.lead')}</p>
+        <OfferStrip onGo={onOfferGo} />
       </Container>
 
       <nav id="menu-tabs" aria-label={t('menu.tabs')} className="sticky top-[var(--header-h)] z-30 border-y border-line bg-cream/95 backdrop-blur supports-[backdrop-filter]:bg-cream/85">

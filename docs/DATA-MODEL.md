@@ -6,6 +6,19 @@ Created by `supabase/migrations/20261005000001_init.sql` and `20261010000001_adm
 `tests/config.test.js` with a small stand-in for what Supabase provides
 (`tests/helpers/supabaseShim.js`).
 
+> **The live site runs on Cloudflare D1** (`d1/migrations`, SQLite; `d1/setup-all.sql` =
+> migrations + seed, written by `node scripts/d1-setup-sql.mjs`). Its tables mirror the ones below.
+> D1 adds, in `0002_menu_text_offers.sql` (24 Oct 2026; new tables only, nothing existing changed):
+>
+> | Table | Columns | Notes |
+> |---|---|---|
+> | `product_extras` | `product_id` (PK), `name_en`, `name_kn` (≤ 80), `description_en`, `description_kn` (≤ 200), `added` (0/1), `updated_at` | Hema's name/description per product (NULL = config; `description_en = ''` = none). `added = 1`: a product she added in admin → Menu; its prices, sizes, courier tier, category and photo are in its `products` row, priced by the same `applyOverrides` on site and server. |
+> | `tile_photos` | `tile` (PK: `delight-box`, `drawing-bar`), `photo_url`, `updated_at` | Customize page tile photos (`customizeTiles` in `src/config/shop.js`). No row = the product's photo. |
+> | `offers` | `id`, `title_en/kn` (≤ 60), `message_en/kn` (≤ 160), `photo_url`, `button_en/kn` (≤ 30), `link_type` (`category`/`product`), `link_id`, `starts_on`, `ends_on` (IST dates, both included), `active`, `created_at`, `updated_at` | Display only, never a price. `/api/menu` sends the ones live today (`publicShowcase` in `netlify/lib/catalog.mjs`). |
+>
+> Until 0002 has run, the D1 store reads as if these tables were empty, so the shop keeps working.
+> The Supabase store has none of these features (it returns no offers and refuses the admin writes).
+
 ## Where things live
 
 | What | Where | Who changes it |

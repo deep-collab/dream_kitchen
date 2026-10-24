@@ -209,7 +209,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Sat 17 Oct – Sun 18 Oct 2026 | ಶನಿ 17 ಅಕ್ಟೋಬರ್ – ಭಾನು 18 Oct 2026 | |
 | Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec | ಜನವರಿ,ಫೆಬ್ರವರಿ,ಮಾರ್ಚ್,ಏಪ್ರಿಲ್,ಮೇ,ಜೂನ್,ಜುಲೈ,ಆಗಸ್ಟ್,ಸೆಪ್ಟೆಂಬರ್,ಅಕ್ಟೋಬರ್,ನವೆಂಬರ್,ಡಿಸೆಂಬರ್ | |
 
-## Later, if you have time (461 more)
+## Later, if you have time (466 more)
 
 ### Logo and tagline
 
@@ -372,6 +372,15 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Made fresh after you order. Tap an item to choose. | ನೀವು ಆರ್ಡರ್ ಮಾಡಿದ ನಂತರ ತಾಜಾವಾಗಿ ತಯಾರಿ. ಆರಿಸಲು ಯಾವುದಾದರೂ ಒತ್ತಿರಿ. | |
 | Menu categories | ಮೆನು ವಿಭಾಗಗಳು | |
 | Sold out | ಖಾಲಿಯಾಗಿದೆ | |
+
+### offers
+
+| English | ಕನ್ನಡ | Correct? |
+|---|---|---|
+| Offers | ಆಫರ್‌ಗಳು | |
+| Previous offer | ಹಿಂದಿನ ಆಫರ್ | |
+| Next offer | ಮುಂದಿನ ಆಫರ್ | |
+| Offer 2 of ₹2,100 | ₹2,100 ರಲ್ಲಿ 2ನೇ ಆಫರ್ | |
 
 ### Choosing an item
 
@@ -574,6 +583,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Drawing Chocolate Bar | ಡ್ರಾಯಿಂಗ್ ಚಾಕೊಲೇಟ್ ಬಾರ್ | |
 | A chocolate bar with a drawing of your choice. Describe it, and add a photo if you have one. | ನಿಮಗೆ ಬೇಕಾದ ಚಿತ್ರವಿರುವ ಚಾಕೊಲೇಟ್ ಬಾರ್. ಅದನ್ನು ವಿವರಿಸಿ, ಫೋಟೋ ಇದ್ದರೆ ಸೇರಿಸಿ. | |
 | Choose the drawing bar ₹950 | ಡ್ರಾಯಿಂಗ್ ಬಾರ್ ಆರಿಸಿ ₹950 | |
+| Choose ₹1,700 | ಆರಿಸಿ ₹1,700 | |
 | Drawings need extra preparation time. | ಚಿತ್ರಕ್ಕೆ ತಯಾರಿಸಲು ಹೆಚ್ಚು ಸಮಯ ಬೇಕು. | |
 
 ### Classes page
