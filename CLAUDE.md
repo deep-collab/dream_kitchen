@@ -9,7 +9,7 @@ Dream Kitchen: home-based handmade brownie tubs, delight boxes, brownies and cho
 to order and sent all over India by courier. Founder: Hema. She started as a student with ₹2,500
 and grew it into a loved home brand. She also teaches chocolate classes (details coming).
 - Phone: one place only, `PHONE` in `src/config/site.js` (a test fails if the digits appear anywhere else)
-- Instagram: @dreamkitchen_01_homemade
+- Instagram: @dreamkitchen_01_homemade, one place only: `instagramHandle` / `instagramUrl` in `src/config/site.js` (a test fails if the address appears anywhere else)
 - Tagline: "Turning your cravings into sweet memories."
 - Customers: mostly on phones, all ages across Karnataka and beyond, including people who are not
   comfortable typing. Keep everything simple, big and plain.
@@ -21,15 +21,30 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - Every admin action lives in `netlify/lib/adminCore.mjs` (no Node-only code): the `admin` function runs it after the login check (Admin session tokens, `admin_users`, 30 days idle = log in again), and the demo runs it on `netlify/lib/store/memoryCore.mjs`. In the browser build `netlify/lib/env.mjs` is swapped for `src/admin/demo/browserEnv.js` (vite.config.js), so no secret's name reaches a browser.
 - Server: **Cloudflare Workers** (`src/worker/index.mjs`) + **Cloudflare D1 Database** (`d1/migrations/0001_init.sql`, `d1/setup-all.sql`), with native edge routing, static asset serving via Cloudflare Assets, and local testing via `wrangler` and SQLite. (Also supports mock memory store for demo/tests, and legacy Supabase adapter).
 - Email: Resend (or the dev outbox `<DK_DEV_DATA_DIR>/outbox/`). Templates: `netlify/lib/emailTemplates.mjs`. Payments: **Razorpay is the main way** as soon as its keys exist (orders and class bookings); UPI (Hema checks the UTR) only as the fallback while it isn't; neither = "Online ordering opens soon – WhatsApp us".
-- Database setup for Cloudflare D1: `npm run d1:setup` (or `npx wrangler d1 migrations apply DB` and `npx wrangler d1 execute DB --file=d1/seed.sql`). Admin user management: `npm run d1:admin <email> <password>`.
-- Secrets configured via `wrangler secret put <NAME>`. Never in code or chat. `node scripts/check-secrets.mjs` checks every build.
-- Git: commit on the working branch; push only when the user says "push"; never merge without being asked.
+- Database setup, two ways (the store is picked in `netlify/lib/store/index.mjs` from the environment):
+  - **Cloudflare D1** (the new repo's `main`, 16 Oct 2026): `d1/migrations/*.sql` (one file per change, applied once each by
+    `npm run d1:migrate -- --remote`; `d1/setup-all.sql` is the combined copy for tests and fresh databases, `node scripts/d1-setup-sql.mjs`),
+    seed `d1/seed.sql`, admin logins `npm run d1:admin <email> <password>`. Guide: `docs/CLOUDFLARE-D1-SETUP.md`. Secrets: `npx wrangler secret put <NAME>`.
+  - **Supabase**: one file, `supabase/setup-all.sql` (`node scripts/setup-sql.mjs`; a test fails if it is stale). Guide: `docs/SETUP-BACKEND.md`.
+  - Every database change goes in BOTH (a Supabase migration and a D1 migration) and in both stores (`supabase.mjs`, `d1.mjs`; `memoryCore.mjs` for tests and the demo).
+  Hema's guide: `docs/admin-guide-for-hema.md`.
+- Secrets only in Netlify environment variables or Cloudflare secrets (`.env.example`). Never in code or chat. `node scripts/check-secrets.mjs` checks every build.
+- Git: commit on the working branch; push only when the user says "push"; never merge without being asked. Since 23 Oct 2026 the repo
+  is `github.com/deep-collab/dream_kitchen` (`origin`; the old one is `old-origin`, never push there). Work goes to a branch + pull request into `main`.
+- Hosting: the new `main` deploys as a **Cloudflare Worker** (`wrangler.toml`, `src/worker/index.mjs`, `npm run deploy`, SITE_URL
+  `https://dream-kitchen.workers.dev`); before that it was **Netlify** project **dreamkitcheno1** (https://dreamkitcheno1.netlify.app,
+  connected to `main`). Which one is live is the owner's decision (23 Oct 2026: still to confirm).
+  The address lives in ONE place, `site.url` in `src/config/site.js`: canonical and og:url links, the share
+  image, JSON-LD, sitemap.xml and robots.txt are built from it; emails use SITE_URL / Netlify's `URL` and fall back to it.
+- Netlify's "Powered by Netlify" badge is injected by Netlify (`/.netlify/scripts/hud`), not our code: off in
+  Project configuration → General → Powered by Netlify badge; `#nl-badge-frame` is also hidden in index.html as a backup.
 
 ## Single sources of truth
 - **`src/config/shop.js`**: the menu, prices, options, courier rates and tiers, lead times, limits, UPI placeholders. TO CONFIRM marks what Hema hasn't given.
 - **`src/lib/pricing.js`**: the one pricing module (unit prices, options, courier zone/tier/charge, Hema's admin overrides and settings, UPI link, UTR). Imported by the website **and** every server function, so totals can never disagree.
 - `src/lib/dates.js` (dispatch dates, IST), `src/lib/checkout.js` (customer details), `src/lib/enquiry.js` (class enquiry): shared by site and server too.
-- Hema's admin changes live in database (`products` / `settings` override columns, NULL = config) and are applied by `applyOverrides` / `applySettings` on both sides.
+- Hema's admin changes live in the database (`products` / `settings` override columns, NULL = config) and are applied by `applyOverrides` / `applySettings` on both sides.
+- **Offers** (23 Oct 2026): admin → Offers (bottom nav Home · Orders · Offers · Classes · Menu · More). Rules in `src/lib/offers.js` (IST dates, both days included; live / scheduled / ended / off; link `category:` / `product:` / `page:customize`), table `offers`; shown by `src/components/layout/OfferBanner.jsx` from the layout (banner on Home, strip on Menu; in the main bundle so pages don't wait for it). Display-only: offers NEVER change a price. Customize tile photos: `page_photos` + `PAGE_PHOTOS` in the same file, admin → Menu → Customize page.
 - Text: `src/i18n/en.json` + `kn.json` (customer pages, both languages); `netlify/lib/emailText.mjs` (customer emails); admin text is English, in `src/admin`. Business details: `src/config/site.js`. Class details (days, slots, the three classes and prices, seats): `src/data/classInfo.js`; booking rules (weekends, seats, booking IDs `DK-CL-YYMMDD-XXXX`): `src/lib/classes.js` + `src/lib/classTimes.js`, shared by site and server.
 
 ## The menu (Hema's, exactly; never invent prices, weights, ingredients or claims)
@@ -79,10 +94,19 @@ Details and tokens: `docs/DESIGN.md`.
 
 ## Working rules
 Ask only if truly blocked. Keep chat replies short. Explain manual steps in plain words. Never put
-keys in code or chat. Run `npm test`, `node scripts/check-i18n.mjs`, `node scripts/qa-step6.mjs` and `node scripts/qa-admin.mjs`
+keys in code or chat. Run `npm test`, `node scripts/check-i18n.mjs`, `node scripts/qa-step6.mjs`, `node scripts/qa-admin.mjs` and `node scripts/qa-offers.mjs`
 (dev server as described in those files; a fresh `DK_DEV_DATA_DIR` per run is best) and
 `node scripts/qa-payments.mjs` (starts its own server) after changes. Speed budget: first-visit JS ≤ ~66 KB gzip
 (`node scripts/bundle-report.mjs`), Lighthouse mobile Performance 90+, the rest 100.
+
+## Policy pages (Razorpay)
+/terms, /refund, /shipping, /privacy: one page (`src/pages/Policy.jsx`), English text in `src/data/policies.js`
+(Hema's refund rules; never add a policy she hasn't agreed to). Linked from every footer with the business
+details (`src/components/layout/BusinessDetails.jsx`). Unknown business details are TODO in `src/config/site.js`.
+Without JavaScript (Razorpay's check): `scripts/prerender.mjs` writes / (dist/index.html), menu, classes, customize,
+contact, faq, our-story, terms, refund, shipping and privacy as real HTML at build time (full text, title, canonical,
+footer details, config prices); every other address gets the empty app, dist/app.html (`/* /app.html 200`).
+`src/main.jsx` empties #root before the app renders. Check: `node scripts/qa-prerender.mjs` (with `serve-http2.mjs`).
 
 ## Build history
 Admin complete (10 Oct 2026, branch admin-complete): the full admin, class booking on the site,

@@ -22,7 +22,10 @@ const cache = new Map()
 const server = createSecureServer({ key: readFileSync(join(dir, 'key.pem')), cert: readFileSync(join(dir, 'cert.pem')), allowHTTP1: true }, (req, res) => {
   let path = normalize(decodeURIComponent(new URL(req.url, 'https://x').pathname)).replaceAll('\\', '/')
   let file = join(DIST, path)
-  if (!existsSync(file) || statSync(file).isDirectory()) file = join(DIST, 'index.html') // like public/_redirects
+  // Like Netlify: the file, a directory's index.html, the page's own .html (/menu -> menu.html), else the app (dist/_redirects)
+  if (existsSync(file) && statSync(file).isDirectory()) file = join(file, 'index.html')
+  if (!existsSync(file) && existsSync(file + '.html')) file += '.html'
+  if (!existsSync(file)) file = join(DIST, 'app.html')
   const type = TYPES[extname(file)] || 'application/octet-stream'
   if (!cache.has(file)) cache.set(file, gzipSync(readFileSync(file)))
   res.writeHead(200, { 'content-type': type, 'content-encoding': 'gzip', 'cache-control': path.startsWith('/assets/') ? 'public, max-age=31536000, immutable' : 'no-cache' })

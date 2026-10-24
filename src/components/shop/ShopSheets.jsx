@@ -1,6 +1,7 @@
 import { createContext, lazy, Suspense, useCallback, useContext, useMemo, useState } from 'react'
 import { useI18n } from '../../i18n/I18nProvider'
 import { useToast } from '../ui/Toast'
+import { MenuContext } from '../../context/MenuProvider'
 import 'virtual:dk-strings/cart'
 
 const SheetsContext = createContext(null)
@@ -20,12 +21,15 @@ export function ShopSheetsProvider({ children }) {
   const close = useCallback(() => setState((s) => ({ ...s, open: false })), [])
   const openProduct = useCallback((product, { line = null, focus = null } = {}) => setState((s) => ({ open: true, product, line, focus, key: s.key + 1 })), [])
   const value = useMemo(() => ({ openProduct, close }), [openProduct, close])
+  // Always the product as it is now: a sheet opened before Hema's menu changes arrived (e.g. from a
+  // link) shows her name, description and prices as soon as they do
+  const latest = useContext(MenuContext)?.menu.productsById[state.product?.id] || state.product
 
   return (
     <SheetsContext.Provider value={value}>
       {children}
       <Suspense fallback={null}>
-        {state.product && <ProductSheet key={state.key} open={state.open} product={state.product} line={state.line} focus={state.focus} onClose={close} />}
+        {state.product && <ProductSheet key={state.key} open={state.open} product={latest} line={state.line} focus={state.focus} onClose={close} />}
       </Suspense>
     </SheetsContext.Provider>
   )

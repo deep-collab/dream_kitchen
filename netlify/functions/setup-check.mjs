@@ -1,17 +1,26 @@
 // GET /api/setup-check: the admin's "Setup check" screen (works before anyone can log in, so the
 // owner can see what is missing). It answers only green / red for each part and never shows a key,
 // an email address or any order data.
-//   database  Cloudflare D1 (or Supabase): the database is reachable, tables exist, and admin exists
-//   resend    an API key is set (it starts with re_)
+//   database  Cloudflare D1 or Supabase: it answers, every setup part has been run (tables, the
+//   supabase  photo storage) and at least one admin login exists ("supabase" kept for older pages)
+//   resend    an API key is set (it starts with re_), and EMAIL_FROM is an address on your own domain
+//             (without it customers get no emails: Resend's test sender only reaches the owner)
 //   razorpay  both keys are set (and whether they are test keys), plus the webhook secret
 //   email     an order-alert address is set (admin Settings or HEMA_EMAIL)
 //   upi       a UPI ID is set (needed only while Razorpay is not set up)
+//   keepAlive the daily keep-alive ran in the last 2 days (netlify/functions/keep-alive.mjs); Supabase
+//             only: a free Supabase project pauses when unused, Cloudflare D1 doesn't (not needed there)
+//   address   the site address in the code (site.url) is the one the site is served from (Netlify's
+//             main domain, or SITE_URL on Cloudflare)
 import { clientIp, handle, json } from '../lib/http.mjs'
 import { getStore } from '../lib/store/index.mjs'
 import { limit } from '../lib/limits.mjs'
 import { applySettings } from '../../src/lib/pricing.js'
 import { rowToSettings, settingsBase } from '../lib/catalog.mjs'
 import { backendMode, config as env, getWorkerEnv } from '../lib/env.mjs'
+import { site } from '../../src/config/site.js'
+
+const KEEP_ALIVE_MAX_MS = 2 * 86_400_000
 
 const has = (name) => {
   const w = getWorkerEnv()
@@ -24,6 +33,7 @@ export default handle(
     const mode = backendMode()
     const out = { mode, checkedAt: new Date().toISOString() }
     let settingsRow = null
+    let beat = null
 
     // 1. Database (Cloudflare D1 or Supabase)
     const sb = { urlSet: has('SUPABASE_URL'), serviceKeySet: has('SUPABASE_SERVICE_ROLE_KEY'), anonKeySet: has('SUPABASE_ANON_KEY') }
@@ -38,6 +48,7 @@ export default handle(
       try {
         admins = health.tables ? await store.auth.countAdmins() : 0
         settingsRow = health.tables ? await store.getSettings() : null
+        beat = health.update && store.lastBeat ? await store.lastBeat() : null
       } catch {
         /* reported below */
       }
@@ -48,7 +59,8 @@ export default handle(
 
     // 2. Resend
     const key = env.resendKey
-    out.resend = { ok: /^re_/.test(key), problem: !key ? 'noKey' : /^re_/.test(key) ? null : 'badKey', fromSet: has('EMAIL_FROM') }
+    const ownSender = has('EMAIL_FROM') && !/@resend\.dev>?\s*$/i.test(env.emailFrom)
+    out.resend = { ok: /^re_/.test(key) && ownSender, problem: !key ? 'noKey' : !/^re_/.test(key) ? 'badKey' : !ownSender ? 'noFrom' : null, fromSet: has('EMAIL_FROM') }
 
     // 3. Razorpay
     const rz = env.razorpay
@@ -64,7 +76,21 @@ export default handle(
     const upi = applySettings(rowToSettings(settingsRow || {}), settingsBase()).payment.upiId
     out.upi = { ok: Boolean(upi) || rz.enabled, set: Boolean(upi), notNeeded: rz.enabled && !upi, problem: upi || rz.enabled ? null : 'noUpi' }
 
-    out.allGood = [(out.database || out.supabase), out.resend, out.razorpay, out.email].every((x) => x.ok)
+    // 6. Keep-alive: ran in the last 2 days (it runs every morning). Only a free Supabase project pauses
+    if (mode === 'd1') out.keepAlive = { ok: true, notNeeded: true, problem: null }
+    else {
+      const last = beat?.last_run_at ? Date.parse(beat.last_run_at) : 0
+      const fresh = last && Date.now() - last < KEEP_ALIVE_MAX_MS
+      out.keepAlive = { ok: Boolean(fresh), lastRunAt: beat?.last_run_at || null, runs: beat?.runs || 0, problem: fresh ? null : mode === 'missing' ? 'noDatabase' : last ? 'late' : 'never' }
+    }
+
+    // 7. The website's address: the one it is served from (Netlify's URL, or SITE_URL on Cloudflare) is the one in the code
+    const served = getWorkerEnv()?.SITE_URL || (typeof process !== 'undefined' && process.env.URL) || ''
+    const strip = (u) => String(u).replace(/\/$/, '').toLowerCase()
+    const sameAddress = !served || strip(served) === strip(site.url)
+    out.address = { ok: sameAddress, url: site.url, served: served || null, problem: sameAddress ? null : 'mismatch' }
+
+    out.allGood = [out.database || out.supabase, out.resend, out.razorpay, out.email, out.keepAlive, out.address].every((x) => x.ok)
     return json(200, out)
   },
   { methods: ['GET'] },

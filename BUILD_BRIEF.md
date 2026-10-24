@@ -21,7 +21,7 @@ You are the design lead and senior front-end engineer at a studio known for buil
 ## Client
 Dream Kitchen, home-based handmade chocolates, loaded brownie tubs, delight boxes and cookies, made fresh to order. Founder: Hema. She started as a student with ₹2,500 and grew it into a loved home brand. She also teaches chocolate classes and will soon be certified.
 - WhatsApp and phone: 9535706956 (use +91 9535706956 / wa.me/919535706956 / tel:+919535706956)
-- Instagram: @dreamkitchen_01_homemade (https://instagram.com/dreamkitchen_01_homemade)
+- Instagram: @dreamkitchen_01_homemade (address: `instagramUrl` in src/config/site.js)
 - Tagline: "Turning your cravings into sweet memories."
 - Customers: Instagram followers of all ages across Karnataka, mostly on phones, including older and rural customers who are not comfortable typing or using websites.
 

@@ -123,7 +123,7 @@ export default function SettingsAdmin({ onSaved }) {
         <h2 className="t-h3">Order alert emails</h2>
         <Field
           label="Send new orders, class bookings and messages to"
-          hint={s.alertEmailFromEnv && !s.alertEmail ? `Now going to ${s.alertEmailFromEnv} (set in Netlify). Type another address to change it.` : 'Use the email you signed up to Resend with (see the setup guide).'}
+          hint={s.alertEmailFromEnv && !s.alertEmail ? `Now going to ${s.alertEmailFromEnv} (the standard address). Type another address to change it.` : 'Use the email you signed up to Resend with (see the setup guide).'}
           error={err('alertEmail') && 'Please type a full email address, like name@gmail.com.'}
         >
           <input className={input} type="email" inputMode="email" autoCapitalize="none" value={s.alertEmail} onChange={set('alertEmail')} data-admin-alert-email />

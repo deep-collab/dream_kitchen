@@ -4,6 +4,7 @@
 import { courier, leadTimes, payment, products as CONFIG_PRODUCTS } from '../../src/config/shop.js'
 import { applyOverrides, applySettings } from '../../src/lib/pricing.js'
 import { config } from './env.mjs'
+import { istToday } from '../../src/lib/offers.js'
 
 const has = (v) => v !== null && v !== undefined
 
@@ -17,6 +18,10 @@ export function rowToOverride(r) {
   if (has(r.active)) o.active = r.active
   if (has(r.price_status)) o.priceStatus = r.price_status
   if (r.photo_url) o.photo = r.photo_url
+  if (r.display_name) o.name = r.display_name
+  if (r.description) o.description = r.description
+  // A product Hema added: the row is the whole product
+  if (r.custom) Object.assign(o, { custom: true, category: r.category, courierTier: r.courier_tier, sort: r.sort })
   return o
 }
 
@@ -85,3 +90,19 @@ export function publicMenu(catalog) {
 
 /** Can a customer pay right now? (UPI set, or Razorpay switched on) */
 export const paymentsOpen = (catalog) => Boolean(catalog.settings.payment.upiId) || config.razorpay.enabled
+
+/**
+ * Hema's offers for the website: switched on, not ended, and starting today or within the next
+ * ten minutes (so one that starts at midnight is there even from a copy cached just before). The
+ * website picks the live ones by today's Indian date itself (src/lib/offers.js).
+ */
+export function publicOffers(rows, now = new Date()) {
+  const today = istToday(now)
+  const soon = istToday(new Date(now.getTime() + 10 * 60_000))
+  return (rows || [])
+    .filter((r) => r.active !== false && r.ends_on >= today && r.starts_on <= soon)
+    .map((r) => ({ id: r.id, title: r.title, message: r.message || null, button: r.button || null, link: r.link || '', photo: r.photo_url || null, startsOn: r.starts_on, endsOn: r.ends_on }))
+}
+
+/** The Customize tiles' photos Hema changed: { [tile]: address } */
+export const publicPagePhotos = (rows) => Object.fromEntries((rows || []).filter((r) => r.photo_url).map((r) => [r.id, r.photo_url]))

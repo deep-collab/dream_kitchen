@@ -160,7 +160,10 @@ async function matrix(browser, codes) {
       await p.locator('[role=dialog] [role=switch]').first().click()
       await p.locator('[role=dialog] details summary').click()
     })],
-    ['sheet-tub-soon', '/menu#brownie-tubs', async (p) => openSheet(p, /Dream Cake|ಡ್ರೀಮ್ ಕೇಕ್/)],
+    // Products without a price (the Dream Cake Tub until Hema prices it) are not on the menu at all
+    ['menu-no-unpriced', '/menu#brownie-tubs', async (p) => {
+      if (await p.getByText(/Dream Cake|ಡ್ರೀಮ್ ಕೇಕ್/).count()) throw new Error('an unpriced product is on the menu')
+    }],
     ['customize', '/customize'],
     ['cart', '/cart'],
     ['checkout', '/checkout', async (p) => p.locator('[data-dk-next]').click()],
@@ -378,7 +381,9 @@ async function security(browser) {
 /* ---------------- 4. loading screen ---------------- */
 async function loader(browser) {
   const { ctx, page } = await newPage(browser, 390, 'en', { intro: true })
-  await page.goto(BASE + '/')
+  // Look as soon as the page starts: on a fast machine the loading screen (1 s at most) can be gone by 'load'
+  await page.goto(BASE + '/', { waitUntil: 'commit' })
+  await page.waitForSelector('#root', { state: 'attached' })
   const shown = await page.evaluate(() => document.documentElement.classList.contains('dk-intro-on') || !!document.getElementById('dk-intro'))
   const t0 = Date.now()
   await page.waitForFunction(() => !document.getElementById('dk-intro'), null, { timeout: 5000 })

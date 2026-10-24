@@ -1,7 +1,8 @@
 /*
   Sample data for the demo admin. Made-up customers (example.com emails, numbers that aren't real
   customers'), priced by the real pricing module so every total adds up. Orders are spread over the
-  last week across every status, plus class bookings for the coming weekends and a few messages.
+  last week across every status, plus class bookings for the coming weekends, a few messages and
+  offers in every state (live, scheduled, off, ended).
 */
 import { products } from '../../config/shop.js'
 import { quote, normaliseSelection, zoneForPincode } from '../../lib/pricing.js'
@@ -66,7 +67,8 @@ export async function seedDemo(store, setClock) {
   await store.upsertProducts([{ id: 'pista-bar', slug: 'pista-bar', category: 'chocolates', name_en: 'Pista Bar', sold_out: true }])
 
   const ref = await samplePhoto()
-  const refPath = 'refs/demo/0b0c8f5e-6a43-4f43-9a0e-2d6f2f1b7c11.png'
+  // Same shape as a real upload (DRAWING_REF_PATTERN), or the order would drop it
+  const refPath = 'refs/20261001/0b0c8f5e-6a43-4f43-9a0e-2d6f2f1b7c11.png'
   if (ref) await store.putObject(refPath, ref, 'image/png')
 
   /** One order: items [[productId, selection, qty]], placed `ago` ms before now, then moved along */
@@ -168,4 +170,25 @@ export async function seedDemo(store, setClock) {
   at(now - 4 * DAY)
   const done = await store.insertEnquiry({ kind: 'general', name: 'Vikram', phone: '9000077777', interest: 'General message', message: 'Can you deliver to Hyderabad?', lang: 'en' })
   await store.updateEnquiry(done.id, { status: 'handled' })
+
+  // Offers: one on the website now, one starting next week, one switched off, one that ended
+  at(now - 3 * DAY)
+  await store.insertOffer({
+    title: { en: 'Diwali Delight Boxes are here', kn: 'ದೀಪಾವಳಿ ಡಿಲೈಟ್ ಬಾಕ್ಸ್‌ಗಳು ಬಂದಿವೆ' },
+    message: { en: 'Order by Sunday for delivery before Diwali. A name on the box is free.', kn: 'ದೀಪಾವಳಿಗೆ ಮುನ್ನ ತಲುಪಲು ಭಾನುವಾರದೊಳಗೆ ಆರ್ಡರ್ ಮಾಡಿ. ಬಾಕ್ಸ್ ಮೇಲೆ ಹೆಸರು ಉಚಿತ.' },
+    button: { en: 'See Delight Boxes', kn: 'ಡಿಲೈಟ್ ಬಾಕ್ಸ್ ನೋಡಿ' },
+    link: 'category:delight-boxes',
+    starts_on: addDaysISO(today, -3),
+    ends_on: addDaysISO(today, 6),
+  })
+  await store.insertOffer({
+    title: { en: 'New: Ragi Walnut Brownies' },
+    message: { en: 'Our walnut brownies, made with ragi flour.' },
+    button: { en: 'Try them' },
+    link: 'product:walnut-brownies',
+    starts_on: addDaysISO(today, 7),
+    ends_on: addDaysISO(today, 14),
+  })
+  await store.insertOffer({ title: { en: 'Weekend chocolate class: 2 seats left' }, message: null, button: null, link: '', starts_on: addDaysISO(today, -1), ends_on: addDaysISO(today, 2), active: false })
+  await store.insertOffer({ title: { en: 'Navratri special Pista Bars' }, message: { en: 'Thank you for all your orders!' }, button: null, link: '', starts_on: addDaysISO(today, -20), ends_on: addDaysISO(today, -10) })
 }

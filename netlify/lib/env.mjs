@@ -44,9 +44,9 @@ export const config = {
   get siteUrl() {
     return (env('SITE_URL') || env('URL') || site.url).replace(/\/$/, '')
   },
-  /** Where new-order and enquiry emails go */
+  /** Where new-order and enquiry emails go (admin Settings can override it): HEMA_EMAIL, else the site's email */
   get hemaEmail() {
-    return env('HEMA_EMAIL')
+    return env('HEMA_EMAIL') || site.email
   },
   get resendKey() {
     return env('RESEND_API_KEY')

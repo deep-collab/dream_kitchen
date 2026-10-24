@@ -661,6 +661,161 @@ values ('product-photos', 'product-photos', true, 2097152, array['image/jpeg', '
 on conflict (id) do update set public = true, file_size_limit = 2097152, allowed_mime_types = array['image/jpeg', 'image/png', 'image/webp'];
 
 -- ===================================================================
+-- supabase/migrations/20261015000001_launch.sql
+-- ===================================================================
+-- Dream Kitchen: final launch (15 Oct 2026). Run AFTER the two earlier migrations. Safe to run again.
+-- Documented in docs/DATA-MODEL.md.
+--
+-- Adds: products Hema creates herself in the admin (custom = true; everything about them lives in
+-- the row), her own names and descriptions for any product, and the daily keep-alive's last run
+-- (so the free Supabase project never pauses; shown on /admin/setup).
+
+-- ---------------------------------------------------------------------------
+-- Products: Hema's own products, and her names / descriptions for any product
+-- ---------------------------------------------------------------------------
+alter table public.products add column if not exists custom boolean not null default false;
+-- { "en": "...", "kn": "..." }; NULL = the config's name / description
+alter table public.products add column if not exists display_name jsonb check (display_name is null or (jsonb_typeof(display_name) = 'object' and char_length(display_name::text) <= 400));
+alter table public.products add column if not exists description jsonb check (description is null or (jsonb_typeof(description) = 'object' and char_length(description::text) <= 2000));
+-- A product Hema adds is complete on its own: a name and a price (or sizes with prices)
+alter table public.products drop constraint if exists products_custom_complete;
+alter table public.products add constraint products_custom_complete check (
+  not custom or (display_name is not null and (price is not null or (sizes is not null and jsonb_array_length(sizes) > 0)))
+);
+alter table public.products drop constraint if exists products_custom_category;
+alter table public.products add constraint products_custom_category check (
+  not custom or category in ('brownie-tubs', 'delight-boxes', 'brownies', 'chocolates')
+);
+
+-- ---------------------------------------------------------------------------
+-- Keep-alive: the scheduled function (netlify/functions/keep-alive.mjs) writes here once a day
+-- ---------------------------------------------------------------------------
+create table if not exists public.heartbeat (
+  id integer primary key default 1 check (id = 1),
+  last_run_at timestamptz,
+  runs integer not null default 0
+);
+insert into public.heartbeat (id) values (1) on conflict (id) do nothing;
+alter table public.heartbeat enable row level security;
+-- No policies: only the server (service role) reads or writes it
+revoke all on public.heartbeat from anon, authenticated;
+
+-- ===================================================================
+-- supabase/migrations/20261022000001_product_photos.sql
+-- ===================================================================
+-- Dream Kitchen: product photos in two sizes (22 Oct 2026). Safe to run again.
+--
+-- Hema's "Change photo" (admin -> Menu) now stores each photo twice, 1200px and 600px WebP, in the
+-- public bucket "product-photos" (<product>/<time>-1200.webp + <product>/<time>-600.webp), and
+-- saves the 1200px address in products.photo_url; the website works out the 600px one. No table
+-- changes: photo_url stays as it was.
+--
+-- Who may change photos, as Row Level Security on storage.objects: Hema's admin account (a row in
+-- admin_users) and the admin function (service role, after her login check; it bypasses RLS).
+-- Nobody else: not the public, not any other logged-in account. Anyone may LOOK at the photos
+-- through their public address (they are on the menu); listing the bucket is admin-only.
+-- products is already admin-only for writing ("admin edits the menu", 20261005000001_init.sql).
+
+drop policy if exists "admin lists product photos" on storage.objects;
+create policy "admin lists product photos" on storage.objects for select to authenticated
+  using (bucket_id = 'product-photos' and public.is_admin());
+
+drop policy if exists "admin adds product photos" on storage.objects;
+create policy "admin adds product photos" on storage.objects for insert to authenticated
+  with check (bucket_id = 'product-photos' and public.is_admin());
+
+drop policy if exists "admin replaces product photos" on storage.objects;
+create policy "admin replaces product photos" on storage.objects for update to authenticated
+  using (bucket_id = 'product-photos' and public.is_admin())
+  with check (bucket_id = 'product-photos' and public.is_admin());
+
+drop policy if exists "admin removes product photos" on storage.objects;
+create policy "admin removes product photos" on storage.objects for delete to authenticated
+  using (bucket_id = 'product-photos' and public.is_admin());
+
+-- ===================================================================
+-- supabase/migrations/20261023000001_offers_and_page_photos.sql
+-- ===================================================================
+-- Dream Kitchen: offers, Customize tile photos and a ragi option for Hema's own products
+-- (23 Oct 2026). Run AFTER the earlier migrations. Safe to run again. Documented in docs/DATA-MODEL.md.
+--
+-- Adds:
+--   * public.offers: Hema's offer banners (admin -> Offers). Display-only: they never change a
+--     price. Dates are Indian calendar dates, both days included.
+--   * public.page_photos: the photos of the Customize page's tiles and Home's customise tile
+--     (admin -> Menu -> Customize page). No row = the product photo that was always there.
+--   * Products Hema adds may now have a ragi version (products.ragi_price, a column that already
+--     exists; nothing to change in the table).
+-- Photos for both go in the existing public bucket "product-photos" (offer-<id>/... and
+-- page-<slot>/...), so the admin-only storage rules of 20261022000001_product_photos.sql apply.
+--
+-- Security (Row Level Security):
+--   * anyone (the website, anon key) may READ offers that are live right now, and the page photos;
+--   * only Hema's admin account (admin_users, public.is_admin()) may add, change or delete;
+--   * the Netlify Functions use the service role (they bypass RLS, after checking her login).
+
+-- ---------------------------------------------------------------------------
+-- Offers
+-- ---------------------------------------------------------------------------
+create table if not exists public.offers (
+  id uuid primary key default gen_random_uuid(),
+  -- { "en": "...", "kn": "..." }; the English is required, the Kannada may be missing
+  title jsonb not null check (jsonb_typeof(title) = 'object' and coalesce(title->>'en', '') <> '' and char_length(title::text) <= 400),
+  message jsonb check (message is null or (jsonb_typeof(message) = 'object' and char_length(message::text) <= 800)),
+  button jsonb check (button is null or (jsonb_typeof(button) = 'object' and char_length(button::text) <= 200)),
+  -- '' (no button), 'category:<id>', 'product:<id>' or 'page:customize'
+  link text not null default '' check (link ~ '^(|category:[a-z0-9-]{2,40}|product:[a-z0-9][a-z0-9-]{1,59}|page:customize)$'),
+  photo_url text check (photo_url is null or char_length(photo_url) <= 500),
+  starts_on date not null,
+  ends_on date not null,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint offers_dates check (ends_on >= starts_on)
+);
+create index if not exists offers_ends_on on public.offers (ends_on);
+drop trigger if exists offers_touch on public.offers;
+create trigger offers_touch before update on public.offers for each row execute function public.touch_updated_at();
+
+alter table public.offers enable row level security;
+revoke all on public.offers from anon;
+grant select on public.offers to anon, authenticated;
+grant insert, update, delete on public.offers to authenticated;
+
+drop policy if exists "live offers are public" on public.offers;
+create policy "live offers are public" on public.offers for select to anon, authenticated
+  using (active and (now() at time zone 'Asia/Kolkata')::date between starts_on and ends_on);
+drop policy if exists "admin reads every offer" on public.offers;
+create policy "admin reads every offer" on public.offers for select to authenticated using (public.is_admin());
+drop policy if exists "admin adds offers" on public.offers;
+create policy "admin adds offers" on public.offers for insert to authenticated with check (public.is_admin());
+drop policy if exists "admin changes offers" on public.offers;
+create policy "admin changes offers" on public.offers for update to authenticated using (public.is_admin()) with check (public.is_admin());
+drop policy if exists "admin deletes offers" on public.offers;
+create policy "admin deletes offers" on public.offers for delete to authenticated using (public.is_admin());
+
+-- ---------------------------------------------------------------------------
+-- Photos of the Customize tiles
+-- ---------------------------------------------------------------------------
+create table if not exists public.page_photos (
+  id text primary key check (id ~ '^[a-z0-9-]{2,40}$'),
+  photo_url text check (photo_url is null or char_length(photo_url) <= 500),
+  updated_at timestamptz not null default now()
+);
+drop trigger if exists page_photos_touch on public.page_photos;
+create trigger page_photos_touch before update on public.page_photos for each row execute function public.touch_updated_at();
+
+alter table public.page_photos enable row level security;
+revoke all on public.page_photos from anon;
+grant select on public.page_photos to anon, authenticated;
+grant insert, update, delete on public.page_photos to authenticated;
+
+drop policy if exists "page photos are public" on public.page_photos;
+create policy "page photos are public" on public.page_photos for select to anon, authenticated using (true);
+drop policy if exists "admin changes page photos" on public.page_photos;
+create policy "admin changes page photos" on public.page_photos for all to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- ===================================================================
 -- supabase/seed.sql
 -- ===================================================================
 -- Dream Kitchen menu (reference columns only). Generated by: node scripts/seed-menu.mjs --sql

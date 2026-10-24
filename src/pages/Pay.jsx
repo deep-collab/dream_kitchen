@@ -79,7 +79,7 @@ function PayOnline({ order, phone, onDone }) {
         <p className="t-small text-brown-2">{t('pay.later')}</p>
       </div>
       <aside className="lg:sticky lg:top-[calc(var(--header-h)+1.5rem)]">
-        <TotalBar label={t('cart.total')} total={total} note={`${t('order.code')} ${order.code}`}>
+        <TotalBar label={t('cart.total')} total={total} note={`${t('order.code')} ${order.code}`} noRefund>
           <Button size="lg" fullWidth onClick={rz.pay} disabled={rz.busy} aria-busy={rz.busy || undefined} data-dk-pay-online>
             {razorpayLabel(t, rz.state, total)}
           </Button>
@@ -172,7 +172,7 @@ function PayUpi({ order, phone, onDone, upi }) {
             <span>{error}</span>
           </p>
         )}
-        <TotalBar label={t('cart.total')} total={total} note={`${t('order.code')} ${order.code}`}>
+        <TotalBar label={t('cart.total')} total={total} note={`${t('order.code')} ${order.code}`} noRefund>
           <Button type="submit" form="pay-form" size="lg" fullWidth disabled={busy || shotBusy} data-dk-paid>
             {busy ? t('pay.submitting') : t('pay.submit')}
           </Button>

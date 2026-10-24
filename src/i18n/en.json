@@ -16,7 +16,11 @@
     "cart": "Cart",
     "skip": "Skip to main content",
     "main": "Main",
-    "language": "Language"
+    "language": "Language",
+    "terms": "Terms & Conditions",
+    "refund": "Refund & Cancellation",
+    "shipping": "Shipping & Delivery",
+    "privacy": "Privacy Policy"
   },
   "common": {
     "close": "Close",
@@ -29,20 +33,32 @@
     "cartItemsOne": ", 1 item",
     "cartEmptySr": ", empty",
     "newTab": "(opens in a new tab)",
+    "instagramLabel": "Dream Kitchen on Instagram, {handle} (opens in a new tab)",
     "loading": "Loading…",
     "copy": "Copy",
     "cartWithCount": "Cart, {count} items",
-    "cartWithCountOne": "Cart, 1 item"
+    "cartWithCountOne": "Cart, 1 item",
+    "noRefund": "No refund on customized orders and classes."
   },
   "footer": {
     "links": "Useful links",
     "rights": "© {year} Dream Kitchen",
     "fssai": "FSSAI licence no. {fssai}",
-    "shipping": "Made fresh to order. Sent all over India by courier."
+    "shipping": "Made fresh to order. Sent all over India by courier.",
+    "policies": "Policies",
+    "details": "Contact details",
+    "owner": "Owner: Hema",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "instagram": "Instagram"
   },
   "banner": {
     "closed": "Orders are paused for now.",
-    "label": "Notice from Dream Kitchen"
+    "label": "Notice from Dream Kitchen",
+    "offers": "Offers",
+    "offerCta": "See offer",
+    "offerShow": "Show offer {n} of {count}"
   },
   "units": {
     "g": "{n} g",
@@ -154,6 +170,22 @@
     "booking": {
       "title": "Your class booking | Dream Kitchen",
       "desc": "Your chocolate class booking with Dream Kitchen."
+    },
+    "terms": {
+      "title": "Terms & Conditions | Dream Kitchen",
+      "desc": "The terms for ordering handmade chocolates and brownies and booking classes with Dream Kitchen."
+    },
+    "refund": {
+      "title": "Refund & Cancellation Policy | Dream Kitchen",
+      "desc": "Dream Kitchen’s refund, replacement and cancellation policy for handmade orders and chocolate classes."
+    },
+    "shipping": {
+      "title": "Shipping & Delivery Policy | Dream Kitchen",
+      "desc": "How Dream Kitchen prepares, dispatches and delivers handmade orders across India, and the courier charges."
+    },
+    "privacy": {
+      "title": "Privacy Policy | Dream Kitchen",
+      "desc": "What Dream Kitchen collects when you order or book a class, and how it is used and protected."
     }
   },
   "home": {
@@ -668,11 +700,13 @@
     "items": {
       "order": {
         "q": "How do I order?",
-        "a": "Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay by UPI on the website. You get an order ID to track it."
+        "a": "Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay by UPI on the website. You get an order ID to track it.",
+        "aOnline": "Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay online on the website. You get an order ID to track it."
       },
       "pay": {
         "q": "How do I pay?",
-        "a": "By UPI on the website: scan the QR code or tap “Pay with a UPI app”, then enter the 12-digit UPI reference. Hema confirms your payment, usually within a few hours."
+        "a": "By UPI on the website: scan the QR code or tap “Pay with a UPI app”, then enter the 12-digit UPI reference. Hema confirms your payment, usually within a few hours.",
+        "aOnline": "Online on the website, through Razorpay: UPI, debit or credit card, or net banking. Your order is confirmed as soon as the payment goes through."
       },
       "courier": {
         "q": "Where do you deliver, and what does courier cost?",
@@ -699,6 +733,16 @@
         "a": "WhatsApp us on {phone} as soon as you can, and Hema will tell you what is possible."
       }
     }
+  },
+  "policy": {
+    "terms": "Terms & Conditions",
+    "refund": "Refund & Cancellation Policy",
+    "shipping": "Shipping & Delivery Policy",
+    "privacy": "Privacy Policy",
+    "updated": "Last updated: {date}",
+    "english": "This policy is written in English.",
+    "contactTitle": "Questions? Contact us",
+    "others": "Our other policies"
   },
   "notFound": {
     "title": "Oops! This page melted away",

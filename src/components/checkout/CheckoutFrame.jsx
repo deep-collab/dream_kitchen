@@ -33,8 +33,10 @@ export function CheckoutProgress({ step }) {
  * The order total and the step's main button. Phones: fixed to the bottom of the screen, so the
  * total is always visible (the tab bar steps aside on checkout). From 1024px: in the summary column.
  *   total: text (e.g. "₹2,100" or "₹1,650 + courier")   label: the total's label
+ *   noRefund: the "No refund on customized orders and classes" line under a pay button
  */
-export function TotalBar({ label, total, children, note }) {
+export function TotalBar({ label, total, children, note, noRefund = false }) {
+  const { t } = useI18n()
   return (
     <div className="on-dark fixed inset-x-0 bottom-0 z-40 border-t border-gold/45 bg-ink px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] text-cream lg:static lg:mt-5 lg:rounded-card lg:border lg:p-5">
       <div className="mx-auto max-w-xl lg:max-w-none">
@@ -43,6 +45,11 @@ export function TotalBar({ label, total, children, note }) {
           <span className="t-price text-gold-light">{total}</span>
         </p>
         {children}
+        {noRefund && (
+          <p className="t-small mt-2 text-center text-cream" data-dk-no-refund>
+            {t('common.noRefund')}
+          </p>
+        )}
         {note && <p className="t-small mt-2 text-center text-muted">{note}</p>}
       </div>
     </div>

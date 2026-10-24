@@ -69,6 +69,18 @@ npx wrangler secret put RAZORPAY_KEY_SECRET
 npx wrangler secret put RAZORPAY_WEBHOOK_SECRET
 ```
 
+### 2.4b Updating a database that is already in use (e.g. 23 Oct 2026: offers)
+When a new file appears in `d1/migrations/` (23 Oct 2026: `0002_products_text_offers_page_photos.sql`,
+for Hema's own products, names and descriptions, offers and the Customize photos), run it on the live
+database **before** deploying the new code:
+```bash
+npm run d1:migrate -- --remote
+```
+Wrangler runs only the files that haven't run yet, so orders and Hema's prices stay as they are.
+(`npm run d1:setup -- --remote` does the same plus the menu seed, which is also safe.) Never
+run `d1/setup-all.sql` itself on a database that is in use: it is for a new, empty database and stops
+at "duplicate column". Check afterwards: `/admin/setup` → the database row is green.
+
 ### 2.5 Deploy Front-End and Worker
 ```bash
 npm run deploy

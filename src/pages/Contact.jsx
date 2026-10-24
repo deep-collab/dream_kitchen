@@ -49,11 +49,17 @@ export default function Contact() {
               </a>
             </li>
             <li>
-              <a href={site.instagram.url} target="_blank" rel="noopener noreferrer" className={row}>
+              <a
+                href={site.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t('common.instagramLabel', { handle: `@${site.instagramHandle}` })}
+                className={row}
+              >
                 <InstagramIcon className="h-7 w-7 shrink-0" />
                 <span>
                   <span className="block font-bold">{t('contact.instagram')}</span>
-                  <span className="t-small block break-all text-brown-2">{site.instagram.handle}</span>
+                  <span className="t-small block break-all text-brown-2">@{site.instagramHandle}</span>
                 </span>
               </a>
             </li>
@@ -70,9 +76,19 @@ export default function Contact() {
             )}
           </ul>
 
-          <p className="mt-5">
-            <span className="font-bold">{t('contact.phone')}:</span> {site.phone.display}
-          </p>
+          <address className="mt-5 space-y-1 not-italic" data-dk-business>
+            <p>
+              <span className="font-bold">{site.name}</span> · {t('footer.owner')}
+            </p>
+            <p>
+              <span className="font-bold">{t('contact.phone')}:</span> {site.phone.display}
+            </p>
+            {site.address && (
+              <p>
+                <span className="font-bold">{t('footer.address')}:</span> {site.address}
+              </p>
+            )}
+          </address>
           {hasCallHours() && (
             <p className="mt-5 flex gap-3">
               <ClockIcon className="mt-0.5 h-6 w-6 shrink-0" />

@@ -50,6 +50,9 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
     bookingEvents: [],
     blocks: [],
     rateLimits: {},
+    heartbeat: { last_run_at: null, runs: 0 },
+    offers: [],
+    pagePhotos: {},
     objects: {},
     publicObjects: {},
     sessions: {},
@@ -77,6 +80,16 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
     /** The store's clock in ms (tests move it forward to check the 30-day rule) */
     clock: () => now().getTime(),
 
+    /* ---------- keep-alive ---------- */
+    async beat(at) {
+      db.heartbeat = { last_run_at: at, runs: (db.heartbeat?.runs || 0) + 1 }
+      save()
+      return clone(db.heartbeat)
+    },
+    async lastBeat() {
+      return clone(db.heartbeat || { last_run_at: null, runs: 0 })
+    },
+
     /* ---------- menu and settings ---------- */
     async listProducts() {
       return clone(Object.values(db.products))
@@ -93,6 +106,41 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
     },
     async getSettings() {
       return clone(db.settings)
+    },
+
+    /* ---------- offers and the Customize tiles' photos ---------- */
+    async listOffers() {
+      return clone([...db.offers].sort((a, b) => (a.starts_on < b.starts_on ? 1 : a.starts_on > b.starts_on ? -1 : 0)))
+    },
+    async insertOffer(row) {
+      if (!row.starts_on || !row.ends_on || row.ends_on < row.starts_on) throw new DbError('23514', 'offers_dates')
+      const offer = { id: uuid(), message: null, button: null, link: '', photo_url: null, active: true, ...clone(row), created_at: iso(), updated_at: iso() }
+      db.offers.push(offer)
+      save()
+      return clone(offer)
+    },
+    async updateOffer(id, patch) {
+      const i = db.offers.findIndex((o) => o.id === id)
+      if (i < 0) return null
+      const next = { ...db.offers[i], ...clone(patch), updated_at: iso() }
+      if (next.ends_on < next.starts_on) throw new DbError('23514', 'offers_dates')
+      db.offers[i] = next
+      save()
+      return clone(next)
+    },
+    async deleteOffer(id) {
+      const before = db.offers.length
+      db.offers = db.offers.filter((o) => o.id !== id)
+      save()
+      return db.offers.length < before
+    },
+    async listPagePhotos() {
+      return clone(Object.values(db.pagePhotos))
+    },
+    async setPagePhoto(id, photoUrl) {
+      db.pagePhotos[id] = { id, photo_url: photoUrl, updated_at: iso() }
+      save()
+      return clone(db.pagePhotos[id])
     },
     async updateSettings(patch) {
       db.settings = { ...db.settings, ...clone(patch), id: 1, updated_at: iso() }

@@ -2,6 +2,7 @@ import { lazy } from 'react'
 import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import { pages } from './routes'
 import { legacyProductPath } from './config/redirects'
+import { POLICY_PAGES } from './components/layout/nav'
 import Layout from './components/layout/Layout'
 
 // Every page loads on demand (src/routes.js). Layout shows the header and footer at once and
@@ -21,6 +22,7 @@ const Booking = lazy(pages.Booking)
 const Story = lazy(pages.Story)
 const Contact = lazy(pages.Contact)
 const FAQ = lazy(pages.FAQ)
+const Policy = lazy(pages.Policy)
 const NotFound = lazy(pages.NotFound)
 
 /** Old product addresses (Steps 2–5): the product's new card, or its category (public/_redirects does the same with a 301) */
@@ -48,6 +50,9 @@ export default function App() {
         <Route path="our-story" element={<Story />} />
         <Route path="contact" element={<Contact />} />
         <Route path="faq" element={<FAQ />} />
+        {POLICY_PAGES.map((page) => (
+          <Route key={page} path={page} element={<Policy key={page} page={page} />} />
+        ))}
         {/* Old addresses */}
         <Route path="shop" element={<Navigate to="/menu" replace />} />
         <Route path="product/:slug" element={<LegacyProduct />} />

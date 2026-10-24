@@ -230,7 +230,7 @@ export default function BookClass() {
               <span>{error}</span>
             </p>
           )}
-          <TotalBar label={t('cart.total')} total={formatINR(fee)}>
+          <TotalBar label={t('cart.total')} total={formatINR(fee)} noRefund>
             <Button type="submit" form="book-form" size="lg" fullWidth disabled={busy} aria-busy={busy || undefined} data-dk-book>
               {busy ? t('book.booking') : t('book.pay', { price: formatINR(fee) })}
             </Button>

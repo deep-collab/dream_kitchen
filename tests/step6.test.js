@@ -102,8 +102,8 @@ describe('old addresses', () => {
     const lines = redirectsFile().split('\n').filter((l) => l && !l.startsWith('#'))
     expect(lines).toContain('/shop  /menu  301')
     expect(lines).toContain('/product/coconut-bar  /menu?c=chocolates  301')
-    expect(lines.indexOf('/admin/*  /admin/index.html  200')).toBeLessThan(lines.indexOf('/*  /index.html  200'))
-    expect(lines.at(-1)).toBe('/*  /index.html  200')
+    expect(lines.indexOf('/admin/*  /admin/index.html  200')).toBeLessThan(lines.indexOf('/*  /app.html  200'))
+    expect(lines.at(-1)).toBe('/*  /app.html  200')
   })
 
   it('the sitemap lists the public pages only', () => {

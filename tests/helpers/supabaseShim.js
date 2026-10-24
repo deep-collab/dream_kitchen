@@ -1,7 +1,8 @@
 // A tiny stand-in for what Supabase provides around our migrations, so they run in PGlite
 // (real Postgres in WebAssembly): the anon / authenticated / service_role roles, auth.users,
 // auth.uid() (Supabase reads the JWT's "sub" claim from request.jwt.claim.sub) and the
-// storage.buckets table. Used by tests/db.test.js.
+// storage.buckets and storage.objects tables (RLS on, granted to every role, as in Supabase).
+// Used by tests/db.test.js.
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { PGlite } from '@electric-sql/pglite'
@@ -19,6 +20,10 @@ grant usage on schema auth to anon, authenticated, service_role;
 grant execute on function auth.uid() to anon, authenticated, service_role;
 create schema storage;
 create table storage.buckets (id text primary key, name text, public boolean, file_size_limit bigint, allowed_mime_types text[]);
+create table storage.objects (id uuid primary key default gen_random_uuid(), bucket_id text references storage.buckets (id), name text, owner uuid);
+alter table storage.objects enable row level security;
+grant usage on schema storage to anon, authenticated, service_role;
+grant all on storage.objects to anon, authenticated, service_role;
 grant usage on schema public to anon, authenticated, service_role;
 alter default privileges in schema public grant all on tables to service_role;
 alter default privileges in schema public grant all on sequences to service_role;

@@ -10,6 +10,7 @@ import kannadaSplit, { kannadaFileName } from './scripts/kannada-split.mjs'
 import stringsSplit from './scripts/strings-split.mjs'
 import { robotsTxt, sitemapXml } from './scripts/sitemap.mjs'
 import devApi from './scripts/dev-api.mjs'
+import prerender from './scripts/prerender.mjs'
 import { redirectsFile } from './src/config/redirects.js'
 
 const readJson = (path) => JSON.parse(readFileSync(new URL(path, import.meta.url), 'utf8'))
@@ -20,8 +21,9 @@ const escapeHtml = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace
 // Fills the {{dk:*}} markers in index.html: the symbol sprite (from the unaltered
 // src/assets/symbol.svg) and the loading-screen tagline (from the i18n files), so the
 // inline loading screen has one source for its artwork and its words. Font URLs come
-// from src/config/fonts.js; the phone number in the description and JSON-LD from
-// src/config/site.js.
+// from src/config/fonts.js; the phone number in the description and JSON-LD, and the site
+// address in the canonical / share links ({{dk:url}}) and the Instagram profile in the JSON-LD
+// ({{dk:instagram}}), from src/config/site.js.
 function dreamKitchenHtml() {
   return {
     name: 'dream-kitchen-html',
@@ -42,6 +44,8 @@ function dreamKitchenHtml() {
           .replace('{{dk:kn-link-id}}', KN_FONTS_LINK_ID)
           .replace('{{dk:meta-desc}}', escapeHtml(en.seo.home.desc.replace('{phone}', site.phone.display)))
           .replace('{{dk:telephone}}', site.phone.tel)
+          .replaceAll('{{dk:url}}', site.url.replace(/\/$/, ''))
+          .replace('{{dk:instagram}}', site.instagramUrl)
       },
     },
   }
@@ -91,6 +95,7 @@ const ROUTE_FILES = [
   ['^/our-story$', 'src/pages/Story.jsx'],
   ['^/contact$', 'src/pages/Contact.jsx'],
   ['^/faq$', 'src/pages/FAQ.jsx'],
+  ['^/(terms|refund|shipping|privacy)$', 'src/pages/Policy.jsx'],
 ]
 function routePreload() {
   return {
@@ -160,6 +165,6 @@ export default defineConfig(({ command }) => ({
   // Two pages: the shop (index.html) and Hema's admin (admin/index.html). The admin has its own
   // bundle, so customers download none of it.
   build: { rollupOptions: { input: { main: 'index.html', admin: 'admin/index.html' } } },
-  plugins: [devApi(), dreamKitchenHtml(), kannadaSplit(), stringsSplit(), kannadaPreload(), routePreload(), seoFiles(), react(), tailwindcss()],
+  plugins: [devApi(), dreamKitchenHtml(), kannadaSplit(), stringsSplit(), kannadaPreload(), routePreload(), seoFiles(), prerender(), react(), tailwindcss()],
   resolve: { alias: command === 'build' ? [...PREACT, BROWSER_ENV] : PREACT },
 }))

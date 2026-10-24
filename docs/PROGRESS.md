@@ -2,6 +2,58 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 23 Oct 2026 (later): the new repo, and everything on Cloudflare D1 too (branch pre-main)
+The repo moved to github.com/deep-collab/dream_kitchen. Its `main` had split off on 10 Oct and moved to a Cloudflare Worker +
+D1 (deep-collab, 16 Oct), without the 11–23 Oct work. `pre-main` = all of our work + that `main`, merged:
+- [x] Conflicts (CLAUDE.md, package.json/-lock, setup-check function and page) resolved keeping both: D1 row + our keep-alive
+  (not needed on D1) and address rows; our Setup check page (theirs called `card()` as a function and would not open)
+- [x] package.json: `@cloudflare/workerd-darwin-arm64` was a required dependency (Apple Mac only: `npm install` fails elsewhere);
+  removed, wrangler brings the right one. `@netlify/functions` kept (loaded only on Netlify, `netlify/lib/cdn.mjs`)
+- [x] D1 had only the 10 Oct features: `d1/migrations/0002_products_text_offers_page_photos.sql` (Hema's own products,
+  names, descriptions, offers, tile photos, with CHECK rules like Supabase's) and the store methods in `d1.mjs`. Also fixed in
+  D1: saving a name or photo no longer wipes the other columns (upsert sets only the given ones), and a Razorpay payment
+  now keeps its payment ID and method (they were dropped)
+- [x] `/api/menu` can't be taken down by a missing offers part (it crashed with 500 on D1 before the store had offers)
+- [x] Checks: 369 tests (tests/d1-features.test.js: the whole admin flow through the Worker on real SQLite; 0002 on a
+  database in use keeps orders and prices); `wrangler deploy --dry-run` builds; in Cloudflare's local runtime
+  (`wrangler dev`, local D1 with both migrations): qa-offers 54/54, qa-admin 24/24; on Netlify-style dev: qa-offers 54/54
+
+## 23 Oct 2026: offers, Edit name / Description, + Add new product, Customize photos (branch hema-admin-offers)
+Hema's requests via the owner. Found first: commit 8fa479b already had name/description editing (folded away in "Edit name and description" under each card, no counter) and one "Add a new product" button at the top of Menu (no ragi); the Customize page's Delight Box tile borrowed the Red Velvet Delight Box photo, so it couldn't be changed on its own.
+- [x] Menu cards: **Edit name** and **Description** buttons next to Save / Mark sold out (own small editors, English + Kannada, counters; description max 200, was 300; `PRODUCT_TEXT_MAX`). The product ID never changes
+- [x] **+ Add new product** (big, gold) at the bottom of each menu section, that section preselected; **ragi version** yes/no + extra price for her own products (`products.ragi_price`, `customProduct` in pricing.js), switchable later. Server re-prices as before
+- [x] **Customize page photos**: admin → Menu → Customize page: three tiles (`customize-box`, `customize-bar`, `home-customize`), same 1200 + 600 WebP upload (shared `src/admin/photos.jsx`), table `page_photos`, fallback = the product photo they always had (`ProductPhoto photo=`)
+- [x] **Offers** tab (`src/admin/Offers.jsx`): list with Live / Scheduled / Ended / Off, + Add new offer, Edit, Turn off/on, Delete (confirm), banner photo, preview, the "offers don't change prices" note. Website: banner at the top of Home, slim strip on Menu, rotating every 6 s with dots (paused on touch/hover/focus; no turning by itself with reduced motion), tap → product sheet or section. Last offers kept on the phone (`dk_offers`) so a returning visitor's banner is in the first paint
+- [x] Database: migration `20261023000001_offers_and_page_photos.sql` (in setup-all.sql). RLS: the public reads only live offers (IST date in the policy) and the tile photos; only `is_admin()` writes. `/api/menu` still answers if the tables are missing (before the owner runs the SQL); Setup check asks for the SQL until they exist
+- [x] Fixed on the way: `/menu?item=` now waits for Hema's menu (a product she added opened nothing on a fresh load) and works for links on the Menu page itself; an open product sheet now shows the latest product (one opened before /api/menu arrived kept the old description and prices); a first description no longer wiped the "Saved" message (Preact rebuilt the editor)
+- [x] Demo: sample offers in every state; the Customize tiles
+- [x] Checks: 336 tests (13 new in tests/offers.test.js, 5 new database tests); check-i18n, check-secrets, build clean; `node scripts/qa-offers.mjs` 54/54 (390 + 1280 × EN/KN: edit name, description, add product and order it with ragi ₹510 + ₹90, tile photo, add / schedule / turn off / delete / edit offers, end dates on the customer's clock, Order now on the first screen, 0 console errors, 0 sideways scroll, 0 targets under 48px); qa-admin 24/24; qa-step6 0 problems; qa-payments all passed
+- [x] Speed: first-visit JS (EN) 47.7–58 KB (was 46.8–56.3; budget ~66). Lighthouse mobile, old and new code measured back to back on this machine (two rounds, median of 3 each): Home 87, 85 → 85, 85; Menu 92, 85 → 92, 85; Cart 97, 93 → 96, 95; Checkout 95, 90 → 95, 94; Accessibility / Best Practices / SEO 100. The same within noise; Home and Menu were already under 90 here (LCP = the first product photo, `uses-responsive-images` 239 KiB: an older issue, not this change)
+- Known: a first-time visitor's banner appears when /api/menu arrives (about 0.3 s, usually under the first-visit loading screen), pushing the page down once; returning visitors get it in the first paint
+
+## 22 Oct 2026: product photo change in two sizes
+- [x] Admin → Menu → **Change photo** (one big button, 56px, full width on a phone): the phone cuts the middle square and makes 1200px + 600px WebP (`productPhotoFiles`, src/admin/MenuAdmin.jsx); both go to the public bucket `product-photos` as `<product>/<time>-1200.webp` + `-600.webp`; `products.photo_url` = the 1200px address, set only after both are stored (a failed upload changes nothing). The 600px address is worked out from it (`src/lib/productPhoto.js`); older one-file photos still work
+- [x] Website (`ProductPhoto`): srcset 600w/1200w for Hema's photos; a photo that fails to load falls back to the built-in photo, then the drawing
+- [x] At once, no redeploy: `/api/menu` has the Netlify cache tag `menu`; the admin function purges it after addProduct / updateProduct / productPhoto / updateSettings (`netlify/lib/cdn.mjs`, `@netlify/functions` purgeCache; a failed purge only means up to a minute's delay)
+- [x] RLS: migration `20261022000001_product_photos.sql`, storage.objects policies for `product-photos`, admin (`is_admin()`) only; tested in tests/db.test.js. Owner: run setup-all.sql again (HANDOVER.md)
+- [x] Checks: 318 tests, check-secrets, check-i18n; qa-admin 24/24 at 390px (button size, failed upload keeps the photo, 1200 + 600 webp served, the menu shows it at once); qa-step6 0 problems; qa-payments all passed; first-visit JS 46.8–56.3 KB (EN)
+
+## 16 Oct 2026: final launch, after the power cut
+- Checked after the power cut: nothing lost. All 15 Oct work (3 commits) was committed and pushed; no lock files, no half-written files, node_modules complete
+- [x] The live site is the Netlify project **dreamkitcheno1**: `site.url` = https://dreamkitcheno1.netlify.app (the one config value); every old luminous-salmiakki address replaced in CLAUDE.md, LAUNCH.md and the guides. The domain is bought, to connect later (SETUP-BACKEND step 1, then 1.5: Supabase URLs, Razorpay website + webhooks)
+- [x] SETUP-BACKEND: dreamkitcheno1 throughout; step 0 links the project to GitHub `main`; step 7 works before the domain is connected (Resend DNS at the domain company); Forgot password: Supabase SMTP via Resend, a Dream Kitchen reset email template, and what to do if no email comes
+- [x] HANDOVER.md: dreamkitcheno1 links; the forgot-password steps match the screens
+- [x] LAUNCH.md: the refund-policy line corrected (the live site on 16 Oct still ran 11 Oct code with the old list; the code has had the corrected list since 12 Oct); court city, delivery time and web address ticked
+- [x] Checks: build, 307 tests, check-i18n, check-secrets; qa-step6 0 problems (4 widths × EN/KN); qa-policies, qa-admin 21/21 (incl. add, rename, hide a product), qa-payments 9/9, qa-prerender; no-JavaScript text check of all 11 pre-rendered pages
+
+## 11 Oct 2026: policy pages for Razorpay verification
+- [x] /terms, /refund, /shipping, /privacy (`src/pages/Policy.jsx`, text in `src/data/policies.js`, English only with a Kannada note; lead time and courier rates read live from config/admin). Refund rules are Hema's (no refunds; custom orders and classes non-refundable, class date can shift with 24 h notice; damaged/melted/incorrect/quality items replaced if reported within 24 h with photos/video)
+- [x] Footer on every page: the four policies + Contact, business name, owner, phone, email/address once filled, Instagram. Contact shows name, owner, phone, address
+- [x] "No refund on customized orders and classes." under Place order, Pay and Book & pay (`TotalBar noRefund`)
+- [x] Products without a price are left off the menu (MenuProvider), so every product shown has a price; they return once Hema prices them in admin
+- [x] TODO in `src/config/site.js`: email, address, jurisdictionCity, deliveryTime (empty = hidden or neutral wording)
+- [x] Checks: `node scripts/qa-policies.mjs` (5 pages × 390/1280 × EN/KN, opened directly and refreshed, on dev and on the production build), qa-step6 0 problems, qa-admin 18/18, qa-payments 9/9, 302 tests, check-i18n and check-secrets clean; first-visit JS +~0.5 KB
+
 ## 10 Oct 2026: the complete admin, connected end to end (branch admin-complete)
 - [x] Database: migration `20261010000001_admin_complete.sql` (class bookings + history, closed weekends/slots, seats under a lock in `create_booking`, product photos in a public bucket, refund note and paid_at, general messages, alert email and class settings hidden from the public, admin last activity, a 750 g courier tier). One file for the owner: `supabase/setup-all.sql` (tested: runs twice in a fresh Postgres)
 - [x] Login: Supabase Auth, only `admin_users` (Hema + owner); Forgot password (Supabase link → /admin/reset); 30 days unused → log in again (checked on the server and the phone); Log out; new Supabase `sb_secret_` keys supported

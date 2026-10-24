@@ -11,6 +11,7 @@ import { createMemoryStore } from '../netlify/lib/store/memory.mjs'
 import { setStore } from '../netlify/lib/store/index.mjs'
 import { outbox } from '../netlify/lib/email.mjs'
 import { csvCell } from '../netlify/lib/reports.mjs'
+import { smallPhoto, uploadedPhotoFiles } from '../src/lib/productPhoto.js'
 import createOrder from '../netlify/functions/create-order.mjs'
 import orderFn from '../netlify/functions/order.mjs'
 import submitPayment from '../netlify/functions/submit-payment.mjs'
@@ -21,6 +22,7 @@ import createBooking from '../netlify/functions/create-booking.mjs'
 import bookingFn from '../netlify/functions/booking.mjs'
 import enquiry from '../netlify/functions/class-enquiry.mjs'
 import setupCheck from '../netlify/functions/setup-check.mjs'
+import keepAlive from '../netlify/functions/keep-alive.mjs'
 import photoFn from '../netlify/functions/photo.mjs'
 import razorpayOrder from '../netlify/functions/razorpay-order.mjs'
 import razorpayVerify from '../netlify/functions/razorpay-verify.mjs'
@@ -415,6 +417,48 @@ describe('menu photos, settings, enquiries, reports, setup check', () => {
     expect(back.body.products.find((x) => x.id === 'almond-bar').ownPhoto).toBe(false)
   })
 
+  const webpOf = (n) => `data:image/webp;base64,${Buffer.from([...new TextEncoder().encode('RIFF'), 0, 0, 0, 0, ...new TextEncoder().encode('WEBPVP8 '), n, n]).toString('base64')}`
+
+  it('Change photo stores the 1200px and the 600px file, and the website finds both', async () => {
+    const s = await login()
+    const r = await act(s, 'productPhoto', { id: 'pista-bar', image: webpOf(1), imageSmall: webpOf(2) })
+    const p = r.body.products.find((x) => x.id === 'pista-bar')
+    expect(p.photo).toMatch(/^\/api\/photo\/pista-bar\/\d+-1200\.webp$/)
+    expect((await call(menuFn, null, { method: 'GET' })).body.overrides).toContainEqual({ id: 'pista-bar', photo: p.photo })
+    const big = await call(photoFn, null, { method: 'GET', path: p.photo })
+    const small = await call(photoFn, null, { method: 'GET', path: smallPhoto(p.photo) })
+    expect([big.status, small.status]).toEqual([200, 200])
+    expect(new Uint8Array(big.body).at(-1)).toBe(1)
+    expect(new Uint8Array(small.body).at(-1)).toBe(2)
+    // Two sizes of different kinds (or a small one that isn't a photo) are refused, nothing changes
+    expect((await act(s, 'productPhoto', { id: 'pista-bar', image: webpOf(3), imageSmall: 'data:image/png;base64,PGh0bWw+' })).body.fields).toEqual({ photo: 'image' })
+    expect((await act(s, 'menu')).body.products.find((x) => x.id === 'pista-bar').photo).toBe(p.photo)
+  })
+
+  it('if the upload fails, the current photo stays on the website', async () => {
+    const s = await login()
+    const first = (await act(s, 'productPhoto', { id: 'walnut-brownies', image: webpOf(1), imageSmall: webpOf(2) })).body.products.find((x) => x.id === 'walnut-brownies').photo
+    const put = store.putPublicObject
+    let n = 0
+    store.putPublicObject = (...a) => (++n === 2 ? Promise.reject(new Error('storage down')) : put(...a)) // the 1200px file fails
+    try {
+      const r = await act(s, 'productPhoto', { id: 'walnut-brownies', image: webpOf(5), imageSmall: webpOf(6) })
+      expect(r.status).toBe(500)
+    } finally {
+      store.putPublicObject = put
+    }
+    expect((await act(s, 'menu')).body.products.find((x) => x.id === 'walnut-brownies').photo).toBe(first)
+    expect((await call(menuFn, null, { method: 'GET' })).body.overrides).toContainEqual(expect.objectContaining({ id: 'walnut-brownies', photo: first }))
+  })
+
+  it('the 600px address of a photo (older one-size photos keep their own address)', () => {
+    expect(smallPhoto('https://x.supabase.co/storage/v1/object/public/product-photos/a/17-1200.webp')).toBe('https://x.supabase.co/storage/v1/object/public/product-photos/a/17-600.webp')
+    expect(smallPhoto('/api/photo/a/17-1200.jpg')).toBe('/api/photo/a/17-600.jpg')
+    expect(smallPhoto('/api/photo/a/17.webp')).toBe('/api/photo/a/17.webp')
+    expect(uploadedPhotoFiles('/api/photo/a/17-1200.webp', '50vw')).toEqual({ src: '/api/photo/a/17-600.webp', srcSet: '/api/photo/a/17-600.webp 600w, /api/photo/a/17-1200.webp 1200w', sizes: '50vw' })
+    expect(uploadedPhotoFiles('/api/photo/a/17.webp', '50vw')).toEqual({ src: '/api/photo/a/17.webp' })
+  })
+
   it('settings: the order-alert email and the 750 g courier rate', async () => {
     const s = await login()
     expect((await act(s, 'updateSettings', { alertEmail: 'not-an-email' })).body.fields).toEqual({ alertEmail: 'invalid' })
@@ -465,10 +509,22 @@ describe('menu photos, settings, enquiries, reports, setup check', () => {
   it('setup check: green and red per part, never a key or an email address', async () => {
     let r = (await call(setupCheck, null, { method: 'GET' })).body
     expect(r).toMatchObject({ mode: 'mock', supabase: { ok: true }, resend: { ok: false, problem: 'noKey' }, razorpay: { ok: false, problem: 'noKeys' }, email: { ok: true }, upi: { ok: true } })
+    expect(r).toMatchObject({ keepAlive: { ok: false, problem: 'never' }, address: { ok: true }, allGood: false })
     process.env.RESEND_API_KEY = 're_test_123'
     razorpayOn()
     r = (await call(setupCheck, null, { method: 'GET' })).body
-    expect(r).toMatchObject({ resend: { ok: true }, razorpay: { ok: true, on: true, testMode: true } })
+    // Resend's test sender reaches no customer: not ready until EMAIL_FROM is on the own domain
+    expect(r).toMatchObject({ resend: { ok: false, problem: 'noFrom' }, razorpay: { ok: true, on: true, testMode: true } })
+    process.env.EMAIL_FROM = 'Dream Kitchen <orders@dreamkitchen.example>'
+    await keepAlive()
+    r = (await call(setupCheck, null, { method: 'GET' })).body
+    expect(r).toMatchObject({ resend: { ok: true }, keepAlive: { ok: true, runs: 1 }, allGood: true })
+    // Netlify serves another main address than the code's site.url
+    process.env.URL = 'https://dreamkitchen.example'
+    r = (await call(setupCheck, null, { method: 'GET' })).body
+    expect(r).toMatchObject({ address: { ok: false, problem: 'mismatch', served: 'https://dreamkitchen.example' }, allGood: false })
+    delete process.env.URL
+    delete process.env.EMAIL_FROM
     const text = JSON.stringify(r)
     expect(text).not.toMatch(/re_test_123|secret_abc|whsec|hema@example\.com|hema@okaxis/)
     delete process.env.RESEND_API_KEY
@@ -476,5 +532,58 @@ describe('menu photos, settings, enquiries, reports, setup check', () => {
     delete process.env.DK_MOCK_BACKEND
     r = (await call(setupCheck, null, { method: 'GET' })).body
     expect(r.supabase).toMatchObject({ ok: false, problem: 'noUrl' })
+  })
+})
+
+describe('final launch: Hema adds products and edits names', () => {
+  it('a new product with one price: on the website menu, priced by the server, hidden (never deleted)', async () => {
+    const s = await login()
+    expect((await act(s, 'addProduct', { category: 'chocolates', name: { en: '' }, courierTier: 'small', price: 0 })).body.fields).toEqual({ name: 'required', price: 'price' })
+    expect((await act(s, 'addProduct', { category: 'customize', name: { en: 'Nope' }, courierTier: 'small', price: 100 })).body.fields).toEqual({ category: 'required' })
+    const r = await act(s, 'addProduct', { category: 'chocolates', name: { en: 'Coconut Bar', kn: 'ತೆಂಗಿನಕಾಯಿ ಬಾರ್' }, description: { en: 'Dark chocolate with coconut.' }, courierTier: 'small', price: 200 })
+    expect(r.status).toBe(200)
+    expect(r.body.id).toBe('coconut-bar')
+    expect(r.body.products.find((p) => p.id === 'coconut-bar')).toMatchObject({ name: 'Coconut Bar', nameKn: 'ತೆಂಗಿನಕಾಯಿ ಬಾರ್', description: 'Dark chocolate with coconut.', custom: true, price: 200, active: true, changed: false })
+    // The same name again gets its own id, so old orders keep their product
+    expect((await act(s, 'addProduct', { category: 'chocolates', name: { en: 'Coconut Bar' }, courierTier: 'small', price: 210 })).body.id).toBe('coconut-bar-2')
+
+    const menu = (await call(menuFn, null, { method: 'GET' })).body
+    expect(menu.overrides).toContainEqual(expect.objectContaining({ id: 'coconut-bar', custom: true, category: 'chocolates', price: 200, name: { en: 'Coconut Bar', kn: 'ತೆಂಗಿನಕಾಯಿ ಬಾರ್' } }))
+
+    // The server prices it (1 × ₹200 + ₹90 courier within Karnataka); a wrong browser price is refused
+    const ok = await call(createOrder, orderBody({ items: [{ productId: 'coconut-bar', selection: {}, qty: 1, unitPrice: 200 }], expectedTotal: 290 }))
+    expect(ok.status).toBe(201)
+    expect(ok.body.order.total).toBe(290)
+
+    // Edit its name and description; Hide it; it can't be ordered while hidden
+    const e = await act(s, 'updateProduct', { id: 'coconut-bar', name: { en: 'Coconut Dream Bar', kn: '' }, description: { en: '', kn: '' } })
+    expect(e.body.products.find((p) => p.id === 'coconut-bar')).toMatchObject({ name: 'Coconut Dream Bar', nameKn: 'Coconut Dream Bar', description: '' })
+    expect((await act(s, 'updateProduct', { id: 'coconut-bar', name: { en: '' } })).body.fields).toEqual({ name: 'required' })
+    await act(s, 'updateProduct', { id: 'coconut-bar', active: false })
+    const hidden = await call(createOrder, orderBody({ items: [{ productId: 'coconut-bar', selection: {}, qty: 1, unitPrice: 200 }], expectedTotal: 290 }))
+    expect(hidden.status).toBe(422)
+    expect(hidden.body.error).toBe('items')
+    // There is no delete action
+    expect((await act(s, 'deleteProduct', { id: 'coconut-bar' })).status).toBe(400)
+  })
+
+  it('a new product with sizes: each size needs a name and a price; its courier tier is the one Hema chose', async () => {
+    const s = await login()
+    expect((await act(s, 'addProduct', { category: 'brownie-tubs', name: { en: 'Big Tub' }, courierTier: 'xl', sizes: [{ label: '', price: 999 }] })).body.fields).toEqual({ sizes: 'needLabels' })
+    const r = await act(s, 'addProduct', { category: 'brownie-tubs', name: { en: 'Big Tub' }, courierTier: 'xl', sizes: [{ label: '1 kg', price: 1999 }, { label: '2 kg', price: 3499 }] })
+    const p = r.body.products.find((x) => x.id === 'big-tub')
+    expect(p).toMatchObject({ courierTier: 'xl', sizes: [{ label: '1 kg', price: 1999 }, { label: '2 kg', price: 3499 }] })
+    // xl courier within Karnataka is the 500–700 g rate until Hema sets it: ₹100
+    const order = await call(createOrder, orderBody({ items: [{ productId: 'big-tub', selection: { size: p.sizes[0].id }, qty: 1, unitPrice: 1999 }], expectedTotal: 2099 }))
+    expect(order.status).toBe(201)
+    expect(order.body.order.total).toBe(2099)
+  })
+
+  it('a menu product’s name and description: Hema’s own, then Back to original', async () => {
+    const s = await login()
+    const r = await act(s, 'updateProduct', { id: 'pista-bar', name: { en: 'Pista Chocolate Bar', kn: 'ಪಿಸ್ತಾ ಚಾಕೊಲೇಟ್ ಬಾರ್' }, description: { en: 'Loaded with pistachios.' } })
+    expect(r.body.products.find((p) => p.id === 'pista-bar')).toMatchObject({ name: 'Pista Chocolate Bar', nameKn: 'ಪಿಸ್ತಾ ಚಾಕೊಲೇಟ್ ಬಾರ್', description: 'Loaded with pistachios.', changed: true })
+    const back = await act(s, 'updateProduct', { id: 'pista-bar', reset: true })
+    expect(back.body.products.find((p) => p.id === 'pista-bar')).toMatchObject({ name: 'Pista Bar', description: '', changed: false })
   })
 })

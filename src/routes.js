@@ -18,6 +18,7 @@ export const pages = {
   Story: () => import('./pages/Story'),
   Contact: () => import('./pages/Contact'),
   FAQ: () => import('./pages/FAQ'),
+  Policy: () => import('./pages/Policy'),
   NotFound: () => import('./pages/NotFound'),
 }
 

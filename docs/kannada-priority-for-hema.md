@@ -209,7 +209,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Sat 17 Oct – Sun 18 Oct 2026 | ಶನಿ 17 ಅಕ್ಟೋಬರ್ – ಭಾನು 18 Oct 2026 | |
 | Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec | ಜನವರಿ,ಫೆಬ್ರವರಿ,ಮಾರ್ಚ್,ಏಪ್ರಿಲ್,ಮೇ,ಜೂನ್,ಜುಲೈ,ಆಗಸ್ಟ್,ಸೆಪ್ಟೆಂಬರ್,ಅಕ್ಟೋಬರ್,ನವೆಂಬರ್,ಡಿಸೆಂಬರ್ | |
 
-## Later, if you have time (461 more)
+## Later, if you have time (495 more)
 
 ### Logo and tagline
 
@@ -230,6 +230,10 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Skip to main content | ಮುಖ್ಯ ವಿಷಯಕ್ಕೆ ನೇರವಾಗಿ ಹೋಗಿ | |
 | Main | ಮುಖ್ಯ | |
 | Language | ಭಾಷೆ | |
+| Terms & Conditions | ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳು | |
+| Refund & Cancellation | ಹಣ ವಾಪಸಾತಿ ಮತ್ತು ರದ್ದತಿ | |
+| Shipping & Delivery | ಶಿಪ್ಪಿಂಗ್ ಮತ್ತು ಡೆಲಿವರಿ | |
+| Privacy Policy | ಗೌಪ್ಯತಾ ನೀತಿ | |
 
 ### Used on many pages
 
@@ -245,10 +249,12 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | , 1 item | , 1 ವಸ್ತು | |
 | , empty | , ಖಾಲಿ | |
 | (opens in a new tab) | (ಹೊಸ ಟ್ಯಾಬ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ) | |
+| Dream Kitchen on Instagram, @dreamkitchen_01_homemade (opens in a new tab) | ಇನ್‌ಸ್ಟಾಗ್ರಾಮ್‌ನಲ್ಲಿ Dream Kitchen, @dreamkitchen_01_homemade (ಹೊಸ ಟ್ಯಾಬ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ) | |
 | Loading… | ತೆರೆಯುತ್ತಿದೆ… | |
 | Copy | ನಕಲಿಸಿ | |
 | Cart, 3 items | ಕಾರ್ಟ್, 3 ವಸ್ತುಗಳು | |
 | Cart, 1 item | ಕಾರ್ಟ್, 1 ವಸ್ತು | |
+| No refund on customized orders and classes. | ಕಸ್ಟಮೈಸ್ ಮಾಡಿದ ಆರ್ಡರ್‌ಗಳು ಮತ್ತು ತರಗತಿಗಳಿಗೆ ಹಣ ವಾಪಸ್ ಇಲ್ಲ. | |
 
 ### Bottom of every page
 
@@ -258,12 +264,22 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | © 2026 Dream Kitchen | © 2026 Dream Kitchen | |
 | FSSAI licence no. 12345678901234 | FSSAI ಪರವಾನಗಿ ಸಂಖ್ಯೆ 12345678901234 | |
 | Made fresh to order. Sent all over India by courier. | ಆರ್ಡರ್‌ಗೆ ತಕ್ಕಂತೆ ತಾಜಾವಾಗಿ ತಯಾರಿ. ಭಾರತದಾದ್ಯಂತ ಕೊರಿಯರ್ ಮೂಲಕ ಕಳುಹಿಸುತ್ತೇವೆ. | |
+| Policies | ನೀತಿಗಳು | |
+| Contact details | ಸಂಪರ್ಕ ವಿವರಗಳು | |
+| Owner: Hema | ಮಾಲೀಕರು: ಹೇಮಾ | |
+| Phone | ಫೋನ್ | |
+| Email | ಇಮೇಲ್ | |
+| Address | ವಿಳಾಸ | |
+| Instagram | ಇನ್‌ಸ್ಟಾಗ್ರಾಮ್ | |
 
 ### Notice under the header
 
 | English | ಕನ್ನಡ | Correct? |
 |---|---|---|
 | Notice from Dream Kitchen | Dream Kitchen ನಿಂದ ಸೂಚನೆ | |
+| Offers | ಆಫರ್‌ಗಳು | |
+| See offer | ಆಫರ್ ನೋಡಿ | |
+| Show offer 2 of 3 | ಆಫರ್ 2 / 3 ತೋರಿಸಿ | |
 
 ### Weights
 
@@ -353,6 +369,14 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Book a chocolate class with Hema: pick a class, a weekend and a time, and pay online. | ಹೇಮಾ ಅವರ ಚಾಕೊಲೇಟ್ ತರಗತಿ ಬುಕ್ ಮಾಡಿ: ತರಗತಿ, ವಾರಾಂತ್ಯ ಮತ್ತು ಸಮಯ ಆಯ್ಕೆಮಾಡಿ, ಆನ್‌ಲೈನ್‌ನಲ್ಲಿ ಪಾವತಿಸಿ. | |
 | Your class booking \| Dream Kitchen | ನಿಮ್ಮ ತರಗತಿ ಬುಕಿಂಗ್ \| Dream Kitchen | |
 | Your chocolate class booking with Dream Kitchen. | Dream Kitchen ನಲ್ಲಿ ನಿಮ್ಮ ಚಾಕೊಲೇಟ್ ತರಗತಿ ಬುಕಿಂಗ್. | |
+| Terms & Conditions \| Dream Kitchen | ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳು \| Dream Kitchen | |
+| The terms for ordering handmade chocolates and brownies and booking classes with Dream Kitchen. | Dream Kitchen ನಲ್ಲಿ ಆರ್ಡರ್ ಮಾಡಲು ಮತ್ತು ತರಗತಿ ಬುಕ್ ಮಾಡಲು ನಿಯಮಗಳು. | |
+| Refund & Cancellation Policy \| Dream Kitchen | ಹಣ ವಾಪಸಾತಿ ಮತ್ತು ರದ್ದತಿ ನೀತಿ \| Dream Kitchen | |
+| Dream Kitchen’s refund, replacement and cancellation policy for handmade orders and chocolate classes. | ಆರ್ಡರ್‌ಗಳು ಮತ್ತು ತರಗತಿಗಳಿಗೆ Dream Kitchen ನ ಹಣ ವಾಪಸಾತಿ, ಬದಲಿ ಮತ್ತು ರದ್ದತಿ ನೀತಿ. | |
+| Shipping & Delivery Policy \| Dream Kitchen | ಶಿಪ್ಪಿಂಗ್ ಮತ್ತು ಡೆಲಿವರಿ ನೀತಿ \| Dream Kitchen | |
+| How Dream Kitchen prepares, dispatches and delivers handmade orders across India, and the courier charges. | Dream Kitchen ಆರ್ಡರ್‌ಗಳನ್ನು ಭಾರತದಾದ್ಯಂತ ಹೇಗೆ ಕಳುಹಿಸುತ್ತದೆ, ಮತ್ತು ಕೊರಿಯರ್ ಶುಲ್ಕಗಳು. | |
+| Privacy Policy \| Dream Kitchen | ಗೌಪ್ಯತಾ ನೀತಿ \| Dream Kitchen | |
+| What Dream Kitchen collects when you order or book a class, and how it is used and protected. | ನೀವು ಆರ್ಡರ್ ಮಾಡಿದಾಗ Dream Kitchen ಯಾವ ಮಾಹಿತಿ ಪಡೆಯುತ್ತದೆ ಮತ್ತು ಅದನ್ನು ಹೇಗೆ ಬಳಸುತ್ತದೆ. | |
 
 ### Home page
 
@@ -686,8 +710,10 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Can’t find your answer? WhatsApp us on +91 95357 06956. | ನಿಮ್ಮ ಪ್ರಶ್ನೆಗೆ ಉತ್ತರ ಸಿಗಲಿಲ್ಲವೇ? +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
 | How do I order? | ಆರ್ಡರ್ ಮಾಡುವುದು ಹೇಗೆ? | |
 | Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay by UPI on the website. You get an order ID to track it. | ಮೆನುವಿನಲ್ಲಿ ನಿಮ್ಮ ಸಿಹಿಗಳನ್ನು ಆರಿಸಿ, ನಂತರ ಕಾರ್ಟ್‌ನಲ್ಲಿ ‘ಮುಂದುವರಿಯಿರಿ’ ಒತ್ತಿರಿ. ವಿಳಾಸ ತುಂಬಿಸಿ, ಆರ್ಡರ್ ಪರಿಶೀಲಿಸಿ, ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲೇ ಯುಪಿಐ ಮೂಲಕ ಪಾವತಿಸಿ. ಸ್ಥಿತಿ ನೋಡಲು ನಿಮಗೆ ಆರ್ಡರ್ ಐಡಿ ಸಿಗುತ್ತದೆ. | |
+| Choose your treats on the Menu, then tap Continue in the cart. Fill in your address, check your order, and pay online on the website. You get an order ID to track it. | ಮೆನುವಿನಲ್ಲಿ ನಿಮ್ಮ ಸಿಹಿಗಳನ್ನು ಆರಿಸಿ, ನಂತರ ಕಾರ್ಟ್‌ನಲ್ಲಿ ‘ಮುಂದುವರಿಯಿರಿ’ ಒತ್ತಿರಿ. ವಿಳಾಸ ತುಂಬಿಸಿ, ಆರ್ಡರ್ ಪರಿಶೀಲಿಸಿ, ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲೇ ಆನ್‌ಲೈನ್ ಮೂಲಕ ಪಾವತಿಸಿ. ಸ್ಥಿತಿ ನೋಡಲು ನಿಮಗೆ ಆರ್ಡರ್ ಐಡಿ ಸಿಗುತ್ತದೆ. | |
 | How do I pay? | ಪಾವತಿ ಹೇಗೆ? | |
 | By UPI on the website: scan the QR code or tap “Pay with a UPI app”, then enter the 12-digit UPI reference. Hema confirms your payment, usually within a few hours. | ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲೇ ಯುಪಿಐ ಮೂಲಕ: QR ಕೋಡ್ ಸ್ಕ್ಯಾನ್ ಮಾಡಿ ಅಥವಾ “ಯುಪಿಐ ಆ್ಯಪ್‌ನಲ್ಲಿ ಪಾವತಿಸಿ” ಒತ್ತಿ, ನಂತರ 12 ಅಂಕಿಯ ಯುಪಿಐ ರೆಫರೆನ್ಸ್ ನೀಡಿ. ಹೇಮಾ ಅವರು ಸಾಮಾನ್ಯವಾಗಿ ಕೆಲವು ಗಂಟೆಗಳಲ್ಲಿ ಪಾವತಿ ಖಚಿತಪಡಿಸುತ್ತಾರೆ. | |
+| Online on the website, through Razorpay: UPI, debit or credit card, or net banking. Your order is confirmed as soon as the payment goes through. | ವೆಬ್‌ಸೈಟ್‌ನಲ್ಲೇ, Razorpay ಮೂಲಕ: UPI, ಡೆಬಿಟ್ ಅಥವಾ ಕ್ರೆಡಿಟ್ ಕಾರ್ಡ್, ಅಥವಾ ನೆಟ್ ಬ್ಯಾಂಕಿಂಗ್. ಪಾವತಿ ಆದ ತಕ್ಷಣ ನಿಮ್ಮ ಆರ್ಡರ್ ಖಚಿತವಾಗುತ್ತದೆ. | |
 | Where do you deliver, and what does courier cost? | ಎಲ್ಲಿಗೆ ಕಳುಹಿಸುತ್ತೀರಿ, ಕೊರಿಯರ್ ಶುಲ್ಕ ಎಷ್ಟು? | |
 | All over India. One courier charge per order: ₹90 within Karnataka and ₹100 outside, or ₹100 / ₹150 when the order has a 500 g or 700 g Delight Box, or {xlKa} / {xlOut} with a 750 g tub. | ಭಾರತದಾದ್ಯಂತ. ಪ್ರತಿ ಆರ್ಡರ್‌ಗೆ ಒಂದೇ ಕೊರಿಯರ್ ಶುಲ್ಕ: ಕರ್ನಾಟಕದೊಳಗೆ ₹90, ಹೊರಗೆ ₹100; ಆರ್ಡರ್‌ನಲ್ಲಿ 500 ಗ್ರಾಂ ಅಥವಾ 700 ಗ್ರಾಂ ಡಿಲೈಟ್ ಬಾಕ್ಸ್ ಇದ್ದರೆ ₹100 / ₹150; 750 ಗ್ರಾಂ ಟಬ್ ಇದ್ದರೆ {xlKa} / {xlOut}. | |
 | When will my order be sent? | ನನ್ನ ಆರ್ಡರ್ ಯಾವಾಗ ಕಳುಹಿಸಲಾಗುತ್ತದೆ? | |
@@ -700,6 +726,19 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Our brownies made with ragi flour instead of maida. Tap “Make it Ragi” when you choose a brownie box. | ಮೈದಾ ಬದಲಿಗೆ ರಾಗಿ ಹಿಟ್ಟಿನಿಂದ ಮಾಡಿದ ನಮ್ಮ ಬ್ರೌನಿಗಳು. ಬ್ರೌನಿ ಬಾಕ್ಸ್ ಆರಿಸುವಾಗ “ರಾಗಿ ಆವೃತ್ತಿ ಮಾಡಿ” ಒತ್ತಿರಿ. | |
 | Can I change or cancel my order? | ನನ್ನ ಆರ್ಡರ್ ಬದಲಿಸಬಹುದೇ ಅಥವಾ ರದ್ದು ಮಾಡಬಹುದೇ? | |
 | WhatsApp us on +91 95357 06956 as soon as you can, and Hema will tell you what is possible. | ಆದಷ್ಟು ಬೇಗ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ, ಏನು ಸಾಧ್ಯ ಎಂದು ಹೇಮಾ ಅವರು ತಿಳಿಸುತ್ತಾರೆ. | |
+
+### policy
+
+| English | ಕನ್ನಡ | Correct? |
+|---|---|---|
+| Terms & Conditions | ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳು | |
+| Refund & Cancellation Policy | ಹಣ ವಾಪಸಾತಿ ಮತ್ತು ರದ್ದತಿ ನೀತಿ | |
+| Shipping & Delivery Policy | ಶಿಪ್ಪಿಂಗ್ ಮತ್ತು ಡೆಲಿವರಿ ನೀತಿ | |
+| Privacy Policy | ಗೌಪ್ಯತಾ ನೀತಿ | |
+| Last updated: Wed, 7 Oct | ಕೊನೆಯ ಬದಲಾವಣೆ: ಬುಧ, 7 ಅಕ್ಟೋಬರ್ | |
+| This policy is written in English. | ಈ ನೀತಿಯನ್ನು ಇಂಗ್ಲಿಷ್‌ನಲ್ಲಿ ಬರೆಯಲಾಗಿದೆ. | |
+| Questions? Contact us | ಪ್ರಶ್ನೆಗಳಿವೆಯೇ? ನಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಿ | |
+| Our other policies | ನಮ್ಮ ಇತರ ನೀತಿಗಳು | |
 
 ### Page not found
 

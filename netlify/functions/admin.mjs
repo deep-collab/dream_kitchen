@@ -9,6 +9,7 @@ import { limit } from '../lib/limits.mjs'
 import { idleTooLong, requireAdmin, touchAdmin } from '../lib/auth.mjs'
 import { runAdminAction } from '../lib/adminCore.mjs'
 import { sendAll } from '../lib/email.mjs'
+import { menuChanged } from '../lib/cdn.mjs'
 import { backendMode, config as env } from '../lib/env.mjs'
 
 const session = (s, email) => ({ accessToken: s.access_token, refreshToken: s.refresh_token, expiresAt: Date.now() + (s.expires_in || 3600) * 1000, email: email || s.user?.email })
@@ -62,9 +63,12 @@ export const adminCtx = () => ({
   env: { hemaEmail: env.hemaEmail, razorpay: { enabled: env.razorpay.enabled, keyId: env.razorpay.keyId }, resend: Boolean(env.resendKey), mode: backendMode() },
 })
 
+// What the website shows from /api/menu: after these, the website gets the change at once (lib/cdn.mjs)
+const CHANGES_MENU = new Set(['addProduct', 'updateProduct', 'productPhoto', 'updateSettings', 'pagePhoto', 'saveOffer', 'setOfferActive', 'deleteOffer', 'offerPhoto'])
+
 export default handle(async (req, context) => {
   checkOrigin(req)
-  const body = await readJson(req, 900_000) // a photo (shrunk on the phone first) fits
+  const body = await readJson(req, 1_200_000) // a photo in its two sizes (shrunk on the phone first) fits
   const store = getStore()
   const action = String(body.action || '')
   if (action === 'login') return json(200, await login(store, body, req, context))
@@ -73,7 +77,9 @@ export default handle(async (req, context) => {
   if (action === 'setPassword') return json(200, await setPassword(store, body, req, context))
 
   const user = await requireAdmin(req, store)
-  return json(200, await runAdminAction(store, user, action, body, adminCtx()))
+  const result = await runAdminAction(store, user, action, body, adminCtx())
+  if (CHANGES_MENU.has(action)) await menuChanged()
+  return json(200, result)
 })
 
 export const config = { path: '/api/admin' }

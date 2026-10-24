@@ -72,7 +72,7 @@ async function newPage(browser, width = 390, height = 844) {
   const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 2, hasTouch: width < 768, isMobile: width < 768, acceptDownloads: true })
   const page = await ctx.newPage()
   page.on('pageerror', (e) => report.consoleErrors.push(`${page.url()}: ${e.message}`))
-  page.on('console', (m) => m.type() === 'error' && !/status of 40[134]/.test(m.text()) && report.consoleErrors.push(`${page.url()}: ${m.text()}`))
+  page.on('console', (m) => m.type() === 'error' && !/status of 40[0134]/.test(m.text()) && report.consoleErrors.push(`${page.url()}: ${m.text()}`))
   return { ctx, page }
 }
 const shot = async (page, name, full = false) => {
@@ -216,16 +216,112 @@ try {
   const raw = Buffer.alloc(1600 * 1200 * 3)
   for (let i = 0; i < raw.length; i++) raw[i] = (i * 2654435761) >>> 24
   const jpg = await sharp(raw, { raw: { width: 1600, height: 1200, channels: 3 } }).jpeg({ quality: 85 }).toBuffer()
+  const brownieCard = page.locator('[data-admin-product=plain-brownies]')
+  const pickBtn = await brownieCard.locator('label', { hasText: 'Change photo' }).boundingBox()
+  if (!pickBtn || pickBtn.height < 56 || pickBtn.width < 300) fail(`Change photo button too small on a phone: ${JSON.stringify(pickBtn)}`)
+  else ok(`Change photo is one big button on a 390px phone (${Math.round(pickBtn.width)}×${Math.round(pickBtn.height)}px)`)
+  // If the upload fails (no signal, storage down), nothing changes and she is told so
+  const photoBefore = (await fetch(`${BASE}/api/menu?t=${Date.now()}`).then((r) => r.json())).overrides.find((o) => o.id === 'plain-brownies')?.photo ?? null
+  const errorsBefore = report.consoleErrors.length
+  await page.route('**/api/admin', (route) => (route.request().postDataJSON()?.action === 'productPhoto' ? route.fulfill({ status: 500, contentType: 'application/json', body: '{"error":"server"}' }) : route.fallback()))
+  await page.setInputFiles('[data-admin-photo=plain-brownies]', { name: 'IMG_2040.jpg', mimeType: 'image/jpeg', buffer: jpg })
+  await brownieCard.locator('text=the website still shows the current photo').waitFor({ timeout: 15000 })
+  await page.unroute('**/api/admin')
+  const photoAfter = (await fetch(`${BASE}/api/menu?t=${Date.now()}`).then((r) => r.json())).overrides.find((o) => o.id === 'plain-brownies')?.photo ?? null
+  if (photoAfter !== photoBefore) fail(`a failed upload changed the photo: ${photoBefore} -> ${photoAfter}`)
+  else ok('a failed upload keeps the current photo, and says so')
+  await brownieCard.locator('text=Change photo').scrollIntoViewIfNeeded()
+  await shot(page, '17f-photo-failed')
+
   await page.setInputFiles('[data-admin-photo=plain-brownies]', { name: 'IMG_2041.jpg', mimeType: 'image/jpeg', buffer: jpg })
-  await page.locator('[data-admin-product=plain-brownies]').locator('text=Photo saved').waitFor({ timeout: 15000 })
+  await brownieCard.locator('text=Photo saved').waitFor({ timeout: 15000 })
   const menu2 = await fetch(`${BASE}/api/menu?t=${Date.now()}`).then((r) => r.json())
   const photo = menu2.overrides.find((o) => o.id === 'plain-brownies')?.photo
-  const served = photo ? await fetch(`${BASE}${photo}`) : null
-  const bytes = served?.ok ? Buffer.from(await served.arrayBuffer()) : null
-  const meta = bytes ? await sharp(bytes).metadata() : null
-  if (!meta) fail('product photo not served')
-  else if (meta.width !== 1000 || meta.height !== 1000 || bytes.length > 300_000) fail(`photo not shrunk: ${meta.width}x${meta.height}, ${bytes.length} bytes`)
-  else ok(`a ${(jpg.length / 1024).toFixed(0)} KB phone photo became a ${meta.width}×${meta.height} ${meta.format} of ${(bytes.length / 1024).toFixed(0)} KB, served to the website`)
+  const sizeOf = async (url) => {
+    const served = url ? await fetch(`${BASE}${url}`) : null
+    const bytes = served?.ok ? Buffer.from(await served.arrayBuffer()) : null
+    return bytes ? { ...(await sharp(bytes).metadata()), bytes: bytes.length } : null
+  }
+  const big = await sizeOf(photo)
+  const small = await sizeOf(photo?.replace(/-1200\.(webp|jpg)$/, '-600.$1'))
+  if (!big || !small || !/-1200\.webp$/.test(photo)) fail(`product photo not served in two sizes: ${photo}`)
+  else if (big.width !== 1200 || big.height !== 1200 || small.width !== 600 || small.height !== 600 || big.format !== 'webp' || small.format !== 'webp' || big.bytes > 680_000 || small.bytes > 160_000)
+    fail(`photo not resized: ${big.width}x${big.height} ${big.format} ${big.bytes} B, ${small.width}x${small.height} ${small.format} ${small.bytes} B`)
+  else ok(`a ${(jpg.length / 1024).toFixed(0)} KB phone photo became 1200×1200 webp (${(big.bytes / 1024).toFixed(0)} KB) + 600×600 webp (${(small.bytes / 1024).toFixed(0)} KB), served to the website`)
+  await brownieCard.locator('text=Photo saved').scrollIntoViewIfNeeded()
+  await shot(page, '17g-photo-saved')
+  // The browser logs the 500 this test sent on purpose; only that one is expected
+  report.consoleErrors = report.consoleErrors.filter((e, i) => i < errorsBefore || !/status of 500/.test(e))
+
+  // The website shows it at once (no redeploy): the menu card on a phone uses the new 600px file
+  const { page: shopPage } = await newPage(browser)
+  await shopPage.goto(`${BASE}/menu`)
+  const cardImg = shopPage.locator(`img[src*="${photo?.replace(/-1200\./, '-600.')}"]`).first()
+  try {
+    await cardImg.waitFor({ state: 'attached', timeout: 10000 })
+    await cardImg.scrollIntoViewIfNeeded()
+    await cardImg.evaluate((img) => (img.complete ? null : new Promise((r) => img.addEventListener('load', r, { once: true }) || setTimeout(r, 5000))))
+    const loaded = await cardImg.evaluate((img) => img.complete && img.naturalWidth && img.currentSrc.split('/').pop())
+    if (!loaded) fail('the new photo is on the menu page but did not load')
+    else ok(`the website menu shows the new photo at once (${loaded} on a phone)`)
+  } catch {
+    fail('the website menu does not show the new photo')
+  }
+  await shopPage.context().close()
+
+  // Flow: add a new product (sizes, courier group, photo), edit its name, see it on the website, hide it
+  await page.goto(`${BASE}/admin/menu`)
+  await page.click('[data-admin-add-product=chocolates]')
+  const form = page.locator('[data-admin-add-form]')
+  await form.locator('[data-admin-add-save]').click()
+  await form.locator('text=Write the name in English.').waitFor() // the section is already chosen: the one where she tapped
+  await audit(page, 'menu-add-form')
+  await shot(page, '17b-add-product-errors', true)
+  const stamp = Date.now().toString(36).slice(-4)
+  await form.locator('[data-admin-new-category]').selectOption('chocolates')
+  await form.locator('[data-admin-name-en]').fill(`Coconut Bar ${stamp}`)
+  await form.locator('textarea').first().fill('Dark chocolate with toasted coconut.')
+  await form.locator('text=Different sizes, each with its price').click()
+  await form.locator('input[aria-label="Size name"]').first().fill('100 g')
+  await form.locator('input[aria-label="Price for 100 g"]').fill('180')
+  await form.locator('text=+ Add a size').click()
+  await form.locator('input[aria-label="Size name"]').nth(1).fill('200 g')
+  await form.locator('input[aria-label="Price for 200 g"]').fill('320')
+  await form.locator('[data-admin-new-tier=small]').check()
+  await page.setInputFiles('[data-admin-add-form] input[type=file]', { name: 'coconut.jpg', mimeType: 'image/jpeg', buffer: jpg })
+  await shot(page, '17c-add-product-filled', true)
+  await form.locator('[data-admin-add-save]').click()
+  await page.locator('text=Added. It is on the website menu now.').waitFor({ timeout: 15000 })
+  const newId = `coconut-bar-${stamp}`
+  const added = page.locator(`[data-admin-product="${newId}"]`)
+  await added.locator('text=Added by you').waitFor()
+  if (!(await added.locator('img').count())) fail('new product: its photo is not shown in the admin')
+  await added.locator('[data-admin-edit-name]').click()
+  await added.locator('[data-admin-name-en]').fill(`Coconut Dream Bar ${stamp}`)
+  await added.locator('[data-admin-save-name]').click()
+  await added.locator('text=Name saved').first().waitFor()
+  await shot(page, '17d-new-product')
+  const menu3 = await fetch(`${BASE}/api/menu?t=${Date.now()}`).then((r) => r.json())
+  const o = menu3.overrides.find((x) => x.id === newId)
+  if (!o?.custom || o.name?.en !== `Coconut Dream Bar ${stamp}` || o.sizes?.length !== 2 || !o.photo) fail(`new product not live: ${JSON.stringify(o)}`)
+  else ok('a new product with two sizes and a photo is added, renamed and live on /api/menu')
+  // On the website: in Chocolates, with its prices, and it goes in the cart
+  const site = await newPage(browser)
+  await site.ctx.addInitScript(() => localStorage.setItem('dk_intro_seen', '1'))
+  await site.page.goto(`${BASE}/menu#chocolates`)
+  const card = site.page.locator(`text=Coconut Dream Bar ${stamp}`).first()
+  await card.waitFor({ timeout: 15000 })
+  await card.click()
+  await site.page.locator('text=₹320').first().waitFor()
+  await shot(site.page, '17e-new-product-on-website')
+  ok('the new product shows on the website menu with both prices')
+  await site.ctx.close()
+  await added.locator('text=Hide from menu').click()
+  await added.locator('text=Hidden').first().waitFor()
+  const menu4 = await fetch(`${BASE}/api/menu?t=${Date.now()}`).then((r) => r.json())
+  if (menu4.overrides.find((x) => x.id === newId)?.active !== false) fail('hiding the new product did not reach /api/menu')
+  else ok('Hide from menu takes it off the website (no delete button anywhere)')
+  if (await page.locator('text=/Delete/i').count()) fail('the menu admin shows a Delete button')
 
   // Flow: class booking payment check, block a slot
   await page.goto(`${BASE}/admin/classes/bookings/${seeded.booking}`)

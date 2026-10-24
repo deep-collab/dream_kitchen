@@ -41,6 +41,8 @@ export async function verifyPassword(password, saltHex, expectedHashHex) {
   return timingSafeEqualStr(hash, expectedHashHex)
 }
 
+const json = (v) => (v ? (typeof v === 'string' ? JSON.parse(v) : v) : null)
+
 function parseProduct(row) {
   if (!row) return null
   return {
@@ -49,8 +51,26 @@ function parseProduct(row) {
     options: row.options ? JSON.parse(row.options) : {},
     active: row.active === null || row.active === undefined ? null : Boolean(row.active),
     sold_out: row.sold_out === null || row.sold_out === undefined ? null : Boolean(row.sold_out),
+    // Hema's own products and her names / descriptions (d1/migrations/0002)
+    custom: Boolean(row.custom),
+    display_name: json(row.display_name),
+    description: json(row.description),
   }
 }
+
+// How each products column is stored: JSON text, 1/0 or as it is
+const PRODUCT_JSON = ['sizes', 'options', 'display_name', 'description']
+const PRODUCT_BOOL = ['active', 'sold_out', 'custom']
+const PRODUCT_PLAIN = ['slug', 'category', 'name_en', 'name_kn', 'price', 'ragi_price', 'courier_tier', 'price_status', 'sort', 'image', 'photo_url']
+const productValue = (k, v) => (PRODUCT_JSON.includes(k) ? (v ? JSON.stringify(v) : null) : PRODUCT_BOOL.includes(k) ? (v == null ? null : v ? 1 : 0) : (v ?? null))
+
+function parseOffer(row) {
+  if (!row) return null
+  return { ...row, title: json(row.title), message: json(row.message), button: json(row.button), active: Boolean(row.active) }
+}
+const OFFER_JSON = ['title', 'message', 'button']
+const OFFER_PLAIN = ['link', 'photo_url', 'starts_on', 'ends_on']
+const offerValue = (k, v) => (OFFER_JSON.includes(k) ? (v ? JSON.stringify(v) : null) : k === 'active' ? (v ? 1 : 0) : (v ?? null))
 
 function parseSettings(row) {
   if (!row) return null
@@ -90,40 +110,22 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
       return (res.results || []).map(parseProduct)
     },
 
+    /** Insert, or update only the columns given (like Supabase's merge): a row with just the
+     *  reference columns (ensureProductRow, the seed) never wipes Hema's prices, names or photo */
     async upsertProducts(rows) {
       if (!rows.length) return
-      const stmts = rows.map((r) =>
-        db
+      const stmts = rows.map((r) => {
+        const row = { name_kn: '', options: {}, courier_tier: 'small', sort: 0, ...r }
+        const cols = [...PRODUCT_PLAIN, ...PRODUCT_JSON, ...PRODUCT_BOOL].filter((k) => k in row)
+        const given = cols.filter((k) => k in r)
+        return db
           .prepare(
-            `INSERT INTO products (id, slug, category, name_en, name_kn, sizes, price, ragi_price, options, courier_tier, price_status, active, sold_out, sort, image, photo_url, updated_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-             ON CONFLICT (id) DO UPDATE SET
-               slug = excluded.slug, category = excluded.category, name_en = excluded.name_en, name_kn = excluded.name_kn,
-               sizes = excluded.sizes, price = excluded.price, ragi_price = excluded.ragi_price, options = excluded.options,
-               courier_tier = excluded.courier_tier, price_status = excluded.price_status, active = excluded.active,
-               sold_out = excluded.sold_out, sort = excluded.sort, image = excluded.image, photo_url = excluded.photo_url,
-               updated_at = excluded.updated_at`,
+            `INSERT INTO products (id, ${cols.join(', ')}, updated_at)
+             VALUES (?, ${cols.map(() => '?').join(', ')}, ?)
+             ON CONFLICT (id) DO UPDATE SET ${[...given.map((k) => `${k} = excluded.${k}`), 'updated_at = excluded.updated_at'].join(', ')}`,
           )
-          .bind(
-            r.id,
-            r.slug,
-            r.category,
-            r.name_en,
-            r.name_kn || '',
-            r.sizes ? JSON.stringify(r.sizes) : null,
-            r.price ?? null,
-            r.ragi_price ?? null,
-            JSON.stringify(r.options || {}),
-            r.courier_tier || 'small',
-            r.price_status || null,
-            r.active == null ? null : r.active ? 1 : 0,
-            r.sold_out == null ? null : r.sold_out ? 1 : 0,
-            r.sort ?? 0,
-            r.image || null,
-            r.photo_url || null,
-            isoNow(),
-          ),
-      )
+          .bind(r.id, ...cols.map((k) => productValue(k, row[k])), isoNow())
+      })
       await db.batch(stmts)
     },
 
@@ -133,16 +135,9 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
       const fields = []
       const values = []
       for (const [k, v] of Object.entries(patch)) {
-        if (['price', 'ragi_price', 'price_status', 'sort', 'image', 'photo_url'].includes(k)) {
-          fields.push(`${k} = ?`)
-          values.push(v ?? null)
-        } else if (['active', 'sold_out'].includes(k)) {
-          fields.push(`${k} = ?`)
-          values.push(v == null ? null : v ? 1 : 0)
-        } else if (['sizes', 'options'].includes(k)) {
-          fields.push(`${k} = ?`)
-          values.push(v ? JSON.stringify(v) : null)
-        }
+        if (![...PRODUCT_PLAIN, ...PRODUCT_JSON, ...PRODUCT_BOOL].includes(k)) continue
+        fields.push(`${k} = ?`)
+        values.push(productValue(k, v))
       }
       fields.push('updated_at = ?')
       values.push(isoNow())
@@ -151,6 +146,51 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
       await db.prepare(`UPDATE products SET ${fields.join(', ')} WHERE id = ?`).bind(...values).run()
       const updated = await db.prepare('SELECT * FROM products WHERE id = ?').bind(id).first()
       return parseProduct(updated)
+    },
+
+    /* ---------- offers and the Customize tiles' photos (d1/migrations/0002) ---------- */
+    async listOffers() {
+      const res = await db.prepare('SELECT * FROM offers ORDER BY starts_on DESC').all()
+      return (res.results || []).map(parseOffer)
+    },
+
+    async insertOffer(row) {
+      const id = crypto.randomUUID()
+      const offer = { active: true, link: '', ...row }
+      const cols = [...OFFER_JSON, ...OFFER_PLAIN, 'active'].filter((k) => k in offer)
+      await db
+        .prepare(`INSERT INTO offers (id, ${cols.join(', ')}) VALUES (?, ${cols.map(() => '?').join(', ')})`)
+        .bind(id, ...cols.map((k) => offerValue(k, offer[k])))
+        .run()
+      return parseOffer(await db.prepare('SELECT * FROM offers WHERE id = ?').bind(id).first())
+    },
+
+    async updateOffer(id, patch) {
+      const cols = Object.keys(patch).filter((k) => [...OFFER_JSON, ...OFFER_PLAIN, 'active'].includes(k))
+      const res = await db
+        .prepare(`UPDATE offers SET ${[...cols.map((k) => `${k} = ?`), 'updated_at = ?'].join(', ')} WHERE id = ?`)
+        .bind(...cols.map((k) => offerValue(k, patch[k])), isoNow(), id)
+        .run()
+      if (!res.meta?.changes) return null
+      return parseOffer(await db.prepare('SELECT * FROM offers WHERE id = ?').bind(id).first())
+    },
+
+    async deleteOffer(id) {
+      const res = await db.prepare('DELETE FROM offers WHERE id = ?').bind(id).run()
+      return (res.meta?.changes || 0) > 0
+    },
+
+    async listPagePhotos() {
+      const res = await db.prepare('SELECT * FROM page_photos').all()
+      return res.results || []
+    },
+
+    async setPagePhoto(id, photoUrl) {
+      await db
+        .prepare('INSERT INTO page_photos (id, photo_url, updated_at) VALUES (?, ?, ?) ON CONFLICT (id) DO UPDATE SET photo_url = excluded.photo_url, updated_at = excluded.updated_at')
+        .bind(id, photoUrl ?? null, isoNow())
+        .run()
+      return db.prepare('SELECT * FROM page_photos WHERE id = ?').bind(id).first()
     },
 
     /* ---------- settings ---------- */
@@ -329,7 +369,7 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
       const fields = []
       const values = []
       const ALLOWED = [
-        'status', 'payment_status', 'utr', 'payment_screenshot', 'courier_name', 'tracking_no',
+        'status', 'payment_status', 'payment_method', 'razorpay_payment_id', 'utr', 'payment_screenshot', 'courier_name', 'tracking_no',
         'tracking_url', 'cancel_reason', 'admin_notes', 'refund_note', 'dispatch_date'
       ]
 
@@ -509,7 +549,7 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
 
       const fields = []
       const values = []
-      const ALLOWED = ['status', 'payment_status', 'utr', 'cancel_reason', 'admin_notes']
+      const ALLOWED = ['status', 'payment_status', 'payment_method', 'razorpay_payment_id', 'utr', 'cancel_reason', 'admin_notes']
 
       for (const k of ALLOWED) {
         if (k in patch) {
@@ -817,10 +857,20 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
         const adminCheck = await db.prepare('SELECT count(*) as c FROM admin_users').first()
         const settCheck = await db.prepare('SELECT count(*) as c FROM settings').first()
         const tables = Boolean(prodCheck && adminCheck && settCheck)
+        // The newest part (d1/migrations/0002): Hema's own products, offers and tile photos
+        let update = false
+        try {
+          await db.prepare('SELECT custom, display_name, description FROM products LIMIT 1').all()
+          await db.prepare('SELECT id FROM offers LIMIT 1').all()
+          await db.prepare('SELECT id FROM page_photos LIMIT 1').all()
+          update = tables
+        } catch {
+          /* the 0002 migration hasn't run: the setup check says so */
+        }
         return {
           reachable: true,
           tables,
-          update: tables,
+          update,
           bucket: true,
           adminCount: Number(adminCheck?.c || 0),
         }

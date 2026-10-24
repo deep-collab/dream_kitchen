@@ -4,8 +4,8 @@
 // Node-only code here, so both run exactly the same rules.
 //   ctx: { send(messages), env: { hemaEmail, razorpay: { enabled, keyId }, resend, mode }, now() }
 // Every answer comes after the store has saved, so the page shows "Saved" only when it is true.
-import { products as CONFIG_PRODUCTS, courier as COURIER } from '../../src/config/shop.js'
-import { applyOverrides, applySettings, isUpiId } from '../../src/lib/pricing.js'
+import { categories as CATEGORIES, products as CONFIG_PRODUCTS, courier as COURIER } from '../../src/config/shop.js'
+import { applyOverrides, applySettings, CUSTOM_CATEGORIES, isUpiId, PRODUCT_TEXT_MAX } from '../../src/lib/pricing.js'
 import { sizeLabel } from '../../src/lib/weights.js'
 import { stateName } from '../../src/data/states.js'
 import { photos } from '../../src/data/photos.js'
@@ -20,6 +20,7 @@ import { BOOKING_NEXT, bookingAction, bookingSummary, classAvailability, classCo
 import { bookingsCsv, dateRange, istDate, istStart, monthlySummary, monthRange, ordersCsv } from './reports.mjs'
 import { customerBooking, customerBookingCancelled, customerStatus } from './emailTemplates.mjs'
 import { fromDataUrl, MIME } from './images.mjs'
+import { istToday, LINK_PATTERN, OFFER_MAX, offerStatus, PAGE_PHOTOS } from '../../src/lib/offers.js'
 
 export const IDLE_DAYS = 30
 const clean = (v, max) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max)
@@ -127,6 +128,9 @@ async function orderAction(store, user, body, ctx) {
 
 const builtInPhoto = (slug) => (photos[slug] ? `/products/${slug}-600.webp?v=${photos[slug]}` : null)
 
+// What counts as "Changed by you" (and is undone by "Back to original"): everything but the photo
+const changedKeys = (row) => Object.keys(rowToOverride(row)).filter((k) => !['id', 'photo', 'custom', 'category', 'courierTier', 'sort'].includes(k))
+
 async function menu(store) {
   const rows = await store.listProducts()
   const byId = Object.fromEntries((rows || []).map((r) => [r.id, r]))
@@ -137,6 +141,11 @@ async function menu(store) {
     return {
       id: p.id,
       name: p.name.en,
+      nameKn: p.name.kn || '',
+      description: p.description?.en || '',
+      descriptionKn: p.description?.kn && p.description.kn !== p.description.en ? p.description.kn : '',
+      custom: Boolean(p.custom),
+      courierTier: p.courierTier,
       category: p.category,
       sizes: (p.sizes || []).map((s) => ({ id: s.id, label: sizeLabel(s).en, price: s.price, grams: s.grams || null })),
       price: p.price ?? null,
@@ -144,17 +153,45 @@ async function menu(store) {
       soldOut: Boolean(p.soldOut),
       active: p.active !== false,
       priceStatus: p.priceStatus,
-      toConfirm: base.toConfirm || null,
+      toConfirm: base?.toConfirm || null,
       photo: row?.photo_url || builtInPhoto(p.slug),
       ownPhoto: Boolean(row?.photo_url),
-      changed: Boolean(row && Object.keys(rowToOverride(row)).filter((k) => k !== 'photo').length > 1),
+      changed: Boolean(!p.custom && row && changedKeys(row).length),
     }
   })
 }
 
+/**
+ * Hema's name and description for a product: { name?: { en, kn }, description?: { en, kn } } ->
+ * the display_name / description columns. A product she added always keeps an English name; for
+ * the others an empty name or description means "back to the original" (null).
+ */
+function textPatch(body, custom, patch, fields) {
+  const pair = (v, max) => ({ en: clean(v?.en, max), kn: clean(v?.kn, max) })
+  if (body.name !== undefined) {
+    const name = pair(body.name, PRODUCT_TEXT_MAX.name)
+    if (!name.en && (custom || name.kn)) fields.name = 'required'
+    else patch.display_name = name.en ? { en: name.en, ...(name.kn ? { kn: name.kn } : {}) } : null
+  }
+  if (body.description !== undefined) {
+    const d = pair(body.description, PRODUCT_TEXT_MAX.description)
+    if (!d.en && d.kn) fields.description = 'required'
+    else patch.description = d.en ? { en: d.en, ...(d.kn ? { kn: d.kn } : {}) } : null
+  }
+}
+
+/** The product as it is now (config, or one Hema added), for an edit */
+async function productBase(store, id) {
+  const config = CONFIG_PRODUCTS.find((p) => p.id === id)
+  if (config) return config
+  const row = (await store.listProducts()).find((r) => r.id === id && r.custom)
+  const product = row && applyOverrides([], [rowToOverride(row)])[0]
+  if (!product) throw new HttpError(404, 'notFound')
+  return product
+}
+
 /** Hema's menu edit -> the override columns (null = back to the config value) */
-export function productPatch(body) {
-  const base = CONFIG_PRODUCTS.find((p) => p.id === body.id)
+export function productPatch(body, base = CONFIG_PRODUCTS.find((p) => p.id === body.id)) {
   if (!base) throw new HttpError(404, 'notFound')
   const patch = {}
   const fields = {}
@@ -164,23 +201,20 @@ export function productPatch(body) {
     if (!Number.isInteger(v) || v <= 0 || v > 100000) fields[key] = 'price'
     else patch[key] = v
   }
-  if (body.reset === true) return { sizes: null, price: null, ragi_price: null, sold_out: null, active: null, price_status: null }
+  if (body.reset === true && !base.custom) return { sizes: null, price: null, ragi_price: null, sold_out: null, active: null, price_status: null, display_name: null, description: null }
+  textPatch(body, base.custom, patch, fields)
   price(body.price, 'price')
   price(body.ragiPrice, 'ragi_price')
   if (Array.isArray(body.sizes)) {
-    const sizes = body.sizes.slice(0, 6).map((s, i) => ({
-      id: clean(s.id || `size-${i + 1}`, 20).toLowerCase().replace(/[^a-z0-9-]/g, '-') || `size-${i + 1}`,
-      ...(clean(s.label, 24) ? { label: clean(s.label, 24) } : {}),
-      ...(Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? { grams: s.grams } : {}),
-      price: s.price,
-    }))
+    const sizes = sizesFrom(body.sizes)
     if (!sizes.length || sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) fields.sizes = 'price'
+    else if (base.custom && sizes.some((s) => !s.label)) fields.sizes = 'needLabels'
     else if (new Set(sizes.map((s) => s.id)).size !== sizes.length) fields.sizes = 'duplicate'
     else patch.sizes = sizes
   }
   if (bool(body.soldOut) !== undefined) patch.sold_out = body.soldOut
   if (bool(body.active) !== undefined) patch.active = body.active
-  if (body.priceStatus === 'live' || body.priceStatus === 'coming-soon') patch.price_status = body.priceStatus
+  if (!base.custom && (body.priceStatus === 'live' || body.priceStatus === 'coming-soon')) patch.price_status = body.priceStatus
   if (Object.keys(fields).length) throw new HttpError(400, 'fields', { fields })
   // Turning a tub on needs prices for every size
   const after = applyOverrides([base], [rowToOverride({ id: base.id, ...patch })])[0]
@@ -188,21 +222,226 @@ export function productPatch(body) {
   return patch
 }
 
+/** Sizes from the admin page: [{ id?, label, grams?, price }] -> the sizes column */
+function sizesFrom(list) {
+  return list.slice(0, 6).map((s, i) => ({
+    id: clean(s.id || `size-${i + 1}`, 20).toLowerCase().replace(/[^a-z0-9-]/g, '-') || `size-${i + 1}`,
+    ...(clean(s.label, 24) ? { label: clean(s.label, 24) } : {}),
+    ...(Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? { grams: s.grams } : {}),
+    price: s.price,
+  }))
+}
+
+/**
+ * A product Hema adds: { category, name: { en, kn }, description?: { en, kn }, courierTier, price? | sizes?, ragiPrice? }.
+ * It goes on the menu straight away, after the config's products in its category. Its id comes
+ * from the English name (never the same as another product's, so old orders keep their names).
+ */
+async function addProduct(store, body) {
+  const fields = {}
+  const patch = {}
+  if (!CUSTOM_CATEGORIES.includes(body.category)) fields.category = 'required'
+  if (!COURIER.tiers.includes(body.courierTier)) fields.courierTier = 'required'
+  textPatch({ name: body.name || {}, description: body.description }, true, patch, fields)
+  const hasSizes = Array.isArray(body.sizes) && body.sizes.length > 0
+  if (hasSizes) {
+    const sizes = sizesFrom(body.sizes)
+    if (sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) fields.sizes = 'price'
+    else if (sizes.some((s) => !s.label)) fields.sizes = 'needLabels'
+    else if (new Set(sizes.map((s) => s.id)).size !== sizes.length) fields.sizes = 'duplicate'
+    else patch.sizes = sizes
+  } else if (!Number.isInteger(body.price) || body.price <= 0 || body.price > 100000) fields.price = 'price'
+  else patch.price = body.price
+  // A ragi version: the extra price on top of the product's price
+  if (body.ragiPrice != null) {
+    if (!Number.isInteger(body.ragiPrice) || body.ragiPrice <= 0 || body.ragiPrice > 100000) fields.ragiPrice = 'price'
+    else patch.ragi_price = body.ragiPrice
+  }
+  if (Object.keys(fields).length) throw new HttpError(400, 'fields', { fields })
+
+  const rows = await store.listProducts()
+  const taken = new Set([...CONFIG_PRODUCTS.map((p) => p.id), ...rows.map((r) => r.id)])
+  const stem = patch.display_name.en.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 50) || 'product'
+  let id = stem.length >= 2 ? stem : `product-${stem}`
+  for (let n = 2; taken.has(id); n++) id = `${stem}-${n}`
+  const sort = rows.filter((r) => r.custom && r.category === body.category).reduce((max, r) => Math.max(max, r.sort || 0), 0) + 1
+  await store.upsertProducts([
+    {
+      id,
+      slug: id,
+      category: body.category,
+      name_en: patch.display_name.en,
+      name_kn: patch.display_name.kn || '',
+      options: {},
+      courier_tier: body.courierTier,
+      sort,
+      image: null,
+      custom: true,
+      display_name: patch.display_name,
+      description: patch.description ?? null,
+      sizes: patch.sizes ?? null,
+      price: patch.price ?? null,
+      ragi_price: patch.ragi_price ?? null,
+      price_status: 'live',
+      active: true,
+      sold_out: false,
+    },
+  ])
+  return id
+}
+
 async function ensureProductRow(store, id) {
-  const base = CONFIG_PRODUCTS.find((p) => p.id === id)
-  if (!base) throw new HttpError(404, 'notFound')
+  const base = await productBase(store, id)
   if (!(await store.listProducts()).some((r) => r.id === base.id)) await store.upsertProducts([productRow(base)])
   return base
 }
 
-/** A new photo from Hema's phone (already shrunk by the admin page to about 1000px) */
+/**
+ * A new photo from Hema's phone, made on the phone in two sizes (image 1200px, imageSmall 600px;
+ * src/lib/productPhoto.js names them). Both files are stored first and photo_url changes last, so
+ * if anything fails the website keeps the current photo. Each upload has its own name (the time),
+ * so no cache anywhere can show an old picture under a new address. A page from before the two
+ * sizes may still send one image alone: it is kept as one file, as before.
+ */
 async function productPhoto(store, body, ctx) {
   const base = await ensureProductRow(store, body.id)
   if (body.image === null) return store.updateProduct(base.id, { photo_url: null })
-  const image = fromDataUrl(body.image, 700_000)
-  if (!image) throw new HttpError(400, 'fields', { fields: { photo: 'image' } })
-  const url = await store.putPublicObject(`${base.id}/${ctx.now().getTime()}.${image.type}`, image.bytes, MIME[image.type])
-  return store.updateProduct(base.id, { photo_url: url })
+  return store.updateProduct(base.id, { photo_url: await storePhoto(store, base.id, body, ctx) })
+}
+
+/**
+ * Stores a photo in its two sizes in the public bucket under <folder>/<time>, the 600px one first.
+ * -> the 1200px address (or the one file's, from a page made before the two sizes)
+ */
+async function storePhoto(store, folder, body, ctx) {
+  const image = fromDataUrl(body.image, 680_000)
+  const small = body.imageSmall === undefined ? null : fromDataUrl(body.imageSmall, 160_000)
+  if (!image || (body.imageSmall !== undefined && small?.type !== image.type)) throw new HttpError(400, 'fields', { fields: { photo: 'image' } })
+  const stem = `${folder}/${ctx.now().getTime()}`
+  if (!small) return store.putPublicObject(`${stem}.${image.type}`, image.bytes, MIME[image.type])
+  await store.putPublicObject(`${stem}-600.${small.type}`, small.bytes, MIME[small.type])
+  return store.putPublicObject(`${stem}-1200.${image.type}`, image.bytes, MIME[image.type])
+}
+
+/* ---------------- the Customize tiles' photos ---------------- */
+
+/** Each tile with the photo it shows now: Hema's own, else the product photo it always had */
+async function pagePhotos(store) {
+  const [rows, products] = await Promise.all([store.listPagePhotos(), menu(store)])
+  const own = Object.fromEntries((rows || []).filter((r) => r.photo_url).map((r) => [r.id, r.photo_url]))
+  return PAGE_PHOTOS.map((slot) => ({
+    id: slot.id,
+    name: slot.name,
+    photo: own[slot.id] || products.find((p) => p.id === slot.fallback)?.photo || null,
+    ownPhoto: Boolean(own[slot.id]),
+  }))
+}
+
+async function pagePhoto(store, body, ctx) {
+  const slot = PAGE_PHOTOS.find((p) => p.id === body.id)
+  if (!slot) throw new HttpError(404, 'notFound')
+  await store.setPagePhoto(slot.id, body.image === null ? null : await storePhoto(store, `page-${slot.id}`, body, ctx))
+}
+
+/* ---------------- offers ---------------- */
+
+const OFFER_ORDER = { live: 0, scheduled: 1, off: 2, ended: 3 }
+// An offer's id (a uuid): anything else is "not found" (Postgres would refuse it with an error)
+const offerId = (v) => {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(v || ''))) throw new HttpError(404, 'notFound')
+  return String(v).toLowerCase()
+}
+
+/** Where an offer's button can go: the menu's sections, the Customize page and every product on the menu */
+async function offerLinks(store) {
+  const products = await menu(store)
+  const name = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.name.en]))
+  return [
+    ...CATEGORIES.filter((c) => !c.hidden).map((c) => ({ value: `category:${c.id}`, label: `Menu: ${c.name.en}`, group: 'Menu sections' })),
+    { value: 'page:customize', label: 'The Customize page', group: 'Menu sections' },
+    ...products.filter((p) => p.active).map((p) => ({ value: `product:${p.id}`, label: `${p.name} (${name[p.category] || 'Customize'})`, group: 'Products' })),
+  ]
+}
+
+function offerView(row, today) {
+  const kn = (v) => (v?.kn && v.kn !== v.en ? v.kn : '')
+  const active = row.active !== false
+  return {
+    id: row.id,
+    titleEn: row.title?.en || '',
+    titleKn: kn(row.title),
+    messageEn: row.message?.en || '',
+    messageKn: kn(row.message),
+    buttonEn: row.button?.en || '',
+    buttonKn: kn(row.button),
+    link: row.link || '',
+    photo: row.photo_url || null,
+    startsOn: row.starts_on,
+    endsOn: row.ends_on,
+    active,
+    status: offerStatus({ active, startsOn: row.starts_on, endsOn: row.ends_on }, today),
+  }
+}
+
+// Live first (ending soonest), then scheduled (starting soonest), then off, then ended (newest first)
+const byStatus = (a, b) => {
+  const d = OFFER_ORDER[a.status] - OFFER_ORDER[b.status]
+  if (d) return d
+  if (a.status === 'scheduled') return a.startsOn < b.startsOn ? -1 : a.startsOn > b.startsOn ? 1 : 0
+  if (a.status === 'live') return a.endsOn < b.endsOn ? -1 : a.endsOn > b.endsOn ? 1 : 0
+  return a.endsOn < b.endsOn ? 1 : a.endsOn > b.endsOn ? -1 : 0
+}
+
+async function offerList(store, ctx) {
+  const today = istToday(ctx.now())
+  const [rows, links] = await Promise.all([store.listOffers(), offerLinks(store)])
+  return { offers: (rows || []).map((r) => offerView(r, today)).sort(byStatus), today, links }
+}
+
+/**
+ * Hema's offer form -> the offers columns.
+ *   { id?, title: { en, kn }, message?: { en, kn }, button?: { en, kn }, link, startsOn, endsOn, active? }
+ * The English title is needed; Kannada is optional everywhere (the English shows instead).
+ */
+export function offerPatch(body, links, today) {
+  const fields = {}
+  const pair = (v, max, key, required) => {
+    const en = clean(v?.en, max)
+    const kn = clean(v?.kn, max)
+    if (!en && (required || kn)) fields[key] = 'required'
+    return en ? { en, ...(kn ? { kn } : {}) } : null
+  }
+  const link = typeof body.link === 'string' ? body.link : ''
+  const patch = {
+    title: pair(body.title, OFFER_MAX.title, 'title', true),
+    message: pair(body.message, OFFER_MAX.message, 'message', false),
+    link,
+    button: link ? pair(body.button, OFFER_MAX.button, 'button', false) : null,
+    starts_on: body.startsOn,
+    ends_on: body.endsOn,
+  }
+  if (!LINK_PATTERN.test(link) || (link && !links.some((l) => l.value === link))) fields.link = 'invalid'
+  if (!isISODate(body.startsOn)) fields.startsOn = 'required'
+  if (!isISODate(body.endsOn)) fields.endsOn = 'required'
+  else if (isISODate(body.startsOn) && body.endsOn < body.startsOn) fields.endsOn = 'beforeStart'
+  else if (body.endsOn < today) fields.endsOn = 'past'
+  if (bool(body.active) !== undefined) patch.active = body.active
+  if (Object.keys(fields).length) throw new HttpError(400, 'fields', { fields })
+  return patch
+}
+
+async function saveOffer(store, body, ctx) {
+  const patch = offerPatch(body, await offerLinks(store), istToday(ctx.now()))
+  if (!body.id) return (await store.insertOffer({ active: true, ...patch })).id
+  const id = offerId(body.id)
+  if (!(await store.updateOffer(id, patch))) throw new HttpError(404, 'notFound')
+  return id
+}
+
+async function offerPhoto(store, body, ctx) {
+  const id = offerId(body.id)
+  if (!(await store.listOffers()).some((o) => o.id === id)) throw new HttpError(404, 'notFound')
+  await store.updateOffer(id, { photo_url: body.image === null ? null : await storePhoto(store, `offer-${id}`, body, ctx) })
 }
 
 /* ---------------- settings ---------------- */
@@ -418,8 +657,12 @@ export async function runAdminAction(store, user, action, body, ctx) {
 
     case 'menu':
       return { products: await menu(store) }
+    case 'addProduct': {
+      const id = await addProduct(store, body)
+      return { id, products: await menu(store) }
+    }
     case 'updateProduct': {
-      const patch = productPatch(body)
+      const patch = productPatch(body, await productBase(store, body.id))
       const base = await ensureProductRow(store, body.id)
       if (!(await store.updateProduct(base.id, patch))) throw new HttpError(500, 'server')
       return { products: await menu(store) }
@@ -427,6 +670,29 @@ export async function runAdminAction(store, user, action, body, ctx) {
     case 'productPhoto':
       if (!(await productPhoto(store, body, ctx))) throw new HttpError(500, 'server')
       return { products: await menu(store) }
+
+    case 'pagePhotos':
+      return { photos: await pagePhotos(store) }
+    case 'pagePhoto':
+      await pagePhoto(store, body, ctx)
+      return { photos: await pagePhotos(store) }
+
+    case 'offers':
+      return offerList(store, ctx)
+    case 'saveOffer': {
+      const id = await saveOffer(store, body, ctx)
+      return { id, ...(await offerList(store, ctx)) }
+    }
+    case 'setOfferActive':
+      if (bool(body.active) === undefined) throw new HttpError(400, 'badRequest')
+      if (!(await store.updateOffer(offerId(body.id), { active: body.active }))) throw new HttpError(404, 'notFound')
+      return offerList(store, ctx)
+    case 'deleteOffer':
+      if (!(await store.deleteOffer(offerId(body.id)))) throw new HttpError(404, 'notFound')
+      return offerList(store, ctx)
+    case 'offerPhoto':
+      await offerPhoto(store, body, ctx)
+      return offerList(store, ctx)
 
     case 'settings':
       return { settings: settingsView(await settingsRow(), ctx) }

@@ -14,7 +14,9 @@ const ITEMS = ['order', 'pay', 'courier', 'when', 'track', 'name', 'ragi', 'chan
 export default function FAQ() {
   useSeo('faq')
   const { t } = useI18n()
-  const { settings } = useShopStatus()
+  const { settings, razorpay } = useShopStatus()
+  // Ordering and paying: Razorpay once it is set up, else the UPI reference (the fallback)
+  const answer = (k) => (razorpay.enabled && (k === 'order' || k === 'pay') ? `faq.items.${k}.aOnline` : `faq.items.${k}.a`)
   const r = settings.courier.rates
   const vars = {
     phone: site.phone.display,
@@ -39,7 +41,7 @@ export default function FAQ() {
                 {t(`faq.items.${k}.q`)}
                 <ChevronDownIcon className="h-5 w-5 shrink-0 transition-transform group-open:rotate-180" />
               </summary>
-              <p className="pb-4">{t(`faq.items.${k}.a`, vars)}</p>
+              <p className="pb-4">{t(answer(k), vars)}</p>
             </details>
           ))}
         </div>

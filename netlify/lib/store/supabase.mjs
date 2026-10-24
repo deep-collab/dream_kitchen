@@ -57,6 +57,15 @@ export function createSupabaseStore({ url, serviceKey, anonKey, fetchImpl = glob
     getSettings: async () => one(await rest('settings?id=eq.1&select=*')),
     updateSettings: async (patch) => one(await rest('settings?id=eq.1', { method: 'PATCH', body: patch, headers: returning })),
 
+    /* ---------- offers and the Customize tiles' photos ---------- */
+    listOffers: () => rest('offers?select=*&order=starts_on.desc'),
+    insertOffer: async (row) => one(await rest('offers', { method: 'POST', body: row, headers: returning })),
+    updateOffer: async (id, patch) => one(await rest(`offers?id=${eq(id)}`, { method: 'PATCH', body: patch, headers: returning })),
+    deleteOffer: async (id) => (await rest(`offers?id=${eq(id)}`, { method: 'DELETE', headers: returning }))?.length > 0,
+    listPagePhotos: () => rest('page_photos?select=*'),
+    setPagePhoto: async (id, photoUrl) =>
+      one(await rest('page_photos?on_conflict=id', { method: 'POST', body: { id, photo_url: photoUrl }, headers: { prefer: 'resolution=merge-duplicates,return=representation' } })),
+
     /* ---------- orders ---------- */
     async createOrder(record) {
       const before = one(await rest(`orders?idempotency_key=${eq(record.idempotency_key)}&select=id`))
@@ -192,7 +201,14 @@ export function createSupabaseStore({ url, serviceKey, anonKey, fetchImpl = glob
       },
     },
 
-    /** Setup check: can we reach the project and read the tables of both setup files? */
+    /* ---------- keep-alive (netlify/functions/keep-alive.mjs) and its last run ---------- */
+    async beat(at) {
+      const row = one(await rest('heartbeat?id=eq.1&select=runs'))
+      return one(await rest('heartbeat?id=eq.1', { method: 'PATCH', body: { last_run_at: at, runs: (row?.runs || 0) + 1 }, headers: returning }))
+    },
+    lastBeat: async () => one(await rest('heartbeat?id=eq.1&select=last_run_at,runs')),
+
+    /** Setup check: can we reach the project and read the tables of every setup file? */
     async health() {
       const out = { reachable: false, tables: false, update: false, bucket: false }
       try {
@@ -201,6 +217,12 @@ export function createSupabaseStore({ url, serviceKey, anonKey, fetchImpl = glob
         out.tables = true
         await rest('settings?id=eq.1&select=class_settings')
         await rest('class_bookings?select=id&limit=1')
+        // The final launch part of setup-all.sql: Hema's own products and the keep-alive
+        await rest('products?select=custom,display_name,description&limit=1')
+        await rest('heartbeat?select=id&limit=1')
+        // 23 Oct 2026: offers and the Customize tiles' photos
+        await rest('offers?select=id&limit=1')
+        await rest('page_photos?select=id&limit=1')
         out.update = true
         const buckets = await call('/storage/v1/bucket')
         out.bucket = Array.isArray(buckets) && ['uploads', 'product-photos'].every((id) => buckets.some((b) => b.id === id))
