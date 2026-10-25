@@ -136,8 +136,11 @@ function seoFiles() {
       const opts = { url: site.url }
       this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemapXml(opts) })
       this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robotsTxt(opts) })
-      // Netlify: old addresses (301) and the app / admin rewrites, from src/config/redirects.js
-      this.emitFile({ type: 'asset', fileName: '_redirects', source: redirectsFile() })
+      // Netlify only: old addresses (301) and the app / admin rewrites, from src/config/redirects.js.
+      // On Cloudflare, Worker routing and redirects are handled natively in src/worker/index.mjs.
+      if (process.env.NETLIFY) {
+        this.emitFile({ type: 'asset', fileName: '_redirects', source: redirectsFile() })
+      }
     },
   }
 }

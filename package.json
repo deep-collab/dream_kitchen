@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node -e \"import('node:fs').then(fs => { if (fs.existsSync('dist/_redirects')) fs.unlinkSync('dist/_redirects') })\"",
     "preview": "vite preview",
-    "deploy": "npm run build && node -e \"import('node:fs').then(fs => { if (fs.existsSync('dist/_redirects')) fs.unlinkSync('dist/_redirects') })\" && wrangler deploy",
+    "deploy": "npm run build && wrangler deploy",
     "dev:worker": "wrangler dev",
     "d1:setup": "node scripts/d1-setup.mjs",
     "d1:migrate": "wrangler d1 migrations apply DB",
