@@ -10,6 +10,8 @@
     <!-- Backup only: the "Powered by Netlify" badge is switched off in Netlify (Project configuration -> General ->
          Powered by Netlify badge). Should it come back, this keeps it off customers' screens. -->
     <style>#nl-badge-frame{display:none!important}</style>
+    <!-- Anything scrolled or tabbed to stops above the fixed bottom bar and below the top bar, never behind them -->
+    <style>html{scroll-padding:4.5rem 0 6rem}</style>
   </head>
   <body>
     <div id="root"></div>

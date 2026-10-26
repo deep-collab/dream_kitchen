@@ -15,3 +15,5 @@ photos-incoming/*
 !photos-incoming/README.md
 # Walkthrough videos for Hema (scripts/walkthrough-video.mjs): too big for git
 docs/video/
+# Live D1 exports (customer data): never commit
+live-backup-*.sql

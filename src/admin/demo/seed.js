@@ -191,4 +191,21 @@ export async function seedDemo(store, setClock) {
   })
   await store.insertOffer({ title: { en: 'Weekend chocolate class: 2 seats left' }, message: null, button: null, link: '', starts_on: addDaysISO(today, -1), ends_on: addDaysISO(today, 2), active: false })
   await store.insertOffer({ title: { en: 'Navratri special Pista Bars' }, message: { en: 'Thank you for all your orders!' }, button: null, link: '', starts_on: addDaysISO(today, -20), ends_on: addDaysISO(today, -10) })
+
+  // Kannada Rajyotsava (1–3 November, the next one): an offer with products and 10% off, and the
+  // waving Karnataka flag behind the website on the same days (developer options -> Site background)
+  const year = today > `${today.slice(0, 4)}-11-03` ? Number(today.slice(0, 4)) + 1 : Number(today.slice(0, 4))
+  const nov = (d) => `${year}-11-0${d}`
+  await store.insertOffer({
+    title: { en: 'Kannada Rajyotsava: 10% off', kn: 'ಕನ್ನಡ ರಾಜ್ಯೋತ್ಸವ: 10% ರಿಯಾಯಿತಿ' },
+    message: { en: 'Delight Boxes and Pista Bars, 1 to 3 November only.', kn: 'ಡಿಲೈಟ್ ಬಾಕ್ಸ್ ಮತ್ತು ಪಿಸ್ತಾ ಬಾರ್, ನವೆಂಬರ್ 1 ರಿಂದ 3 ರವರೆಗೆ ಮಾತ್ರ.' },
+    button: null,
+    badge: { en: 'Rajyotsava offer', kn: 'ರಾಜ್ಯೋತ್ಸವ ಆಫರ್' },
+    link: '',
+    items: { categories: ['delight-boxes'], products: ['pista-bar'] },
+    deal: { kind: 'percent', value: 10 },
+    starts_on: nov(1),
+    ends_on: nov(3),
+  })
+  await store.setConfig('background', { themes: { rajyotsava: { on: true, opacity: 8, animate: true, startsOn: nov(1), endsOn: nov(3) } } }, 'developer (demo)')
 }

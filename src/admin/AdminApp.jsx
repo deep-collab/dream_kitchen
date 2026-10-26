@@ -15,6 +15,7 @@ import Enquiries from './Enquiries'
 import Reports from './Reports'
 import More from './More'
 import SetupCheck from './SetupCheck'
+import DevBackground from './DevBackground'
 import { AlertIcon, ClassesIcon, HomeIcon, MenuIcon, ShopIcon, TagIcon, TruckIcon } from '../components/icons'
 
 const WARNINGS = {
@@ -107,7 +108,8 @@ function Shell({ me, refreshMe }) {
           <Route path="classes/bookings/:code" element={<BookingDetail />} />
           <Route path="offers" element={<Offers />} />
           <Route path="menu" element={<MenuAdmin />} />
-          <Route path="more" element={<More email={me?.email} />} />
+          <Route path="more" element={<More me={me} />} />
+          <Route path="dev/:tool" element={<DevPage me={me} />} />
           <Route path="settings" element={<SettingsAdmin onSaved={refreshMe} />} />
           <Route path="enquiries" element={<Enquiries />} />
           <Route path="reports" element={<Reports />} />
@@ -141,6 +143,21 @@ function Shell({ me, refreshMe }) {
       </nav>
     </div>
   )
+}
+
+/** A developer option (admin -> More -> Developer options). The server checks the account again for every action. */
+function DevPage({ me }) {
+  const { pathname } = useLocation()
+  const tool = pathname.split('/').pop()
+  if (!me) return null
+  if (!me.dev)
+    return (
+      <p role="alert" className="mt-4 font-bold text-error">
+        This account can’t use the developer options.
+      </p>
+    )
+  if (tool === 'background') return <DevBackground />
+  return <Home />
 }
 
 /** A page without the admin's bars (login, reset, setup check before logging in) */

@@ -6,6 +6,7 @@ import ScrollToTop from '../ScrollToTop'
 import Header from './Header'
 import Banner from './Banner'
 import OfferBanner from './OfferBanner'
+import SiteBackground from './SiteBackground'
 import LanguageError from './LanguageError'
 import Footer from './Footer'
 import TabBar from './TabBar'
@@ -27,9 +28,10 @@ function FirstPaint() {
 // Hema's live offers: the banner at the very top of Home, a slim strip on the Menu page. Part of
 // the main bundle (not the pages' own files), so the page never waits for one more file to draw.
 function PageOffers() {
-  const { pathname } = useLocation()
+  const { pathname, search } = useLocation()
   if (pathname === '/') return <OfferBanner />
-  if (pathname === '/menu') return <OfferBanner variant="strip" />
+  // The menu showing one offer's products has its own heading instead of the strip
+  if (pathname === '/menu' && !new URLSearchParams(search).has('offer')) return <OfferBanner variant="strip" />
   return null
 }
 
@@ -39,8 +41,10 @@ const PageLoading = () => <div aria-busy="true" className="min-h-dvh" />
 // Shell for every page. #dk-app is made inert while a sheet is open.
 export default function Layout() {
   const { t } = useI18n()
+  // `isolate`: the festival background (SiteBackground) sits between the page's cream and the content
   return (
-    <div id="dk-app" className="flex min-h-dvh flex-col">
+    <div id="dk-app" className="isolate flex min-h-dvh flex-col">
+      <SiteBackground />
       <ScrollToTop />
       <a
         href="#main"

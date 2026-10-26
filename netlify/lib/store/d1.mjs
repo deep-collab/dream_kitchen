@@ -66,10 +66,20 @@ const productValue = (k, v) => (PRODUCT_JSON.includes(k) ? (v ? JSON.stringify(v
 
 function parseOffer(row) {
   if (!row) return null
-  return { ...row, title: json(row.title), message: json(row.message), button: json(row.button), active: Boolean(row.active) }
+  return {
+    ...row,
+    title: json(row.title),
+    message: json(row.message),
+    button: json(row.button),
+    // d1/migrations/0003: the offer's products, special price and badge
+    items: json(row.items),
+    deal: json(row.deal),
+    badge: json(row.badge),
+    active: Boolean(row.active),
+  }
 }
-const OFFER_JSON = ['title', 'message', 'button']
-const OFFER_PLAIN = ['link', 'photo_url', 'starts_on', 'ends_on']
+const OFFER_JSON = ['title', 'message', 'button', 'items', 'deal', 'badge']
+const OFFER_PLAIN = ['link', 'photo_url', 'photo_phone_url', 'starts_on', 'ends_on']
 const offerValue = (k, v) => (OFFER_JSON.includes(k) ? (v ? JSON.stringify(v) : null) : k === 'active' ? (v ? 1 : 0) : (v ?? null))
 
 function parseSettings(row) {
@@ -191,6 +201,25 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
         .bind(id, photoUrl ?? null, isoNow())
         .run()
       return db.prepare('SELECT * FROM page_photos WHERE id = ?').bind(id).first()
+    },
+
+    /* ---------- site settings of the developer options (d1/migrations/0003) ---------- */
+    /** { [key]: value } for every setting saved (a missing key = the built-in default) */
+    async getConfig() {
+      const res = await db.prepare('SELECT key, value FROM site_config').all()
+      return Object.fromEntries((res.results || []).map((r) => [r.key, JSON.parse(r.value)]))
+    },
+
+    /** Saves one setting; null takes it away (back to the default) */
+    async setConfig(key, value, by = null) {
+      if (value === null || value === undefined) {
+        await db.prepare('DELETE FROM site_config WHERE key = ?').bind(key).run()
+        return
+      }
+      await db
+        .prepare('INSERT INTO site_config (key, value, updated_at, updated_by) VALUES (?, ?, ?, ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at, updated_by = excluded.updated_by')
+        .bind(key, JSON.stringify(value), isoNow(), by)
+        .run()
     },
 
     /* ---------- settings ---------- */
@@ -777,7 +806,17 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
       async isAdmin(userId) {
         if (!userId) return false
         const user = await db.prepare('SELECT id FROM admin_users WHERE id = ?').bind(userId).first()
-        return Boolean(user)
+        return Boolean(user) && (await this.role(userId)) !== 'disabled'
+      },
+
+      /** 'owner' | 'developer' | 'full' | 'orders_menu' | 'orders' | 'disabled' (d1/migrations/0003; before it: 'owner') */
+      async role(userId) {
+        try {
+          const row = await db.prepare('SELECT role FROM admin_users WHERE id = ?').bind(userId).first()
+          return row?.role || 'owner'
+        } catch {
+          return 'owner'
+        }
       },
 
       async lastSeen(userId) {

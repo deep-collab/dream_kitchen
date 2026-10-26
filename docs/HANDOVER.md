@@ -96,23 +96,33 @@ photos, each with its own **Change photo** button:
 Until you change one it shows the product photo it always had. **Use the product photo again** undoes
 it. Same as product photos: two sizes, live at once, only your admin login can change them.
 
-## Offers (new tab, 23 Oct 2026)
+## Offers (new tab, 23 Oct 2026; products and special prices since 26 Oct 2026)
 
 The bottom bar of the admin is now **Home · Orders · Offers · Classes · Menu · More**.
 
-An offer is a black-and-gold banner at the **very top of the Home page** (and a slim strip at the top
-of the Menu page). **Offers only show a banner. They do not change prices.** If an offer has a special
-price, change the price yourself in **Menu** (and change it back when the offer ends).
+An offer is a big black-and-gold banner, the **first thing on the Home page** (above the logo), and a
+slim strip at the top of the Menu page. On phones the photo is 16:9 with the words on it; on
+computers the banner is slim and wide, with the 3:1 photo on the right. "Order now" always stays on
+the first screen (checked at 360, 390 and 1280 px wide).
 
 **Add an offer**
 1. Admin → **Offers** → **+ Add new offer**.
-2. **Title** (English; Kannada optional), a **short message** (optional, up to 120 letters).
-3. **Where the button goes**: a menu section (e.g. Delight Boxes), the Customize page, or one product.
-   **Button text** is optional (empty = "See offer"). Choose **No button** for a message only.
-4. **Start date** and **end date** (Indian time, both days included: from midnight at the start of the
-   first day to midnight at the end of the last).
-5. **Banner photo** (optional) and the **On** switch.
-6. Look at **How it looks on the website**, then **Add offer**.
+2. **Title** (English; Kannada optional), an **offer line** (optional, up to 120 letters).
+3. **Products in this offer** (optional): **every product on the website** (e.g. 50% off everything), or
+   whole menu sections and/or single products. Then:
+   - the banner's button (**"Shop the offer"**, or your own words) opens the menu showing **only these
+     products**, each with the offer's **badge** (e.g. "Rajyotsava offer"; empty = "Offer"), with a
+     **Show full menu** button;
+   - while the offer is live the menu has an **Offers** tab first, listing every offer's products.
+4. **Special price** (optional, only with products): % off (1–90), ₹ off each item, or an exact price for each
+   product and size. The website shows the regular price crossed out, and **the server charges the
+   offer price, only on the offer's dates** (Indian time). After the end date, or when the offer is
+   turned off, the regular prices are back at once. Without a special price: just the badge.
+5. Without products: **where the button goes** (a menu section, the Customize page or one product).
+6. **Start date** and **end date** (Indian time, both days included).
+7. **Banner photo** (optional): a crop tool with two fixed frames, **computers 3:1** and **phones 16:9**;
+   drag the photo and zoom. What is in the frames is exactly what the website shows.
+8. Look at **How it looks on the website** (phone and computer), then **Add offer**.
 
 **The list** shows each offer with its state:
 - **Live**: on the website now. **Scheduled**: it starts on its start date by itself.
@@ -121,10 +131,44 @@ price, change the price yourself in **Menu** (and change it back when the offer 
 **Edit** changes anything. **Turn off** takes it off the website at once (Turn on puts it back).
 **Delete** asks "Are you sure?" first and cannot be undone.
 
-On the website: with more than one live offer they take turns every 6 seconds, with dots to pick one;
-tapping goes to the section or product. With no live offer, nothing shows.
+On the website: several live offers are slides (swipe, tap a dot, or they change every 6 seconds;
+never for visitors who ask their phone for less motion). With no live offer, nothing shows.
 
-**Try it first** in the practice admin (`/admin/demo` → **Offers**): it has sample offers in every state.
+**Try it first** in the practice admin (`/admin/demo` → **Offers**): it has sample offers in every
+state, including **Kannada Rajyotsava: 10% off** (Delight Boxes and Pista Bars, 1–3 November).
+
+## One-time step for Deep (26 Oct 2026): run the new database part BEFORE merging
+
+The Rajyotsava work adds `d1/migrations/0003_offer_items_site_config.sql`. It **only adds** (4 new
+columns on `offers`, a `role` column on `admin_users`, a new `site_config` table): nothing is removed,
+orders and Hema's prices stay, every existing admin account becomes `owner` (as today).
+
+1. On the computer with the code, in the project folder: `npm run d1:migrate -- --remote`
+   (log in first with `npx wrangler login` if it asks). It runs only the files not run before.
+2. Make Jashwanth's admin account the **developer** (the only account that sees the hidden developer
+   options). With his admin email:
+   `npx wrangler d1 execute DB --remote --command "UPDATE admin_users SET role = 'developer' WHERE email = 'his-email@example.com'"`
+   (No account for him yet? First `npm run d1:admin his-email@example.com <password> --remote`, then the line above.)
+3. Check `/admin/setup`: all green. Then merge.
+
+Until the migration has run, the website keeps working (offers just show without products, prices
+and the new photos), but saving an offer with products would fail: so run it first.
+(Netlify + Supabase instead: run `supabase/setup-all.sql` again, as in the 23 Oct step below.)
+
+## Hidden developer options (for Jashwanth; not in Hema's guide yet)
+
+Admin → **More** → tap the **version line at the very bottom 7 times** → "Developer options unlocked"
+(on that phone or computer only). It works only for the **developer** account (step 2 above): the
+server checks the account for every developer action, hiding the buttons is only for looks.
+- **Site background**: the faint layer behind the website. Default: the light Dream Kitchen logo
+  behind the home hero (as before). Festival themes, each with its own dates (Indian time), strength
+  (1–20 %, light by default) and animation switch, with a preview before saving: Kannada Rajyotsava
+  (waving Karnataka flag), Diwali (diyas and sparkles), Christmas (snow and stars), New Year
+  (fireworks), Valentine's (hearts), or your own picture (made light on upload). After its end date
+  the website goes back to the default by itself. Light on phones (canvas, max 30 frames a second,
+  loaded only while a theme is on), paused while the tab is hidden, still for "reduce motion".
+- **Show them to Hema**: one switch at the bottom of Site background. On: Hema's account sees the
+  developer options in More without tapping.
 
 ## One-time step for Jashwanth (23 Oct 2026): run the new database part
 

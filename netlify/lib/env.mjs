@@ -65,7 +65,8 @@ export const config = {
   },
   /** Local dev only: the mock store's admin login (never used with Supabase or D1) */
   get devAdmin() {
-    return { email: env('DK_DEV_ADMIN_EMAIL'), password: env('DK_DEV_ADMIN_PASSWORD') }
+    // DK_DEV_ADMIN_ROLE=developer: the practice admin also sees the developer options (local QA)
+    return { email: env('DK_DEV_ADMIN_EMAIL'), password: env('DK_DEV_ADMIN_PASSWORD'), role: env('DK_DEV_ADMIN_ROLE') || 'owner' }
   },
   /** Local dev only: where the mock store keeps its data between restarts ('' = memory only) */
   get devDataDir() {

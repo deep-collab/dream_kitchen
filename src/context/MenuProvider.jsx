@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { categories as CATEGORIES, products as PRODUCTS } from '../config/shop'
 import { applyOverrides, applySettings, hasPrice } from '../lib/pricing'
-import { cleanPagePhotos, istToday, liveOffers } from '../lib/offers'
+import { allLiveOffers, applyOfferPrices, cleanPagePhotos, istToday, MAX_LIVE_OFFERS } from '../lib/offers'
+import { publicConfig } from '../lib/siteConfig'
 import { loadRemoteMenu } from '../services'
 
 export const MenuContext = createContext(null)
@@ -53,17 +54,18 @@ export function MenuProvider({ children }) {
   }, [fetchRemote])
   const refresh = useCallback(() => fetchRemote(true), [fetchRemote])
 
-  // An offer starts and ends at midnight, Indian time, even on a page left open
+  // An offer (and a festival background) starts and ends at midnight, Indian time, even on a page left open
   const offerList = remote === undefined ? cachedOffers : remote?.offers
-  const hasOffers = Array.isArray(offerList) && offerList.length > 0
   useEffect(() => {
-    if (!hasOffers) return undefined
     const timer = setInterval(() => setToday(istToday()), 60_000)
     return () => clearInterval(timer)
-  }, [hasOffers])
+  }, [])
 
   const value = useMemo(() => {
-    const all = applyOverrides(PRODUCTS, remote?.overrides || [])
+    // Hema's offers live today: their special prices are applied exactly as the server applies
+    // them (netlify/lib/catalog.mjs), so the cart shows the price that will be charged
+    const live = allLiveOffers(offerList, today)
+    const all = applyOfferPrices(applyOverrides(PRODUCTS, remote?.overrides || []), live)
     const settings = applySettings(remote?.settings || {})
     return {
       menu: {
@@ -74,8 +76,13 @@ export function MenuProvider({ children }) {
         productsById: Object.fromEntries(all.map((p) => [p.id, p])),
       },
       settings,
-      // Hema's offers showing today, and the Customize tiles' photos she changed
-      offers: liveOffers(offerList, today),
+      // Hema's offers showing today (the banner shows the first few; the menu filter knows them all),
+      // and the Customize tiles' photos she changed
+      offers: live.slice(0, MAX_LIVE_OFFERS),
+      allOffers: live,
+      today,
+      // The developer options' settings (src/lib/siteConfig.js), defaults until /api/menu arrives
+      config: publicConfig(remote?.config || {}),
       pagePhotos: cleanPagePhotos(remote?.pagePhotos),
       refresh,
       remoteLoaded: remote !== undefined,
@@ -94,6 +101,15 @@ export const useMenu = () => useContext(MenuContext).menu
 
 /** The offers to show now (src/lib/offers.js liveOffers), [] when none */
 export const useOffers = () => useContext(MenuContext).offers
+
+/** Every offer live today (for the menu's offer filter and badges), [] when none */
+export const useAllOffers = () => useContext(MenuContext).allOffers
+
+/** The developer options' public settings (src/lib/siteConfig.js publicConfig) and today's Indian date */
+export function useSiteConfig() {
+  const { config, today } = useContext(MenuContext)
+  return { config, today }
+}
 
 /** The Customize tiles' photos Hema changed: { [tile id]: address } (src/lib/offers.js PAGE_PHOTOS) */
 export const usePagePhotos = () => useContext(MenuContext).pagePhotos

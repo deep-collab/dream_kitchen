@@ -66,6 +66,13 @@ export function createSupabaseStore({ url, serviceKey, anonKey, fetchImpl = glob
     setPagePhoto: async (id, photoUrl) =>
       one(await rest('page_photos?on_conflict=id', { method: 'POST', body: { id, photo_url: photoUrl }, headers: { prefer: 'resolution=merge-duplicates,return=representation' } })),
 
+    /* ---------- site settings of the developer options (20261026000001) ---------- */
+    getConfig: async () => Object.fromEntries((await rest('site_config?select=key,value')).map((r) => [r.key, r.value])),
+    async setConfig(key, value, by = null) {
+      if (value === null || value === undefined) await rest(`site_config?key=${eq(key)}`, { method: 'DELETE' })
+      else await rest('site_config?on_conflict=key', { method: 'POST', body: { key, value, updated_by: by }, headers: { prefer: 'resolution=merge-duplicates,return=minimal' } })
+    },
+
     /* ---------- orders ---------- */
     async createOrder(record) {
       const before = one(await rest(`orders?idempotency_key=${eq(record.idempotency_key)}&select=id`))
@@ -174,7 +181,15 @@ export function createSupabaseStore({ url, serviceKey, anonKey, fetchImpl = glob
       },
       async isAdmin(userId) {
         const rows = await rest(`admin_users?user_id=${eq(userId)}&select=user_id`)
-        return Array.isArray(rows) && rows.length === 1
+        return Array.isArray(rows) && rows.length === 1 && (await this.role(userId)) !== 'disabled'
+      },
+      /** The account's role (20261026000001); 'owner' before that migration ran */
+      async role(userId) {
+        try {
+          return one(await rest(`admin_users?user_id=${eq(userId)}&select=role`))?.role || 'owner'
+        } catch {
+          return 'owner'
+        }
       },
       lastSeen: async (userId) => one(await rest(`admin_users?user_id=${eq(userId)}&select=last_seen_at`))?.last_seen_at || null,
       touch: (userId) => rest(`admin_users?user_id=${eq(userId)}`, { method: 'PATCH', body: { last_seen_at: new Date().toISOString() }, headers: { prefer: 'return=minimal' } }),

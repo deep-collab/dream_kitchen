@@ -28,8 +28,10 @@ import TextField from '../ui/TextField'
 import Button from '../ui/Button'
 import ProductPhoto from './ProductPhoto'
 import { useAddedToast } from './ShopSheets'
-import { AlertIcon, ChevronDownIcon, CloseIcon, ImageIcon } from '../icons'
+import { regularVersion } from '../../lib/offers'
+import { AlertIcon, ChevronDownIcon, CloseIcon, ImageIcon, TagIcon } from '../icons'
 import 'virtual:dk-strings/sheet'
+import 'virtual:dk-strings/menu'
 
 const ORDER = ['size', 'name', 'drawingText', 'drawingRef']
 // e.g. Brownies: "5 pieces in every box"
@@ -49,6 +51,9 @@ export function ProductSheet({ open, product, line, focus, onClose }) {
 
   const forSale = isForSale(product)
   const price = forSale ? unitPrice(product, selection) : null
+  // In a live offer with a special price: the regular price for the same choices, crossed out
+  const regular = forSale ? regularVersion(product) : null
+  const was = regular ? unitPrice(regular, selection) : null
   const errors = forSale ? selectionErrors(product, selection) : {}
   delete errors.product
   const shown = tried ? errors : {}
@@ -99,8 +104,22 @@ export function ProductSheet({ open, product, line, focus, onClose }) {
       <div className="flex gap-4">
         <ProductPhoto slug={product.slug} art={product.art} eager rounded="rounded-card" sizes="128px" className="h-28 w-28 shrink-0 sm:h-32 sm:w-32" />
         <div className="min-w-0 flex-1">
+          {product.offer && (
+            <p className="mb-1">
+              <span className="inline-flex items-center gap-1 rounded-full bg-ink px-2.5 py-0.5 text-[0.875rem] font-bold text-gold-light" data-dk-sheet-offer>
+                <TagIcon className="h-3.5 w-3.5 text-gold" />
+                {product.offer.badge ? pick(product.offer.badge) : t('menu.offerBadge')}
+              </span>
+            </p>
+          )}
           {forSale ? (
             <p className="t-price">
+              {was != null && was > price && (
+                <s className="t-small mr-2 font-normal text-brown-2" data-dk-sheet-was>
+                  <span className="sr-only">{t('menu.wasPrice')} </span>
+                  {formatINR(was)}
+                </s>
+              )}
               {formatINR(price ?? 0)}
               {product.showWeight && product.grams && <span className="t-small ml-2 font-normal text-brown-2">{t('sheet.weight', { grams: product.grams })}</span>}
             </p>
@@ -166,6 +185,12 @@ function SizeChoice({ product, value, onChange }) {
             <input type="radio" name={name} value={s.id} checked={value === s.id} onChange={() => onChange(s.id)} className="peer sr-only" />
             <span className="flex min-h-16 flex-col items-center justify-center rounded-control border-[1.5px] border-control-line bg-[#fffdf8] px-1 py-2 text-center transition-colors peer-checked:border-ink peer-checked:bg-ink peer-checked:text-cream peer-focus-visible:shadow-[0_0_0_3px_var(--color-ink)] peer-focus-visible:outline-3 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-gold hover:border-brown-2">
               <span className="leading-tight font-bold">{pick(sizeLabel(s))}</span>
+              {product.offer?.was?.sizes?.[s.id] > s.price && (
+                <s className="t-small tabular-nums opacity-75">
+                  <span className="sr-only">{t('menu.wasPrice')} </span>
+                  {formatINR(product.offer.was.sizes[s.id])}
+                </s>
+              )}
               <span className="t-small tabular-nums">{formatINR(s.price)}</span>
             </span>
           </label>

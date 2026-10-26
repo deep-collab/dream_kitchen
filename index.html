@@ -66,6 +66,8 @@
            defined once here so the loader can hand its lockup to the hero exactly. */
         .dk-lockup { --lk: 40px; display: flex; flex-direction: column; align-items: center; text-align: center; color: #d4af37; }
         @media (min-width: 768px) { .dk-lockup--hero { --lk: 52px; } }
+        /* Short phones (e.g. 360 x 640): a slightly smaller logo, so an offer banner above it leaves "Order now" on the first screen */
+        @media (max-width: 767px) and (max-height: 700px) { .dk-lockup--hero { --lk: 30px; } }
         @media (min-width: 1024px) { .dk-lockup--hero { --lk: 54px; } }
         .dk-lockup--sm { --lk: 26px; }
         .dk-lockup__symbol { display: block; width: calc(var(--lk) * 2.55); height: auto; aspect-ratio: 220.3 / 213; overflow: visible; }
@@ -80,6 +82,7 @@
         @media (min-width: 1024px) { .dk-tagline { font-size: 32px; max-width: none; } }
         .dk-tagline:lang(kn) { font-family: "Noto Serif Kannada", "Cormorant Garamond", Georgia, serif; font-style: normal; font-size: 21px; line-height: 1.55; max-width: 17em; }
         @media (min-width: 1024px) { .dk-tagline:lang(kn) { font-size: 26px; max-width: none; } }
+        @media (max-width: 767px) and (max-height: 700px) { .dk-tagline { font-size: 23px; } .dk-tagline:lang(kn) { font-size: 18px; line-height: 1.45; } }
         .dk-tagline.dk-tagline--footer { font-size: 22px; max-width: 16em; }
         .dk-tagline.dk-tagline--footer:lang(kn) { font-size: 18px; }
         @media (min-width: 1024px) { .dk-tagline.dk-tagline--footer { margin-left: 0; text-align: left; } }

@@ -2,6 +2,36 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 26 Oct 2026: Rajyotsava (site background, wide offer banner, offer products and prices, hidden developer options) (branch pre-main)
+URGENT for Kannada Rajyotsava, 1 Nov. `pre-main` re-made from the newest `main` (the 24 Oct `pre-main` is superseded by PR #1, which
+`main` now holds; the old branch is kept on this PC as `pre-main-old-24oct`).
+- [x] **Hidden developer options**: admin → More → 7 taps on the new version line ("Developer options unlocked", this device only).
+  Server-checked for every action: `admin_users.role = 'developer'`, or Hema's `owner` account once the developer switches
+  "Show them to Hema" on (`site_config.devAccess`). Helper roles (`full`, `orders_menu`, `orders`, `disabled`) exist in the
+  database for Part 2; `disabled` can't log in
+- [x] **Site background** (developer options): default = the faint logo behind the home hero (as before); Rajyotsava flag,
+  Diwali diyas, Christmas snow, New Year fireworks, Valentine's hearts (canvas, `src/components/background/themes.js`, its own
+  1.8 KB chunk loaded only while a theme is on; ≤30 fps, ≤1.5 dpr, paused while hidden, one still frame for reduce motion or
+  animation off), or an own picture (washed light on upload). Per theme: dates (IST), strength 1–20 % (default 7 %, logo 4.5 %),
+  animation on/off, preview before saving; back to the default after the end date by itself. Fixed behind the content
+  (`#dk-app` is `isolate`), and on the black hero instead of the logo
+- [x] **Offer banner**: the first thing on Home: phones = 16:9 photo with the words on it (end date top-left, dots bottom-right),
+  short phones (≤700 px tall, `short:` variant) = small 16:9 photo beside the words + a smaller hero logo, computers = slim wide
+  card with the 3:1 photo on the right. Swipeable slides (scroll-snap) with dots, 6 s turns. "Order now" stays on the first
+  screen at 360×640, 390×844 and 1280×800 in EN and KN (measured)
+- [x] **Crop tool** for the banner photo (`src/admin/CropPhoto.jsx`): two fixed frames (3:1 → 1500/750 px, 16:9 → 1200/600 px),
+  drag + zoom; previews for phone and computer in the form
+- [x] **Offer products**: every product (`items.all`, e.g. 50% off everything), sections and/or products, a badge, "Shop the offer" → `/menu?offer=<id>` (only those products, badge,
+  "Show full menu"), an "Offers" tab first in the menu while live (`/menu?offer=all`)
+- [x] **Special prices**: % off / ₹ off / exact per product and size (`deal`), `applyOfferPrices` on the website AND in
+  `loadCatalog`, so create-order charges the offer price only on the offer's IST dates (regular price refused as "price changed"
+  during it, and the other way round after). Regular price crossed out on cards, sheet and sizes
+- [x] Database: `d1/migrations/0003_offer_items_site_config.sql` + `supabase/migrations/20261026000001_…` (only adds). NOT run on live
+- [x] Demo: the developer options (demo user = developer), a Rajyotsava background and offer (10 % off Delight Boxes + Pista Bar, 1–3 Nov)
+- [x] Checks: 385 tests (16 new in tests/rajyotsava.test.js); check-i18n, check-secrets, build; qa-rajyotsava 199/199 (Chromium + WebKit,
+  360/390/1280 × EN/KN, reduce motion, the visitor's clock after the end date), qa-offers 54/54, qa-admin 24/24, qa-step6,
+  qa-payments; first-visit JS ≤ 62.1 KB (English)
+
 ## 23 Oct 2026 (later): the new repo, and everything on Cloudflare D1 too (branch pre-main)
 The repo moved to github.com/deep-collab/dream_kitchen. Its `main` had split off on 10 Oct and moved to a Cloudflare Worker +
 D1 (deep-collab, 16 Oct), without the 11–23 Oct work. `pre-main` = all of our work + that `main`, merged:

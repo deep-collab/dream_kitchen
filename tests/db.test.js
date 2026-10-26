@@ -153,7 +153,7 @@ describe('the database’s own rules', () => {
   it('RLS is on for every table', async () => {
     const r = await db.query(`select relname, relrowsecurity from pg_class where relnamespace = 'public'::regnamespace and relkind = 'r' order by relname`)
     expect(r.rows.every((x) => x.relrowsecurity)).toBe(true)
-    expect(r.rows.map((x) => x.relname)).toEqual(['admin_users', 'booking_events', 'class_blocks', 'class_bookings', 'class_enquiries', 'heartbeat', 'offers', 'order_events', 'orders', 'page_photos', 'products', 'rate_limits', 'settings'])
+    expect(r.rows.map((x) => x.relname)).toEqual(['admin_users', 'booking_events', 'class_blocks', 'class_bookings', 'class_enquiries', 'heartbeat', 'offers', 'order_events', 'orders', 'page_photos', 'products', 'rate_limits', 'settings', 'site_config'])
   })
 })
 

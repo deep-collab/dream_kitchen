@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Short phones (e.g. 360 x 640): `short:` makes things compact so the first screen still shows "Order now" */
+@custom-variant short (@media (max-width: 767px) and (max-height: 700px));
+
 /* ==========================================================================
    Design tokens (docs/DESIGN.md). Tailwind 4 turns each into a utility and a
    CSS variable, e.g. bg-ink / var(--color-ink).
@@ -320,6 +323,10 @@
   0%, 100% { opacity: 0.15; transform: scale(0.7); }
   50% { opacity: 0.9; transform: scale(1); }
 }
+@keyframes dk-rise {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
 /* Hero: slow watermark drift + sparkles (GPU transforms/opacity only). Static under reduced motion. */
 .dk-drift { transform: rotate(-8deg); transform-origin: 50% 50%; }
 .dk-sparkle { opacity: 0.55; }
@@ -327,6 +334,8 @@
   .pop { animation: dk-pop 0.35s ease; }
   .dk-toast { animation: dk-toast-in 0.25s var(--ease-out-soft); }
   .dk-offer-in { animation: dk-offer-in 0.35s var(--ease-out-soft); }
+  /* The home offer banner: a gentle rise as the page opens */
+  .dk-rise { animation: dk-rise 0.5s var(--ease-out-soft) both; }
   .dk-drift { animation: dk-drift 48s ease-in-out infinite; will-change: transform; }
   .dk-sparkle { animation: dk-twinkle var(--dur, 6s) ease-in-out var(--delay, 0s) infinite; }
 }

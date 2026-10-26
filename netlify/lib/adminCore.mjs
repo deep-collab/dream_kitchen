@@ -20,7 +20,8 @@ import { BOOKING_NEXT, bookingAction, bookingSummary, classAvailability, classCo
 import { bookingsCsv, dateRange, istDate, istStart, monthlySummary, monthRange, ordersCsv } from './reports.mjs'
 import { customerBooking, customerBookingCancelled, customerStatus } from './emailTemplates.mjs'
 import { fromDataUrl, MIME } from './images.mjs'
-import { istToday, LINK_PATTERN, OFFER_MAX, offerStatus, PAGE_PHOTOS } from '../../src/lib/offers.js'
+import { cleanDeal, cleanItems, istToday, LINK_PATTERN, OFFER_MAX, offerStatus, PAGE_PHOTOS } from '../../src/lib/offers.js'
+import { backgroundErrors, BACKGROUND_THEMES, cleanBackground, cleanConfig } from '../../src/lib/siteConfig.js'
 
 export const IDLE_DAYS = 30
 const clean = (v, max) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max)
@@ -374,12 +375,28 @@ function offerView(row, today) {
     messageKn: kn(row.message),
     buttonEn: row.button?.en || '',
     buttonKn: kn(row.button),
+    badgeEn: row.badge?.en || '',
+    badgeKn: kn(row.badge),
     link: row.link || '',
+    items: cleanItems(row.items) || { categories: [], products: [] },
+    deal: cleanDeal(row.deal),
     photo: row.photo_url || null,
+    photoPhone: row.photo_phone_url || null,
     startsOn: row.starts_on,
     endsOn: row.ends_on,
     active,
     status: offerStatus({ active, startsOn: row.starts_on, endsOn: row.ends_on }, today),
+  }
+}
+
+/** What an offer can hold: the menu sections, and every product on the menu with its prices */
+async function offerChoices(store) {
+  const products = await menu(store)
+  return {
+    categories: CATEGORIES.filter((c) => !c.hidden).map((c) => ({ id: c.id, name: c.name.en })),
+    products: products
+      .filter((p) => p.active)
+      .map((p) => ({ id: p.id, name: p.name, category: p.category, price: p.price, sizes: p.sizes.map((s) => ({ id: s.id, label: s.label, price: s.price })) })),
   }
 }
 
@@ -394,16 +411,19 @@ const byStatus = (a, b) => {
 
 async function offerList(store, ctx) {
   const today = istToday(ctx.now())
-  const [rows, links] = await Promise.all([store.listOffers(), offerLinks(store)])
-  return { offers: (rows || []).map((r) => offerView(r, today)).sort(byStatus), today, links }
+  const [rows, links, choices] = await Promise.all([store.listOffers(), offerLinks(store), offerChoices(store)])
+  return { offers: (rows || []).map((r) => offerView(r, today)).sort(byStatus), today, links, choices }
 }
 
 /**
  * Hema's offer form -> the offers columns.
- *   { id?, title: { en, kn }, message?: { en, kn }, button?: { en, kn }, link, startsOn, endsOn, active? }
+ *   { id?, title: { en, kn }, message?: { en, kn }, button?: { en, kn }, link, startsOn, endsOn, active?,
+ *     items?: { categories, products }, deal?: (src/lib/offers.js cleanDeal) | null, badge?: { en, kn } }
  * The English title is needed; Kannada is optional everywhere (the English shows instead).
+ * Products and sections must be on the menu; a special price needs products, and an exact price
+ * only for products in the offer.
  */
-export function offerPatch(body, links, today) {
+export function offerPatch(body, links, today, choices = null) {
   const fields = {}
   const pair = (v, max, key, required) => {
     const en = clean(v?.en, max)
@@ -426,23 +446,102 @@ export function offerPatch(body, links, today) {
   else if (isISODate(body.startsOn) && body.endsOn < body.startsOn) fields.endsOn = 'beforeStart'
   else if (body.endsOn < today) fields.endsOn = 'past'
   if (bool(body.active) !== undefined) patch.active = body.active
+
+  // The offer's products, special price and badge (26 Oct 2026). Left out = unchanged.
+  if (body.items !== undefined) {
+    const items = cleanItems(body.items)
+    const knownCat = new Set(choices?.categories.map((c) => c.id) || [])
+    const knownProduct = new Set(choices?.products.map((p) => p.id) || [])
+    if (items && (items.categories.some((c) => !knownCat.has(c)) || items.products.some((p) => !knownProduct.has(p)))) fields.items = 'invalid'
+    patch.items = items
+  }
+  if (body.deal !== undefined) {
+    const deal = body.deal === null ? null : cleanDeal(body.deal)
+    const items = patch.items === undefined ? cleanItems(body.currentItems) : patch.items
+    if (body.deal !== null && !deal) fields.deal = 'invalid'
+    else if (deal && !items) fields.deal = 'noItems'
+    else if (deal?.kind === 'prices') {
+      const holds = (id) => items.all || items.products.includes(id) || items.categories.includes(choices?.products.find((p) => p.id === id)?.category)
+      if (Object.keys(deal.prices).some((id) => !holds(id))) fields.deal = 'notInOffer'
+    }
+    patch.deal = deal
+  }
+  if (body.badge !== undefined) patch.badge = pair(body.badge, OFFER_MAX.badge, 'badge', false)
   if (Object.keys(fields).length) throw new HttpError(400, 'fields', { fields })
   return patch
 }
 
 async function saveOffer(store, body, ctx) {
-  const patch = offerPatch(body, await offerLinks(store), istToday(ctx.now()))
-  if (!body.id) return (await store.insertOffer({ active: true, ...patch })).id
-  const id = offerId(body.id)
+  const id = body.id ? offerId(body.id) : null
+  const current = id ? (await store.listOffers()).find((o) => o.id === id) : null
+  if (id && !current) throw new HttpError(404, 'notFound')
+  const [links, choices] = await Promise.all([offerLinks(store), offerChoices(store)])
+  const patch = offerPatch({ ...body, currentItems: current?.items }, links, istToday(ctx.now()), choices)
+  if (!id) return (await store.insertOffer({ active: true, ...patch })).id
   if (!(await store.updateOffer(id, patch))) throw new HttpError(404, 'notFound')
   return id
 }
 
+/**
+ * The banner photo, cut on Hema's phone in two shapes (src/admin/CropPhoto.jsx): 'wide' (3:1, for
+ * computers; photo_url) and 'phone' (16:9; photo_phone_url, under offer-<id>-phone/), each sent on its own (1500 / 1200 px
+ * and a half-size copy). { image: null } removes both. A page from before the two shapes sends one
+ * square photo: it is the wide one, as before.
+ */
 async function offerPhoto(store, body, ctx) {
   const id = offerId(body.id)
   if (!(await store.listOffers()).some((o) => o.id === id)) throw new HttpError(404, 'notFound')
-  await store.updateOffer(id, { photo_url: body.image === null ? null : await storePhoto(store, `offer-${id}`, body, ctx) })
+  if (body.image === null) return store.updateOffer(id, { photo_url: null, photo_phone_url: null })
+  if (body.variant === 'phone') return store.updateOffer(id, { photo_phone_url: await storePhoto(store, `offer-${id}-phone`, body, ctx) })
+  await store.updateOffer(id, { photo_url: await storePhoto(store, `offer-${id}`, body, ctx) })
 }
+
+/* ---------------- developer options (admin -> More, hidden) ---------------- */
+
+/**
+ * May this account use the developer options? The developer always; Hema (the owner account) once
+ * the developer switched "Show to Hema" on. Checked here, on the server, for every developer
+ * action: hiding the buttons in the admin is only for looks.
+ */
+export async function devAllowed(store, user) {
+  if (user?.role === 'developer') return true
+  if (user?.role !== 'owner') return false
+  return cleanConfig(await store.getConfig().catch(() => ({}))).devAccess.owner
+}
+async function requireDev(store, user) {
+  if (!(await devAllowed(store, user))) throw new HttpError(403, 'notAllowed')
+}
+
+async function devConfig(store, user) {
+  const c = cleanConfig(await store.getConfig())
+  return { background: c.background, themes: BACKGROUND_THEMES, devAccess: c.devAccess, isDeveloper: user.role === 'developer' }
+}
+
+async function devAction(store, user, action, body, ctx) {
+  await requireDev(store, user)
+  switch (action) {
+    case 'devConfig':
+      return devConfig(store, user)
+    case 'saveBackground': {
+      const errors = backgroundErrors(body.background)
+      if (Object.keys(errors).length) throw new HttpError(400, 'fields', { fields: errors })
+      await store.setConfig('background', cleanBackground(body.background), user.email || null)
+      return devConfig(store, user)
+    }
+    case 'backgroundImage':
+      // Uploaded first and only used once the form is saved, so it can be previewed before
+      return { url: await storePhoto(store, 'background', body, ctx) }
+    case 'setDevAccess':
+      // Only the developer decides whether Hema sees these tools
+      if (user.role !== 'developer') throw new HttpError(403, 'notAllowed')
+      if (bool(body.owner) === undefined) throw new HttpError(400, 'badRequest')
+      await store.setConfig('devAccess', { owner: body.owner }, user.email || null)
+      return devConfig(store, user)
+    default:
+      throw new HttpError(400, 'badRequest')
+  }
+}
+export const DEV_ACTIONS = new Set(['devConfig', 'saveBackground', 'backgroundImage', 'setDevAccess'])
 
 /* ---------------- settings ---------------- */
 
@@ -639,11 +738,13 @@ async function monthly(store, body, ctx) {
 
 /* ---------------- the dispatcher ---------------- */
 
-export async function runAdminAction(store, user, action, body, ctx) {
+export async function runAdminAction(store, signedIn, action, body, ctx) {
+  const user = { ...signedIn, role: signedIn?.role || 'owner' }
   const settingsRow = () => store.getSettings()
+  if (DEV_ACTIONS.has(action)) return devAction(store, user, action, body, ctx)
   switch (action) {
     case 'me':
-      return { email: user.email, warnings: warnings(await settingsRow(), ctx), mode: ctx.env.mode }
+      return { email: user.email, role: user.role, dev: await devAllowed(store, user), warnings: warnings(await settingsRow(), ctx), mode: ctx.env.mode }
 
     case 'summary':
       return { summary: await summary(store, ctx), warnings: warnings(await settingsRow(), ctx) }

@@ -58,7 +58,9 @@
     "label": "Notice from Dream Kitchen",
     "offers": "Offers",
     "offerCta": "See offer",
-    "offerShow": "Show offer {n} of {count}"
+    "offerShow": "Show offer {n} of {count}",
+    "ends": "Ends {date}",
+    "shopOffer": "Shop the offer"
   },
   "units": {
     "g": "{n} g",
@@ -204,7 +206,15 @@
     "tabs": "Menu categories",
     "from": "from {price}",
     "priceSoon": "Price coming soon",
-    "soldOut": "Sold out"
+    "soldOut": "Sold out",
+    "offersTab": "Offers",
+    "offersAll": "All offer items",
+    "offerBadge": "Offer",
+    "wasPrice": "Regular price",
+    "fullMenu": "Show full menu",
+    "offerEnded": "This offer has ended",
+    "offerEndedText": "Have a look at the full menu.",
+    "offerEmpty": "These items are not on the menu right now."
   },
   "sheet": {
     "size": "Size",

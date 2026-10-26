@@ -58,7 +58,9 @@
     "label": "Dream Kitchen ನಿಂದ ಸೂಚನೆ",
     "offers": "ಆಫರ್‌ಗಳು",
     "offerCta": "ಆಫರ್ ನೋಡಿ",
-    "offerShow": "ಆಫರ್ {n} / {count} ತೋರಿಸಿ"
+    "offerShow": "ಆಫರ್ {n} / {count} ತೋರಿಸಿ",
+    "ends": "{date} ವರೆಗೆ",
+    "shopOffer": "ಆಫರ್ ಖರೀದಿಸಿ"
   },
   "units": {
     "g": "{n} ಗ್ರಾಂ",
@@ -204,7 +206,15 @@
     "tabs": "ಮೆನು ವಿಭಾಗಗಳು",
     "from": "{price} ರಿಂದ",
     "priceSoon": "ಬೆಲೆ ಶೀಘ್ರದಲ್ಲೇ",
-    "soldOut": "ಖಾಲಿಯಾಗಿದೆ"
+    "soldOut": "ಖಾಲಿಯಾಗಿದೆ",
+    "offersTab": "ಆಫರ್‌ಗಳು",
+    "offersAll": "ಎಲ್ಲಾ ಆಫರ್ ಐಟಂಗಳು",
+    "offerBadge": "ಆಫರ್",
+    "wasPrice": "ಸಾಮಾನ್ಯ ಬೆಲೆ",
+    "fullMenu": "ಪೂರ್ಣ ಮೆನು ತೋರಿಸಿ",
+    "offerEnded": "ಈ ಆಫರ್ ಮುಗಿದಿದೆ",
+    "offerEndedText": "ಪೂರ್ಣ ಮೆನು ನೋಡಿ.",
+    "offerEmpty": "ಈ ಐಟಂಗಳು ಈಗ ಮೆನುವಿನಲ್ಲಿ ಇಲ್ಲ."
   },
   "sheet": {
     "size": "ಗಾತ್ರ",
