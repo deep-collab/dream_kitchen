@@ -77,7 +77,11 @@ export default handle(async (req, context) => {
   if (action === 'setPassword') return json(200, await setPassword(store, body, req, context))
 
   const user = await requireAdmin(req, store)
-  const result = await runAdminAction(store, user, action, body, adminCtx())
+  const result = await runAdminAction(store, user, action, body, adminCtx()).catch((e) => {
+    // the server log names the action that failed (lib/http.mjs)
+    if (e && typeof e === 'object' && !(e instanceof HttpError)) e.action = action.slice(0, 40)
+    throw e
+  })
   if (CHANGES_MENU.has(action)) await menuChanged()
   return json(200, result)
 })

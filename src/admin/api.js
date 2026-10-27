@@ -125,9 +125,16 @@ async function authed(token, body) {
   }
 }
 
-/** Plain words for an admin error */
-export function problem(r) {
+/**
+ * Plain words for an admin error, saying what failed. `saving`: the words start "Couldn't save".
+ * An unexpected server error carries a ref, the same one as the server log line.
+ */
+export function problem(r, { saving = false } = {}) {
+  const failed = saving ? 'Couldn’t save' : 'That didn’t work'
+  const ref = r?.ref ? ` (ref ${r.ref})` : ''
   const words = {
+    dbUpdate: `${failed}: the website’s database hasn’t been updated for this yet (a database update, “migration”, still has to be run). Nothing new was saved. Please tell Deep${ref}.`,
+    server: `${failed}: the server hit an unexpected error${ref}. Please try again; if it happens again, send Deep a screenshot of this message.`,
     network: 'No internet connection. Check it and try again.',
     login: 'Please log in again.',
     expired: 'You haven’t used the admin for 30 days, so please log in again.',
@@ -142,5 +149,5 @@ export function problem(r) {
     linkExpired: 'This reset link has expired or was already used. Ask for a new one.',
     tooLarge: 'That photo is too big. Try another one.',
   }
-  return words[r?.error] || 'Something went wrong. Please try again.'
+  return words[r?.error] || `${failed}: the server answered “${r?.error || 'nothing'}”${r?.status ? ` (${r.status})` : ''}. Please try again; if it happens again, send Deep a screenshot of this message.`
 }

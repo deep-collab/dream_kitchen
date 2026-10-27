@@ -44,9 +44,18 @@ export function clientIp(req, context) {
   )
 }
 
+// The database is older than the code: a migration hasn't been run on it (SQLite / D1 and Postgres words)
+const OLD_DATABASE = /no such (table|column)|has no column named|column .* does not exist|relation .* does not exist/i
+
+/** True when an error means the database still needs a migration (D1 puts the SQLite words in `cause`) */
+export const needsMigration = (error) => OLD_DATABASE.test(`${error?.message || ''} ${error?.cause?.message || ''}`)
+
 /**
  * Wraps a function body: method check, JSON errors, and no stack traces to the browser.
  *   export default handle(async (req, context) => json(200, {...}), { methods: ['POST'] })
+ * An unexpected error is logged in full (path, admin action, stack) with a short ref that the
+ * answer carries too, so the admin can show it and the log line can be found
+ * (`npx wrangler tail`). An out-of-date database answers 'dbUpdate', not 'server'.
  */
 export function handle(fn, { methods = ['POST'] } = {}) {
   return async (req, context) => {
@@ -55,8 +64,11 @@ export function handle(fn, { methods = ['POST'] } = {}) {
       return await fn(req, context)
     } catch (error) {
       if (error instanceof HttpError) return json(error.status, { error: error.code, ...error.extra })
-      console.error('[dk] unexpected error', error)
-      return json(500, { error: 'server' })
+      const ref = Math.random().toString(36).slice(2, 8).toUpperCase()
+      const where = `${req.method} ${new URL(req.url).pathname}${error?.action ? ` action=${error.action}` : ''}`
+      const old = needsMigration(error)
+      console.error(`[dk] ${old ? 'database needs a migration' : 'unexpected error'} ref=${ref} ${where}:`, error?.stack || error, error?.cause ? `cause: ${error.cause?.stack || error.cause}` : '')
+      return old ? json(503, { error: 'dbUpdate', ref }) : json(500, { error: 'server', ref })
     }
   }
 }

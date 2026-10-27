@@ -417,6 +417,75 @@ describe('Cookie Tins', () => {
   })
 })
 
+describe('the live database on 27 Oct 2026: 0003 and 0004 never run (Save gave “Something went wrong”)', () => {
+  function liveDatabase() {
+    const live = new Database(':memory:')
+    live.exec(readFileSync('d1/migrations/0001_init.sql', 'utf8'))
+    live.exec(readFileSync('d1/seed.sql', 'utf8'))
+    live.exec(readFileSync('d1/migrations/0002_products_text_offers_page_photos.sql', 'utf8'))
+    return live
+  }
+
+  it('before the update: Save and Turn on say the database needs an update, logged in full; after it: saved, scheduled from 1 Nov, 50% off on 1 Nov, off again', async () => {
+    const live = liveDatabase()
+    env = { ...env, DB: createD1SqliteAdapter(live) }
+    await createD1Store(env.DB).auth.createAdmin(HEMA.email, HEMA.password)
+    const s = await login()
+    expect((await act(s, 'updateProduct', { id: 'almond-bar', price: 199 })).status).toBe(200)
+    const placed = await order([line('almond-bar', 199)], 289)
+    expect(placed.status).toBe(201)
+    // what Hema saw: the card with "Turn on this offer" (no row), and Save failing
+    expect((await act(s, 'offers')).body.rajyotsava).toMatchObject({ exists: false, active: false, status: 'off' })
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const failed = await rajOn(s)
+    expect(failed.status).toBe(503)
+    expect(failed.body).toMatchObject({ error: 'dbUpdate', ref: expect.stringMatching(/^[A-Z0-9]{4,6}$/) })
+    const line0 = logged.mock.calls.map((c) => c.join(' ')).find((t) => t.includes(failed.body.ref))
+    expect(line0).toMatch(/database needs a migration .* POST \/api\/admin action=saveRajyotsava/)
+    expect(line0).toMatch(/no column named items/)
+    logged.mockRestore()
+    expect(live.prepare('SELECT count(*) AS c FROM offers').get().c).toBe(0) // nothing half-saved
+    expect((await menu()).ready).toBe(true) // the website kept working
+
+    // the fix: `npm run d1:migrate -- --remote` runs 0003 then 0004; nothing else changes
+    const dump = (sql) => JSON.stringify(live.prepare(sql).all())
+    const before = { orders: dump('SELECT * FROM orders ORDER BY id'), settings: dump('SELECT * FROM settings'), products: dump('SELECT * FROM products ORDER BY id') }
+    live.exec(readFileSync('d1/migrations/0003_offer_items_site_config.sql', 'utf8'))
+    live.exec(readFileSync('d1/migrations/0004_rajyotsava_cookie_tins.sql', 'utf8'))
+    expect(dump('SELECT * FROM orders ORDER BY id')).toBe(before.orders)
+    expect(dump('SELECT * FROM settings')).toBe(before.settings)
+    expect(JSON.parse(dump('SELECT * FROM products ORDER BY id'))).toEqual(JSON.parse(before.products).map((p) => ({ ...p, added: 0 })))
+    expect((await createD1Store(env.DB).health()).update).toBe(true)
+
+    // Save (the drawing ticked), then Turn off, then Turn on: "On / Scheduled from 1 Nov"
+    const saved = await rajOn(s, { drawing: true })
+    expect(saved.status).toBe(200)
+    expect(saved.body.rajyotsava).toMatchObject({ exists: true, active: true, startsOn: '2026-11-01', endsOn: '2026-11-30', percent: 50, drawing: true, status: 'scheduled' })
+    expect((await rajOn(s, { active: false })).body.rajyotsava).toMatchObject({ active: false, status: 'off' })
+    expect((await rajOn(s, { active: true })).body.rajyotsava).toMatchObject({ active: true, status: 'scheduled', startsOn: '2026-11-01' })
+    // the dates are stored as the Indian dates typed in (the date box shows 11/01/2026 on a US phone)
+    expect(live.prepare('SELECT starts_on, ends_on, active FROM offers WHERE id = ?').get(RAJYOTSAVA.id)).toEqual({ starts_on: '2026-11-01', ends_on: '2026-11-30', active: 1 })
+
+    // 31 Oct 23:59 IST: normal price; 1 Nov 00:00 IST: half price
+    setNow(OCT_31_2359)
+    expect(byId((await siteMenu()).products, 'pista-bar').price).toBe(450)
+    setNow(NOV_1_0000)
+    const nov = await siteMenu()
+    expect(rajyotsavaLive(nov.live)).toBeTruthy()
+    expect(byId(nov.products, 'pista-bar').price).toBe(225)
+    expect((await order([line('pista-bar', 225)], 315)).status).toBe(201)
+  })
+
+  it('the admin says what failed instead of “Something went wrong”', async () => {
+    const { problem } = await import('../src/admin/api.js')
+    expect(problem({ ok: false, status: 503, error: 'dbUpdate', ref: 'AB12CD' }, { saving: true })).toMatch(/^Couldn’t save: the website’s database hasn’t been updated .*ref AB12CD/)
+    expect(problem({ ok: false, status: 500, error: 'server', ref: 'ZZ9' }, { saving: true })).toMatch(/^Couldn’t save: the server hit an unexpected error \(ref ZZ9\)/)
+    expect(problem({ ok: false, status: 418, error: 'teapot' })).toMatch(/“teapot” \(418\)/)
+    expect(problem({ ok: false, error: 'fields' }, { saving: true })).toBe('Please check the boxes marked in red.')
+    for (const e of ['dbUpdate', 'server', 'unknown']) expect(problem({ ok: false, error: e })).not.toMatch(/Something went wrong/)
+  })
+})
+
 describe('d1/migrations/0004 on a database already in use', () => {
   function oldDatabase() {
     const old = new Database(':memory:')
