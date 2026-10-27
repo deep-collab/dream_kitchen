@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { adminCall } from './api'
-import { day, ErrorText, Loading, useAdminData } from './ui'
+import { day, ErrorText, formatINR, Loading, useAdminData } from './ui'
 import { site } from '../config/site'
 import { formatPhone } from '../lib/validation'
 
@@ -70,6 +70,7 @@ export default function PackingSlip() {
               <tr className="border-b border-black">
                 <th className="py-1 pr-2">Item</th>
                 <th className="w-16 py-1 text-right">Qty</th>
+                <th className="w-40 py-1 pl-2 text-right">Price</th>
               </tr>
             </thead>
             <tbody>
@@ -83,10 +84,45 @@ export default function PackingSlip() {
                     {i.drawing && <div>Drawing: {i.drawingText}</div>}
                   </td>
                   <td className="py-2 text-right text-lg font-bold">{i.qty}</td>
+                  <td className="py-2 pl-2 text-right tabular-nums" data-admin-slip-price>
+                    {i.offer && (
+                      <>
+                        <s className="block text-sm">{formatINR(i.regularLineTotal)}</s>
+                        <span className="block text-sm font-bold">{i.offer.label?.en || 'Offer'}</span>
+                      </>
+                    )}
+                    <strong>{formatINR(i.lineTotal)}</strong>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          <dl className="mt-2 ml-auto max-w-xs text-right">
+            {o.savings && (
+              <>
+                <div className="flex justify-between gap-4">
+                  <dt>Regular price</dt>
+                  <dd className="tabular-nums">{formatINR(o.savings.regularSubtotal)}</dd>
+                </div>
+                <div className="flex justify-between gap-4 font-bold" data-admin-slip-saving>
+                  <dt>{o.savings.labels.map((l) => l.en).join(', ')}</dt>
+                  <dd className="tabular-nums">−{formatINR(o.savings.saved)}</dd>
+                </div>
+              </>
+            )}
+            <div className="flex justify-between gap-4">
+              <dt>Items</dt>
+              <dd className="tabular-nums">{formatINR(o.subtotal)}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt>Courier</dt>
+              <dd className="tabular-nums">{formatINR(o.courier)}</dd>
+            </div>
+            <div className="flex justify-between gap-4 border-t border-black font-bold">
+              <dt>Total</dt>
+              <dd className="tabular-nums">{formatINR(o.total)}</dd>
+            </div>
+          </dl>
           {o.notes && (
             <p className="mt-3">
               <strong>Customer’s note:</strong> {o.notes}

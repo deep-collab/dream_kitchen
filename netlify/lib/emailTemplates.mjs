@@ -6,6 +6,7 @@
 //   class booking and its confirmation or cancellation.
 import { site } from '../../src/config/site.js'
 import { formatINR } from '../../src/lib/pricing.js'
+import { orderSavings } from '../../src/lib/offers.js'
 import { formatPhone } from '../../src/lib/validation.js'
 import { stateName } from '../../src/data/states.js'
 import { applyClassSettings, slotLabel } from '../../src/lib/classes.js'
@@ -52,10 +53,21 @@ function itemLines(order, lang) {
     if (i.ragi) bits.push(t('ragi', lang))
     if (i.nameOnBox) bits.push(`${t('nameOnBox', lang)}: “${i.nameOnBox}”`)
     if (i.drawing) bits.push(`${t('drawing', lang)}: ${i.drawingText || ''}${i.drawingRef ? ' (+ photo)' : ''}`)
-    return `${bits.join(', ')} × ${i.qty}  ${formatINR(i.lineTotal)}`
+    // An offer line: the regular price, the offer's name and the price paid ("₹1,250 → Rajyotsava 50% off → ₹625")
+    const price = i.offer ? `${formatINR(i.regularLineTotal)} → ${offerWords(i.offer.label, lang)} → ${formatINR(i.lineTotal)}` : formatINR(i.lineTotal)
+    return `${bits.join(', ')} × ${i.qty}  ${price}`
   })
 }
-const money = (order, lang) => [`${t('subtotal', lang)}: ${formatINR(order.subtotal)}`, `${t('courier', lang)}: ${formatINR(order.courier)}`, `${t('total', lang)}: ${formatINR(order.total)}`]
+const offerWords = (label, lang) => (lang === 'kn' ? label?.kn || label?.en : label?.en) || 'Offer'
+function money(order, lang) {
+  const saved = orderSavings(order.items)
+  return [
+    ...(saved ? [`${t('regular', lang)}: ${formatINR(saved.regularSubtotal)}`, `${saved.labels.map((l) => offerWords(l, lang)).join(', ')}: −${formatINR(saved.saved)}`] : []),
+    `${t('subtotal', lang)}: ${formatINR(order.subtotal)}`,
+    `${t('courier', lang)}: ${formatINR(order.courier)}`,
+    `${t('total', lang)}: ${formatINR(order.total)}`,
+  ]
+}
 const adminLink = (path) => `${config.siteUrl}/admin/${path}`
 const trackLink = (order) => t('track', langOf(order), { link: `${config.siteUrl}/track?id=${order.order_code}` })
 

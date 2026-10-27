@@ -5,8 +5,8 @@ import Symbol from '../brand/Symbol'
 import Button from '../ui/Button'
 import { WhatsAppIcon } from '../icons'
 import ThemeLayer from '../background/ThemeLayer'
-import { useSiteConfig } from '../../context/MenuProvider'
-import { activeBackground } from '../../lib/siteConfig'
+import { useRajyotsava, useSiteConfig } from '../../context/MenuProvider'
+import { festivalBackground } from '../../lib/siteConfig'
 import 'virtual:dk-strings/home'
 
 // The two outline buttons: compact side by side on phones (48px tall), full size on desktop
@@ -22,8 +22,9 @@ const SIDE = 'flex-auto whitespace-nowrap max-md:min-h-12 max-md:gap-2 max-md:px
 export default function Hero() {
   const { t } = useI18n()
   const { config, today } = useSiteConfig()
-  // The background behind the hero (developer options): the faint logo by default, or the festival theme on its dates
-  const bg = activeBackground(config.background, today)
+  // The background behind the hero: the faint logo by default, the festival theme on its dates
+  // (developer options), or the Karnataka flag while the Rajyotsava offer is live
+  const bg = festivalBackground(config.background, today, Boolean(useRajyotsava()))
   return (
     <section className="on-dark relative isolate overflow-hidden bg-ink text-cream">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">

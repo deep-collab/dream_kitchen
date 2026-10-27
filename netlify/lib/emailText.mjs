@@ -15,6 +15,7 @@ export const customerText = {
   },
   items: { en: 'Your items', kn: 'ನಿಮ್ಮ ವಸ್ತುಗಳು' },
   subtotal: { en: 'Items', kn: 'ವಸ್ತುಗಳು' },
+  regular: { en: 'Regular price', kn: 'ಸಾಮಾನ್ಯ ಬೆಲೆ' },
   courier: { en: 'Courier', kn: 'ಕೊರಿಯರ್' },
   total: { en: 'Total', kn: 'ಒಟ್ಟು' },
   dispatch: { en: 'Preferred dispatch date: {date}', kn: 'ಕಳುಹಿಸುವ ದಿನಾಂಕ: {date}' },

@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { categories as CATEGORIES, products as PRODUCTS } from '../config/shop'
 import { applyOverrides, applySettings, hasPrice } from '../lib/pricing'
-import { allLiveOffers, applyOfferPrices, cleanPagePhotos, istToday, MAX_LIVE_OFFERS } from '../lib/offers'
+import { allLiveOffers, applyOfferPrices, cleanPagePhotos, istToday, MAX_LIVE_OFFERS, rajyotsavaLive } from '../lib/offers'
 import { publicConfig } from '../lib/siteConfig'
 import { loadRemoteMenu } from '../services'
 
@@ -67,12 +67,14 @@ export function MenuProvider({ children }) {
     const live = allLiveOffers(offerList, today)
     const all = applyOfferPrices(applyOverrides(PRODUCTS, remote?.overrides || []), live)
     const settings = applySettings(remote?.settings || {})
+    // Every product customers see has a clear price: one without (e.g. "price coming soon") stays
+    // off the menu until Hema sets its price in the admin
+    const products = all.filter((p) => p.active !== false && hasPrice(p)).sort((a, b) => a.sort - b.sort)
     return {
       menu: {
-        categories: CATEGORIES.filter((c) => !c.hidden).sort((a, b) => a.sort - b.sort),
-        // Every product customers see has a clear price: one without (e.g. "price coming soon") stays
-        // off the menu until Hema sets its price in the admin
-        products: all.filter((p) => p.active !== false && hasPrice(p)).sort((a, b) => a.sort - b.sort),
+        // A section that only Hema fills (Cookie Tins) gets its tab and Home tile once it has a product
+        categories: CATEGORIES.filter((c) => !c.hidden && (!c.whenStocked || products.some((p) => p.category === c.id && p.menu !== false))).sort((a, b) => a.sort - b.sort),
+        products,
         productsById: Object.fromEntries(all.map((p) => [p.id, p])),
       },
       settings,
@@ -80,6 +82,11 @@ export function MenuProvider({ children }) {
       // and the Customize tiles' photos she changed
       offers: live.slice(0, MAX_LIVE_OFFERS),
       allOffers: live,
+      // Kannada Rajyotsava (src/lib/offers.js RAJYOTSAVA): the offer while it is live, else null.
+      // `fresh`: known from /api/menu itself, not the phone's copy (the popup waits for that, so an
+      // offer Hema just turned off never pops up)
+      rajyotsava: rajyotsavaLive(live),
+      rajyotsavaFresh: remote !== undefined,
       today,
       // The developer options' settings (src/lib/siteConfig.js), defaults until /api/menu arrives
       config: publicConfig(remote?.config || {}),
@@ -101,6 +108,12 @@ export const useMenu = () => useContext(MenuContext).menu
 
 /** The offers to show now (src/lib/offers.js liveOffers), [] when none */
 export const useOffers = () => useContext(MenuContext).offers
+
+/** The Rajyotsava offer while it is live ({ ...offer, fresh }), else null */
+export function useRajyotsava() {
+  const { rajyotsava, rajyotsavaFresh } = useContext(MenuContext)
+  return rajyotsava ? { ...rajyotsava, percent: rajyotsava.deal.value, fresh: rajyotsavaFresh } : null
+}
 
 /** Every offer live today (for the menu's offer filter and badges), [] when none */
 export const useAllOffers = () => useContext(MenuContext).allOffers

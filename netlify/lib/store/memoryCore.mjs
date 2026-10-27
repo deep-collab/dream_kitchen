@@ -9,6 +9,8 @@
 // Hooks: persist(db) after every change; writeFile / readFile for uploads; publicUrl(path) for
 // product photos.
 
+import { rajyotsavaRow } from '../../../src/lib/rajyotsava.js'
+
 const clone = (v) => (v == null ? v : JSON.parse(JSON.stringify(v)))
 const uuid = () => globalThis.crypto.randomUUID()
 const hex = (n) => Array.from(globalThis.crypto.getRandomValues(new Uint8Array(n)), (b) => b.toString(16).padStart(2, '0')).join('')
@@ -51,7 +53,8 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
     blocks: [],
     rateLimits: {},
     heartbeat: { last_run_at: null, runs: 0 },
-    offers: [],
+    // A new database has the Rajyotsava offer, as the migration gives D1 and Supabase (d1/migrations/0004)
+    offers: [{ ...rajyotsavaRow(), created_at: '2026-10-27T00:00:00.000Z', updated_at: '2026-10-27T00:00:00.000Z' }],
     pagePhotos: {},
     config: {},
     roles: {},

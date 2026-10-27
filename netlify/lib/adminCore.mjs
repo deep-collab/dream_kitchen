@@ -5,7 +5,7 @@
 //   ctx: { send(messages), env: { hemaEmail, razorpay: { enabled, keyId }, resend, mode }, now() }
 // Every answer comes after the store has saved, so the page shows "Saved" only when it is true.
 import { categories as CATEGORIES, products as CONFIG_PRODUCTS, courier as COURIER } from '../../src/config/shop.js'
-import { applyOverrides, applySettings, CUSTOM_CATEGORIES, isUpiId, PRODUCT_TEXT_MAX } from '../../src/lib/pricing.js'
+import { applyOverrides, applySettings, CUSTOM_CATEGORIES, isUpiId, PRODUCT_TEXT_MAX, SIZE_LIMITS } from '../../src/lib/pricing.js'
 import { sizeLabel } from '../../src/lib/weights.js'
 import { stateName } from '../../src/data/states.js'
 import { photos } from '../../src/data/photos.js'
@@ -20,7 +20,8 @@ import { BOOKING_NEXT, bookingAction, bookingSummary, classAvailability, classCo
 import { bookingsCsv, dateRange, istDate, istStart, monthlySummary, monthRange, ordersCsv } from './reports.mjs'
 import { customerBooking, customerBookingCancelled, customerStatus } from './emailTemplates.mjs'
 import { fromDataUrl, MIME } from './images.mjs'
-import { cleanDeal, cleanItems, istToday, LINK_PATTERN, OFFER_MAX, offerStatus, PAGE_PHOTOS } from '../../src/lib/offers.js'
+import { cleanDeal, cleanItems, DEAL_MAX, istToday, LINK_PATTERN, OFFER_MAX, offerStatus, orderSavings, PAGE_PHOTOS, RAJYOTSAVA } from '../../src/lib/offers.js'
+import { rajyotsavaRow } from '../../src/lib/rajyotsava.js'
 import { backgroundErrors, BACKGROUND_THEMES, cleanBackground, cleanConfig } from '../../src/lib/siteConfig.js'
 
 export const IDLE_DAYS = 30
@@ -91,6 +92,8 @@ async function orderDetail(store, code) {
     courierTier: row.courier_tier,
     items,
     subtotal: row.subtotal,
+    // What an offer took off (e.g. Rajyotsava 50% off): the regular subtotal and the saving
+    savings: orderSavings(row.items),
     courier: row.courier,
     notes: row.notes,
     adminNotes: row.admin_notes,
@@ -148,7 +151,7 @@ async function menu(store) {
       custom: Boolean(p.custom),
       courierTier: p.courierTier,
       category: p.category,
-      sizes: (p.sizes || []).map((s) => ({ id: s.id, label: sizeLabel(s).en, price: s.price, grams: s.grams || null })),
+      sizes: (p.sizes || []).map((s) => ({ id: s.id, label: sizeLabel(s).en, price: s.price, grams: s.grams || null, courierTier: s.courierTier || p.courierTier })),
       price: p.price ?? null,
       ragiPrice: p.ragiPrice ?? null,
       soldOut: Boolean(p.soldOut),
@@ -208,10 +211,15 @@ export function productPatch(body, base = CONFIG_PRODUCTS.find((p) => p.id === b
   price(body.ragiPrice, 'ragi_price')
   if (Array.isArray(body.sizes)) {
     const sizes = sizesFrom(body.sizes)
-    if (!sizes.length || sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) fields.sizes = 'price'
-    else if (base.custom && sizes.some((s) => !s.label)) fields.sizes = 'needLabels'
-    else if (new Set(sizes.map((s) => s.id)).size !== sizes.length) fields.sizes = 'duplicate'
+    const problem = body.sizes.length > SIZE_LIMITS.count ? 'tooMany' : sizeProblem(sizes)
+    if (problem || !sizes.length) fields.sizes = problem || 'price'
     else patch.sizes = sizes
+    // Her own product changing from one price to sizes: the one price goes
+    if (!problem && base.custom && body.price === undefined) patch.price = null
+  } else if (base.custom && body.sizes === null) {
+    // Her own product changing from sizes to one price ("No sizes")
+    patch.sizes = null
+    if (body.price === undefined) fields.price = 'price'
   }
   if (bool(body.soldOut) !== undefined) patch.sold_out = body.soldOut
   if (bool(body.active) !== undefined) patch.active = body.active
@@ -223,14 +231,31 @@ export function productPatch(body, base = CONFIG_PRODUCTS.find((p) => p.id === b
   return patch
 }
 
-/** Sizes from the admin page: [{ id?, label, grams?, price }] -> the sizes column */
+/**
+ * Sizes from the admin page, in Hema's order: [{ id?, label, grams?, price, courierTier? }] -> the
+ * sizes column (any number up to SIZE_LIMITS.count: 100 g, 250 g, 1 kg, 6 pieces, small tin…). Each
+ * size may have its own courier tier; without one it uses the product's.
+ */
 function sizesFrom(list) {
-  return list.slice(0, 6).map((s, i) => ({
+  return list.slice(0, SIZE_LIMITS.count).map((s, i) => ({
     id: clean(s.id || `size-${i + 1}`, 20).toLowerCase().replace(/[^a-z0-9-]/g, '-') || `size-${i + 1}`,
-    ...(clean(s.label, 24) ? { label: clean(s.label, 24) } : {}),
+    ...(clean(s.label, SIZE_LIMITS.label) ? { label: clean(s.label, SIZE_LIMITS.label) } : {}),
     ...(Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? { grams: s.grams } : {}),
     price: s.price,
+    ...(COURIER.tiers.includes(s.courierTier) ? { courierTier: s.courierTier } : {}),
   }))
+}
+
+/**
+ * What is wrong with a list of sizes, or null: 'price' (every size needs a price above ₹0),
+ * 'needLabels' (a name each, e.g. "250 g" or "small tin"), 'duplicate' (two sizes with the same name)
+ */
+function sizeProblem(sizes) {
+  if (sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) return 'price'
+  if (sizes.some((s) => !s.label)) return 'needLabels'
+  const names = sizes.map((s) => (s.label || s.id).toLowerCase().replace(/\s+/g, ''))
+  if (new Set(names).size !== sizes.length || new Set(sizes.map((s) => s.id)).size !== sizes.length) return 'duplicate'
+  return null
 }
 
 /**
@@ -242,15 +267,17 @@ async function addProduct(store, body) {
   const fields = {}
   const patch = {}
   if (!CUSTOM_CATEGORIES.includes(body.category)) fields.category = 'required'
-  if (!COURIER.tiers.includes(body.courierTier)) fields.courierTier = 'required'
   textPatch({ name: body.name || {}, description: body.description }, true, patch, fields)
   const hasSizes = Array.isArray(body.sizes) && body.sizes.length > 0
+  // With sizes, each size has its own courier tier; the product's is the first size's unless given
+  const sizeTier = hasSizes ? body.sizes.find((s) => COURIER.tiers.includes(s?.courierTier))?.courierTier : null
+  const courierTier = COURIER.tiers.includes(body.courierTier) ? body.courierTier : sizeTier
+  if (!courierTier) fields.courierTier = 'required'
   if (hasSizes) {
     const sizes = sizesFrom(body.sizes)
-    if (sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) fields.sizes = 'price'
-    else if (sizes.some((s) => !s.label)) fields.sizes = 'needLabels'
-    else if (new Set(sizes.map((s) => s.id)).size !== sizes.length) fields.sizes = 'duplicate'
-    else patch.sizes = sizes
+    const problem = body.sizes.length > SIZE_LIMITS.count ? 'tooMany' : sizeProblem(sizes)
+    if (problem) fields.sizes = problem
+    else patch.sizes = sizes.map((s) => ({ ...s, courierTier: s.courierTier || courierTier }))
   } else if (!Number.isInteger(body.price) || body.price <= 0 || body.price > 100000) fields.price = 'price'
   else patch.price = body.price
   // A ragi version: the extra price on top of the product's price
@@ -274,7 +301,7 @@ async function addProduct(store, body) {
       name_en: patch.display_name.en,
       name_kn: patch.display_name.kn || '',
       options: {},
-      courier_tier: body.courierTier,
+      courier_tier: courierTier,
       sort,
       image: null,
       custom: true,
@@ -412,7 +439,62 @@ const byStatus = (a, b) => {
 async function offerList(store, ctx) {
   const today = istToday(ctx.now())
   const [rows, links, choices] = await Promise.all([store.listOffers(), offerLinks(store), offerChoices(store)])
-  return { offers: (rows || []).map((r) => offerView(r, today)).sort(byStatus), today, links, choices }
+  // The Rajyotsava offer has its own card at the top (its switch, dates and percent), not in the list
+  const festival = (rows || []).find((r) => r.id === RAJYOTSAVA.id)
+  return {
+    offers: (rows || []).filter((r) => r.id !== RAJYOTSAVA.id).map((r) => offerView(r, today)).sort(byStatus),
+    rajyotsava: rajyotsavaView(festival, today),
+    today,
+    links,
+    choices,
+  }
+}
+
+/* ---------------- the Kannada Rajyotsava offer (its own card in admin -> Offers) ---------------- */
+
+/** The card: on/off, dates, percent, and whether the drawing add-on is discounted too */
+function rajyotsavaView(row, today) {
+  const deal = cleanDeal(row?.deal)
+  const active = row ? row.active !== false : false
+  const startsOn = row?.starts_on || RAJYOTSAVA.startsOn
+  const endsOn = row?.ends_on || RAJYOTSAVA.endsOn
+  return {
+    id: RAJYOTSAVA.id,
+    exists: Boolean(row),
+    active,
+    startsOn,
+    endsOn,
+    percent: deal?.kind === 'percent' ? deal.value : RAJYOTSAVA.percent,
+    drawing: Boolean(deal?.drawing),
+    status: row ? offerStatus({ active, startsOn, endsOn }, today) : 'off',
+  }
+}
+
+/**
+ * Hema's changes to the Rajyotsava offer: { active, startsOn, endsOn, percent, drawing }. It always
+ * holds every product; the words follow the percent. If the row is missing (e.g. a database set up
+ * without the migration's row) it is put back with its fixed id.
+ */
+export function rajyotsavaPatch(body, today) {
+  const fields = {}
+  if (bool(body.active) === undefined) fields.active = 'required'
+  if (!isISODate(body.startsOn)) fields.startsOn = 'required'
+  if (!isISODate(body.endsOn)) fields.endsOn = 'required'
+  else if (isISODate(body.startsOn) && body.endsOn < body.startsOn) fields.endsOn = 'beforeStart'
+  else if (body.active && body.endsOn < today) fields.endsOn = 'past'
+  if (!Number.isInteger(body.percent) || body.percent < 1 || body.percent > DEAL_MAX.percent) fields.percent = 'percent'
+  if (Object.keys(fields).length) throw new HttpError(400, 'fields', { fields })
+  const { id, ...row } = rajyotsavaRow({ percent: body.percent, startsOn: body.startsOn, endsOn: body.endsOn, active: body.active, drawing: body.drawing === true })
+  return { id, row }
+}
+
+async function saveRajyotsava(store, body, ctx) {
+  const { id, row } = rajyotsavaPatch(body, istToday(ctx.now()))
+  const exists = (await store.listOffers()).some((o) => o.id === id)
+  // The photos stay as they are (the Rajyotsava banner draws its own picture)
+  const { photo_url, photo_phone_url, ...patch } = row // eslint-disable-line no-unused-vars
+  if (exists) await store.updateOffer(id, patch)
+  else await store.insertOffer({ id, ...row })
 }
 
 /**
@@ -788,7 +870,12 @@ export async function runAdminAction(store, signedIn, action, body, ctx) {
       if (bool(body.active) === undefined) throw new HttpError(400, 'badRequest')
       if (!(await store.updateOffer(offerId(body.id), { active: body.active }))) throw new HttpError(404, 'notFound')
       return offerList(store, ctx)
+    case 'saveRajyotsava':
+      await saveRajyotsava(store, body, ctx)
+      return offerList(store, ctx)
     case 'deleteOffer':
+      // The Rajyotsava offer is switched off, never deleted (the website knows it by its id)
+      if (String(body.id || '').toLowerCase() === RAJYOTSAVA.id) throw new HttpError(400, 'fields', { fields: { offer: 'fixed' } })
       if (!(await store.deleteOffer(offerId(body.id)))) throw new HttpError(404, 'notFound')
       return offerList(store, ctx)
     case 'offerPhoto':

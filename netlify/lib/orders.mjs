@@ -2,7 +2,9 @@
 // and Hema's status actions. The prices come ONLY from the shared pricing module and the menu
 // (catalog.mjs); the numbers the browser sends are compared, never trusted.
 import { limits } from '../../src/config/shop.js'
-import { normaliseSelection, quote, selectionErrors, sizeOf, stateMismatch, zoneForPincode } from '../../src/lib/pricing.js'
+import { normaliseSelection, quote, selectionErrors, sizeOf, stateMismatch, unitPrice, zoneForPincode } from '../../src/lib/pricing.js'
+import { regularVersion } from '../../src/lib/offers.js'
+import { offerLabel } from '../../src/lib/rajyotsava.js'
 import { dispatchRules, isISODate, preferredDateError, earliestDate } from '../../src/lib/dates.js'
 import { cleanDetails, detailsErrors } from '../../src/lib/checkout.js'
 import { makeOrderId } from '../../src/lib/orderId.js'
@@ -78,9 +80,15 @@ export function priceRequest(body, catalog, now = new Date()) {
   }
 }
 
-/** What the order remembers about one item: names in both languages, choices and prices */
+/**
+ * What the order remembers about one item: names in both languages, choices and prices. An item
+ * an offer made cheaper also keeps its regular price and the offer's name ("Rajyotsava 50% off"),
+ * so the order page, Track Order, the packing slip and the emails can show all three.
+ */
 export function snapshotItem({ product, selection, qty }, line) {
   const size = selection.size ? sizeOf(product, selection.size) : null
+  const regular = product.offer?.was && line.unitPrice != null ? unitPrice(regularVersion(product), selection) : null
+  const offer = regular != null && regular > line.unitPrice ? { id: product.offer.id, label: offerLabel(product.offer) } : null
   return {
     productId: product.id,
     category: product.category,
@@ -95,6 +103,7 @@ export function snapshotItem({ product, selection, qty }, line) {
     unitPrice: line.unitPrice,
     lineTotal: line.lineTotal,
     tier: line.tier,
+    ...(offer ? { regularUnitPrice: regular, regularLineTotal: regular * qty, offer } : {}),
   }
 }
 
@@ -172,6 +181,7 @@ export function publicOrder(row, events = []) {
       qty: i.qty,
       unitPrice: i.unitPrice,
       lineTotal: i.lineTotal,
+      ...(i.offer ? { regularUnitPrice: i.regularUnitPrice, regularLineTotal: i.regularLineTotal, offer: i.offer } : {}),
     })),
     subtotal: row.subtotal,
     courier: row.courier,

@@ -125,6 +125,14 @@ and everything in the parcel (no prices). Tap **Print**, or take a screenshot.
 
 Every product has its own card.
 
+**Sizes (any weight or size):** a product can have up to 12 sizes, like 100 g, 250 g, 1 kg, 6 pieces or small tin. Each
+size has its own **name**, **price** and **courier charge** (small, medium or large parcel). Tap **+ Add a size**, **✕** to
+remove one, and **↑ ↓** to change the order the website shows them in, then **Save**. Your own products can also be
+**No sizes: one fixed price**. Two sizes can't have the same name, and every size needs a price.
+
+**Cookie Tins:** a new section at the bottom of Menu. Tap **+ Add new product** there to add a cookie tin with its sizes,
+prices, photo and description. The Cookie Tins tab and the Home tile appear on the website once one is on the menu.
+
 **Change a price:** type the new price and tap **Save**. Wait for the green **Saved**.
 
 ![Changing a price](screenshots/admin/guide/09-menu-price.png)
@@ -185,6 +193,21 @@ the website, tap **Hide from menu**.
 ---
 
 ## 5. Offers: a banner on the website
+
+### Kannada Rajyotsava: 50% off everything (1 to 30 November)
+
+At the top of **Offers** is its own card, **Rajyotsava 50% off**. It is already set up: every product on the website
+(every section and size, ragi versions too) is half price from 1 November 12:00 AM to 30 November 11:59 PM, for online
+orders. Prices are rounded to the nearest rupee. Courier charges, class fees and the drawing add-on stay at full price
+(tick **Also take 50% off the drawing add-on** if you want that too). While it is on, the website shows a Rajyotsava popup
+once per visit, an **Offer Zone 🎁** button at the top, a red-and-yellow banner on Home and a very faint Karnataka flag.
+
+- **Turn off this offer**: everything above stops at once, and normal prices come back. **Turn on this offer** brings it back.
+- Change the **dates** or the **%**, then tap **Save**. Before and after the dates, normal prices come back by themselves.
+- Every order shows the regular price, "Rajyotsava 50% off" and the price paid: on the order page, the packing slip,
+  Track Order and the emails.
+
+### Your other offers
 
 ![Offers](screenshots/rajyotsava/admin-390-offers-list.png)
 

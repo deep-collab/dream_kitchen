@@ -51,8 +51,9 @@ function parseProduct(row) {
     options: row.options ? JSON.parse(row.options) : {},
     active: row.active === null || row.active === undefined ? null : Boolean(row.active),
     sold_out: row.sold_out === null || row.sold_out === undefined ? null : Boolean(row.sold_out),
-    // Hema's own products and her names / descriptions (d1/migrations/0002)
-    custom: Boolean(row.custom),
+    // Hema's own products and her names / descriptions (d1/migrations/0002); in a section added
+    // later (Cookie Tins) her products are stored with added = 1 instead (d1/migrations/0004)
+    custom: Boolean(row.custom || row.added),
     display_name: json(row.display_name),
     description: json(row.description),
   }
@@ -62,7 +63,11 @@ function parseProduct(row) {
 const PRODUCT_JSON = ['sizes', 'options', 'display_name', 'description']
 const PRODUCT_BOOL = ['active', 'sold_out', 'custom']
 const PRODUCT_PLAIN = ['slug', 'category', 'name_en', 'name_kn', 'price', 'ragi_price', 'courier_tier', 'price_status', 'sort', 'image', 'photo_url']
-const productValue = (k, v) => (PRODUCT_JSON.includes(k) ? (v ? JSON.stringify(v) : null) : PRODUCT_BOOL.includes(k) ? (v == null ? null : v ? 1 : 0) : (v ?? null))
+const productValue = (k, v) => (PRODUCT_JSON.includes(k) ? (v ? JSON.stringify(v) : null) : PRODUCT_BOOL.includes(k) || k === 'added' ? (v == null ? null : v ? 1 : 0) : (v ?? null))
+// The sections 0002's CHECK on products.custom allows; Hema's products in any other section (e.g.
+// Cookie Tins) are written as custom = 0, added = 1 (d1/migrations/0004), and read back as custom
+const CUSTOM_CHECKED = ['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates']
+const forColumns = (r) => (r.custom === true && r.category && !CUSTOM_CHECKED.includes(r.category) ? { ...r, custom: false, added: true } : r)
 
 function parseOffer(row) {
   if (!row) return null
@@ -124,9 +129,10 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
      *  reference columns (ensureProductRow, the seed) never wipes Hema's prices, names or photo */
     async upsertProducts(rows) {
       if (!rows.length) return
-      const stmts = rows.map((r) => {
+      const stmts = rows.map((input) => {
+        const r = forColumns(input)
         const row = { name_kn: '', options: {}, courier_tier: 'small', sort: 0, ...r }
-        const cols = [...PRODUCT_PLAIN, ...PRODUCT_JSON, ...PRODUCT_BOOL].filter((k) => k in row)
+        const cols = [...PRODUCT_PLAIN, ...PRODUCT_JSON, ...PRODUCT_BOOL, ...(r.added ? ['added'] : [])].filter((k) => k in row)
         const given = cols.filter((k) => k in r)
         return db
           .prepare(
@@ -164,8 +170,9 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
       return (res.results || []).map(parseOffer)
     },
 
-    async insertOffer(row) {
-      const id = crypto.randomUUID()
+    async insertOffer({ id: given, ...row }) {
+      // A given id: the Rajyotsava offer, put back by the admin if it was ever missing
+      const id = given || crypto.randomUUID()
       const offer = { active: true, link: '', ...row }
       const cols = [...OFFER_JSON, ...OFFER_PLAIN, 'active'].filter((k) => k in offer)
       await db
@@ -896,15 +903,17 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
         const adminCheck = await db.prepare('SELECT count(*) as c FROM admin_users').first()
         const settCheck = await db.prepare('SELECT count(*) as c FROM settings').first()
         const tables = Boolean(prodCheck && adminCheck && settCheck)
-        // The newest part (d1/migrations/0002): Hema's own products, offers and tile photos
+        // The newest parts: Hema's own products, offers and tile photos (d1/migrations/0002), offer
+        // products and prices and the site settings (0003), Cookie Tins and the Rajyotsava offer (0004)
         let update = false
         try {
-          await db.prepare('SELECT custom, display_name, description FROM products LIMIT 1').all()
-          await db.prepare('SELECT id FROM offers LIMIT 1').all()
+          await db.prepare('SELECT custom, display_name, description, added FROM products LIMIT 1').all()
+          await db.prepare('SELECT id, items, deal, badge FROM offers LIMIT 1').all()
           await db.prepare('SELECT id FROM page_photos LIMIT 1').all()
+          await db.prepare('SELECT key FROM site_config LIMIT 1').all()
           update = tables
         } catch {
-          /* the 0002 migration hasn't run: the setup check says so */
+          /* a migration hasn't run (0002, 0003 or 0004): the setup check says so */
         }
         return {
           reachable: true,

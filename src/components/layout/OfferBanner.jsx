@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useOffers } from '../../context/MenuProvider'
+import { useOffers, useRajyotsava } from '../../context/MenuProvider'
+import { OFFER_ZONE_HREF, RAJYOTSAVA } from '../../lib/offers'
+import { rajyotsavaLine } from '../festival/rajyotsavaWords'
 import { useI18n } from '../../i18n/I18nProvider'
 import { smallPhoto } from '../../lib/productPhoto'
 import { dateParts } from '../../lib/dates'
@@ -21,7 +23,9 @@ const reduceMotion = () => typeof window !== 'undefined' && window.matchMedia?.(
  * product or section she chose. Nothing at all when no offer is live.
  */
 export default function OfferBanner({ variant = 'banner' }) {
-  const offers = useOffers()
+  const live = useOffers()
+  // Kannada Rajyotsava first: its own slide (and its own words in the strip)
+  const offers = [...live].sort((a, b) => (b.id === RAJYOTSAVA.id) - (a.id === RAJYOTSAVA.id))
   if (!offers.length) return null
   return variant === 'strip' ? <OfferStrip offers={offers} /> : <OfferSlides offers={offers} />
 }
@@ -102,7 +106,10 @@ function OfferSlides({ offers }) {
       <div className="dk-container pt-2 pb-2.5 md:pt-3 md:pb-4">
         <div className="dk-rise relative overflow-hidden rounded-card border border-gold/50 bg-[#1b1612] shadow-[0_10px_30px_-18px_rgb(201_162_39/0.6)]">
           <div ref={track} onScroll={onScroll} className="flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {offers.map((o, i) => (
+            {offers.map((o, i) =>
+              o.id === RAJYOTSAVA.id ? (
+                <RajyotsavaSlide key={o.id} label={t('banner.offerShow', { n: i + 1, count })} hidden={many && i !== index} navigate={navigate} many={many} />
+              ) : (
               <Slide
                 key={o.id}
                 offer={o}
@@ -114,7 +121,8 @@ function OfferSlides({ offers }) {
                 navigate={navigate}
                 many={many}
               />
-            ))}
+              ),
+            )}
           </div>
           {many && (
             <div className="absolute right-1 bottom-1 rounded-full bg-ink/60 md:right-2 md:bottom-2 short:right-auto short:left-1">
@@ -124,6 +132,60 @@ function OfferSlides({ offers }) {
         </div>
       </div>
     </section>
+  )
+}
+
+/**
+ * Kannada Rajyotsava's slide: no photo needed. Black and gold with the Karnataka colours (a flag
+ * ribbon down the left, a soft yellow and red glow), "Happy Kannada Rajyotsava", a big "50% OFF",
+ * the offer line ("on everything · All of November · Online orders only") and "Go to Offer Zone".
+ * As short as the other slides, so "Order now" stays on a phone's first screen.
+ */
+function RajyotsavaSlide({ label, hidden, navigate, many }) {
+  const { t, lang } = useI18n()
+  const raj = useRajyotsava()
+  if (!raj) return null
+  const kn = lang === 'kn'
+  const [what, when, online] = rajyotsavaLine(raj, t)
+  return (
+    <article
+      aria-roledescription="slide"
+      aria-label={label}
+      aria-hidden={hidden || undefined}
+      inert={hidden || undefined}
+      className="relative w-full shrink-0 cursor-pointer snap-center snap-always"
+      onClick={() => navigate(OFFER_ZONE_HREF)}
+      data-dk-offer={raj.id}
+      data-dk-raj-banner
+    >
+      <div aria-hidden="true" className="absolute inset-y-0 left-0 flex w-2 flex-col md:w-2.5">
+        <span className="h-1/2 bg-[#f6c512]" />
+        <span className="h-1/2 bg-[#d62828]" />
+      </div>
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 bg-[radial-gradient(70%_120%_at_0%_0%,rgb(246_197_18/0.2),transparent_65%),radial-gradient(70%_120%_at_100%_100%,rgb(214_40_40/0.28),transparent_65%)] py-2.5 pr-3 pl-5 md:flex-nowrap md:gap-x-6 md:py-4 md:pr-6 md:pl-8 short:py-2">
+        <p className={`dk-raj-off shrink-0 font-bold ${kn ? 'font-kannada-serif text-[1.75rem] leading-[1.22] md:text-[2.375rem]' : 'font-heading text-[2.75rem] leading-none md:text-[3.5rem]'} short:text-[2rem]`}>
+          {t('banner.rajOff', { percent: raj.percent })}
+          {/* Phones: "on everything" beside the big words, so the banner is a line shorter */}
+          <span className={`ml-2 align-middle text-cream md:hidden ${kn ? 'text-base' : 'font-body text-[1.0625rem]'}`} style={{ WebkitTextFillColor: 'currentColor' }}>
+            {t('banner.rajEverything')}
+          </span>
+        </p>
+        <div className="min-w-0 flex-1 basis-40">
+          {/* short phones: no greeting line (the popup greets), so "Order now" stays on the first screen */}
+          <p className={`leading-snug font-bold text-gold-light short:hidden ${kn ? 'font-kannada-serif text-[1.0625rem] md:text-xl' : 'text-[1.1875rem] md:text-2xl md:leading-tight'}`}>{t('banner.rajHello')}</p>
+          <p className="t-small leading-snug text-cream md:text-body">
+            <span className="hidden md:inline">{what} · </span>
+            <span className="whitespace-nowrap">{when}</span> · <strong className="whitespace-nowrap text-gold-light">{online}</strong>
+          </p>
+        </div>
+        <div className={`flex w-full items-center md:w-auto ${many ? 'pr-24 md:pr-16' : ''}`}>
+          <Link to={OFFER_ZONE_HREF} className="btn btn-primary min-h-12 px-5 py-2 short:px-4" data-dk-offer-link onClick={(e) => e.stopPropagation()}>
+            <span aria-hidden="true">🎁</span>
+            <span>{t('banner.rajGo')}</span>
+          </Link>
+        </div>
+      </div>
+    </article>
   )
 }
 
@@ -220,8 +282,10 @@ function OfferStrip({ offers }) {
     const timer = setInterval(() => setIndex((i) => (i + 1) % count), ROTATE_MS)
     return () => clearInterval(timer)
   }, [many, paused, count])
-  const offer = offers[index % count]
-  const cta = offer.button ? pick(offer.button) : t(offer.items ? 'banner.shopOffer' : 'banner.offerCta')
+  const shown = offers[index % count]
+  const raj = shown.id === RAJYOTSAVA.id
+  const offer = raj ? { ...shown, href: OFFER_ZONE_HREF, title: { en: `${t('banner.rajHello')} · ${t('banner.rajOff', { percent: shown.deal.value })}`, kn: `${t('banner.rajHello')} · ${t('banner.rajOff', { percent: shown.deal.value })}` } } : shown
+  const cta = raj ? t('banner.zone') : offer.button ? pick(offer.button) : t(offer.items ? 'banner.shopOffer' : 'banner.offerCta')
   const hold = {
     onPointerEnter: () => setPaused(true),
     onPointerLeave: () => setPaused(false),

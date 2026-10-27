@@ -3,6 +3,7 @@ import { site } from '../../config/site'
 import { formatINR } from '../../lib/pricing'
 import { formatDay } from '../../lib/dates'
 import { orderItemChoices } from '../../lib/lineText'
+import { orderSavings } from '../../lib/offers'
 import { AlertIcon, CheckIcon, ExternalIcon } from '../icons'
 import 'virtual:dk-strings/track'
 import 'virtual:dk-strings/order'
@@ -99,6 +100,8 @@ function CourierInfo({ order }) {
 /** The items of a placed order, with their choices, and the totals */
 export function OrderItems({ order }) {
   const { t, pick } = useI18n()
+  // An offer (e.g. Rajyotsava 50% off): the regular price crossed out, the offer's name and the price paid
+  const savings = orderSavings(order.items)
   return (
     <div>
       <ul className="divide-y divide-line border-y border-line">
@@ -110,14 +113,39 @@ export function OrderItems({ order }) {
                 <p className="leading-snug font-bold">
                   {pick(item.name)} <span className="font-normal text-brown-2">× {item.qty}</span>
                 </p>
-                <p className="shrink-0 font-bold tabular-nums">{formatINR(item.lineTotal)}</p>
+                <p className="shrink-0 text-right font-bold tabular-nums">
+                  {item.offer && (
+                    <s className="t-small block font-normal text-brown-2" data-dk-order-was>
+                      <span className="sr-only">{t('order.regularPrice')} </span>
+                      {formatINR(item.regularLineTotal)}
+                    </s>
+                  )}
+                  {formatINR(item.lineTotal)}
+                </p>
               </div>
               {choices.length > 0 && <p className="t-small text-brown-2">{choices.map((c) => (c.label ? `${c.label}: ${c.value}` : c.value)).join(' · ')}</p>}
+              {item.offer && (
+                <p className="t-small mt-0.5 font-bold text-[#8a1c14]" data-dk-order-offer>
+                  {pick(item.offer.label || { en: 'Offer' })}
+                </p>
+              )}
             </li>
           )
         })}
       </ul>
       <dl className="mt-3 space-y-1">
+        {savings && (
+          <>
+            <div className="flex justify-between gap-4">
+              <dt className="text-brown-2">{t('order.regularPrice')}</dt>
+              <dd className="tabular-nums">{formatINR(savings.regularSubtotal)}</dd>
+            </div>
+            <div className="flex justify-between gap-4 font-bold text-[#8a1c14]" data-dk-order-saving>
+              <dt>{savings.labels.map((l) => pick(l)).join(', ')}</dt>
+              <dd className="tabular-nums">−{formatINR(savings.saved)}</dd>
+            </div>
+          </>
+        )}
         <div className="flex justify-between gap-4">
           <dt className="text-brown-2">{t('cart.subtotal')}</dt>
           <dd className="tabular-nums">{formatINR(order.subtotal)}</dd>

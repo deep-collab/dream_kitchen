@@ -2,6 +2,53 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 27 Oct 2026: Kannada Rajyotsava 50% off, the Kannada logo, any number of sizes, Cookie Tins (branch pre-main)
+URGENT: must be live before 1 Nov. Built on the 26 Oct `pre-main` (its Rajyotsava groundwork is kept). The uncommitted work found
+on this PC that day (admin change history / undo, editable texts, feature switches, delivery rules; migration `0004_admin_changes.sql`)
+is NOT in this branch: it is saved on the local branch `wip-admin-changes-26oct` (never pushed). If it comes back, its D1
+migration must be renamed to 0005 (0004 is taken here).
+- [x] **Rajyotsava offer** (`src/lib/offers.js` RAJYOTSAVA, fixed id `20261101-0000-4000-8000-000000000001`, made by the migration):
+  50% off every product (all sections and sizes, ragi versions too), 1–30 Nov IST, rounded to the nearest rupee (`percentOff`),
+  on the website AND in `loadCatalog` (create-order charges it; a stale price is refused as "price changed"). Never discounted:
+  courier, class fees/bookings, the drawing add-on (unless Hema ticks "also the drawing": `deal.drawing`, then `drawingPrice`);
+  the name on the box is free anyway. Order lines remember `regularUnitPrice`, `regularLineTotal` and `offer.label`
+  ("Rajyotsava 50% off", `src/lib/rajyotsava.js`, server side only so English visitors download no Kannada); `orderSavings`
+  gives the regular subtotal and the saving for the admin's order page, the packing slip (now with a price column), Track
+  Order / confirmation and both emails
+- [x] **Admin → Offers**: its own card at the top (not in the list): Live/Scheduled/Off, start/end dates, % (1–90), "also the
+  drawing", Save, **Turn off this offer** (`saveRajyotsava`; can't be deleted; put back with its id if the row is ever missing)
+- [x] **Popup** (`src/components/festival/`, its own 1.3 KB chunk): once per visit (sessionStorage `dk_raj_popup`), not between
+  pages, not on checkout / pay / order / class-booking pages, never on the admin, only once /api/menu says live (not from the
+  phone's saved offers, so a switched-off offer never pops up), after the first-visit loading screen. Karnataka red and yellow
+  with black and gold, the logo (Kannada too), big "50% OFF", ✕ / Maybe later / tap outside / Esc, focus trapped, page inert
+- [x] **Offer Zone 🎁 / ಆಫರ್ ವಲಯ**: header button while live (two short lines on phones, fits at 360 px), the popup's and the
+  banner's button → `/menu?offer=zone`: every product, old price crossed out, a red "50% OFF" badge. Home: a wide Rajyotsava
+  banner (no photo needed; shorter on phones so "Order now" stays clear of the tab bar at 360×640 / 360×740)
+- [x] **Flag background**: while the offer is live the faint background (hero + page) is the Karnataka flag theme (the existing
+  canvas: softly waving, 7 %, still for reduce motion, paused while the tab is hidden), `festivalBackground` in siteConfig.js;
+  back to the logo by itself after 30 Nov or when turned off
+- [x] **Kannada logo**: `src/config/site.js` `logo` ({ en, kn } pairs, split by the build like the menu): "ಡ್ರೀಮ್ ಕಿಚನ್" /
+  "ಕೈಯಿಂದ ಮಾಡಿದ ಚಾಕೊಲೇಟ್‌ಗಳು" in Noto Serif Kannada, same symbol, gold and layout (hero, header, footer, popup, loading
+  screen); switches with the language button. TO CONFIRM: Hema checks the spelling
+- [x] **Any sizes** (admin → Menu, + Add new product and Save under a product): up to 12 sizes, each a name, price and courier
+  tier, add / remove / ↑ ↓; "No sizes: one fixed price" ⇄ sizes for her own products; every product with sizes (Delight Boxes
+  too) gets the full editor. Checked on the server: a name each, price above ₹0, no two names the same (case and spaces
+  ignored), at most 12. Size ids are kept when reordering, so carts still match
+- [x] **Cookie Tins / ಕುಕೀ ಟಿನ್‌ಗಳು** (category `cookie-tins`, gold tin drawing): Hema's own products only; the tab and the Home
+  tile appear once one is on the menu (7 tiles: the last spans the row). Demo admin only: a sample "Butter Cookie Tin" in 3 sizes
+- [x] Database: `d1/migrations/0004_rajyotsava_cookie_tins.sql` + `supabase/migrations/20261027000001_…` (only adds: D1 column
+  `products.added` for her products in sections after 0002, whose CHECK can't change without rebuilding the table; the D1 store
+  reads it as `custom`; Supabase widens `products_custom_category`; the Rajyotsava row, INSERT OR IGNORE). NOT run on live.
+  Live also still needs 0003 (26 Oct). Rehearsed on this PC's local D1 (0001–0002 applied, like live): orders, products,
+  settings identical after 0003 + 0004; the new code works before the migration too (only adding a cookie tin needs 0004)
+- [x] Checks: 399 tests (14 new, tests/rajyotsava-november.test.js: the Worker on SQLite at 31 Oct 23:59 / 1 Nov 00:00 /
+  30 Nov 23:59 / 1 Dec 00:00, rounding, every product and size, courier / class / drawing, off and on, % and dates, 5 sizes,
+  cookie tin, order → admin → Track → emails, 0004 on a database in use); `scripts/qa-rajyotsava-november.mjs` with the
+  server's clock set by `scripts/fake-clock.mjs`: nov1 268/268, nov30 192/192 (and a page left open into 1 Dec drops it by
+  itself), oct31 78/78, dec1 78/78 (Chromium + WebKit, 360×640 / 360×740 / 390 / 1280, EN + KN, 0 console errors, 0 sideways
+  scroll, 0 targets under 48 px); qa-step6 0 problems, qa-admin 24/24, qa-offers 55/55, qa-rajyotsava 199/199, qa-payments all
+  passed; check-i18n, check-secrets, build, `wrangler deploy --dry-run`; first-visit JS (EN) 55.1–64.6 KB (was 52.8–62.1)
+
 ## 26 Oct 2026: Rajyotsava (site background, wide offer banner, offer products and prices, hidden developer options) (branch pre-main)
 URGENT for Kannada Rajyotsava, 1 Nov. `pre-main` re-made from the newest `main` (the 24 Oct `pre-main` is superseded by PR #1, which
 `main` now holds; the old branch is kept on this PC as `pre-main-old-24oct`).

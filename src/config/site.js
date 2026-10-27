@@ -44,6 +44,24 @@ export const site = {
 
   fssai: '', // UNCONFIRMED: 14-digit licence, shown in the footer and on Contact once filled
   shelfLife: '', // UNCONFIRMED (not shown anywhere yet)
+
+  // The logo's words (27 Oct 2026). The Kannada shows instead of "DREAM KITCHEN / HANDMADE
+  // CHOCOLATES" when the site is in ಕನ್ನಡ (home hero, header, footer, the popup and the
+  // first-visit loading screen), same symbol, gold and layout. Correct the Kannada here (TO
+  // CONFIRM: Hema checks the spelling); the English stays as the printed logo. Each is shown on two
+  // lines, split at the last space: "ಡ್ರೀಮ್ / ಕಿಚನ್" and "ಕೈಯಿಂದ ಮಾಡಿದ / ಚಾಕೊಲೇಟ್‌ಗಳು". Like the
+  // menu, the build moves the Kannada into the Kannada file (scripts/kannada-split.mjs).
+  logo: {
+    name: { en: 'Dream Kitchen', kn: 'ಡ್ರೀಮ್ ಕಿಚನ್' },
+    tagline: { en: 'Handmade Chocolates', kn: 'ಕೈಯಿಂದ ಮಾಡಿದ ಚಾಕೊಲೇಟ್‌ಗಳು' },
+  },
+}
+
+/** "ಕೈಯಿಂದ ಮಾಡಿದ ಚಾಕೊಲೇಟ್‌ಗಳು" -> ["ಕೈಯಿಂದ ಮಾಡಿದ", "ಚಾಕೊಲೇಟ್‌ಗಳು"]: the logo's two lines (split at the last space) */
+export function logoLines(text) {
+  const t = String(text || '').trim()
+  const i = t.lastIndexOf(' ')
+  return i > 0 ? [t.slice(0, i), t.slice(i + 1)] : [t, '']
 }
 
 // QA only, development builds only (production drops this): scripts/qa-*.mjs may set

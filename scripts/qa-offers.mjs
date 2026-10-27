@@ -413,8 +413,9 @@ try {
     await p.goto(`${BASE}/admin/demo/offers`)
     await p.waitForSelector('[data-admin-offer]')
     const s = await p.locator('[data-admin-offer]').evaluateAll((els) => els.map((e) => e.getAttribute('data-admin-offer-status')))
-    // 26 Oct: the Rajyotsava sample (1–3 Nov) is a second scheduled offer
-    check(s.join(',') === 'live,scheduled,scheduled,off,ended', `demo: sample offers ${s.join(', ')}`, `demo offers: ${s.join(', ')}`)
+    // 27 Oct: the Rajyotsava offer is the real one (50% off, all November), on its own card above the list
+    check(s.join(',') === 'live,scheduled,off,ended', `demo: sample offers ${s.join(', ')}`, `demo offers: ${s.join(', ')}`)
+    check((await p.locator('[data-admin-raj]').count()) === 1, 'demo: the Rajyotsava card is above the offers', 'demo: no Rajyotsava card')
     await audit(p, 'demo offers')
     await shot(p, '19-demo-offers', true)
     await p.goto(`${BASE}/admin/demo/menu`)

@@ -94,6 +94,9 @@ export const categories = [
     note: { en: '5 pieces in every box', kn: 'ಪ್ರತಿ ಬಾಕ್ಸ್‌ನಲ್ಲಿ 5 ತುಂಡುಗಳು' },
   },
   { id: 'chocolates', sort: 4, art: 'bar', name: { en: 'Chocolates', kn: 'ಚಾಕೊಲೇಟ್‌ಗಳು' }, tab: { en: 'Chocolates', kn: 'ಚಾಕೊಲೇಟ್‌ಗಳು' } },
+  // Cookie Tins (27 Oct 2026): Hema adds the products herself in the admin (sizes, prices, photo,
+  // courier tier). The tab and the Home tile show once one of them is on the menu.
+  { id: 'cookie-tins', sort: 5, art: 'cookie-tin', name: { en: 'Cookie Tins', kn: 'ಕುಕೀ ಟಿನ್‌ಗಳು' }, tab: { en: 'Cookie Tins', kn: 'ಕುಕೀ ಟಿನ್‌ಗಳು' }, whenStocked: true },
   // Customize-only items (the Drawing Chocolate Bar): never a menu tab
   { id: 'customize', sort: 9, art: 'drawing-bar', name: { en: 'Customize', kn: 'ಕಸ್ಟಮೈಸ್' }, hidden: true },
 ]

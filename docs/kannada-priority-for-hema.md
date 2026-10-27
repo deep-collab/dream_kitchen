@@ -122,6 +122,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Hema will confirm your payment, usually within a few hours. | ಹೇಮಾ ಅವರು ನಿಮ್ಮ ಪಾವತಿಯನ್ನು ಸಾಮಾನ್ಯವಾಗಿ ಕೆಲವು ಗಂಟೆಗಳಲ್ಲಿ ಖಚಿತಪಡಿಸುತ್ತಾರೆ. | |
 | Your items | ನಿಮ್ಮ ವಸ್ತುಗಳು | |
 | Items | ವಸ್ತುಗಳು | |
+| Regular price | ಸಾಮಾನ್ಯ ಬೆಲೆ | |
 | Courier | ಕೊರಿಯರ್ | |
 | Total | ಒಟ್ಟು | |
 | Preferred dispatch date: Wed, 7 Oct | ಕಳುಹಿಸುವ ದಿನಾಂಕ: ಬುಧ, 7 ಅಕ್ಟೋಬರ್ | |
@@ -209,7 +210,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Sat 17 Oct – Sun 18 Oct 2026 | ಶನಿ 17 ಅಕ್ಟೋಬರ್ – ಭಾನು 18 Oct 2026 | |
 | Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec | ಜನವರಿ,ಫೆಬ್ರವರಿ,ಮಾರ್ಚ್,ಏಪ್ರಿಲ್,ಮೇ,ಜೂನ್,ಜುಲೈ,ಆಗಸ್ಟ್,ಸೆಪ್ಟೆಂಬರ್,ಅಕ್ಟೋಬರ್,ನವೆಂಬರ್,ಡಿಸೆಂಬರ್ | |
 
-## Later, if you have time (495 more)
+## Later, if you have time (520 more)
 
 ### Logo and tagline
 
@@ -280,6 +281,21 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Offers | ಆಫರ್‌ಗಳು | |
 | See offer | ಆಫರ್ ನೋಡಿ | |
 | Show offer 2 of 3 | ಆಫರ್ 2 / 3 ತೋರಿಸಿ | |
+| Ends Wed, 7 Oct | ಬುಧ, 7 ಅಕ್ಟೋಬರ್ ವರೆಗೆ | |
+| Shop the offer | ಆಫರ್ ಖರೀದಿಸಿ | |
+| Offer Zone | ಆಫರ್ ವಲಯ | |
+| Offer Zone: {percent}% off everything | ಆಫರ್ ವಲಯ: ಎಲ್ಲದರ ಮೇಲೆ {percent}% ರಿಯಾಯಿತಿ | |
+| Happy Kannada Rajyotsava | ಕನ್ನಡ ರಾಜ್ಯೋತ್ಸವದ ಹಾರ್ದಿಕ ಶುಭಾಶಯಗಳು | |
+| {percent}% OFF | {percent}% ರಿಯಾಯಿತಿ | |
+| {percent}% off on everything | ಎಲ್ಲಾ ಉತ್ಪನ್ನಗಳ ಮೇಲೆ {percent}% ರಿಯಾಯಿತಿ | |
+| All of November | ನವೆಂಬರ್ ಪೂರ್ತಿ | |
+| Till Wed, 7 Oct | ಬುಧ, 7 ಅಕ್ಟೋಬರ್ ವರೆಗೆ | |
+| Online orders only | ಆನ್‌ಲೈನ್ ಆರ್ಡರ್‌ಗಳಿಗೆ ಮಾತ್ರ | |
+| Go to Offer Zone | ಆಫರ್ ವಲಯಕ್ಕೆ ಹೋಗಿ | |
+| Maybe later | ನಂತರ ನೋಡುತ್ತೇನೆ | |
+| Close | ಮುಚ್ಚಿ | |
+| Every item on the menu is {percent}% off, every size. Courier charges stay the same. | ಮೆನುವಿನ ಪ್ರತಿಯೊಂದು ವಸ್ತುವಿನ ಮೇಲೆ, ಪ್ರತಿ ಗಾತ್ರಕ್ಕೂ {percent}% ರಿಯಾಯಿತಿ. ಕೊರಿಯರ್ ಶುಲ್ಕ ಬದಲಾಗುವುದಿಲ್ಲ. | |
+| on everything | ಎಲ್ಲದರ ಮೇಲೆ | |
 
 ### Weights
 
@@ -396,6 +412,14 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Made fresh after you order. Tap an item to choose. | ನೀವು ಆರ್ಡರ್ ಮಾಡಿದ ನಂತರ ತಾಜಾವಾಗಿ ತಯಾರಿ. ಆರಿಸಲು ಯಾವುದಾದರೂ ಒತ್ತಿರಿ. | |
 | Menu categories | ಮೆನು ವಿಭಾಗಗಳು | |
 | Sold out | ಖಾಲಿಯಾಗಿದೆ | |
+| Offers | ಆಫರ್‌ಗಳು | |
+| All offer items | ಎಲ್ಲಾ ಆಫರ್ ಐಟಂಗಳು | |
+| Offer | ಆಫರ್ | |
+| Regular price | ಸಾಮಾನ್ಯ ಬೆಲೆ | |
+| Show full menu | ಪೂರ್ಣ ಮೆನು ತೋರಿಸಿ | |
+| This offer has ended | ಈ ಆಫರ್ ಮುಗಿದಿದೆ | |
+| Have a look at the full menu. | ಪೂರ್ಣ ಮೆನು ನೋಡಿ. | |
+| These items are not on the menu right now. | ಈ ಐಟಂಗಳು ಈಗ ಮೆನುವಿನಲ್ಲಿ ಇಲ್ಲ. | |
 
 ### Choosing an item
 
@@ -552,6 +576,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Enter the mobile number you ordered with to see this order. | ಈ ಆರ್ಡರ್ ನೋಡಲು ಆರ್ಡರ್ ಮಾಡಿದ ಮೊಬೈಲ್ ಸಂಖ್ಯೆ ನೀಡಿ. | |
 | Show my order | ನನ್ನ ಆರ್ಡರ್ ತೋರಿಸಿ | |
 | We couldn’t find this order with that number. Check both, or WhatsApp us on +91 95357 06956. | ಆ ಸಂಖ್ಯೆಯೊಂದಿಗೆ ಈ ಆರ್ಡರ್ ಸಿಗಲಿಲ್ಲ. ಎರಡನ್ನೂ ಪರಿಶೀಲಿಸಿ, ಅಥವಾ +91 95357 06956 ಗೆ ವಾಟ್ಸ್‌ಆ್ಯಪ್ ಮಾಡಿ. | |
+| Regular price | ಸಾಮಾನ್ಯ ಬೆಲೆ | |
 
 ### Track Order
 
@@ -774,6 +799,7 @@ Step 6 (5 Oct 2026) replaced most of the site: everything below is new or change
 | Brownies | ಬ್ರೌನಿಗಳು | |
 | 5 pieces in every box | ಪ್ರತಿ ಬಾಕ್ಸ್‌ನಲ್ಲಿ 5 ತುಂಡುಗಳು | |
 | Chocolates | ಚಾಕೊಲೇಟ್‌ಗಳು | |
+| Cookie Tins | ಕುಕೀ ಟಿನ್‌ಗಳು | |
 | Customize | ಕಸ್ಟಮೈಸ್ | |
 
 ### Menu: items and descriptions

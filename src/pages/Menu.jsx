@@ -7,7 +7,7 @@ import Container from '../components/ui/Container'
 import ProductCard from '../components/shop/ProductCard'
 import { useShopSheets } from '../components/shop/ShopSheets'
 import { TagIcon } from '../components/icons'
-import { inOffer } from '../lib/offers'
+import { inOffer, OFFER_ZONE, RAJYOTSAVA } from '../lib/offers'
 import { dateParts } from '../lib/dates'
 import 'virtual:dk-strings/menu'
 
@@ -34,7 +34,8 @@ function scrollToCategory(id, smooth = true) {
  * Deep links: /menu#delight-boxes (home tiles), /menu?c=delight-boxes (old addresses),
  * /menu?item=<slug> (opens that product's sheet), /menu?offer=<id> (only that offer's products,
  * from the offer banner's "Shop the offer") and /menu?offer=all (every live offer's products: the
- * "Offers" tab, first in the row while an offer with products is live).
+ * "Offers" tab, first in the row while an offer with products is live), /menu?offer=zone (the
+ * Offer Zone: the Rajyotsava offer, every product at its offer price).
  */
 export default function Menu() {
   useSeo('menu')
@@ -45,7 +46,8 @@ export default function Menu() {
   const { hash, search } = useLocation()
   const navigate = useNavigate()
   const { openProduct } = useShopSheets()
-  const offerParam = new URLSearchParams(search).get('offer')
+  const asked = new URLSearchParams(search).get('offer')
+  const offerParam = asked === OFFER_ZONE ? RAJYOTSAVA.id : asked
   const filtering = Boolean(offerParam)
   const [active, setActive] = useState(menu.categories[0]?.id)
   const tabsRef = useRef(null)
@@ -213,6 +215,7 @@ function ProductGrid({ products, eagerFirst }) {
 function OfferProducts({ offerParam, offers, products, ready }) {
   const { t, pick } = useI18n()
   const one = offerParam === 'all' ? null : offers.find((o) => o.id === offerParam)
+  const zone = one?.id === RAJYOTSAVA.id
   const shown = offerParam === 'all' ? offers : one ? [one] : []
   const list = products.filter((p) => p.menu !== false && shown.some((o) => inOffer(o, p)))
   const ends = (iso) => {
@@ -222,7 +225,7 @@ function OfferProducts({ offerParam, offers, products, ready }) {
   // Waiting for Hema's offers to arrive: nothing yet (it is a moment)
   if (!shown.length && !ready) return <div aria-busy="true" className="min-h-[50vh]" />
   return (
-    <section aria-labelledby="offer-title" className="pt-5 pb-4 lg:pt-8" data-dk-offer-menu={offerParam}>
+    <section aria-labelledby="offer-title" className="pt-5 pb-4 lg:pt-8" data-dk-offer-menu={zone ? OFFER_ZONE : offerParam}>
       <Container>
         <div className="on-dark flex flex-col gap-3 rounded-card border border-gold/50 bg-ink p-4 text-cream sm:flex-row sm:items-center sm:gap-x-4 md:p-5">
           <div className="min-w-0 sm:flex-1">
@@ -234,9 +237,25 @@ function OfferProducts({ offerParam, offers, products, ready }) {
               {one && <span className="t-small font-bold text-champagne">{ends(one.endsOn)}</span>}
             </p>
             <h2 id="offer-title" className="t-h3 mt-1.5 text-gold-light">
-              {one ? pick(one.title) : shown.length ? t('menu.offersAll') : t('menu.offerEnded')}
+              {zone ? (
+                <>
+                  {t('banner.zone')} <span aria-hidden="true">🎁</span>
+                </>
+              ) : one ? (
+                pick(one.title)
+              ) : shown.length ? (
+                t('menu.offersAll')
+              ) : (
+                t('menu.offerEnded')
+              )}
             </h2>
-            {one?.message && <p className="t-small mt-0.5 text-cream">{pick(one.message)}</p>}
+            {zone ? (
+              <p className="t-small mt-0.5 text-cream" data-dk-zone-text>
+                {t('banner.rajHello')}: {t('banner.rajZoneText', { percent: one.deal.value })} <strong className="text-gold-light">{t('banner.rajOnline')}</strong>
+              </p>
+            ) : (
+              one?.message && <p className="t-small mt-0.5 text-cream">{pick(one.message)}</p>
+            )}
           </div>
           <Link to="/menu" className="btn btn-secondary min-h-12 self-start px-5 py-2 sm:self-auto" data-dk-full-menu>
             {t('menu.fullMenu')}

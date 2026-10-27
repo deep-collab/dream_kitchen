@@ -31,6 +31,8 @@
   --color-control-line: #8f7d66; /* 3.8:1 on cream: input/chip boundaries (WCAG 1.4.11) */
 
   --font-wordmark: Cinzel, "Trajan Pro", "Times New Roman", Georgia, serif;
+  /* The logo in Kannada (src/components/brand/Wordmark.jsx) */
+  --font-kannada-serif: "Noto Serif Kannada", "Noto Sans Kannada", Georgia, serif;
   --font-heading: "Cormorant Garamond", "Noto Serif Kannada", Garamond, "Times New Roman", Georgia, serif;
   --font-body: Lato, "Noto Sans Kannada", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-sans: var(--font-body);
@@ -327,6 +329,27 @@
   from { opacity: 0; transform: translateY(10px) scale(0.985); }
   to { opacity: 1; transform: none; }
 }
+/* Kannada Rajyotsava (27 Oct 2026): the Offer Zone button's soft glow in the Karnataka colours,
+   and the popup's fade + scale-in. Opacity / transform / box-shadow only; still with reduced motion. */
+@keyframes dk-zone-glow {
+  0%, 100% { box-shadow: 0 0 0 1px rgb(246 197 18 / 0.25), 0 0 10px 0 rgb(246 197 18 / 0.35); }
+  50% { box-shadow: 0 0 0 1px rgb(214 40 40 / 0.45), 0 0 16px 2px rgb(214 40 40 / 0.45); }
+}
+@keyframes dk-raj-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dk-raj-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+.dk-zone { box-shadow: 0 0 0 1px rgb(246 197 18 / 0.3), 0 0 12px 0 rgb(246 197 18 / 0.35); }
+.dk-raj-backdrop { animation: dk-raj-fade 0.22s ease-out both; }
+.dk-raj-card { animation: dk-raj-fade 0.18s ease-out both; }
+.dk-raj-off {
+  background: linear-gradient(180deg, #fff3b0 0%, #ebd27a 30%, #d4af37 62%, #b8901e 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 10px rgb(214 40 40 / 0.55));
+}
 /* Hero: slow watermark drift + sparkles (GPU transforms/opacity only). Static under reduced motion. */
 .dk-drift { transform: rotate(-8deg); transform-origin: 50% 50%; }
 .dk-sparkle { opacity: 0.55; }
@@ -338,6 +361,8 @@
   .dk-rise { animation: dk-rise 0.5s var(--ease-out-soft) both; }
   .dk-drift { animation: dk-drift 48s ease-in-out infinite; will-change: transform; }
   .dk-sparkle { animation: dk-twinkle var(--dur, 6s) ease-in-out var(--delay, 0s) infinite; }
+  .dk-zone { animation: dk-zone-glow 2.6s ease-in-out infinite; }
+  .dk-raj-card { animation: dk-raj-in 0.32s var(--ease-out-soft) both; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

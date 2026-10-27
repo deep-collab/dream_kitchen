@@ -11,7 +11,15 @@
   customer sees is the price charged. Without a deal it never changes a price.
   Dates are Indian calendar dates (IST), both days included: an offer from 24 Oct to 31 Oct shows
   from midnight on the 24th to midnight at the end of the 31st, Indian time.
+
+  Kannada Rajyotsava (27 Oct 2026; its stored words: src/lib/rajyotsava.js, kept out of the
+  website's code so English visitors download no Kannada): one offer with a fixed id, made by the database migration
+  (d1/migrations/0004, supabase 20261027000001): 50% off every product, 1 to 30 November, online
+  orders only. While it is live the website shows its popup, the "Offer Zone" button in the header,
+  its banner on Home and the faint waving Karnataka flag; Hema turns it off, moves its dates or
+  changes the percent in admin -> Offers, and all of that stops or changes with it.
 */
+import { optionPrices as OPTION_PRICES } from '../config/shop.js'
 
 export const OFFER_MAX = { title: 60, message: 120, button: 24, badge: 24 }
 // How many products / sections one offer may hold, and the biggest discount (keeps a typo harmless)
@@ -19,6 +27,17 @@ export const OFFER_ITEMS_MAX = 60
 export const DEAL_MAX = { percent: 90, amount: 100000 }
 // More than this many live offers at once: the first ones show (the banner stays quick to read)
 export const MAX_LIVE_OFFERS = 5
+// How many sizes one product may have (admin -> Menu); exact offer prices can be given for each
+export const MAX_SIZES = 12
+
+export const RAJYOTSAVA = { id: '20261101-0000-4000-8000-000000000001', startsOn: '2026-11-01', endsOn: '2026-11-30', percent: 50 }
+
+/** The Offer Zone: the menu with every product of the Rajyotsava offer (src/pages/Menu.jsx) */
+export const OFFER_ZONE = 'zone'
+export const OFFER_ZONE_HREF = `/menu?offer=${OFFER_ZONE}`
+
+/** The Rajyotsava offer among today's live offers (cleaned), or null */
+export const rajyotsavaLive = (live) => (Array.isArray(live) ? live : []).find((o) => o?.id === RAJYOTSAVA.id && o.items && o.deal?.kind === 'percent') || null
 
 /** Today's date in India ("2026-10-23"). India has no summer time, so a fixed +5:30 is exact. */
 export const istToday = (now = new Date()) => new Date(now.getTime() + 330 * 60_000).toISOString().slice(0, 10)
@@ -76,12 +95,14 @@ export function cleanItems(v) {
 
 /**
  * A special price, or null:
- *   { kind: 'percent', value: 1..90 }   { kind: 'amount', value: ₹ off each item }
+ *   { kind: 'percent', value: 1..90, drawing? }   { kind: 'amount', value: ₹ off each item }
  *   { kind: 'prices', prices: { [product]: ₹ | { [size]: ₹ } } }   (an exact price per product / size)
+ * A percent off lowers every size and the ragi version too; the drawing add-on keeps its price
+ * unless `drawing: true` (Hema's choice, admin -> Offers).
  */
 export function cleanDeal(v) {
   if (!v || typeof v !== 'object') return null
-  if (v.kind === 'percent') return whole(v.value, DEAL_MAX.percent) ? { kind: 'percent', value: v.value } : null
+  if (v.kind === 'percent') return whole(v.value, DEAL_MAX.percent) ? { kind: 'percent', value: v.value, ...(v.drawing === true ? { drawing: true } : {}) } : null
   if (v.kind === 'amount') return whole(v.value, DEAL_MAX.amount) ? { kind: 'amount', value: v.value } : null
   if (v.kind !== 'prices' || !v.prices || typeof v.prices !== 'object') return null
   const prices = {}
@@ -89,7 +110,7 @@ export function cleanDeal(v) {
     if (!ID.test(id)) continue
     if (whole(p, DEAL_MAX.amount)) prices[id] = p
     else if (p && typeof p === 'object') {
-      const sizes = Object.fromEntries(Object.entries(p).filter(([s, x]) => SIZE_ID.test(s) && whole(x, DEAL_MAX.amount)).slice(0, 6))
+      const sizes = Object.fromEntries(Object.entries(p).filter(([s, x]) => SIZE_ID.test(s) && whole(x, DEAL_MAX.amount)).slice(0, MAX_SIZES))
       if (Object.keys(sizes).length) prices[id] = sizes
     }
   }
@@ -148,7 +169,7 @@ export const inOffer = (offer, product) =>
 function dealPrice(deal, product, sizeId, price) {
   if (!deal || !Number.isFinite(price)) return null
   let next = null
-  if (deal.kind === 'percent') next = Math.round((price * (100 - deal.value)) / 100)
+  if (deal.kind === 'percent') next = percentOff(price, deal.value)
   else if (deal.kind === 'amount') next = price - deal.value
   else if (deal.kind === 'prices') {
     const p = deal.prices[product.id]
@@ -159,14 +180,20 @@ function dealPrice(deal, product, sizeId, price) {
   return next < price ? next : null
 }
 
+/** 50% off ₹549 = ₹275: rounded to the nearest rupee (halves up), never below ₹1 */
+export const percentOff = (price, percent) => Math.max(1, Math.round((price * (100 - percent)) / 100))
+
 /**
- * The menu with the live offers on top: each product in an offer gets `offer` ({ id, badge, was })
- * and, when the offer has a special price that lowers it, the new price (sizes too; extras such as
- * ragi or a drawing keep their price). In two offers at once: the lower price wins. The website and
- * the server call this with the same offers and the same Indian date, so they always agree.
- *   was: the regular price ({ price } or { sizes: { [size]: price } }) when the price changed, else null
+ * The menu with the live offers on top: each product in an offer gets `offer` ({ id, badge, title,
+ * deal, was }) and, when the offer has a special price that lowers it, the new price (sizes too). A
+ * percent off also lowers the ragi version's extra; the drawing add-on keeps its price unless the
+ * offer says `drawing: true` (then the product carries its own `drawingPrice`). In two offers at
+ * once: the lower price wins. The website and the server call this with the same offers and the
+ * same Indian date, so they always agree.
+ *   was: the regular prices ({ price } or { sizes: { [size]: price } }, plus ragiPrice / drawingPrice
+ *        when those changed) when a price changed, else null
  */
-export function applyOfferPrices(products, offers) {
+export function applyOfferPrices(products, offers, base = { drawing: OPTION_PRICES.drawing }) {
   const live = (offers || []).filter((o) => o?.items)
   if (!live.length) return products
   const low = (x) => (x.sizes?.length ? Math.min(...x.sizes.map((s) => s.price)) : x.price)
@@ -175,23 +202,37 @@ export function applyOfferPrices(products, offers) {
     for (const o of live) {
       if (!inOffer(o, p)) continue
       const next = { ...p }
-      let changed = false
+      const was = {}
       if (p.sizes?.length) {
         next.sizes = p.sizes.map((s) => {
           const d = dealPrice(o.deal, p, s.id, s.price)
           if (d == null) return s
-          changed = true
+          was.sizes = Object.fromEntries(p.sizes.map((x) => [x.id, x.price]))
           return { ...s, price: d }
         })
       } else {
         const d = dealPrice(o.deal, p, null, p.price)
         if (d != null) {
           next.price = d
-          changed = true
+          was.price = p.price
         }
       }
-      const was = changed ? (p.sizes?.length ? { sizes: Object.fromEntries(p.sizes.map((s) => [s.id, s.price])) } : { price: p.price }) : null
-      next.offer = { id: o.id, badge: o.badge, was }
+      // A percent off: the ragi version is the same product, so its extra comes down too
+      if (o.deal?.kind === 'percent' && Number.isFinite(p.ragiPrice) && (was.sizes || was.price != null)) {
+        const r = percentOff(p.ragiPrice, o.deal.value)
+        if (r < p.ragiPrice) {
+          next.ragiPrice = r
+          was.ragiPrice = p.ragiPrice
+        }
+      }
+      // The drawing add-on: full price unless Hema ticked "the drawing too"
+      if (o.deal?.kind === 'percent' && o.deal.drawing && p.options?.drawing === true && Number.isFinite(base.drawing)) {
+        next.drawingPrice = percentOff(base.drawing, o.deal.value)
+        was.drawingPrice = base.drawing
+      }
+      const changed = Object.keys(was).length > 0
+      // title and deal: for the order line's words ("Rajyotsava 50% off", src/lib/rajyotsava.js)
+      next.offer = { id: o.id, badge: o.badge, title: o.title, deal: o.deal, was: changed ? was : null }
       // A changed price beats a badge alone; the lower price beats a higher one
       if (!best || (changed && !best.offer.was) || (changed && low(next) < low(best))) best = next
     }
@@ -199,19 +240,39 @@ export function applyOfferPrices(products, offers) {
   })
 }
 
-/** The product at its regular prices (for the crossed-out price of the chosen size), or null */
+/** The product at its regular prices (for the crossed-out price of the chosen choices), or null */
 export function regularVersion(product) {
   const was = product?.offer?.was
   if (!was) return null
-  if (was.sizes) return { ...product, sizes: product.sizes.map((s) => ({ ...s, price: was.sizes[s.id] ?? s.price })) }
-  return { ...product, price: was.price }
+  const next = { ...product }
+  if (was.sizes) next.sizes = product.sizes.map((s) => ({ ...s, price: was.sizes[s.id] ?? s.price }))
+  if (was.price != null) next.price = was.price
+  if (was.ragiPrice != null) next.ragiPrice = was.ragiPrice
+  delete next.drawingPrice
+  return next
 }
 
 /** The regular "from" price of a product whose price an offer lowered (for the crossed-out price) */
 export function regularFrom(product) {
   const was = product?.offer?.was
   if (!was) return null
-  return was.sizes ? Math.min(...Object.values(was.sizes)) : was.price
+  if (was.sizes) return Math.min(...Object.values(was.sizes))
+  return was.price ?? null
+}
+
+/**
+ * What an order's offers took off, from its lines (netlify/lib/orders.mjs snapshotItem): for the
+ * totals on the order page, Track Order, the packing slip and the emails.
+ *   -> { regularSubtotal, saved, labels: [{ en, kn }] } or null when no offer lowered a price
+ */
+export function orderSavings(items) {
+  const offered = (items || []).filter((i) => i?.offer && Number.isFinite(i.regularLineTotal) && Number.isFinite(i.lineTotal))
+  if (!offered.length) return null
+  const saved = offered.reduce((sum, i) => sum + (i.regularLineTotal - i.lineTotal), 0)
+  if (saved <= 0) return null
+  const labels = [...new Map(offered.map((i) => [i.offer.label?.en || i.offer.id, i.offer.label || { en: 'Offer' }])).values()]
+  const regularSubtotal = (items || []).reduce((sum, i) => sum + (i.offer ? i.regularLineTotal : i.lineTotal || 0), 0)
+  return { regularSubtotal, saved, labels }
 }
 
 /*

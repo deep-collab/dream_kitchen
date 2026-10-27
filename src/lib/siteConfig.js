@@ -87,6 +87,17 @@ export function activeBackground(bg, today = istToday()) {
   return { id: chosen, opacity: t.opacity / 100, animate: t.animate, image: chosen === 'custom' ? b.customImage : null }
 }
 
+/**
+ * The background to show, with the Rajyotsava offer: while it is live the faint background is the
+ * Karnataka flag (yellow over red, softly waving; its strength and animation from the developer
+ * options, 7% by default); afterwards (or switched off) the usual one, by itself.
+ */
+export function festivalBackground(bg, today = istToday(), rajyotsavaOn = false) {
+  if (!rajyotsavaOn) return activeBackground(bg, today)
+  const t = cleanBackground(bg).themes.rajyotsava
+  return { id: 'rajyotsava', opacity: t.opacity / 100, animate: t.animate, image: null }
+}
+
 /* ======================= who sees the developer options ======================= */
 
 export const cleanDevAccess = (v) => ({ owner: v?.owner === true })

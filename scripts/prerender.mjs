@@ -216,7 +216,8 @@ ${cats
 
 /** src/pages/Home.jsx: the hero (logo, tagline, three buttons), the six tiles and the drawings card */
 function homeMain(t) {
-  const cats = categories.filter((c) => !c.hidden).sort((a, b) => a.sort - b.sort)
+  // Cookie Tins: only Hema's own products, which the config doesn't have, so no tile here
+  const cats = categories.filter((c) => !c.hidden && !c.whenStocked).sort((a, b) => a.sort - b.sort)
   const tiles = [...cats.map((c) => ({ to: `/menu#${c.id}`, label: en(c.name) })), { to: '/customize', label: t.nav.customize }, { to: '/classes', label: t.nav.classes }]
   const bar = products.find((p) => p.id === 'drawing-chocolate-bar')
   return `<section class="on-dark relative isolate overflow-hidden bg-ink text-cream">

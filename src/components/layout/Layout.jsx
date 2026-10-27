@@ -11,6 +11,7 @@ import LanguageError from './LanguageError'
 import Footer from './Footer'
 import TabBar from './TabBar'
 import CartAnnouncer from './CartAnnouncer'
+import RajyotsavaGate from '../festival/RajyotsavaGate'
 
 // Tells the inline loading screen, Hema's settings fetch and the QA scripts that the first page
 // has painted. It sits inside the page's Suspense boundary, so it runs only once the page's own
@@ -65,6 +66,7 @@ export default function Layout() {
       <Footer />
       <TabBar />
       <CartAnnouncer />
+      <RajyotsavaGate />
     </div>
   )
 }

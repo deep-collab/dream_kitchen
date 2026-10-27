@@ -3,12 +3,14 @@ import { adminCall } from './api'
 import { Btn, card, ErrorText, Field, formatINR, input, Loading, PageTitle, Pill, SaveMessage, useAdminData, useSave } from './ui'
 import { ImageIcon } from '../components/icons'
 import { smallPhoto } from '../lib/productPhoto'
-import { PRODUCT_TEXT_MAX } from '../lib/pricing'
+import { PRODUCT_TEXT_MAX, SIZE_LIMITS } from '../lib/pricing'
 import { Counter, PhotoButtons, productPhotoFiles } from './photos'
 
-const CATEGORY_WORDS = { 'brownie-tubs': 'Brownie Tubs', 'delight-boxes': 'Delight Boxes', brownies: 'Brownies', chocolates: 'Chocolates', customize: 'Customize page' }
+const CATEGORY_WORDS = { 'brownie-tubs': 'Brownie Tubs', 'delight-boxes': 'Delight Boxes', brownies: 'Brownies', chocolates: 'Chocolates', 'cookie-tins': 'Cookie Tins', customize: 'Customize page' }
 // Where Hema can add her own products (the Customize page's items stay as they are)
-const ADDABLE = ['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates']
+const ADDABLE = ['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates', 'cookie-tins']
+// Shown under a section with nothing in it yet
+const EMPTY_WORDS = { 'cookie-tins': 'No cookie tins yet. Tap “+ Add new product” to add one (with its sizes, prices, photo and courier charge). The Cookie Tins tab and Home tile show on the website once one is on the menu.' }
 
 // Courier charge groups in Hema's words (the six rates themselves are in Settings)
 const TIER_WORDS = {
@@ -16,44 +18,106 @@ const TIER_WORDS = {
   large: 'Medium parcel: like a 500 g or 700 g Delight Box',
   xl: 'Large parcel: 750 g or more',
 }
+// A product's price: one fixed price, or sizes (each with its own price and courier charge)
+const PRICED = [
+  ['one', 'No sizes: one fixed price'],
+  ['sizes', 'Sizes, each with its own price'],
+]
 const NAME_MAX = PRODUCT_TEXT_MAX.name
 const DESCRIPTION_MAX = PRODUCT_TEXT_MAX.description
 const priceDigits = (v) => v.replace(/\D/g, '').slice(0, 6)
 const num = (v) => (String(v).trim() === '' ? NaN : Number(v))
 
-/** Sizes with a name and a price each (a new product, a tub, or a product Hema added) */
-function SizeRows({ sizes, setSizes, error }) {
+/**
+ * Sizes, in the order the website shows them: each with a name (100 g, 250 g, 1 kg, 6 pieces,
+ * small tin…), its price and its courier charge (parcel size). Add, remove and move up / down;
+ * up to SIZE_LIMITS.count. Used by "+ Add new product" and by Save under every product with sizes.
+ */
+function SizeRows({ sizes, setSizes, error, testId = 'size' }) {
+  const change = (i, patch) => setSizes(sizes.map((x, j) => (j === i ? { ...x, ...patch } : x)))
+  const move = (i, by) => {
+    const next = [...sizes]
+    ;[next[i], next[i + by]] = [next[i + by], next[i]]
+    setSizes(next)
+  }
   return (
-    <div className="space-y-2">
-      {sizes.map((s, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <input className={`${input} min-w-0 flex-1`} aria-label="Size name" placeholder="Size, e.g. 250 g" maxLength={24} value={s.label || ''} onChange={(e) => setSizes(sizes.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)))} />
-          <span aria-hidden="true">₹</span>
-          <input
-            className={`${input} w-28`}
-            inputMode="numeric"
-            aria-label={`Price for ${s.label || 'this size'}`}
-            value={s.price}
-            onChange={(e) => setSizes(sizes.map((x, j) => (j === i ? { ...x, price: priceDigits(e.target.value) } : x)))}
-          />
-          {sizes.length > 1 && (
-            <Btn tone="light" className="px-3" onClick={() => setSizes(sizes.filter((_, j) => j !== i))} aria-label="Remove this size">
-              ✕
-            </Btn>
-          )}
-        </div>
-      ))}
-      {sizes.length < 6 && (
-        <Btn tone="light" onClick={() => setSizes([...sizes, { id: `size-${Date.now().toString(36)}`, label: '', price: '' }])}>
+    <div className="space-y-2" data-admin-sizes={testId}>
+      <ol className="space-y-2">
+        {sizes.map((s, i) => (
+          <li key={s.id || i} className="rounded-control border border-line bg-cream p-2" data-admin-size-row={i}>
+            <div className="flex items-center gap-2">
+              <span className="w-6 shrink-0 text-center font-bold text-brown-2" aria-hidden="true">
+                {i + 1}
+              </span>
+              <input
+                className={`${input} min-w-0 flex-1`}
+                aria-label={`Size ${i + 1} name`}
+                placeholder="e.g. 250 g, 1 kg, small tin"
+                maxLength={SIZE_LIMITS.label}
+                value={s.label || ''}
+                onChange={(e) => change(i, { label: e.target.value })}
+                data-admin-size-label
+              />
+              <span aria-hidden="true">₹</span>
+              <input
+                className={`${input} w-24 shrink-0`}
+                inputMode="numeric"
+                aria-label={`Price for ${s.label || `size ${i + 1}`}`}
+                value={s.price}
+                onChange={(e) => change(i, { price: priceDigits(e.target.value) })}
+                data-admin-size-price
+              />
+            </div>
+            <div className="mt-2 flex flex-wrap items-center gap-2 pl-8">
+              <select
+                className={`${input} min-w-0 flex-1`}
+                aria-label={`Courier charge for ${s.label || `size ${i + 1}`}`}
+                value={s.courierTier || 'small'}
+                onChange={(e) => change(i, { courierTier: e.target.value })}
+                data-admin-size-tier
+              >
+                {Object.entries(TIER_WORDS).map(([tier, words]) => (
+                  <option key={tier} value={tier}>
+                    {words.split(':')[0]}
+                  </option>
+                ))}
+              </select>
+              <Btn tone="light" className="min-w-12 px-3" onClick={() => move(i, -1)} disabled={i === 0} aria-label={`Move ${s.label || `size ${i + 1}`} up`} data-admin-size-up>
+                ↑
+              </Btn>
+              <Btn tone="light" className="min-w-12 px-3" onClick={() => move(i, 1)} disabled={i === sizes.length - 1} aria-label={`Move ${s.label || `size ${i + 1}`} down`} data-admin-size-down>
+                ↓
+              </Btn>
+              {sizes.length > 1 && (
+                <Btn tone="light" className="min-w-12 px-3" onClick={() => setSizes(sizes.filter((_, j) => j !== i))} aria-label={`Remove ${s.label || `size ${i + 1}`}`} data-admin-size-remove>
+                  ✕
+                </Btn>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+      {sizes.length < SIZE_LIMITS.count && (
+        <Btn tone="light" onClick={() => setSizes([...sizes, newSize(sizes.at(-1)?.courierTier)])} data-admin-size-add>
           + Add a size
         </Btn>
       )}
+      <p className="t-small text-brown-2">The website shows the sizes in this order. Courier: which parcel each size is most like.</p>
       {error && <p className="t-small font-bold text-error">{error}</p>}
     </div>
   )
 }
 
-const SIZE_ERRORS = { price: 'Give every size a price.', needLabels: 'Give every size a name, like “250 g”.', duplicate: 'Two sizes have the same name.', needPrices: 'Give every size a name and a price first.' }
+const newSize = (courierTier = 'small') => ({ id: `size-${Date.now().toString(36)}${Math.floor(Math.random() * 36).toString(36)}`, label: '', price: '', courierTier })
+const sizesBody = (sizes) => sizes.map((s) => ({ id: s.id, label: s.label, price: num(s.price), courierTier: s.courierTier || 'small', ...(s.grams ? { grams: s.grams } : {}) }))
+
+const SIZE_ERRORS = {
+  price: 'Give every size a price above ₹0.',
+  needLabels: 'Give every size a name, like “250 g” or “small tin”.',
+  duplicate: 'Two sizes have the same name. Give each size its own name.',
+  needPrices: 'Give every size a name and a price first.',
+  tooMany: `At most ${SIZE_LIMITS.count} sizes.`,
+}
 
 /** Name in English and Kannada (the Kannada may stay empty: Kannada readers then see the English) */
 function NameFields({ value, set, error, required }) {
@@ -114,7 +178,7 @@ function RagiFields({ on, setOn, price, setPrice, error, name }) {
   )
 }
 
-const EMPTY_NEW = { nameEn: '', nameKn: '', descEn: '', descKn: '', priced: 'one', price: '', sizes: [{ id: 'size-1', label: '', price: '' }], tier: '', ragi: false, ragiPrice: '' }
+const EMPTY_NEW = { nameEn: '', nameKn: '', descEn: '', descKn: '', priced: 'one', price: '', sizes: [{ id: 'size-1', label: '', price: '', courierTier: 'small' }], tier: '', ragi: false, ragiPrice: '' }
 
 /**
  * "+ Add new product", at the bottom of each menu section: category (that section, can be
@@ -142,8 +206,7 @@ function AddProduct({ category, onAdded }) {
         category: form.category,
         name: { en: form.nameEn, kn: form.nameKn },
         description: { en: form.descEn, kn: form.descKn },
-        courierTier: form.tier,
-        ...(form.priced === 'sizes' ? { sizes: form.sizes.map((s) => ({ label: s.label, price: num(s.price) })) } : { price: num(form.price) }),
+        ...(form.priced === 'sizes' ? { sizes: sizesBody(form.sizes).map(({ id, ...size }) => size) } : { price: num(form.price), courierTier: form.tier }),
         ...(form.ragi ? { ragiPrice: num(form.ragiPrice) } : {}),
       }
       const r = await adminCall('addProduct', body)
@@ -206,10 +269,7 @@ function AddProduct({ category, onAdded }) {
 
       <fieldset>
         <legend className="mb-1 font-bold">Price</legend>
-        {[
-          ['one', 'One price'],
-          ['sizes', 'Different sizes, each with its price'],
-        ].map(([v, words]) => (
+        {PRICED.map(([v, words]) => (
           <label key={v} className="flex min-h-12 items-center gap-3">
             <input type="radio" name={`priced-${category}`} className="h-6 w-6 accent-ink" checked={form.priced === v} onChange={() => set({ priced: v })} data-admin-priced={v} />
             {words}
@@ -223,24 +283,26 @@ function AddProduct({ category, onAdded }) {
               {errors.price && <span className="t-small font-bold text-error">Write the price in rupees.</span>}
             </div>
           ) : (
-            <SizeRows sizes={form.sizes} setSizes={(sizes) => set({ sizes })} error={SIZE_ERRORS[errors.sizes]} />
+            <SizeRows sizes={form.sizes} setSizes={(sizes) => set({ sizes })} error={SIZE_ERRORS[errors.sizes]} testId={`new-${category}`} />
           )}
         </div>
       </fieldset>
 
       <RagiFields name={`ragi-${category}`} on={form.ragi} setOn={(ragi) => set({ ragi })} price={form.ragiPrice} setPrice={(ragiPrice) => set({ ragiPrice })} error={errors.ragiPrice} />
 
-      <fieldset>
-        <legend className="font-bold">Courier charge</legend>
-        <p className="t-small text-brown-2">Which parcel is it most like? The customer pays that courier charge (the rates are in Settings).</p>
-        {Object.entries(TIER_WORDS).map(([tier, words]) => (
-          <label key={tier} className="flex min-h-12 items-center gap-3">
-            <input type="radio" name={`tier-${category}`} className="h-6 w-6 shrink-0 accent-ink" checked={form.tier === tier} onChange={() => set({ tier })} data-admin-new-tier={tier} />
-            {words}
-          </label>
-        ))}
-        {errors.courierTier && <p className="t-small font-bold text-error">Choose the parcel size.</p>}
-      </fieldset>
+      {form.priced === 'one' && (
+        <fieldset>
+          <legend className="font-bold">Courier charge</legend>
+          <p className="t-small text-brown-2">Which parcel is it most like? The customer pays that courier charge (the rates are in Settings).</p>
+          {Object.entries(TIER_WORDS).map(([tier, words]) => (
+            <label key={tier} className="flex min-h-12 items-center gap-3">
+              <input type="radio" name={`tier-${category}`} className="h-6 w-6 shrink-0 accent-ink" checked={form.tier === tier} onChange={() => set({ tier })} data-admin-new-tier={tier} />
+              {words}
+            </label>
+          ))}
+          {errors.courierTier && <p className="t-small font-bold text-error">Choose the parcel size.</p>}
+        </fieldset>
+      )}
 
       <div>
         <p className="font-bold">Photo (optional)</p>
@@ -395,6 +457,7 @@ export default function MenuAdmin() {
               <p className="mt-4 font-bold">Product on the Customize page</p>
             </>
           )}
+          {EMPTY_WORDS[c] && !products.some((p) => p.category === c) && <p className="t-small mt-1 text-brown-2">{EMPTY_WORDS[c]}</p>}
           <ul className="mt-2 space-y-3">
             {products
               .filter((p) => p.category === c)
@@ -421,9 +484,13 @@ export default function MenuAdmin() {
 
 function ProductEditor({ product: p, onSaved }) {
   const isTub = p.category === 'brownie-tubs'
-  // Sizes she can name, add and remove: the tubs (sizes still to confirm) and her own products with sizes
-  const namedSizes = (isTub && !p.custom) || (p.custom && p.sizes.length > 0)
-  const [sizes, setSizes] = useState(p.sizes.map((s) => ({ ...s, price: String(s.price) })))
+  // Her own products: one fixed price, or sizes (she can switch between them)
+  const [priced, setPriced] = useState(p.sizes.length ? 'sizes' : 'one')
+  // Sizes she can name, add, remove and reorder: every product with sizes (the tubs too, while
+  // theirs are still to confirm), and her own products set to sizes
+  const namedSizes = (isTub && !p.custom) || (p.custom ? priced === 'sizes' : p.sizes.length > 0)
+  const startSizes = () => (p.sizes.length ? p.sizes.map((s) => ({ ...s, price: String(s.price) })) : [newSize(p.courierTier)])
+  const [sizes, setSizes] = useState(startSizes)
   const [price, setPrice] = useState(p.price != null ? String(p.price) : '')
   const [ragi, setRagi] = useState(p.ragiPrice != null ? String(p.ragiPrice) : '')
   const [ragiOn, setRagiOn] = useState(p.ragiPrice != null)
@@ -433,7 +500,8 @@ function ProductEditor({ product: p, onSaved }) {
   // After a save (or "Back to original") show what the server now has, keeping the "Saved" message
   const saved = JSON.stringify([p.sizes, p.price, p.ragiPrice, p.priceStatus])
   useEffect(() => {
-    setSizes(p.sizes.map((s) => ({ ...s, price: String(s.price) })))
+    setPriced(p.sizes.length ? 'sizes' : 'one')
+    setSizes(startSizes())
     setPrice(p.price != null ? String(p.price) : '')
     setRagi(p.ragiPrice != null ? String(p.ragiPrice) : '')
     setRagiOn(p.ragiPrice != null)
@@ -449,8 +517,10 @@ function ProductEditor({ product: p, onSaved }) {
 
   const savePrices = () => {
     const body = {}
-    if (p.sizes.length || namedSizes) body.sizes = sizes.map((s) => ({ id: s.id, label: s.label, price: num(s.price), ...(s.grams ? { grams: s.grams } : {}) }))
-    if (!p.sizes.length && !namedSizes) body.price = num(price)
+    if (namedSizes) body.sizes = sizesBody(sizes)
+    else body.price = num(price)
+    // Her own product from sizes to one price: the sizes go
+    if (p.custom && !namedSizes && p.sizes.length) body.sizes = null
     // Her own products: the ragi version can be switched on and off; the standard brownies keep theirs
     if (p.custom) body.ragiPrice = ragiOn ? num(ragi) : null
     else if (p.ragiPrice != null) body.ragiPrice = num(ragi)
@@ -492,23 +562,19 @@ function ProductEditor({ product: p, onSaved }) {
       {p.toConfirm && <p className="t-small mt-1 text-[#6b4b00]">To confirm: {p.toConfirm}</p>}
 
       <div className="mt-3 space-y-2">
-        {namedSizes && <SizeRows sizes={sizes} setSizes={setSizes} error={SIZE_ERRORS[save.fields?.sizes]} />}
-        {!namedSizes &&
-          p.sizes.length > 0 &&
-          sizes.map((s, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <span className="w-24 font-bold">{s.label}</span>
-              <span aria-hidden="true">₹</span>
-              <input
-                className={`${input} w-28`}
-                inputMode="numeric"
-                aria-label={`Price for ${s.label || 'this size'}`}
-                value={s.price}
-                onChange={(e) => setSizes(sizes.map((x, j) => (j === i ? { ...x, price: e.target.value.replace(/\D/g, '') } : x)))}
-              />
-            </div>
-          ))}
-        {!p.sizes.length && !namedSizes && (
+        {p.custom && (
+          <fieldset>
+            <legend className="sr-only">Price</legend>
+            {PRICED.map(([v, words]) => (
+              <label key={v} className="flex min-h-12 items-center gap-3">
+                <input type="radio" name={`priced-${p.id}`} className="h-6 w-6 accent-ink" checked={priced === v} onChange={() => setPriced(v)} data-admin-edit-priced={v} />
+                {words}
+              </label>
+            ))}
+          </fieldset>
+        )}
+        {namedSizes && <SizeRows sizes={sizes} setSizes={setSizes} error={SIZE_ERRORS[save.fields?.sizes]} testId={p.id} />}
+        {!namedSizes && (
           <div className="flex items-center gap-2">
             <span className="w-24 font-bold">Price</span>
             <span aria-hidden="true">₹</span>
@@ -559,12 +625,13 @@ function ProductEditor({ product: p, onSaved }) {
       <div className="mt-2">
         <SaveMessage save={save} />
         {save.status === 'error' && !namedSizes && save.fields?.sizes && <p className="t-small text-error">{SIZE_ERRORS[save.fields.sizes]}</p>}
+        {save.status === 'error' && !namedSizes && save.fields?.price && <p className="t-small text-error">Write the price in rupees.</p>}
       </div>
       {/* Keyed, so a change above (e.g. the first description appearing) never rebuilds them and loses "Saved" */}
       {panel === 'name' && <NameEditor key="name-editor" product={p} onSaved={onSaved} onClose={() => setPanel(null)} />}
       {panel === 'description' && <DescriptionEditor key="description-editor" product={p} onSaved={onSaved} onClose={() => setPanel(null)} />}
       {p.sizes.length === 0 && p.price != null && <p className="t-small mt-1 text-brown-2">Now: {formatINR(p.price)}</p>}
-      {p.custom && <p className="t-small mt-1 text-brown-2">Courier: {TIER_WORDS[p.courierTier]?.split(':')[0]}</p>}
+      {p.custom && !p.sizes.length && <p className="t-small mt-1 text-brown-2">Courier: {TIER_WORDS[p.courierTier]?.split(':')[0]}</p>}
 
       <div className="mt-3 border-t border-line pt-3">
         <PhotoButtons action="productPhoto" id={p.id} hasOwn={p.ownPhoto} removeText={p.custom ? 'Remove photo' : 'Use the old photo'} onSaved={(d) => onSaved(d.products)} />

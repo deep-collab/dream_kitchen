@@ -115,7 +115,8 @@ export function unitPrice(product, sel = {}, prices = OPTION_PRICES) {
     price = size.price
   } else price = product.price
   if (hasRagi(product) && sel.ragi) price += product.ragiPrice
-  if (product.options?.drawing === true && sel.drawing) price += prices.drawing
+  // The drawing add-on: Hema's price, or the offer's when an offer lowers it too (src/lib/offers.js)
+  if (product.options?.drawing === true && sel.drawing) price += Number.isFinite(product.drawingPrice) ? product.drawingPrice : prices.drawing
   if (hasNameOption(product) && clean(sel.name)) price += prices.nameOnBox
   return price
 }
@@ -222,7 +223,10 @@ const money = (v) => (Number.isInteger(v) && v > 0 && v <= 100000 ? v : undefine
 /** Limits for Hema's own names and descriptions (the admin checks the same) */
 export const PRODUCT_TEXT_MAX = { name: 60, description: 200 }
 /** The categories Hema can add products to (the Customize page's items stay in the config) */
-export const CUSTOM_CATEGORIES = ['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates']
+export const CUSTOM_CATEGORIES = ['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates', 'cookie-tins']
+/** How many sizes a product may have (admin -> Menu), and the longest size name */
+export const SIZE_LIMITS = { count: 12, label: 24 }
+const SIZE_ID = /^[a-z0-9-]{1,20}$/
 export const PRODUCT_ID_PATTERN = /^[a-z0-9][a-z0-9-]{1,59}$/
 
 /** { en, kn } from Hema's text: the English is needed; the Kannada falls back to it */
@@ -259,15 +263,16 @@ function customProduct(o) {
     custom: true,
     // A ragi version, if she gave it an extra price
     ...(money(o.ragiPrice) ? { ragiPrice: o.ragiPrice } : {}),
-    // The sizes' ids and tier; their prices and names come in with the rest of her changes
-    ...(sized ? { sizes: o.sizes.filter((s) => s && typeof s.id === 'string').map((s) => ({ id: s.id, courierTier: tier })) } : {}),
+    // The sizes' ids and courier tiers (each size its own, else the product's); their prices and
+    // names come in with the rest of her changes
+    ...(sized ? { sizes: o.sizes.filter((s) => s && typeof s.id === 'string').map((s) => ({ id: s.id, courierTier: COURIER.tiers.includes(s.courierTier) ? s.courierTier : tier })) } : {}),
   }
 }
 
 /**
  * The config menu with Hema's admin changes on top. Both sides call this with the same rows,
  * so they price the same menu. Only known fields with sane values are taken.
- *   overrides: [{ id, price?, ragiPrice?, sizes?: [{ id, grams?, label?, price }], soldOut?, active?, priceStatus?, photo?,
+ *   overrides: [{ id, price?, ragiPrice?, sizes?: [{ id, grams?, label?, price, courierTier? }], soldOut?, active?, priceStatus?, photo?,
  *                 name?: { en, kn }, description?: { en, kn } }]
  *   plus the products Hema added: { id, custom: true, category, name, description?, courierTier, sort?, price? | sizes? },
  *   listed after the config's, and only once they have a price (or sizes with prices).
@@ -293,14 +298,15 @@ function withOverride(p, o) {
   if (money(o.ragiPrice) && hasRagi(p)) next.ragiPrice = o.ragiPrice
   if (Array.isArray(o.sizes) && o.sizes.length && (hasSizes(p) || p.category === 'brownie-tubs')) {
     const sizes = o.sizes
-      .filter((s) => s && typeof s.id === 'string' && /^[a-z0-9-]{1,20}$/.test(s.id) && money(s.price))
-      .slice(0, 6)
+      .filter((s) => s && typeof s.id === 'string' && SIZE_ID.test(s.id) && money(s.price))
+      .slice(0, SIZE_LIMITS.count)
       .map((s) => {
         const base = sizeOf(p, s.id)
         const grams = Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? s.grams : base?.grams
-        const label = typeof s.label === 'string' && clean(s.label) ? clean(s.label).slice(0, 24) : undefined
-        // New tub sizes Hema adds get their tier from the weight (750 g and more = xl)
-        const tier = base?.courierTier || (p.category === 'brownie-tubs' && grams >= 750 ? 'xl' : p.courierTier)
+        const label = typeof s.label === 'string' && clean(s.label) ? clean(s.label).slice(0, SIZE_LIMITS.label) : undefined
+        // The courier tier Hema chose for this size; else the config's for it; new tub sizes get
+        // theirs from the weight (750 g and more = xl); else the product's
+        const tier = COURIER.tiers.includes(s.courierTier) ? s.courierTier : base?.courierTier || (p.category === 'brownie-tubs' && grams >= 750 ? 'xl' : p.courierTier)
         return { id: s.id, price: s.price, ...(grams ? { grams } : {}), ...(label ? { label } : {}), courierTier: tier }
       })
       // Her own products' sizes need a name (there is no weight in the config to name them)

@@ -5,7 +5,7 @@
 // on the server) and the site background with its dates.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { dateChoices, dispatchRules } from '../src/lib/dates.js'
-import { allLiveOffers, applyOfferPrices, cleanDeal, cleanItems, cleanOffer, istToday, regularFrom, regularVersion } from '../src/lib/offers.js'
+import { allLiveOffers, applyOfferPrices, cleanDeal, cleanItems, cleanOffer, istToday, RAJYOTSAVA, regularFrom, regularVersion } from '../src/lib/offers.js'
 import { activeBackground, backgroundErrors, cleanBackground } from '../src/lib/siteConfig.js'
 import { applyOverrides, quote, unitPrice } from '../src/lib/pricing.js'
 import { products as CONFIG } from '../src/config/shop.js'
@@ -59,6 +59,9 @@ beforeEach(async () => {
   setNow('2026-10-26T06:00:00Z') // 11:30 am in India, 26 Oct
   store = createMemoryStore({ admins: [HEMA, DEV, OFF], now: () => new Date(nowMs) })
   await store.updateSettings({ upi_id: 'hema@okaxis' })
+  // These tests are about any offer Hema makes; the built-in 50% Rajyotsava offer (27 Oct 2026,
+  // tests/rajyotsava-november.test.js) is switched off here so its November dates don't mix in
+  await store.updateOffer(RAJYOTSAVA.id, { active: false })
   setStore(store)
   ip++
 })
@@ -90,7 +93,7 @@ describe('offer prices (src/lib/offers.js): the same on the website and the serv
     const exact = applyOfferPrices(products, [offer({ deal: { kind: 'prices', prices: { 'pista-bar': 399, 'mango-delight-box': { '250g': 599, '700g': 9999 } } } })])
     expect(byId(exact, 'pista-bar').price).toBe(399)
     expect(byId(exact, 'mango-delight-box').sizes.map((s) => s.price)).toEqual([599, 1250, 1900]) // 9999 is not a discount
-    expect(byId(exact, 'chocolate-delight-box').offer).toEqual({ id: 'o1', badge: null, was: null }) // in the offer, no exact price: badge only
+    expect(byId(exact, 'chocolate-delight-box').offer).toMatchObject({ id: 'o1', badge: null, was: null }) // in the offer, no exact price: badge only
     const badgeOnly = byId(applyOfferPrices(products, [offer({ deal: null })]), 'pista-bar')
     expect(badgeOnly).toMatchObject({ price: 450, offer: { was: null } })
     expect(byId(applyOfferPrices(products, [offer({ deal: { kind: 'amount', value: 5000 } })]), 'pista-bar').price).toBe(1)
@@ -313,6 +316,7 @@ describe('“every product on the website” (e.g. 50% off everything)', () => {
     const r = await act(s, 'saveOffer', rajyotsava({ items: { all: true }, deal: { kind: 'percent', value: 50 }, startsOn: '2026-10-26', endsOn: '2026-10-27' }))
     expect(r.body.offers.find((o) => o.id === r.body.id).items).toMatchObject({ all: true })
     expect((await order([{ productId: 'almond-bar', selection: {}, qty: 1, unitPrice: 75 }], 165)).status).toBe(201)
-    expect((await order([{ productId: 'walnut-brownies', selection: { ragi: true }, qty: 1, unitPrice: 375 }], 465)).status).toBe(201) // 650/2 + ragi 50
+    // A percent off takes the ragi version's extra down too (27 Oct 2026): 650/2 + 50/2
+    expect((await order([{ productId: 'walnut-brownies', selection: { ragi: true }, qty: 1, unitPrice: 350 }], 440)).status).toBe(201)
   })
 })
