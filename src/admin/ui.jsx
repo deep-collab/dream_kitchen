@@ -57,7 +57,7 @@ export function useSave() {
     setState({ status: 'saving', message: '', fields: {} })
     const r = await fn()
     if (r.ok) setState({ status: 'saved', message: savedText, fields: {} })
-    else setState({ status: 'error', message: problem(r), fields: r.fields || {} })
+    else setState({ status: 'error', message: problem(r, { saving: true }), fields: r.fields || {} })
     return r
   }, [])
   const reset = useCallback(() => setState({ status: 'idle', message: '', fields: {} }), [])
