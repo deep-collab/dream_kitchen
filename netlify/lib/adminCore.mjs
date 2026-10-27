@@ -5,7 +5,7 @@
 //   ctx: { send(messages), env: { hemaEmail, razorpay: { enabled, keyId }, resend, mode }, now() }
 // Every answer comes after the store has saved, so the page shows "Saved" only when it is true.
 import { categories as CATEGORIES, products as CONFIG_PRODUCTS, courier as COURIER } from '../../src/config/shop.js'
-import { applyOverrides, applySettings, CUSTOM_CATEGORIES, isUpiId, PRODUCT_TEXT_MAX } from '../../src/lib/pricing.js'
+import { applyOverrides, applySettings, CUSTOM_CATEGORIES, isUpiId, PRODUCT_TEXT_MAX, SIZE_LIMITS } from '../../src/lib/pricing.js'
 import { sizeLabel } from '../../src/lib/weights.js'
 import { stateName } from '../../src/data/states.js'
 import { photos } from '../../src/data/photos.js'
@@ -20,7 +20,9 @@ import { BOOKING_NEXT, bookingAction, bookingSummary, classAvailability, classCo
 import { bookingsCsv, dateRange, istDate, istStart, monthlySummary, monthRange, ordersCsv } from './reports.mjs'
 import { customerBooking, customerBookingCancelled, customerStatus } from './emailTemplates.mjs'
 import { fromDataUrl, MIME } from './images.mjs'
-import { istToday, LINK_PATTERN, OFFER_MAX, offerStatus, PAGE_PHOTOS } from '../../src/lib/offers.js'
+import { cleanDeal, cleanItems, DEAL_MAX, istToday, LINK_PATTERN, OFFER_MAX, offerStatus, orderSavings, PAGE_PHOTOS, RAJYOTSAVA } from '../../src/lib/offers.js'
+import { rajyotsavaRow } from '../../src/lib/rajyotsava.js'
+import { backgroundErrors, BACKGROUND_THEMES, cleanBackground, cleanConfig } from '../../src/lib/siteConfig.js'
 
 export const IDLE_DAYS = 30
 const clean = (v, max) => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max)
@@ -90,6 +92,8 @@ async function orderDetail(store, code) {
     courierTier: row.courier_tier,
     items,
     subtotal: row.subtotal,
+    // What an offer took off (e.g. Rajyotsava 50% off): the regular subtotal and the saving
+    savings: orderSavings(row.items),
     courier: row.courier,
     notes: row.notes,
     adminNotes: row.admin_notes,
@@ -147,7 +151,7 @@ async function menu(store) {
       custom: Boolean(p.custom),
       courierTier: p.courierTier,
       category: p.category,
-      sizes: (p.sizes || []).map((s) => ({ id: s.id, label: sizeLabel(s).en, price: s.price, grams: s.grams || null })),
+      sizes: (p.sizes || []).map((s) => ({ id: s.id, label: sizeLabel(s).en, price: s.price, grams: s.grams || null, courierTier: s.courierTier || p.courierTier })),
       price: p.price ?? null,
       ragiPrice: p.ragiPrice ?? null,
       soldOut: Boolean(p.soldOut),
@@ -207,10 +211,15 @@ export function productPatch(body, base = CONFIG_PRODUCTS.find((p) => p.id === b
   price(body.ragiPrice, 'ragi_price')
   if (Array.isArray(body.sizes)) {
     const sizes = sizesFrom(body.sizes)
-    if (!sizes.length || sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) fields.sizes = 'price'
-    else if (base.custom && sizes.some((s) => !s.label)) fields.sizes = 'needLabels'
-    else if (new Set(sizes.map((s) => s.id)).size !== sizes.length) fields.sizes = 'duplicate'
+    const problem = body.sizes.length > SIZE_LIMITS.count ? 'tooMany' : sizeProblem(sizes)
+    if (problem || !sizes.length) fields.sizes = problem || 'price'
     else patch.sizes = sizes
+    // Her own product changing from one price to sizes: the one price goes
+    if (!problem && base.custom && body.price === undefined) patch.price = null
+  } else if (base.custom && body.sizes === null) {
+    // Her own product changing from sizes to one price ("No sizes")
+    patch.sizes = null
+    if (body.price === undefined) fields.price = 'price'
   }
   if (bool(body.soldOut) !== undefined) patch.sold_out = body.soldOut
   if (bool(body.active) !== undefined) patch.active = body.active
@@ -222,14 +231,31 @@ export function productPatch(body, base = CONFIG_PRODUCTS.find((p) => p.id === b
   return patch
 }
 
-/** Sizes from the admin page: [{ id?, label, grams?, price }] -> the sizes column */
+/**
+ * Sizes from the admin page, in Hema's order: [{ id?, label, grams?, price, courierTier? }] -> the
+ * sizes column (any number up to SIZE_LIMITS.count: 100 g, 250 g, 1 kg, 6 pieces, small tin…). Each
+ * size may have its own courier tier; without one it uses the product's.
+ */
 function sizesFrom(list) {
-  return list.slice(0, 6).map((s, i) => ({
+  return list.slice(0, SIZE_LIMITS.count).map((s, i) => ({
     id: clean(s.id || `size-${i + 1}`, 20).toLowerCase().replace(/[^a-z0-9-]/g, '-') || `size-${i + 1}`,
-    ...(clean(s.label, 24) ? { label: clean(s.label, 24) } : {}),
+    ...(clean(s.label, SIZE_LIMITS.label) ? { label: clean(s.label, SIZE_LIMITS.label) } : {}),
     ...(Number.isInteger(s.grams) && s.grams > 0 && s.grams < 10000 ? { grams: s.grams } : {}),
     price: s.price,
+    ...(COURIER.tiers.includes(s.courierTier) ? { courierTier: s.courierTier } : {}),
   }))
+}
+
+/**
+ * What is wrong with a list of sizes, or null: 'price' (every size needs a price above ₹0),
+ * 'needLabels' (a name each, e.g. "250 g" or "small tin"), 'duplicate' (two sizes with the same name)
+ */
+function sizeProblem(sizes) {
+  if (sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) return 'price'
+  if (sizes.some((s) => !s.label)) return 'needLabels'
+  const names = sizes.map((s) => (s.label || s.id).toLowerCase().replace(/\s+/g, ''))
+  if (new Set(names).size !== sizes.length || new Set(sizes.map((s) => s.id)).size !== sizes.length) return 'duplicate'
+  return null
 }
 
 /**
@@ -241,15 +267,17 @@ async function addProduct(store, body) {
   const fields = {}
   const patch = {}
   if (!CUSTOM_CATEGORIES.includes(body.category)) fields.category = 'required'
-  if (!COURIER.tiers.includes(body.courierTier)) fields.courierTier = 'required'
   textPatch({ name: body.name || {}, description: body.description }, true, patch, fields)
   const hasSizes = Array.isArray(body.sizes) && body.sizes.length > 0
+  // With sizes, each size has its own courier tier; the product's is the first size's unless given
+  const sizeTier = hasSizes ? body.sizes.find((s) => COURIER.tiers.includes(s?.courierTier))?.courierTier : null
+  const courierTier = COURIER.tiers.includes(body.courierTier) ? body.courierTier : sizeTier
+  if (!courierTier) fields.courierTier = 'required'
   if (hasSizes) {
     const sizes = sizesFrom(body.sizes)
-    if (sizes.some((s) => !Number.isInteger(s.price) || s.price <= 0 || s.price > 100000)) fields.sizes = 'price'
-    else if (sizes.some((s) => !s.label)) fields.sizes = 'needLabels'
-    else if (new Set(sizes.map((s) => s.id)).size !== sizes.length) fields.sizes = 'duplicate'
-    else patch.sizes = sizes
+    const problem = body.sizes.length > SIZE_LIMITS.count ? 'tooMany' : sizeProblem(sizes)
+    if (problem) fields.sizes = problem
+    else patch.sizes = sizes.map((s) => ({ ...s, courierTier: s.courierTier || courierTier }))
   } else if (!Number.isInteger(body.price) || body.price <= 0 || body.price > 100000) fields.price = 'price'
   else patch.price = body.price
   // A ragi version: the extra price on top of the product's price
@@ -273,7 +301,7 @@ async function addProduct(store, body) {
       name_en: patch.display_name.en,
       name_kn: patch.display_name.kn || '',
       options: {},
-      courier_tier: body.courierTier,
+      courier_tier: courierTier,
       sort,
       image: null,
       custom: true,
@@ -374,12 +402,28 @@ function offerView(row, today) {
     messageKn: kn(row.message),
     buttonEn: row.button?.en || '',
     buttonKn: kn(row.button),
+    badgeEn: row.badge?.en || '',
+    badgeKn: kn(row.badge),
     link: row.link || '',
+    items: cleanItems(row.items) || { categories: [], products: [] },
+    deal: cleanDeal(row.deal),
     photo: row.photo_url || null,
+    photoPhone: row.photo_phone_url || null,
     startsOn: row.starts_on,
     endsOn: row.ends_on,
     active,
     status: offerStatus({ active, startsOn: row.starts_on, endsOn: row.ends_on }, today),
+  }
+}
+
+/** What an offer can hold: the menu sections, and every product on the menu with its prices */
+async function offerChoices(store) {
+  const products = await menu(store)
+  return {
+    categories: CATEGORIES.filter((c) => !c.hidden).map((c) => ({ id: c.id, name: c.name.en })),
+    products: products
+      .filter((p) => p.active)
+      .map((p) => ({ id: p.id, name: p.name, category: p.category, price: p.price, sizes: p.sizes.map((s) => ({ id: s.id, label: s.label, price: s.price })) })),
   }
 }
 
@@ -394,16 +438,74 @@ const byStatus = (a, b) => {
 
 async function offerList(store, ctx) {
   const today = istToday(ctx.now())
-  const [rows, links] = await Promise.all([store.listOffers(), offerLinks(store)])
-  return { offers: (rows || []).map((r) => offerView(r, today)).sort(byStatus), today, links }
+  const [rows, links, choices] = await Promise.all([store.listOffers(), offerLinks(store), offerChoices(store)])
+  // The Rajyotsava offer has its own card at the top (its switch, dates and percent), not in the list
+  const festival = (rows || []).find((r) => r.id === RAJYOTSAVA.id)
+  return {
+    offers: (rows || []).filter((r) => r.id !== RAJYOTSAVA.id).map((r) => offerView(r, today)).sort(byStatus),
+    rajyotsava: rajyotsavaView(festival, today),
+    today,
+    links,
+    choices,
+  }
+}
+
+/* ---------------- the Kannada Rajyotsava offer (its own card in admin -> Offers) ---------------- */
+
+/** The card: on/off, dates, percent, and whether the drawing add-on is discounted too */
+function rajyotsavaView(row, today) {
+  const deal = cleanDeal(row?.deal)
+  const active = row ? row.active !== false : false
+  const startsOn = row?.starts_on || RAJYOTSAVA.startsOn
+  const endsOn = row?.ends_on || RAJYOTSAVA.endsOn
+  return {
+    id: RAJYOTSAVA.id,
+    exists: Boolean(row),
+    active,
+    startsOn,
+    endsOn,
+    percent: deal?.kind === 'percent' ? deal.value : RAJYOTSAVA.percent,
+    drawing: Boolean(deal?.drawing),
+    status: row ? offerStatus({ active, startsOn, endsOn }, today) : 'off',
+  }
+}
+
+/**
+ * Hema's changes to the Rajyotsava offer: { active, startsOn, endsOn, percent, drawing }. It always
+ * holds every product; the words follow the percent. If the row is missing (e.g. a database set up
+ * without the migration's row) it is put back with its fixed id.
+ */
+export function rajyotsavaPatch(body, today) {
+  const fields = {}
+  if (bool(body.active) === undefined) fields.active = 'required'
+  if (!isISODate(body.startsOn)) fields.startsOn = 'required'
+  if (!isISODate(body.endsOn)) fields.endsOn = 'required'
+  else if (isISODate(body.startsOn) && body.endsOn < body.startsOn) fields.endsOn = 'beforeStart'
+  else if (body.active && body.endsOn < today) fields.endsOn = 'past'
+  if (!Number.isInteger(body.percent) || body.percent < 1 || body.percent > DEAL_MAX.percent) fields.percent = 'percent'
+  if (Object.keys(fields).length) throw new HttpError(400, 'fields', { fields })
+  const { id, ...row } = rajyotsavaRow({ percent: body.percent, startsOn: body.startsOn, endsOn: body.endsOn, active: body.active, drawing: body.drawing === true })
+  return { id, row }
+}
+
+async function saveRajyotsava(store, body, ctx) {
+  const { id, row } = rajyotsavaPatch(body, istToday(ctx.now()))
+  const exists = (await store.listOffers()).some((o) => o.id === id)
+  // The photos stay as they are (the Rajyotsava banner draws its own picture)
+  const { photo_url, photo_phone_url, ...patch } = row // eslint-disable-line no-unused-vars
+  if (exists) await store.updateOffer(id, patch)
+  else await store.insertOffer({ id, ...row })
 }
 
 /**
  * Hema's offer form -> the offers columns.
- *   { id?, title: { en, kn }, message?: { en, kn }, button?: { en, kn }, link, startsOn, endsOn, active? }
+ *   { id?, title: { en, kn }, message?: { en, kn }, button?: { en, kn }, link, startsOn, endsOn, active?,
+ *     items?: { categories, products }, deal?: (src/lib/offers.js cleanDeal) | null, badge?: { en, kn } }
  * The English title is needed; Kannada is optional everywhere (the English shows instead).
+ * Products and sections must be on the menu; a special price needs products, and an exact price
+ * only for products in the offer.
  */
-export function offerPatch(body, links, today) {
+export function offerPatch(body, links, today, choices = null) {
   const fields = {}
   const pair = (v, max, key, required) => {
     const en = clean(v?.en, max)
@@ -426,23 +528,102 @@ export function offerPatch(body, links, today) {
   else if (isISODate(body.startsOn) && body.endsOn < body.startsOn) fields.endsOn = 'beforeStart'
   else if (body.endsOn < today) fields.endsOn = 'past'
   if (bool(body.active) !== undefined) patch.active = body.active
+
+  // The offer's products, special price and badge (26 Oct 2026). Left out = unchanged.
+  if (body.items !== undefined) {
+    const items = cleanItems(body.items)
+    const knownCat = new Set(choices?.categories.map((c) => c.id) || [])
+    const knownProduct = new Set(choices?.products.map((p) => p.id) || [])
+    if (items && (items.categories.some((c) => !knownCat.has(c)) || items.products.some((p) => !knownProduct.has(p)))) fields.items = 'invalid'
+    patch.items = items
+  }
+  if (body.deal !== undefined) {
+    const deal = body.deal === null ? null : cleanDeal(body.deal)
+    const items = patch.items === undefined ? cleanItems(body.currentItems) : patch.items
+    if (body.deal !== null && !deal) fields.deal = 'invalid'
+    else if (deal && !items) fields.deal = 'noItems'
+    else if (deal?.kind === 'prices') {
+      const holds = (id) => items.all || items.products.includes(id) || items.categories.includes(choices?.products.find((p) => p.id === id)?.category)
+      if (Object.keys(deal.prices).some((id) => !holds(id))) fields.deal = 'notInOffer'
+    }
+    patch.deal = deal
+  }
+  if (body.badge !== undefined) patch.badge = pair(body.badge, OFFER_MAX.badge, 'badge', false)
   if (Object.keys(fields).length) throw new HttpError(400, 'fields', { fields })
   return patch
 }
 
 async function saveOffer(store, body, ctx) {
-  const patch = offerPatch(body, await offerLinks(store), istToday(ctx.now()))
-  if (!body.id) return (await store.insertOffer({ active: true, ...patch })).id
-  const id = offerId(body.id)
+  const id = body.id ? offerId(body.id) : null
+  const current = id ? (await store.listOffers()).find((o) => o.id === id) : null
+  if (id && !current) throw new HttpError(404, 'notFound')
+  const [links, choices] = await Promise.all([offerLinks(store), offerChoices(store)])
+  const patch = offerPatch({ ...body, currentItems: current?.items }, links, istToday(ctx.now()), choices)
+  if (!id) return (await store.insertOffer({ active: true, ...patch })).id
   if (!(await store.updateOffer(id, patch))) throw new HttpError(404, 'notFound')
   return id
 }
 
+/**
+ * The banner photo, cut on Hema's phone in two shapes (src/admin/CropPhoto.jsx): 'wide' (3:1, for
+ * computers; photo_url) and 'phone' (16:9; photo_phone_url, under offer-<id>-phone/), each sent on its own (1500 / 1200 px
+ * and a half-size copy). { image: null } removes both. A page from before the two shapes sends one
+ * square photo: it is the wide one, as before.
+ */
 async function offerPhoto(store, body, ctx) {
   const id = offerId(body.id)
   if (!(await store.listOffers()).some((o) => o.id === id)) throw new HttpError(404, 'notFound')
-  await store.updateOffer(id, { photo_url: body.image === null ? null : await storePhoto(store, `offer-${id}`, body, ctx) })
+  if (body.image === null) return store.updateOffer(id, { photo_url: null, photo_phone_url: null })
+  if (body.variant === 'phone') return store.updateOffer(id, { photo_phone_url: await storePhoto(store, `offer-${id}-phone`, body, ctx) })
+  await store.updateOffer(id, { photo_url: await storePhoto(store, `offer-${id}`, body, ctx) })
 }
+
+/* ---------------- developer options (admin -> More, hidden) ---------------- */
+
+/**
+ * May this account use the developer options? The developer always; Hema (the owner account) once
+ * the developer switched "Show to Hema" on. Checked here, on the server, for every developer
+ * action: hiding the buttons in the admin is only for looks.
+ */
+export async function devAllowed(store, user) {
+  if (user?.role === 'developer') return true
+  if (user?.role !== 'owner') return false
+  return cleanConfig(await store.getConfig().catch(() => ({}))).devAccess.owner
+}
+async function requireDev(store, user) {
+  if (!(await devAllowed(store, user))) throw new HttpError(403, 'notAllowed')
+}
+
+async function devConfig(store, user) {
+  const c = cleanConfig(await store.getConfig())
+  return { background: c.background, themes: BACKGROUND_THEMES, devAccess: c.devAccess, isDeveloper: user.role === 'developer' }
+}
+
+async function devAction(store, user, action, body, ctx) {
+  await requireDev(store, user)
+  switch (action) {
+    case 'devConfig':
+      return devConfig(store, user)
+    case 'saveBackground': {
+      const errors = backgroundErrors(body.background)
+      if (Object.keys(errors).length) throw new HttpError(400, 'fields', { fields: errors })
+      await store.setConfig('background', cleanBackground(body.background), user.email || null)
+      return devConfig(store, user)
+    }
+    case 'backgroundImage':
+      // Uploaded first and only used once the form is saved, so it can be previewed before
+      return { url: await storePhoto(store, 'background', body, ctx) }
+    case 'setDevAccess':
+      // Only the developer decides whether Hema sees these tools
+      if (user.role !== 'developer') throw new HttpError(403, 'notAllowed')
+      if (bool(body.owner) === undefined) throw new HttpError(400, 'badRequest')
+      await store.setConfig('devAccess', { owner: body.owner }, user.email || null)
+      return devConfig(store, user)
+    default:
+      throw new HttpError(400, 'badRequest')
+  }
+}
+export const DEV_ACTIONS = new Set(['devConfig', 'saveBackground', 'backgroundImage', 'setDevAccess'])
 
 /* ---------------- settings ---------------- */
 
@@ -639,11 +820,13 @@ async function monthly(store, body, ctx) {
 
 /* ---------------- the dispatcher ---------------- */
 
-export async function runAdminAction(store, user, action, body, ctx) {
+export async function runAdminAction(store, signedIn, action, body, ctx) {
+  const user = { ...signedIn, role: signedIn?.role || 'owner' }
   const settingsRow = () => store.getSettings()
+  if (DEV_ACTIONS.has(action)) return devAction(store, user, action, body, ctx)
   switch (action) {
     case 'me':
-      return { email: user.email, warnings: warnings(await settingsRow(), ctx), mode: ctx.env.mode }
+      return { email: user.email, role: user.role, dev: await devAllowed(store, user), warnings: warnings(await settingsRow(), ctx), mode: ctx.env.mode }
 
     case 'summary':
       return { summary: await summary(store, ctx), warnings: warnings(await settingsRow(), ctx) }
@@ -687,7 +870,12 @@ export async function runAdminAction(store, user, action, body, ctx) {
       if (bool(body.active) === undefined) throw new HttpError(400, 'badRequest')
       if (!(await store.updateOffer(offerId(body.id), { active: body.active }))) throw new HttpError(404, 'notFound')
       return offerList(store, ctx)
+    case 'saveRajyotsava':
+      await saveRajyotsava(store, body, ctx)
+      return offerList(store, ctx)
     case 'deleteOffer':
+      // The Rajyotsava offer is switched off, never deleted (the website knows it by its id)
+      if (String(body.id || '').toLowerCase() === RAJYOTSAVA.id) throw new HttpError(400, 'fields', { fields: { offer: 'fixed' } })
       if (!(await store.deleteOffer(offerId(body.id)))) throw new HttpError(404, 'notFound')
       return offerList(store, ctx)
     case 'offerPhoto':

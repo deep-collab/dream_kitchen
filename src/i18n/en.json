@@ -58,7 +58,22 @@
     "label": "Notice from Dream Kitchen",
     "offers": "Offers",
     "offerCta": "See offer",
-    "offerShow": "Show offer {n} of {count}"
+    "offerShow": "Show offer {n} of {count}",
+    "ends": "Ends {date}",
+    "shopOffer": "Shop the offer",
+    "zone": "Offer Zone",
+    "zoneLabel": "Offer Zone: {percent}% off everything",
+    "rajHello": "Happy Kannada Rajyotsava",
+    "rajOff": "{percent}% OFF",
+    "rajLine": "{percent}% off on everything",
+    "rajAllNovember": "All of November",
+    "rajTill": "Till {date}",
+    "rajOnline": "Online orders only",
+    "rajGo": "Go to Offer Zone",
+    "rajLater": "Maybe later",
+    "rajClose": "Close",
+    "rajZoneText": "Every item on the menu is {percent}% off, every size. Courier charges stay the same.",
+    "rajEverything": "on everything"
   },
   "units": {
     "g": "{n} g",
@@ -204,7 +219,15 @@
     "tabs": "Menu categories",
     "from": "from {price}",
     "priceSoon": "Price coming soon",
-    "soldOut": "Sold out"
+    "soldOut": "Sold out",
+    "offersTab": "Offers",
+    "offersAll": "All offer items",
+    "offerBadge": "Offer",
+    "wasPrice": "Regular price",
+    "fullMenu": "Show full menu",
+    "offerEnded": "This offer has ended",
+    "offerEndedText": "Have a look at the full menu.",
+    "offerEmpty": "These items are not on the menu right now."
   },
   "sheet": {
     "size": "Size",
@@ -462,7 +485,8 @@
     "track": "Track your order",
     "needPhone": "Enter the mobile number you ordered with to see this order.",
     "show": "Show my order",
-    "notFound": "We couldn’t find this order with that number. Check both, or WhatsApp us on {phone}."
+    "notFound": "We couldn’t find this order with that number. Check both, or WhatsApp us on {phone}.",
+    "regularPrice": "Regular price"
   },
   "track": {
     "title": "Track your order",

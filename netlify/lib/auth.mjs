@@ -31,5 +31,6 @@ export async function requireAdmin(req, store) {
   if (!(await store.auth.isAdmin(user.id))) throw new HttpError(403, 'notAdmin')
   if (await idleTooLong(store, user.id)) throw new HttpError(401, 'expired')
   await touchAdmin(store, user.id)
-  return user
+  // What this account may do (adminCore checks it for every action): 'owner', 'developer', ...
+  return { ...user, role: (await store.auth.role?.(user.id)) || 'owner' }
 }

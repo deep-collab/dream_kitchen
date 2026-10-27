@@ -65,8 +65,8 @@ export function stripKannada(code, id = 'data file') {
   return out
 }
 
-/** Files whose { en, kn } pairs are split: every src/data/*.js and the shop config */
-export const DATA_FILES = ['src/config/shop.js']
+/** Files whose { en, kn } pairs are split: every src/data/*.js, the shop config and the logo's words (site config) */
+export const DATA_FILES = ['src/config/shop.js', 'src/config/site.js']
 export const dataFiles = (root) => [
   ...readdirSync(resolve(root, 'src/data'))
     .filter((f) => f.endsWith('.js'))

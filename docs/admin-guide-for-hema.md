@@ -125,6 +125,14 @@ and everything in the parcel (no prices). Tap **Print**, or take a screenshot.
 
 Every product has its own card.
 
+**Sizes (any weight or size):** a product can have up to 12 sizes, like 100 g, 250 g, 1 kg, 6 pieces or small tin. Each
+size has its own **name**, **price** and **courier charge** (small, medium or large parcel). Tap **+ Add a size**, **✕** to
+remove one, and **↑ ↓** to change the order the website shows them in, then **Save**. Your own products can also be
+**No sizes: one fixed price**. Two sizes can't have the same name, and every size needs a price.
+
+**Cookie Tins:** a new section at the bottom of Menu. Tap **+ Add new product** there to add a cookie tin with its sizes,
+prices, photo and description. The Cookie Tins tab and the Home tile appear on the website once one is on the menu.
+
 **Change a price:** type the new price and tap **Save**. Wait for the green **Saved**.
 
 ![Changing a price](screenshots/admin/guide/09-menu-price.png)
@@ -186,28 +194,53 @@ the website, tap **Hide from menu**.
 
 ## 5. Offers: a banner on the website
 
-![Offers](screenshots/offers/13-offers-list.png)
+### Kannada Rajyotsava: 50% off everything (1 to 30 November)
 
-An offer is a black-and-gold banner at the very top of the website's Home page (and a slim strip on
-the Menu page). **Offers do not change prices.** If your offer has a special price, change it yourself
-in **Menu**, and change it back when the offer ends.
+At the top of **Offers** is its own card, **Rajyotsava 50% off**. It is already set up: every product on the website
+(every section and size, ragi versions too) is half price from 1 November 12:00 AM to 30 November 11:59 PM, for online
+orders. Prices are rounded to the nearest rupee. Courier charges, class fees and the drawing add-on stay at full price
+(tick **Also take 50% off the drawing add-on** if you want that too). While it is on, the website shows a Rajyotsava popup
+once per visit, an **Offer Zone 🎁** button at the top, a red-and-yellow banner on Home and a very faint Karnataka flag.
+
+- **Turn off this offer**: everything above stops at once, and normal prices come back. **Turn on this offer** brings it back.
+- Change the **dates** or the **%**, then tap **Save**. Before and after the dates, normal prices come back by themselves.
+- Every order shows the regular price, "Rajyotsava 50% off" and the price paid: on the order page, the packing slip,
+  Track Order and the emails.
+
+### Your other offers
+
+![Offers](screenshots/rajyotsava/admin-390-offers-list.png)
+
+An offer is a big black-and-gold banner, the first thing on the website's Home page (and a slim strip
+on the Menu page). It can hold **products**, and give them a **special price** for its dates only.
 
 **Add an offer:** tap **+ Add new offer**, then:
-1. **Title** in English (Kannada if you like), and a **short message** (optional).
-2. **Where the button goes**: a menu section, the Customize page or one product. The **button text**
-   is optional ("See offer" if empty).
-3. **Start date** and **end date**. Both days count: it shows from the morning of the start date to
-   the night of the end date.
-4. A **banner photo** if you like, and **On**.
-5. Check **How it looks on the website**, then tap **Add offer**.
+1. **Title** in English (Kannada if you like), and a short **offer line** (optional).
+2. **Products in this offer** (optional): tick **Every product on the website**, or whole menu
+   sections ("All of Delight Boxes"), or single products. (For "50% off everything": tick **Every
+   product on the website**, then **A percentage off** below and type **50**.) The banner's button then opens the menu showing **only these**, each with your
+   **badge** (e.g. "Rajyotsava offer"; empty = "Offer"). The menu also gets an **Offers** tab.
+3. **Special price** (optional, only with products): a percentage off (1 to 90%), rupees off each item, or an
+   exact offer price for each product and size. The table shows each regular price and the offer
+   price. Customers see the regular price crossed out, and the order is charged the offer price,
+   **only on the offer's dates**. After the end date the regular prices come back by themselves.
+   No special price: the products just get the badge.
+4. Without products: choose **where the button goes** (a menu section, the Customize page or one product).
+5. **Start date** and **end date**. Both days count: from the morning of the start date to the night
+   of the end date. Afterwards the banner goes away by itself.
+6. **Banner photo** (optional): a wide photo works best. You then move the photo inside two frames:
+   one for **computers (wide, 3:1)** and one for **phones (16:9)**, and zoom with the slider. What is
+   inside the frames is exactly what the website shows. Tap **Use this photo**.
+7. Check **How it looks on the website** (phone and computer), then tap **Add offer**.
 
-![A new offer](screenshots/offers/12-offer-form-filled.png)
+![A new offer with products and 15% off](screenshots/rajyotsava/admin-390-offer-form.png)
 
 Each offer in the list says **Live** (on the website now), **Scheduled** (it starts by itself on its
-start date), **Ended** or **Off**. **Edit** changes it, **Turn off** takes it off the website at once,
-**Delete** asks first and then removes it for good.
+start date), **Ended** or **Off**. **Edit** changes it, **Turn off** takes it off the website at once
+(and its prices go back to normal at once), **Delete** asks first and then removes it for good.
 
-![The banner on the website](screenshots/offers/20-home-banner-390-en.png)
+![The banner on the website](screenshots/rajyotsava/home-chromium-390-en.png)
+![Shop the offer: only the offer's products](screenshots/rajyotsava/offer-menu-chromium-390-en.png)
 
 ---
 

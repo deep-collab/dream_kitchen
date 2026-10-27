@@ -38,7 +38,9 @@ describe('the menu is exactly Hema’s list', () => {
   it('has no butter delight box, no cookies, no other bars and no combo', () => {
     const ids = products.map((p) => p.id).join(' ')
     expect(ids).not.toMatch(/butter|cookie|colour|classic|name-bar|combo|nutty-caramel/)
-    expect(categories.map((c) => c.id)).toEqual(['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates', 'customize'])
+    // Cookie Tins (27 Oct 2026): a section only Hema's own products fill, so the config has none in it
+    expect(categories.map((c) => c.id)).toEqual(['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates', 'cookie-tins', 'customize'])
+    expect(products.filter((p) => p.category === 'cookie-tins')).toEqual([])
   })
 
   it('lists the drawing bar only on the Customize page', () => {

@@ -168,8 +168,20 @@ export default function OrderDetail() {
                 <p className="font-bold">
                   {i.name.en} × {i.qty}
                 </p>
-                <p className="font-bold tabular-nums">{formatINR(i.lineTotal)}</p>
+                <p className="text-right font-bold tabular-nums">
+                  {i.offer && (
+                    <s className="block text-[0.9375rem] font-normal text-brown-2" data-admin-line-was>
+                      {formatINR(i.regularLineTotal)}
+                    </s>
+                  )}
+                  {formatINR(i.lineTotal)}
+                </p>
               </div>
+              {i.offer && (
+                <p className="t-small mt-0.5 font-bold text-[#8a1c14]" data-admin-line-offer>
+                  {i.offer.label?.en || 'Offer'}: {formatINR(i.regularUnitPrice)} → {formatINR(i.unitPrice)} each
+                </p>
+              )}
               <ul className="t-small mt-1 space-y-0.5">
                 {i.size && <li>Size: {i.size.label}</li>}
                 {i.ragi && <li>Ragi version</li>}
@@ -194,6 +206,18 @@ export default function OrderDetail() {
           ))}
         </ul>
         <dl className="mt-2 space-y-1">
+          {order.savings && (
+            <>
+              <div className="flex justify-between">
+                <dt>Items at the regular price</dt>
+                <dd className="tabular-nums">{formatINR(order.savings.regularSubtotal)}</dd>
+              </div>
+              <div className="flex justify-between font-bold text-[#8a1c14]" data-admin-order-saving>
+                <dt>{order.savings.labels.map((l) => l.en).join(', ')}</dt>
+                <dd className="tabular-nums">−{formatINR(order.savings.saved)}</dd>
+              </div>
+            </>
+          )}
           <div className="flex justify-between">
             <dt>Items (subtotal)</dt>
             <dd className="tabular-nums">{formatINR(order.subtotal)}</dd>

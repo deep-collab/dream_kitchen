@@ -64,7 +64,7 @@ export const adminCtx = () => ({
 })
 
 // What the website shows from /api/menu: after these, the website gets the change at once (lib/cdn.mjs)
-const CHANGES_MENU = new Set(['addProduct', 'updateProduct', 'productPhoto', 'updateSettings', 'pagePhoto', 'saveOffer', 'setOfferActive', 'deleteOffer', 'offerPhoto'])
+const CHANGES_MENU = new Set(['addProduct', 'updateProduct', 'productPhoto', 'updateSettings', 'pagePhoto', 'saveOffer', 'setOfferActive', 'saveRajyotsava', 'deleteOffer', 'offerPhoto', 'saveBackground'])
 
 export default handle(async (req, context) => {
   checkOrigin(req)

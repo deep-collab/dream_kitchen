@@ -133,6 +133,7 @@ export function problem(r) {
     expired: 'You haven’t used the admin for 30 days, so please log in again.',
     credentials: 'That email or password is not right.',
     notAdmin: 'This account is not allowed into the admin.',
+    notAllowed: 'This account is not allowed to do this.',
     tooMany: 'Too many tries. Please wait a few minutes and try again.',
     transition: 'This has moved on already. The page has been refreshed.',
     notFound: 'Not found. It may have been removed.',

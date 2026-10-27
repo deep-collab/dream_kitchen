@@ -739,7 +739,7 @@ const PARTS = [
       await r.say('**Tubs**: tap **+ Add a size**, type the size and price. These are only examples.', async () => {
         await r.show(tub)
         await r.tap(tub.getByRole('button', { name: '+ Add a size' }))
-        await r.type(tub.getByLabel('Size name').last(), '500 g', { delay: 70 })
+        await r.type(tub.getByLabel(/^Size \d+ name$/).last(), '500 g', { delay: 70 })
         await r.type(tub.getByLabel(/^Price for/).last(), '800', { delay: 120 })
       })
       await r.say('Tick **Show prices and allow ordering**, then **Save**.', async () => {

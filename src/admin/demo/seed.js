@@ -191,4 +191,36 @@ export async function seedDemo(store, setClock) {
   })
   await store.insertOffer({ title: { en: 'Weekend chocolate class: 2 seats left' }, message: null, button: null, link: '', starts_on: addDaysISO(today, -1), ends_on: addDaysISO(today, 2), active: false })
   await store.insertOffer({ title: { en: 'Navratri special Pista Bars' }, message: { en: 'Thank you for all your orders!' }, button: null, link: '', starts_on: addDaysISO(today, -20), ends_on: addDaysISO(today, -10) })
+
+  // Kannada Rajyotsava: the practice store starts with the real offer (50% off everything, all of
+  // November; admin -> Offers, its own card), as the database migration gives the live site.
+
+  // Cookie Tins (demo only, never on the live menu): one sample tin in three sizes, so Hema sees
+  // how a product with sizes, prices and courier charges looks
+  await store.upsertProducts([
+    {
+      id: 'butter-cookie-tin',
+      slug: 'butter-cookie-tin',
+      category: 'cookie-tins',
+      name_en: 'Butter Cookie Tin (sample)',
+      name_kn: 'ಬಟರ್ ಕುಕೀ ಟಿನ್ (ಮಾದರಿ)',
+      options: {},
+      courier_tier: 'small',
+      sort: 1,
+      image: null,
+      custom: true,
+      display_name: { en: 'Butter Cookie Tin (sample)', kn: 'ಬಟರ್ ಕುಕೀ ಟಿನ್ (ಮಾದರಿ)' },
+      description: { en: 'A sample product for the demo: crisp butter cookies in a gift tin.', kn: 'ಡೆಮೊಗಾಗಿ ಮಾದರಿ: ಉಡುಗೊರೆ ಟಿನ್‌ನಲ್ಲಿ ಗರಿಗರಿ ಬಟರ್ ಕುಕೀಗಳು.' },
+      sizes: [
+        { id: 'size-1', label: 'Small tin', price: 399, courierTier: 'small' },
+        { id: 'size-2', label: 'Medium tin', price: 699, courierTier: 'large' },
+        { id: 'size-3', label: 'Large tin', price: 999, courierTier: 'xl' },
+      ],
+      price: null,
+      ragi_price: null,
+      price_status: 'live',
+      active: true,
+      sold_out: false,
+    },
+  ])
 }

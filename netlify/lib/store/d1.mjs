@@ -51,8 +51,9 @@ function parseProduct(row) {
     options: row.options ? JSON.parse(row.options) : {},
     active: row.active === null || row.active === undefined ? null : Boolean(row.active),
     sold_out: row.sold_out === null || row.sold_out === undefined ? null : Boolean(row.sold_out),
-    // Hema's own products and her names / descriptions (d1/migrations/0002)
-    custom: Boolean(row.custom),
+    // Hema's own products and her names / descriptions (d1/migrations/0002); in a section added
+    // later (Cookie Tins) her products are stored with added = 1 instead (d1/migrations/0004)
+    custom: Boolean(row.custom || row.added),
     display_name: json(row.display_name),
     description: json(row.description),
   }
@@ -62,14 +63,28 @@ function parseProduct(row) {
 const PRODUCT_JSON = ['sizes', 'options', 'display_name', 'description']
 const PRODUCT_BOOL = ['active', 'sold_out', 'custom']
 const PRODUCT_PLAIN = ['slug', 'category', 'name_en', 'name_kn', 'price', 'ragi_price', 'courier_tier', 'price_status', 'sort', 'image', 'photo_url']
-const productValue = (k, v) => (PRODUCT_JSON.includes(k) ? (v ? JSON.stringify(v) : null) : PRODUCT_BOOL.includes(k) ? (v == null ? null : v ? 1 : 0) : (v ?? null))
+const productValue = (k, v) => (PRODUCT_JSON.includes(k) ? (v ? JSON.stringify(v) : null) : PRODUCT_BOOL.includes(k) || k === 'added' ? (v == null ? null : v ? 1 : 0) : (v ?? null))
+// The sections 0002's CHECK on products.custom allows; Hema's products in any other section (e.g.
+// Cookie Tins) are written as custom = 0, added = 1 (d1/migrations/0004), and read back as custom
+const CUSTOM_CHECKED = ['brownie-tubs', 'delight-boxes', 'brownies', 'chocolates']
+const forColumns = (r) => (r.custom === true && r.category && !CUSTOM_CHECKED.includes(r.category) ? { ...r, custom: false, added: true } : r)
 
 function parseOffer(row) {
   if (!row) return null
-  return { ...row, title: json(row.title), message: json(row.message), button: json(row.button), active: Boolean(row.active) }
+  return {
+    ...row,
+    title: json(row.title),
+    message: json(row.message),
+    button: json(row.button),
+    // d1/migrations/0003: the offer's products, special price and badge
+    items: json(row.items),
+    deal: json(row.deal),
+    badge: json(row.badge),
+    active: Boolean(row.active),
+  }
 }
-const OFFER_JSON = ['title', 'message', 'button']
-const OFFER_PLAIN = ['link', 'photo_url', 'starts_on', 'ends_on']
+const OFFER_JSON = ['title', 'message', 'button', 'items', 'deal', 'badge']
+const OFFER_PLAIN = ['link', 'photo_url', 'photo_phone_url', 'starts_on', 'ends_on']
 const offerValue = (k, v) => (OFFER_JSON.includes(k) ? (v ? JSON.stringify(v) : null) : k === 'active' ? (v ? 1 : 0) : (v ?? null))
 
 function parseSettings(row) {
@@ -114,9 +129,10 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
      *  reference columns (ensureProductRow, the seed) never wipes Hema's prices, names or photo */
     async upsertProducts(rows) {
       if (!rows.length) return
-      const stmts = rows.map((r) => {
+      const stmts = rows.map((input) => {
+        const r = forColumns(input)
         const row = { name_kn: '', options: {}, courier_tier: 'small', sort: 0, ...r }
-        const cols = [...PRODUCT_PLAIN, ...PRODUCT_JSON, ...PRODUCT_BOOL].filter((k) => k in row)
+        const cols = [...PRODUCT_PLAIN, ...PRODUCT_JSON, ...PRODUCT_BOOL, ...(r.added ? ['added'] : [])].filter((k) => k in row)
         const given = cols.filter((k) => k in r)
         return db
           .prepare(
@@ -154,8 +170,9 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
       return (res.results || []).map(parseOffer)
     },
 
-    async insertOffer(row) {
-      const id = crypto.randomUUID()
+    async insertOffer({ id: given, ...row }) {
+      // A given id: the Rajyotsava offer, put back by the admin if it was ever missing
+      const id = given || crypto.randomUUID()
       const offer = { active: true, link: '', ...row }
       const cols = [...OFFER_JSON, ...OFFER_PLAIN, 'active'].filter((k) => k in offer)
       await db
@@ -191,6 +208,25 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
         .bind(id, photoUrl ?? null, isoNow())
         .run()
       return db.prepare('SELECT * FROM page_photos WHERE id = ?').bind(id).first()
+    },
+
+    /* ---------- site settings of the developer options (d1/migrations/0003) ---------- */
+    /** { [key]: value } for every setting saved (a missing key = the built-in default) */
+    async getConfig() {
+      const res = await db.prepare('SELECT key, value FROM site_config').all()
+      return Object.fromEntries((res.results || []).map((r) => [r.key, JSON.parse(r.value)]))
+    },
+
+    /** Saves one setting; null takes it away (back to the default) */
+    async setConfig(key, value, by = null) {
+      if (value === null || value === undefined) {
+        await db.prepare('DELETE FROM site_config WHERE key = ?').bind(key).run()
+        return
+      }
+      await db
+        .prepare('INSERT INTO site_config (key, value, updated_at, updated_by) VALUES (?, ?, ?, ?) ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at, updated_by = excluded.updated_by')
+        .bind(key, JSON.stringify(value), isoNow(), by)
+        .run()
     },
 
     /* ---------- settings ---------- */
@@ -777,7 +813,17 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
       async isAdmin(userId) {
         if (!userId) return false
         const user = await db.prepare('SELECT id FROM admin_users WHERE id = ?').bind(userId).first()
-        return Boolean(user)
+        return Boolean(user) && (await this.role(userId)) !== 'disabled'
+      },
+
+      /** 'owner' | 'developer' | 'full' | 'orders_menu' | 'orders' | 'disabled' (d1/migrations/0003; before it: 'owner') */
+      async role(userId) {
+        try {
+          const row = await db.prepare('SELECT role FROM admin_users WHERE id = ?').bind(userId).first()
+          return row?.role || 'owner'
+        } catch {
+          return 'owner'
+        }
       },
 
       async lastSeen(userId) {
@@ -857,15 +903,17 @@ export function createD1Store(db, { r2Bucket = null, siteUrl = '' } = {}) {
         const adminCheck = await db.prepare('SELECT count(*) as c FROM admin_users').first()
         const settCheck = await db.prepare('SELECT count(*) as c FROM settings').first()
         const tables = Boolean(prodCheck && adminCheck && settCheck)
-        // The newest part (d1/migrations/0002): Hema's own products, offers and tile photos
+        // The newest parts: Hema's own products, offers and tile photos (d1/migrations/0002), offer
+        // products and prices and the site settings (0003), Cookie Tins and the Rajyotsava offer (0004)
         let update = false
         try {
-          await db.prepare('SELECT custom, display_name, description FROM products LIMIT 1').all()
-          await db.prepare('SELECT id FROM offers LIMIT 1').all()
+          await db.prepare('SELECT custom, display_name, description, added FROM products LIMIT 1').all()
+          await db.prepare('SELECT id, items, deal, badge FROM offers LIMIT 1').all()
           await db.prepare('SELECT id FROM page_photos LIMIT 1').all()
+          await db.prepare('SELECT key FROM site_config LIMIT 1').all()
           update = tables
         } catch {
-          /* the 0002 migration hasn't run: the setup check says so */
+          /* a migration hasn't run (0002, 0003 or 0004): the setup check says so */
         }
         return {
           reachable: true,

@@ -9,6 +9,8 @@
 // Hooks: persist(db) after every change; writeFile / readFile for uploads; publicUrl(path) for
 // product photos.
 
+import { rajyotsavaRow } from '../../../src/lib/rajyotsava.js'
+
 const clone = (v) => (v == null ? v : JSON.parse(JSON.stringify(v)))
 const uuid = () => globalThis.crypto.randomUUID()
 const hex = (n) => Array.from(globalThis.crypto.getRandomValues(new Uint8Array(n)), (b) => b.toString(16).padStart(2, '0')).join('')
@@ -51,8 +53,11 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
     blocks: [],
     rateLimits: {},
     heartbeat: { last_run_at: null, runs: 0 },
-    offers: [],
+    // A new database has the Rajyotsava offer, as the migration gives D1 and Supabase (d1/migrations/0004)
+    offers: [{ ...rajyotsavaRow(), created_at: '2026-10-27T00:00:00.000Z', updated_at: '2026-10-27T00:00:00.000Z' }],
     pagePhotos: {},
+    config: {},
+    roles: {},
     objects: {},
     publicObjects: {},
     sessions: {},
@@ -63,12 +68,14 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
   let db = { ...empty(), ...(initial || {}) }
   const save = () => persist(db)
   const iso = () => now().toISOString()
-  // Admin accounts: one from DK_DEV_ADMIN_* (dev), or a list (demo/tests)
+  // Admin accounts: one from DK_DEV_ADMIN_* (dev), or a list (demo/tests). role: 'owner' unless given
   const accounts = (admins || (admin.email ? [{ ...admin, id: '00000000-0000-4000-8000-00000000a0a0' }] : [])).map((a, i) => ({
     id: a.id || `00000000-0000-4000-8000-0000000000${String(i).padStart(2, '0')}`,
     email: String(a.email).toLowerCase(),
     password: a.password,
+    role: a.role || 'owner',
   }))
+  const roleOf = (id) => db.roles[id] || accounts.find((a) => a.id === id)?.role || 'owner'
   const passwordOf = (a) => db.passwords[a.id] ?? a.password
   const event = (list, ownerKey, ownerId, e) => {
     list.push({ id: db.nextEventId++, [ownerKey]: ownerId, at: iso(), kind: e.kind || 'status', from_status: e.from_status ?? null, to_status: e.to_status, by: e.by, note: e.note ?? null })
@@ -142,6 +149,18 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
       save()
       return clone(db.pagePhotos[id])
     },
+
+    /* ---------- site settings of the developer options ---------- */
+    async getConfig() {
+      return clone(Object.fromEntries(Object.entries(db.config || {}).map(([k, r]) => [k, r.value])))
+    },
+    async setConfig(key, value, by = null) {
+      db.config ||= {}
+      if (value === null || value === undefined) delete db.config[key]
+      else db.config[key] = { value: clone(value), updated_at: iso(), updated_by: by }
+      save()
+    },
+
     async updateSettings(patch) {
       db.settings = { ...db.settings, ...clone(patch), id: 1, updated_at: iso() }
       save()
@@ -410,7 +429,10 @@ export function createMemoryCore({ initial = null, now = () => new Date(), admin
         return s.user
       },
       async isAdmin(userId) {
-        return accounts.some((a) => a.id === userId)
+        return accounts.some((a) => a.id === userId) && roleOf(userId) !== 'disabled'
+      },
+      async role(userId) {
+        return roleOf(userId)
       },
       async lastSeen(userId) {
         return db.adminSeen[userId] || null

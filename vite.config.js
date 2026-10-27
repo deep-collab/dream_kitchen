@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { readSymbol, spriteMarkup } from './scripts/symbol.mjs'
 import { FONTS_EN, FONTS_KN, KN_FONTS_LINK_ID } from './src/config/fonts.js'
-import { site } from './src/config/site.js'
+import { logoLines, site } from './src/config/site.js'
 import kannadaSplit, { kannadaFileName } from './scripts/kannada-split.mjs'
 import stringsSplit from './scripts/strings-split.mjs'
 import { robotsTxt, sitemapXml } from './scripts/sitemap.mjs'
@@ -38,6 +38,8 @@ function dreamKitchenHtml() {
           .replaceAll('{{dk:viewBox}}', sym.viewBox)
           .replace('{{dk:tagline-en}}', escapeHtml(en.brand.tagline))
           .replace('{{dk:tagline-kn}}', escapeHtml(kn.brand.tagline))
+          .replace('{{dk:logo-kn-name}}', escapeHtml(logoLines(site.logo.name.kn).join('|')))
+          .replace('{{dk:logo-kn-sub}}', escapeHtml(logoLines(site.logo.tagline.kn).join('|')))
           .replace('{{dk:brand-aria}}', escapeHtml(en.brand.lockupLabel))
           .replaceAll('{{dk:fonts-en}}', escapeHtml(FONTS_EN))
           .replace('{{dk:fonts-kn}}', FONTS_KN)

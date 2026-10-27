@@ -107,6 +107,27 @@ const ART = {
       <path d="M114 36 q-6 6 -10 10 q4 1 9 -4 q3 -3 1 -6" />
     </>
   ),
+  // Cookie Tins: a round tin, its lid lifted and tilted, cookies with chocolate chips inside
+  'cookie-tin': (
+    <>
+      <ellipse cx="78" cy="76" rx="44" ry="11" />
+      <path d="M34 76 V116 Q78 136 122 116 V76" />
+      <path d="M34 96 Q78 113 122 96" opacity=".7" />
+      <path d="M34 104 Q78 121 122 104" opacity=".7" />
+      <path d="M46 104 l6 -4 l6 4 l-6 4Z M70 108 l6 -4 l6 4 l-6 4Z M94 107 l6 -4 l6 4 l-6 4Z" opacity=".65" />
+      <ellipse cx="58" cy="71" rx="13" ry="5.5" transform="rotate(-10 58 71)" />
+      <ellipse cx="80" cy="68" rx="13" ry="5.5" transform="rotate(6 80 68)" />
+      <ellipse cx="101" cy="72" rx="12" ry="5" transform="rotate(-4 101 72)" />
+      <circle cx="55" cy="70" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="62" cy="72" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="78" cy="67" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="85" cy="69" r="1.5" fill="currentColor" stroke="none" />
+      <circle cx="99" cy="71" r="1.5" fill="currentColor" stroke="none" />
+      <ellipse cx="88" cy="40" rx="46" ry="11" transform="rotate(-9 88 40)" />
+      <path d="M42.5 47 l1 7 Q90 64 134.5 41 l-1.5 -7" transform="rotate(-1 88 50)" opacity=".85" />
+      <path d="M78 33 q10 -6 20 -1" opacity=".7" />
+    </>
+  ),
   // Chocolate classes: a mixing bowl of melted chocolate, a whisk, and a mould tray in front
   class: (
     <>
@@ -148,7 +169,7 @@ function Sparkle({ x, y, s = 1 }) {
 export const ART_KINDS = Object.keys(ART)
 
 /**
- * kind: tub | delight-box | brownie-box | bar | drawing-bar | assortment | class
+ * kind: tub | delight-box | brownie-box | bar | drawing-bar | cookie-tin | assortment | class
  * label: pass a description when the image is meaningful on its own; omit when the
  *        product name sits right beside it (then the tile is decorative).
  */

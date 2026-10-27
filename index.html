@@ -66,6 +66,8 @@
            defined once here so the loader can hand its lockup to the hero exactly. */
         .dk-lockup { --lk: 40px; display: flex; flex-direction: column; align-items: center; text-align: center; color: #d4af37; }
         @media (min-width: 768px) { .dk-lockup--hero { --lk: 52px; } }
+        /* Short phones (e.g. 360 x 640): a slightly smaller logo, so an offer banner above it leaves "Order now" on the first screen */
+        @media (max-width: 767px) and (max-height: 700px) { .dk-lockup--hero { --lk: 30px; } }
         @media (min-width: 1024px) { .dk-lockup--hero { --lk: 54px; } }
         .dk-lockup--sm { --lk: 26px; }
         .dk-lockup__symbol { display: block; width: calc(var(--lk) * 2.55); height: auto; aspect-ratio: 220.3 / 213; overflow: visible; }
@@ -76,10 +78,15 @@
         .dk-lockup__sub span { display: block; }
         .dk-lockup__sub .dk-lockup__ruled { display: flex; align-items: center; justify-content: center; gap: 0.7em; }
         .dk-lockup__ruled::before, .dk-lockup__ruled::after { content: ""; width: 2.4em; height: 1px; background: currentColor; opacity: 0.75; }
+        /* The logo in Kannada (src/config/site.js logoKn): same lockup, Noto Serif Kannada, no capitals or wide tracking (they break Kannada letters) */
+        .dk-lockup--kn .dk-lockup__name { font-family: "Noto Serif Kannada", "Noto Sans Kannada", Georgia, serif; text-transform: none; font-size: calc(var(--lk) * 0.84); line-height: 1.2; letter-spacing: 0; padding-left: 0; }
+        .dk-lockup--kn .dk-lockup__sub { font-family: "Noto Serif Kannada", "Noto Sans Kannada", Georgia, serif; text-transform: none; font-size: calc(var(--lk) * 0.36); line-height: 1.45; letter-spacing: 0.03em; padding-left: 0.03em; margin-top: calc(var(--lk) * 0.16); }
+        .dk-lockup--kn .dk-lockup__ruled::before, .dk-lockup--kn .dk-lockup__ruled::after { width: 1.6em; }
         .dk-tagline { margin: 0 auto; max-width: 15em; padding-bottom: 0.08em; font-family: "Cormorant Garamond", Garamond, "Times New Roman", Georgia, serif; font-style: italic; font-weight: 600; font-size: 26px; line-height: 1.22; text-wrap: balance; text-align: center; background: linear-gradient(180deg, #ebd27a 0%, #d4af37 60%, #c9a227 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
         @media (min-width: 1024px) { .dk-tagline { font-size: 32px; max-width: none; } }
         .dk-tagline:lang(kn) { font-family: "Noto Serif Kannada", "Cormorant Garamond", Georgia, serif; font-style: normal; font-size: 21px; line-height: 1.55; max-width: 17em; }
         @media (min-width: 1024px) { .dk-tagline:lang(kn) { font-size: 26px; max-width: none; } }
+        @media (max-width: 767px) and (max-height: 700px) { .dk-tagline { font-size: 23px; } .dk-tagline:lang(kn) { font-size: 18px; line-height: 1.45; } }
         .dk-tagline.dk-tagline--footer { font-size: 22px; max-width: 16em; }
         .dk-tagline.dk-tagline--footer:lang(kn) { font-size: 18px; }
         @media (min-width: 1024px) { .dk-tagline.dk-tagline--footer { margin-left: 0; text-align: left; } }
@@ -140,8 +147,8 @@
             <use href="#dk-symbol" class="dk-intro__draw" />
             <use href="#dk-symbol" fill="url(#dk-shine)" />
           </svg>
-          <p class="dk-lockup__name dk-intro__word"><span>Dream</span><span>Kitchen</span></p>
-          <p class="dk-lockup__sub dk-intro__word"><span class="dk-lockup__ruled">Handmade</span><span>Chocolates</span></p>
+          <p class="dk-lockup__name dk-intro__word" id="dk-intro-name" data-kn="{{dk:logo-kn-name}}"><span>Dream</span><span>Kitchen</span></p>
+          <p class="dk-lockup__sub dk-intro__word" id="dk-intro-sub" data-kn="{{dk:logo-kn-sub}}"><span class="dk-lockup__ruled">Handmade</span><span>Chocolates</span></p>
         </div>
         <p class="dk-tagline dk-intro__tag" id="dk-intro-tag" data-kn="{{dk:tagline-kn}}">{{dk:tagline-en}}</p>
       </div>
@@ -165,6 +172,15 @@
         if (html.lang === 'kn') {
           tag.textContent = tag.getAttribute('data-kn')
           tag.setAttribute('lang', 'kn')
+          // The logo in Kannada too ("line one|line two"), as the hero shows it
+          lockup.classList.add('dk-lockup--kn')
+          ;['dk-intro-name', 'dk-intro-sub'].forEach(function (id) {
+            var p = document.getElementById(id)
+            var lines = (p.getAttribute('data-kn') || '').split('|')
+            p.setAttribute('lang', 'kn')
+            p.children[0].textContent = lines[0] || ''
+            p.children[1].textContent = lines[1] || ''
+          })
         }
 
         var start = performance.now()

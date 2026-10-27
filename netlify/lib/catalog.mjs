@@ -1,10 +1,13 @@
 // The menu and settings as they are right now: src/config/shop.js with Hema's admin changes
 // on top, through the SAME applyOverrides / applySettings the website uses (src/lib/pricing.js).
 // The `menu` function sends the website exactly the inputs used here, so both sides price alike.
+// Live offers with a special price lower their products' prices here too (applyOfferPrices, by
+// today's Indian date), exactly as the website shows them, and only on the offer's dates.
 import { courier, leadTimes, payment, products as CONFIG_PRODUCTS } from '../../src/config/shop.js'
 import { applyOverrides, applySettings } from '../../src/lib/pricing.js'
 import { config } from './env.mjs'
-import { istToday } from '../../src/lib/offers.js'
+import { allLiveOffers, applyOfferPrices, istToday } from '../../src/lib/offers.js'
+import { publicConfig } from '../../src/lib/siteConfig.js'
 
 const has = (v) => v !== null && v !== undefined
 
@@ -56,13 +59,23 @@ export const productRow = (p) => ({
   image: p.art || null,
 })
 
-/** Everything a price check needs, read fresh from the store */
-export async function loadCatalog(store) {
-  const [rows, settingsRow] = await Promise.all([store.listProducts(), store.getSettings()])
+// Offers and the developer options' settings are extras: if they can't be read (e.g. before the
+// owner ran a migration) the menu and ordering still work, just without them
+const extra = (read, fallback) => Promise.resolve().then(read).catch((e) => (console.warn('[catalog] extra data unavailable:', e?.message), fallback))
+
+/** Everything a price check needs, read fresh from the store (`now` decides which offers are live) */
+export async function loadCatalog(store, now = new Date()) {
+  const [rows, settingsRow, offerRows, configMap] = await Promise.all([
+    store.listProducts(),
+    store.getSettings(),
+    extra(() => store.listOffers(), []),
+    extra(() => store.getConfig?.() ?? {}, {}),
+  ])
   const overrides = (rows || []).map(rowToOverride).filter((o) => Object.keys(o).length > 1)
-  const products = applyOverrides(CONFIG_PRODUCTS, overrides)
+  const offers = publicOffers(offerRows, now)
+  const products = applyOfferPrices(applyOverrides(CONFIG_PRODUCTS, overrides), allLiveOffers(offers, istToday(now)))
   const settings = applySettings(rowToSettings(settingsRow || {}), settingsBase())
-  return { products, productsById: Object.fromEntries(products.map((p) => [p.id, p])), overrides, settings, settingsRow: settingsRow || {} }
+  return { products, productsById: Object.fromEntries(products.map((p) => [p.id, p])), overrides, settings, settingsRow: settingsRow || {}, offers, config: configMap || {} }
 }
 
 /**
@@ -101,8 +114,24 @@ export function publicOffers(rows, now = new Date()) {
   const soon = istToday(new Date(now.getTime() + 10 * 60_000))
   return (rows || [])
     .filter((r) => r.active !== false && r.ends_on >= today && r.starts_on <= soon)
-    .map((r) => ({ id: r.id, title: r.title, message: r.message || null, button: r.button || null, link: r.link || '', photo: r.photo_url || null, startsOn: r.starts_on, endsOn: r.ends_on }))
+    .map((r) => ({
+      id: r.id,
+      title: r.title,
+      message: r.message || null,
+      button: r.button || null,
+      link: r.link || '',
+      photo: r.photo_url || null,
+      photoPhone: r.photo_phone_url || null,
+      badge: r.badge || null,
+      items: r.items || null,
+      deal: r.deal || null,
+      startsOn: r.starts_on,
+      endsOn: r.ends_on,
+    }))
 }
+
+/** The developer options' settings the website needs (src/lib/siteConfig.js publicConfig) */
+export const publicSiteConfig = (map) => publicConfig(map || {})
 
 /** The Customize tiles' photos Hema changed: { [tile]: address } */
 export const publicPagePhotos = (rows) => Object.fromEntries((rows || []).filter((r) => r.photo_url).map((r) => [r.id, r.photo_url]))

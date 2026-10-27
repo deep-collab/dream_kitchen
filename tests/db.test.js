@@ -153,7 +153,7 @@ describe('the database’s own rules', () => {
   it('RLS is on for every table', async () => {
     const r = await db.query(`select relname, relrowsecurity from pg_class where relnamespace = 'public'::regnamespace and relkind = 'r' order by relname`)
     expect(r.rows.every((x) => x.relrowsecurity)).toBe(true)
-    expect(r.rows.map((x) => x.relname)).toEqual(['admin_users', 'booking_events', 'class_blocks', 'class_bookings', 'class_enquiries', 'heartbeat', 'offers', 'order_events', 'orders', 'page_photos', 'products', 'rate_limits', 'settings'])
+    expect(r.rows.map((x) => x.relname)).toEqual(['admin_users', 'booking_events', 'class_blocks', 'class_bookings', 'class_enquiries', 'heartbeat', 'offers', 'order_events', 'orders', 'page_photos', 'products', 'rate_limits', 'settings', 'site_config'])
   })
 })
 
@@ -307,7 +307,8 @@ describe('offers and Customize tile photos (20261023000001_offers_and_page_photo
 
   it('Hema reads all of them', async () => {
     const r = await asRole(db, 'authenticated', HEMA, (tx) => tx.query('select * from public.offers'))
-    expect(titles(r.rows)).toEqual(['Later', 'Live', 'Over', 'Switched off', 'Today only'])
+    // + the Rajyotsava offer the 20261027000001 migration adds
+    expect(titles(r.rows)).toEqual(['Happy Kannada Rajyotsava', 'Later', 'Live', 'Over', 'Switched off', 'Today only'])
   })
 
   it('only Hema may add, change or delete an offer', async () => {

@@ -31,8 +31,10 @@ export default function Home() {
   const menu = useMenu()
   const pagePhotos = usePagePhotos()
   const bar = menu.productsById['drawing-chocolate-bar']
+  // A section Hema fills herself (Cookie Tins) shows the photo of its first product
+  const tilePhoto = (c) => TILE_PHOTO[c.id] || menu.products.find((p) => p.category === c.id)?.slug
   const tiles = [
-    ...menu.categories.map((c) => ({ key: c.id, to: `/menu#${c.id}`, label: pick(c.name), slug: TILE_PHOTO[c.id], art: c.art })),
+    ...menu.categories.map((c) => ({ key: c.id, to: `/menu#${c.id}`, label: pick(c.name), slug: tilePhoto(c), art: c.art })),
     { key: 'customize', to: '/customize', label: t('nav.customize'), slug: 'drawing-chocolate-bar', art: 'drawing-bar', photo: pagePhotos['home-customize'] },
     { key: 'classes', to: '/classes', label: t('nav.classes'), slug: 'classes', art: 'class' },
   ]
@@ -46,13 +48,22 @@ export default function Home() {
           </h2>
           <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5">
             {tiles.map((tile, i) => (
-              <li key={tile.key}>
+              // An odd last tile (7 with Cookie Tins) spans the row, so the grid stays even
+              <li key={tile.key} className={i === tiles.length - 1 ? `${tiles.length % 2 ? 'max-sm:col-span-2' : ''} ${tiles.length % 3 === 1 ? 'sm:col-span-3' : ''}` : undefined}>
                 <Link
                   to={tile.to}
                   data-dk-tile
                   className="group block overflow-hidden rounded-card border border-line bg-[#fffcf5] transition-shadow hover:shadow-[0_6px_24px_-12px_rgb(42_29_22/0.35)]"
                 >
-                  <ProductPhoto slug={tile.slug} photo={tile.photo} art={tile.art} eager={i < 2} rounded="rounded-none" sizes="(min-width: 640px) 33vw, 50vw" className="aspect-[4/3] w-full" />
+                  <ProductPhoto
+                    slug={tile.slug}
+                    photo={tile.photo}
+                    art={tile.art}
+                    eager={i < 2}
+                    rounded="rounded-none"
+                    sizes="(min-width: 640px) 33vw, 50vw"
+                    className={`w-full ${i === tiles.length - 1 && tiles.length % 2 ? 'aspect-[8/3] sm:aspect-[4/3]' : 'aspect-[4/3]'} ${i === tiles.length - 1 && tiles.length % 3 === 1 ? 'sm:aspect-[4/1]' : ''}`}
+                  />
                   <span className="flex min-h-12 items-center px-3 py-2 leading-snug font-bold group-hover:underline sm:px-4">{tile.label}</span>
                 </Link>
               </li>

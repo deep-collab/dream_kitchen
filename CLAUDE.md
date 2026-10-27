@@ -44,7 +44,14 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - **`src/lib/pricing.js`**: the one pricing module (unit prices, options, courier zone/tier/charge, Hema's admin overrides and settings, UPI link, UTR). Imported by the website **and** every server function, so totals can never disagree.
 - `src/lib/dates.js` (dispatch dates, IST), `src/lib/checkout.js` (customer details), `src/lib/enquiry.js` (class enquiry): shared by site and server too.
 - Hema's admin changes live in the database (`products` / `settings` override columns, NULL = config) and are applied by `applyOverrides` / `applySettings` on both sides.
-- **Offers** (23 Oct 2026): admin → Offers (bottom nav Home · Orders · Offers · Classes · Menu · More). Rules in `src/lib/offers.js` (IST dates, both days included; live / scheduled / ended / off; link `category:` / `product:` / `page:customize`), table `offers`; shown by `src/components/layout/OfferBanner.jsx` from the layout (banner on Home, strip on Menu; in the main bundle so pages don't wait for it). Display-only: offers NEVER change a price. Customize tile photos: `page_photos` + `PAGE_PHOTOS` in the same file, admin → Menu → Customize page.
+- **Offers** (23 Oct 2026): admin → Offers (bottom nav Home · Orders · Offers · Classes · Menu · More). Rules in `src/lib/offers.js` (IST dates, both days included; live / scheduled / ended / off; link `category:` / `product:` / `page:customize`), table `offers`; shown by `src/components/layout/OfferBanner.jsx` from the layout (banner on Home, strip on Menu; in the main bundle so pages don't wait for it). Since 26 Oct 2026 an offer can hold products (`items`: sections and/or products; "Shop the offer" = `/menu?offer=<id>`, an "Offers" tab while live) with a badge, and an optional special price (`deal`: percent, rupees off, or exact prices per product/size) applied by `applyOfferPrices` in `src/lib/offers.js` on BOTH sides (MenuProvider and `loadCatalog`), only on the offer's IST dates. Without a deal an offer never changes a price. Banner photos: wide 3:1 (`photo_url`) + phone 16:9 (`photo_phone_url`), cut in the admin (`src/admin/CropPhoto.jsx`).
+- **Kannada Rajyotsava** (27 Oct 2026): one offer with a fixed id (`RAJYOTSAVA` in `src/lib/offers.js`, made by D1 migration 0004),
+  50% off every product 1–30 Nov, online orders only; its own card in admin → Offers (`saveRajyotsava`: on/off, dates, %, drawing too).
+  While live: the popup (`src/components/festival/`), the header "Offer Zone" button (`/menu?offer=zone`), its Home banner and the
+  flag background (`festivalBackground`). A percent deal lowers sizes and the ragi extra; the drawing add-on only with `deal.drawing`.
+  Order lines keep `regularUnitPrice` / `regularLineTotal` / `offer.label` (`src/lib/rajyotsava.js`, server only: no Kannada in the
+  English bundle); `orderSavings` totals them. QA: `scripts/qa-rajyotsava-november.mjs` (server clock: `scripts/fake-clock.mjs`).
+- **Developer options** (hidden; admin -> More, 7 taps on the version line; server-checked: `admin_users.role = 'developer'`, or the owner once `site_config.devAccess.owner`): settings in the `site_config` table, cleaned by `src/lib/siteConfig.js` on both sides and sent to the website in `/api/menu` (`config`). Site background: `src/components/background/` (canvas themes in their own chunk). Customize tile photos: `page_photos` + `PAGE_PHOTOS` in the same file, admin → Menu → Customize page.
 - Text: `src/i18n/en.json` + `kn.json` (customer pages, both languages); `netlify/lib/emailText.mjs` (customer emails); admin text is English, in `src/admin`. Business details: `src/config/site.js`. Class details (days, slots, the three classes and prices, seats): `src/data/classInfo.js`; booking rules (weekends, seats, booking IDs `DK-CL-YYMMDD-XXXX`): `src/lib/classes.js` + `src/lib/classTimes.js`, shared by site and server.
 
 ## The menu (Hema's, exactly; never invent prices, weights, ingredients or claims)
@@ -52,6 +59,8 @@ and grew it into a loved home brand. She also teaches chocolate classes (details
 - Delight Boxes 250 g / 500 g / 700 g: Red Velvet, Chocolate, Mango ₹650 / ₹1,250 / ₹1,900; Pista ₹750 / ₹1,500 / ₹2,250. Name on the box free (20 letters, English or Kannada); drawing +₹450 (description + optional reference photo; extra lead time).
 - Brownies, 5 pieces: Plain ₹350, Nutty ₹549, Nutella ₹549, Walnut ₹650 (ragi +₹50), Assorted ₹700 (ragi +₹80). Ingredient names only, "Contains" line; ragi gluten status TO CONFIRM.
 - Chocolates: Pista Bar ₹450 (250 g shown), Almond Bar ₹150 (no weight).
+- Cookie Tins (27 Oct 2026): no config products; Hema adds them in the admin. The tab and Home tile show once one is on the menu (`whenStocked`).
+- Sizes: any product can have up to 12 (`SIZE_LIMITS`), each with a name, price and courier tier (admin → Menu).
 - Customize page only: Drawing Chocolate Bar ₹950.
 - Weights shown only for Delight Box sizes and the Pista Bar (tub sizes are TO CONFIRM).
 - Courier (customer pays, one charge per order, the highest rate among its tiers): 250 g ₹90 Karnataka / ₹100 outside; 500–700 g (Delight Box 500 g, 700 g) ₹100 / ₹150; 750 g tubs (TO CONFIRM, defaults to the 500–700 g rate). Zone from the pincode (56–59 = Karnataka); a state mismatch warns, the pincode wins. Hema sets all six rates in admin Settings.
@@ -80,7 +89,7 @@ Call / WhatsApp-the-customer). Help texts and emails say "WhatsApp us on {phone}
 Black #0F0F0F, gold #C9A227 + gradient (#EBD27A → #D4AF37 → #B8901E), champagne #F3E7CF, cream #FFF9EF,
 brown #2A1D16, muted gold #CDBF9E. Gold text only on black. Cinzel for the wordmark only; Cormorant
 Garamond headings; Lato body 18px; Noto Kannada fonts on demand. Hema's symbol `src/assets/symbol.svg`
-unaltered. Gold line drawings until real photos (`public/products/<slug>.webp`, `scripts/photos.mjs`).
+unaltered. In Kannada the logo's words are Hema's Kannada (`site.logo` in `src/config/site.js`, Noto Serif Kannada). Gold line drawings until real photos (`public/products/<slug>.webp`, `scripts/photos.mjs`).
 Details and tokens: `docs/DESIGN.md`.
 
 ## Simple for everyone (top priority)

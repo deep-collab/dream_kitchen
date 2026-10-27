@@ -76,7 +76,10 @@ database **before** deploying the new code:
 ```bash
 npm run d1:migrate -- --remote
 ```
+27 Oct 2026: `0003_offer_items_site_config.sql` (offer products and prices, site settings) and
+`0004_rajyotsava_cookie_tins.sql` (the Rajyotsava 50% offer, Cookie Tins) are new. Both only add.
 Wrangler runs only the files that haven't run yet, so orders and Hema's prices stay as they are.
+Before: `npx wrangler d1 export DB --remote --output=backup-before-0004.sql` keeps a copy, just in case.
 (`npm run d1:setup -- --remote` does the same plus the menu seed, which is also safe.) Never
 run `d1/setup-all.sql` itself on a database that is in use: it is for a new, empty database and stops
 at "duplicate column". Check afterwards: `/admin/setup` → the database row is green.

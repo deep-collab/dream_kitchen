@@ -30,7 +30,8 @@ export async function createDemoBackend() {
     now: () => new Date(),
     env: { hemaEmail: 'hema@example.com', razorpay: { enabled: true, keyId: 'rzp_live_demo' }, resend: true, mode: 'demo' },
   }
-  const user = { id: 'demo', email: 'hema (demo)' }
+  // The demo shows everything, the developer options too (on this device they still need the 7 taps)
+  const user = { id: 'demo', email: 'hema (demo)', role: 'developer' }
   return {
     async call(action, body = {}) {
       await wait(120) // feels like a real save

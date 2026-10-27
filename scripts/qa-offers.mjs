@@ -175,7 +175,12 @@ try {
     if (button) await f.locator('[data-admin-offer-button]').fill(button)
     await f.locator('[data-admin-offer-start]').fill(starts)
     await f.locator('[data-admin-offer-end]').fill(ends)
-    if (photo) await page.setInputFiles('[data-admin-offer-photo]', { name: 'offer.jpg', mimeType: 'image/jpeg', buffer: photo })
+    if (photo) {
+      // Since 26 Oct the photo is cut into its two shapes (wide 3:1 and phone 16:9) first
+      await page.setInputFiles('[data-admin-offer-photo]', { name: 'offer.jpg', mimeType: 'image/jpeg', buffer: photo })
+      await page.locator('[data-admin-crop-done]').click()
+      await page.locator('text=Photo ready').waitFor()
+    }
     if (name) {
       await audit(page, `admin/offers form ${name}`)
       await shot(page, name, true)
@@ -246,16 +251,18 @@ try {
       if (lang === 'kn') {
         await p.locator('[data-dk-offer-dot]').nth(info.text.includes('Diwali') ? 1 : 0).click()
         await sleep(400)
-        const t = await p.locator('[data-dk-offers=banner]').innerText()
+        const t = await p.locator('[data-dk-offers=banner] [data-dk-offer]:not([inert])').innerText()
         check(/ಹೊಸದು/.test(t), `${tag}: Hema's Kannada title shows for Kannada readers`, `${tag}: no Kannada title: ${t}`)
       }
       await audit(p, `site ${tag} home`)
       await shot(p, `20-home-banner-${tag}`)
-      // It rotates on its own (6 s), and the dots pick one
-      const first = await p.locator('[data-dk-offers=banner] p').first().innerText()
+      // It rotates on its own (6 s), and the dots pick one. Since 26 Oct the banner is swipeable slides:
+      // every live offer is in the page, the ones not showing are inert
+      const shown = '[data-dk-offers=banner] [data-dk-offer]:not([inert])'
+      const first = await p.locator(`${shown} p`).first().innerText()
       await p.mouse.move(1, height - 1)
       await sleep(6600)
-      const second = await p.locator('[data-dk-offers=banner] p').first().innerText()
+      const second = await p.locator(`${shown} p`).first().innerText()
       check(first !== second, `${tag}: offers take turns (${first.slice(0, 20)}… → ${second.slice(0, 20)}…)`, `${tag}: the banner did not rotate`)
 
       await p.goto(`${BASE}/menu`)
@@ -303,11 +310,11 @@ try {
     await p.waitForSelector('[data-dk-offers=banner]')
     // Show the Choco Chip offer (dots), then tap its button: the product sheet opens
     for (let i = 0; i < 2; i++) {
-      if ((await p.locator('[data-dk-offers=banner]').innerText()).includes('Choco Chip')) break
+      if ((await p.locator('[data-dk-offers=banner] [data-dk-offer]:not([inert])').innerText()).includes('Choco Chip')) break
       await p.locator('[data-dk-offer-dot]').nth(i).tap()
       await sleep(300)
     }
-    await p.locator('[data-dk-offer-link]').tap()
+    await p.locator('[data-dk-offer]:not([inert]) [data-dk-offer-link]').tap()
     await p.waitForSelector('[role=dialog]', { timeout: 10000 })
     const sheet = await p.locator('[role=dialog]').innerText()
     check(/Choco Chip Brownies/.test(sheet) && /Five fudgy brownies/.test(sheet), 'tapping the offer opens the new product’s sheet', `the offer led to: ${p.url()} ${sheet.slice(0, 60)}`)
@@ -406,7 +413,9 @@ try {
     await p.goto(`${BASE}/admin/demo/offers`)
     await p.waitForSelector('[data-admin-offer]')
     const s = await p.locator('[data-admin-offer]').evaluateAll((els) => els.map((e) => e.getAttribute('data-admin-offer-status')))
+    // 27 Oct: the Rajyotsava offer is the real one (50% off, all November), on its own card above the list
     check(s.join(',') === 'live,scheduled,off,ended', `demo: sample offers ${s.join(', ')}`, `demo offers: ${s.join(', ')}`)
+    check((await p.locator('[data-admin-raj]').count()) === 1, 'demo: the Rajyotsava card is above the offers', 'demo: no Rajyotsava card')
     await audit(p, 'demo offers')
     await shot(p, '19-demo-offers', true)
     await p.goto(`${BASE}/admin/demo/menu`)
