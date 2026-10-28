@@ -35,7 +35,7 @@ function scrollToCategory(id, smooth = true) {
  * /menu?item=<slug> (opens that product's sheet), /menu?offer=<id> (only that offer's products,
  * from the offer banner's "Shop the offer") and /menu?offer=all (every live offer's products: the
  * "Offers" tab, first in the row while an offer with products is live), /menu?offer=zone (the
- * Offer Zone: the Rajyotsava offer, every product at its offer price).
+ * Offer Zone: Kannada Rajyotsava, every product with its "50% OFF" badge at its menu price).
  */
 export default function Menu() {
   useSeo('menu')
@@ -232,7 +232,7 @@ function OfferProducts({ offerParam, offers, products, ready }) {
             <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <span className="inline-flex items-center gap-1 rounded-full whitespace-nowrap bg-[linear-gradient(180deg,#ebd27a,#d4af37_55%,#b8901e)] px-2.5 py-0.5 text-[0.9375rem] font-bold text-ink">
                 <TagIcon className="h-4 w-4" />
-                {one?.badge ? pick(one.badge) : t('menu.offerBadge')}
+                {zone ? t('banner.rajOff', { percent: one.percent }) : one?.badge ? pick(one.badge) : t('menu.offerBadge')}
               </span>
               {one && <span className="t-small font-bold text-champagne">{ends(one.endsOn)}</span>}
             </p>
@@ -251,7 +251,7 @@ function OfferProducts({ offerParam, offers, products, ready }) {
             </h2>
             {zone ? (
               <p className="t-small mt-0.5 text-cream" data-dk-zone-text>
-                {t('banner.rajHello')}: {t('banner.rajZoneText', { percent: one.deal.value })} <strong className="text-gold-light">{t('banner.rajOnline')}</strong>
+                {t('banner.rajHello')}: {t('banner.rajZoneText', { percent: one.percent })} <strong className="text-gold-light">{t('banner.rajOnline')}</strong>
               </p>
             ) : (
               one?.message && <p className="t-small mt-0.5 text-cream">{pick(one.message)}</p>

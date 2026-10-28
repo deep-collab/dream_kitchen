@@ -28,7 +28,7 @@ import TextField from '../ui/TextField'
 import Button from '../ui/Button'
 import ProductPhoto from './ProductPhoto'
 import { useAddedToast } from './ShopSheets'
-import { regularVersion } from '../../lib/offers'
+import { RAJYOTSAVA, rajyotsavaBadge, regularVersion } from '../../lib/offers'
 import { AlertIcon, ChevronDownIcon, CloseIcon, ImageIcon, TagIcon } from '../icons'
 import 'virtual:dk-strings/sheet'
 import 'virtual:dk-strings/menu'
@@ -54,6 +54,8 @@ export function ProductSheet({ open, product, line, focus, onClose }) {
   // In a live offer with a special price: the regular price for the same choices, crossed out
   const regular = forSale ? regularVersion(product) : null
   const was = regular ? unitPrice(regular, selection) : null
+  // Kannada Rajyotsava's "50% OFF" badge, in the same red as on the card (display only)
+  const festive = product.offer?.id === RAJYOTSAVA.id
   const errors = forSale ? selectionErrors(product, selection) : {}
   delete errors.product
   const shown = tried ? errors : {}
@@ -106,9 +108,12 @@ export function ProductSheet({ open, product, line, focus, onClose }) {
         <div className="min-w-0 flex-1">
           {product.offer && (
             <p className="mb-1">
-              <span className="inline-flex items-center gap-1 rounded-full bg-ink px-2.5 py-0.5 text-[0.875rem] font-bold text-gold-light" data-dk-sheet-offer>
-                <TagIcon className="h-3.5 w-3.5 text-gold" />
-                {product.offer.badge ? pick(product.offer.badge) : t('menu.offerBadge')}
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[0.875rem] font-bold ${festive ? 'border border-[#f6c512] bg-[#b3261e] text-cream' : 'bg-ink text-gold-light'}`}
+                data-dk-sheet-offer
+              >
+                <TagIcon className={`h-3.5 w-3.5 ${festive ? 'text-[#f6c512]' : 'text-gold'}`} />
+                {festive ? rajyotsavaBadge(t) : product.offer.badge ? pick(product.offer.badge) : t('menu.offerBadge')}
               </span>
             </p>
           )}

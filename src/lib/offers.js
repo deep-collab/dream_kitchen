@@ -15,11 +15,14 @@
   Kannada Rajyotsava (27 Oct 2026; its stored words: src/lib/rajyotsava.js, kept out of the
   website's code so English visitors download no Kannada): one offer with a fixed id, made by the database migration
   (d1/migrations/0004, supabase 20261027000001): 50% off every product, 1 to 30 November, online
-  orders only. While it is live the website shows its popup, the "Offer Zone" button in the header,
-  its banner on Home and the faint waving Karnataka flag; Hema turns it off, moves its dates or
-  changes the percent in admin -> Offers, and all of that stops or changes with it.
+  orders only.
+  Since 28 Oct 2026 it is DISPLAY ONLY: Hema lowered her menu prices by hand, so that database row
+  is ignored everywhere (cleanOffer drops it, applyOfferPrices never uses its deal) and nothing is
+  taken off. The badges, popup, Offer Zone, banner and flag come from src/config/rajyotsava.js
+  alone (rajyotsavaDisplay), on its dates, and never change a price.
 */
 import { optionPrices as OPTION_PRICES } from '../config/shop.js'
+import { rajyotsava as RAJYOTSAVA_DISPLAY } from '../config/rajyotsava.js'
 
 export const OFFER_MAX = { title: 60, message: 120, button: 24, badge: 24 }
 // How many products / sections one offer may hold, and the biggest discount (keeps a typo harmless)
@@ -36,8 +39,41 @@ export const RAJYOTSAVA = { id: '20261101-0000-4000-8000-000000000001', startsOn
 export const OFFER_ZONE = 'zone'
 export const OFFER_ZONE_HREF = `/menu?offer=${OFFER_ZONE}`
 
-/** The Rajyotsava offer among today's live offers (cleaned), or null */
-export const rajyotsavaLive = (live) => (Array.isArray(live) ? live : []).find((o) => o?.id === RAJYOTSAVA.id && o.items && o.deal?.kind === 'percent') || null
+const isRajyotsava = (o) => String(o?.id || '').toLowerCase() === RAJYOTSAVA.id
+
+/**
+ * The display-only Rajyotsava offer for an Indian date (src/config/rajyotsava.js), or null outside
+ * its dates or when switched off there. Every product carries its badge; no deal, so no price
+ * changes. (Its words come from the website's text files, banner.raj*.)
+ */
+export function rajyotsavaDisplay(today = istToday(), config = RAJYOTSAVA_DISPLAY) {
+  if (!config?.enabled || !isDate(config.startsOn) || !isDate(config.endsOn)) return null
+  if (today < config.startsOn || today > config.endsOn) return null
+  return {
+    id: RAJYOTSAVA.id,
+    title: { en: 'Kannada Rajyotsava' },
+    message: null,
+    button: null,
+    href: OFFER_ZONE_HREF,
+    photo: null,
+    photoPhone: null,
+    badge: null,
+    items: { all: true, categories: [], products: [] },
+    deal: null,
+    percent: config.percent,
+    flagOpacity: config.flagOpacity,
+    startsOn: config.startsOn,
+    endsOn: config.endsOn,
+    active: true,
+    display: true,
+  }
+}
+
+/** "50% OFF" / "50% ರಿಯಾಯಿತಿ": the Rajyotsava badge in the visitor's language (t from useI18n) */
+export const rajyotsavaBadge = (t, config = RAJYOTSAVA_DISPLAY) => t('banner.rajOff', { percent: config.percent })
+
+/** The Rajyotsava display offer among today's offers, or null */
+export const rajyotsavaLive = (live) => (Array.isArray(live) ? live : []).find((o) => o?.id === RAJYOTSAVA.id && o.display) || null
 
 /** Today's date in India ("2026-10-23"). India has no summer time, so a fixed +5:30 is exact. */
 export const istToday = (now = new Date()) => new Date(now.getTime() + 330 * 60_000).toISOString().slice(0, 10)
@@ -125,6 +161,8 @@ export function cleanDeal(v) {
  */
 export function cleanOffer(o) {
   if (!o || typeof o.id !== 'string') return null
+  // The old Rajyotsava offer row (50% off): ignored, display only now (rajyotsavaDisplay)
+  if (isRajyotsava(o)) return null
   const title = pair(o.title, OFFER_MAX.title)
   if (!title || !isDate(o.startsOn) || !isDate(o.endsOn) || o.endsOn < o.startsOn) return null
   const items = cleanItems(o.items)
@@ -201,38 +239,40 @@ export function applyOfferPrices(products, offers, base = { drawing: OPTION_PRIC
     let best = null
     for (const o of live) {
       if (!inOffer(o, p)) continue
+      // Rajyotsava never lowers a price (display only, src/config/rajyotsava.js)
+      const deal = isRajyotsava(o) ? null : o.deal
       const next = { ...p }
       const was = {}
       if (p.sizes?.length) {
         next.sizes = p.sizes.map((s) => {
-          const d = dealPrice(o.deal, p, s.id, s.price)
+          const d = dealPrice(deal, p, s.id, s.price)
           if (d == null) return s
           was.sizes = Object.fromEntries(p.sizes.map((x) => [x.id, x.price]))
           return { ...s, price: d }
         })
       } else {
-        const d = dealPrice(o.deal, p, null, p.price)
+        const d = dealPrice(deal, p, null, p.price)
         if (d != null) {
           next.price = d
           was.price = p.price
         }
       }
       // A percent off: the ragi version is the same product, so its extra comes down too
-      if (o.deal?.kind === 'percent' && Number.isFinite(p.ragiPrice) && (was.sizes || was.price != null)) {
-        const r = percentOff(p.ragiPrice, o.deal.value)
+      if (deal?.kind === 'percent' && Number.isFinite(p.ragiPrice) && (was.sizes || was.price != null)) {
+        const r = percentOff(p.ragiPrice, deal.value)
         if (r < p.ragiPrice) {
           next.ragiPrice = r
           was.ragiPrice = p.ragiPrice
         }
       }
       // The drawing add-on: full price unless Hema ticked "the drawing too"
-      if (o.deal?.kind === 'percent' && o.deal.drawing && p.options?.drawing === true && Number.isFinite(base.drawing)) {
-        next.drawingPrice = percentOff(base.drawing, o.deal.value)
+      if (deal?.kind === 'percent' && deal.drawing && p.options?.drawing === true && Number.isFinite(base.drawing)) {
+        next.drawingPrice = percentOff(base.drawing, deal.value)
         was.drawingPrice = base.drawing
       }
       const changed = Object.keys(was).length > 0
       // title and deal: for the order line's words ("Rajyotsava 50% off", src/lib/rajyotsava.js)
-      next.offer = { id: o.id, badge: o.badge, title: o.title, deal: o.deal, was: changed ? was : null }
+      next.offer = { id: o.id, badge: o.badge, title: o.title, deal, was: changed ? was : null }
       // A changed price beats a badge alone; the lower price beats a higher one
       if (!best || (changed && !best.offer.was) || (changed && low(next) < low(best))) best = next
     }

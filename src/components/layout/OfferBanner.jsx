@@ -284,7 +284,7 @@ function OfferStrip({ offers }) {
   }, [many, paused, count])
   const shown = offers[index % count]
   const raj = shown.id === RAJYOTSAVA.id
-  const offer = raj ? { ...shown, href: OFFER_ZONE_HREF, title: { en: `${t('banner.rajHello')} · ${t('banner.rajOff', { percent: shown.deal.value })}`, kn: `${t('banner.rajHello')} · ${t('banner.rajOff', { percent: shown.deal.value })}` } } : shown
+  const offer = raj ? { ...shown, href: OFFER_ZONE_HREF, title: { en: `${t('banner.rajHello')} · ${t('banner.rajOff', { percent: shown.percent })}`, kn: `${t('banner.rajHello')} · ${t('banner.rajOff', { percent: shown.percent })}` } } : shown
   const cta = raj ? t('banner.zone') : offer.button ? pick(offer.button) : t(offer.items ? 'banner.shopOffer' : 'banner.offerCta')
   const hold = {
     onPointerEnter: () => setPaused(true),

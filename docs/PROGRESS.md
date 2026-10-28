@@ -2,7 +2,24 @@
 
 Read this first in every session. Source of truth: CLAUDE.md. Design rules: docs/DESIGN.md (Step 6 section first). Data: docs/DATA-MODEL.md. Setup: docs/SETUP-BACKEND.md.
 
+## 28 Oct 2026: Kannada Rajyotsava is DISPLAY ONLY (branch pre-main)
+Hema lowered her menu prices by hand, so the website must take nothing off. No migration; no table or column removed.
+- [x] One config file, `src/config/rajyotsava.js` (`enabled`, `startsOn` 2026-11-01, `endsOn` 2026-11-30, `percent` 50, `flagOpacity` 7).
+  `rajyotsavaDisplay(today)` in `src/lib/offers.js` turns it into a display offer (all products, `deal: null`) for IST dates.
+- [x] No discount anywhere: `cleanOffer` drops the database's Rajyotsava row (id `RAJYOTSAVA.id`) and `applyOfferPrices` never uses its
+  deal, on the website AND the server (`loadCatalog`), so order lines carry no `regularUnitPrice` / `offer`, and the admin order page,
+  packing slip, Track Order and emails show the menu prices only. Hema's other offers with special prices are unchanged.
+- [x] Display from the config only: "50% OFF" badge (Karnataka red) on every product card and product sheet, the Home banner and strip,
+  the Offer Zone (`/menu?offer=zone`) and its header button, the popup once per visit (not on the admin), the faint flag (7%, still with
+  reduce motion). The old admin card (Save / Turn on) is replaced by a note: "Display-only offer, runs 1–30 Nov automatically."
+  (`saveRajyotsava` still exists on the server but changes nothing on the website.)
+- [x] Tests: `tests/rajyotsava-november.test.js` rewritten (403 tests); browser QA `scripts/qa-rajyotsava-november.mjs` for oct31 / nov1 / nov30 /
+  dec1 at 360, 390 and 1280px, EN + KN, Chromium + WebKit: cart, review, server total, Track Order, admin order and packing slip = menu prices.
+- Note: the display follows the visitor's own clock (a phone with a wrong date can show or hide the badges; it never changes a price).
+- Hema: the website never changes her prices back by itself after November (her Menu prices stay as she set them).
+
 ## 27 Oct 2026: Kannada Rajyotsava 50% off, the Kannada logo, any number of sizes, Cookie Tins (branch pre-main)
+(Superseded on 28 Oct 2026: the 50% discount is switched off; see above.)
 URGENT: must be live before 1 Nov. Built on the 26 Oct `pre-main` (its Rajyotsava groundwork is kept). The uncommitted work found
 on this PC that day (admin change history / undo, editable texts, feature switches, delivery rules; migration `0004_admin_changes.sql`)
 is NOT in this branch: it is saved on the local branch `wip-admin-changes-26oct` (never pushed). If it comes back, its D1

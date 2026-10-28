@@ -88,14 +88,17 @@ export function activeBackground(bg, today = istToday()) {
 }
 
 /**
- * The background to show, with the Rajyotsava offer: while it is live the faint background is the
- * Karnataka flag (yellow over red, softly waving; its strength and animation from the developer
- * options, 7% by default); afterwards (or switched off) the usual one, by itself.
+ * The background to show, with Kannada Rajyotsava: on its dates the faint background is the
+ * Karnataka flag (yellow over red, softly waving; its strength from src/config/rajyotsava.js,
+ * `flagOpacity`, 7%, else the developer options'; animation from the developer options, still with
+ * "reduce motion"); afterwards (or switched off) the usual one, by itself.
+ *   raj: the display offer (src/lib/offers.js rajyotsavaDisplay) or null
  */
-export function festivalBackground(bg, today = istToday(), rajyotsavaOn = false) {
-  if (!rajyotsavaOn) return activeBackground(bg, today)
+export function festivalBackground(bg, today = istToday(), raj = null) {
+  if (!raj) return activeBackground(bg, today)
   const t = cleanBackground(bg).themes.rajyotsava
-  return { id: 'rajyotsava', opacity: t.opacity / 100, animate: t.animate, image: null }
+  const strength = typeof raj === 'object' && Number.isFinite(raj.flagOpacity) ? opacity(raj.flagOpacity, t.opacity) : t.opacity
+  return { id: 'rajyotsava', opacity: strength / 100, animate: t.animate, image: null }
 }
 
 /* ======================= who sees the developer options ======================= */

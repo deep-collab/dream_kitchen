@@ -28,16 +28,15 @@ const markSeen = () => {
 const QUIET = /^\/(checkout|pay|order|classes\/book)/
 
 /**
- * Kannada Rajyotsava: decides when the popup shows. Every new visit while the offer is live, once
- * the page is up (and after the first-visit loading screen), never on the admin (its own page) and
- * never from the phone's saved copy of the offers: only once /api/menu has said it is live, so an
- * offer Hema just turned off never pops up.
+ * Kannada Rajyotsava: decides when the popup shows. Every new visit on its dates
+ * (src/config/rajyotsava.js), once the page is up (and after the first-visit loading screen),
+ * never on the admin (its own page).
  */
 export default function RajyotsavaGate() {
   const raj = useRajyotsava()
   const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
-  const wanted = Boolean(raj?.fresh) && !QUIET.test(pathname) && !open && !seen()
+  const wanted = Boolean(raj) && !QUIET.test(pathname) && !open && !seen()
 
   useEffect(() => {
     if (!wanted) return undefined
