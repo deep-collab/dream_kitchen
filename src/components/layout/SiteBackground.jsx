@@ -11,7 +11,7 @@ import ThemeLayer from '../background/ThemeLayer'
  */
 export default function SiteBackground() {
   const { config, today } = useSiteConfig()
-  const bg = festivalBackground(config.background, today, Boolean(useRajyotsava()))
+  const bg = festivalBackground(config.background, today, useRajyotsava())
   if (bg.id === 'default') return null
   return <ThemeLayer bg={bg} className="fixed inset-0 -z-10 h-dvh w-full" />
 }

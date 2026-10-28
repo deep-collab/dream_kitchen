@@ -1,13 +1,16 @@
-// QA for the 27 Oct 2026 request, in real browsers on the practice database, with the SERVER and
-// the browser both set to the day being checked (so the server's prices for that day are tested
-// too, not just the page):
-//   - Kannada Rajyotsava, 50% off everything: the popup (every new visit, not between pages, not
-//     on the admin), the "Offer Zone 🎁" button in the header, the wide banner on Home, the Offer
-//     Zone (every product, old price crossed out, "50% OFF"), the faint waving Karnataka flag
+// QA for the 27 Oct 2026 request, changed 28 Oct 2026 to DISPLAY ONLY (src/config/rajyotsava.js:
+// Hema lowered her menu prices by hand, so nothing is taken off). In real browsers on the practice
+// database, with the SERVER and the browser both set to the day being checked (so the server's
+// prices for that day are tested too, not just the page):
+//   - Kannada Rajyotsava: the popup (every new visit, not between pages, not on the admin), the
+//     "Offer Zone 🎁" button in the header, the wide banner on Home, the Offer Zone (every product
+//     with "50% OFF" and its real menu price, nothing crossed out), the product sheet's badge, the
+//     faint waving Karnataka flag; none of it on 31 Oct or 1 Dec
 //   - the Kannada logo (hero and header), switching with the language button
 //   - admin: a product with 5 sizes (each its own price and courier charge, reordered), a cookie tin,
-//     the Rajyotsava card (Turn off this offer / on again)
-//   - one full order at the offer price, through to the admin's order page, the packing slip and Track Order
+//     the Rajyotsava note ("Display-only offer ...", no buttons); the old database switch changes nothing
+//   - one full order at the menu prices: cart and review totals, the server's total, Track Order,
+//     the admin's order page and the packing slip, with no "Rajyotsava 50% off" and no saving
 // At 360 (640 and 740 tall), 390 and 1280px, English and Kannada, in Chromium (Android Chrome) and WebKit (iPhone Safari).
 // Checks console errors, sideways scroll and targets under 48px. Screenshots: docs/screenshots/rajyotsava-november/.
 //
@@ -46,9 +49,16 @@ const api = async (body, token) => {
 }
 const { accessToken } = await api({ action: 'login', ...ADMIN })
 const act = (action, body = {}) => api({ action, ...body }, accessToken)
+// The database's old Rajyotsava row (50% off) is still there (no tables or columns removed), and ignored
 const raj = (await act('offers')).rajyotsava
-check(raj.exists && raj.percent === 50 && raj.startsOn === '2026-11-01' && raj.endsOn === '2026-11-30', `the practice database has the Rajyotsava offer (${raj.startsOn} – ${raj.endsOn}, ${raj.percent}%, ${raj.status})`, `Rajyotsava offer: ${JSON.stringify(raj)}`)
-check(raj.status === (LIVE ? 'live' : PHASE === 'oct31' ? 'scheduled' : 'ended'), `admin says “${raj.status}” on ${PHASE}`, `admin status ${raj.status} on ${PHASE}`)
+check(raj.exists, `the practice database still has the old Rajyotsava row (${raj.percent}%, ${raj.status}): kept, ignored`, `Rajyotsava row: ${JSON.stringify(raj)}`)
+// The server's price for the day: the menu price (₹450 + ₹90 courier), never half
+{
+  const body = (price, total) => ({ idempotencyKey: `qa-raj-${PHASE}-${price}-${Date.now()}-abcdefgh`, items: [{ productId: 'pista-bar', selection: {}, qty: 1, unitPrice: price }], customer: { name: 'QA Check', phone: '9741099999', email: '', line1: '1, Test Road', line2: 'Area', city: 'Mysuru', pincode: '570023', state: 'karnataka', landmark: '', note: '' }, dispatchDate: '', expectedTotal: total, lang: 'en', website: '' })
+  const half = await fetch(`${BASE}/api/create-order`, { method: 'POST', headers: { 'content-type': 'application/json', origin: BASE }, body: JSON.stringify(body(225, 315)) })
+  const halfBody = await half.json()
+  check(half.status === 409 && halfBody.lines?.[0]?.unitPrice === 450, `${PHASE}: the server refuses ₹225 and says the price is ₹450 (the menu price)`, `${PHASE}: server answered ${half.status} ${JSON.stringify(halfBody).slice(0, 200)}`)
+}
 
 /* ---------- browsers ---------- */
 async function audit(page, label) {
@@ -189,16 +199,43 @@ for (const engine of ENGINES) {
         await page.reload()
         await ready(page)
         check(!(await popupShown(page, 1800)), `${label}: no popup after a reload in the same visit`, `${label}: popup after reload`)
-        // Offer Zone: every menu product, old price crossed out, 50% OFF
+        // Offer Zone: every menu product with "50% OFF" and its real menu price, nothing crossed out
         await page.locator('header [data-dk-zone]').click()
         await page.waitForSelector('[data-dk-offer-menu=zone] [data-dk-card]')
         const cards = await page.locator('[data-dk-offer-menu=zone] [data-dk-card]').evaluateAll((els) =>
-          els.map((c) => ({ was: c.querySelector('[data-dk-was-price]')?.textContent || '', badge: c.querySelector('[data-dk-offer-badge]')?.textContent || '' })),
+          els.map((c) => ({ name: c.querySelector('.font-bold')?.textContent || '', was: c.querySelector('[data-dk-was-price]')?.textContent || '', badge: c.querySelector('[data-dk-offer-badge]')?.textContent || '', price: c.querySelector('.t-price')?.textContent || '' })),
         )
         const badge = lang === 'kn' ? '50% ರಿಯಾಯಿತಿ' : '50% OFF'
-        check(cards.length >= 15 && cards.every((c) => c.was && c.badge.includes(badge)), `${label}: Offer Zone shows ${cards.length} products, each crossed out with “${badge}”`, `${label}: Offer Zone cards ${JSON.stringify(cards.slice(0, 3))} (${cards.length})`)
+        check(cards.length >= 15 && cards.every((c) => !c.was && c.badge.includes(badge)), `${label}: Offer Zone shows ${cards.length} products, each with “${badge}” and nothing crossed out`, `${label}: Offer Zone cards ${JSON.stringify(cards.slice(0, 3))} (${cards.length})`)
+        const pista = cards.find((c) => /₹450/.test(c.price) && !/₹225/.test(c.price))
+        check(pista && !cards.some((c) => /₹225\b|₹275\b|₹325\b/.test(c.price)), `${label}: the Offer Zone prices are the menu prices (e.g. ${pista?.price})`, `${label}: zone prices ${cards.map((c) => c.price).join(' / ')}`)
+        const zoneText = await page.locator('[data-dk-offer-menu=zone]').innerText()
+        check(zoneText.includes(lang === 'kn' ? 'ಆಫರ್ ವಲಯ' : 'Offer Zone'), `${label}: Offer Zone heading`, `${label}: zone text ${zoneText.slice(0, 200)}`)
         await audit(page, `${label} offer zone`)
         await shot(page, `zone-${label}`)
+        // A product sheet: the red "50% OFF" badge and the menu price, nothing crossed out
+        await page.locator('[data-dk-offer-menu=zone] [data-dk-card] [data-dk-open]').first().click()
+        await page.waitForSelector('[role=dialog] [data-dk-sheet-offer]')
+        const sheet = await page.evaluate(() => {
+          const d = document.querySelector('[role=dialog]')
+          return { badge: d.querySelector('[data-dk-sheet-offer]')?.textContent || '', was: d.querySelectorAll('[data-dk-sheet-was], s').length, add: d.querySelector('[data-dk-add]')?.textContent || '' }
+        })
+        check(sheet.badge.includes(badge) && sheet.was === 0, `${label}: product sheet shows “${badge}”, nothing crossed out (${sheet.add.trim()})`, `${label}: sheet ${JSON.stringify(sheet)}`)
+        await audit(page, `${label} sheet`)
+        await shot(page, `sheet-${label}`)
+        await page.keyboard.press('Escape')
+        await sleep(300)
+      } else {
+        // Not November: no badges on the menu, and the Offer Zone address has nothing to show
+        await page.goto(`${BASE}/menu`)
+        await ready(page)
+        await page.waitForSelector('[data-dk-card]')
+        await sleep(800)
+        const badges = await page.locator('[data-dk-offer-badge]').count()
+        check(badges === 0, `${label}: no “50% OFF” badges on the menu on ${PHASE}`, `${label}: ${badges} badges on ${PHASE}`)
+        await page.goto(`${BASE}/menu?offer=zone`)
+        await sleep(1200)
+        check((await page.locator('[data-dk-offer-menu] [data-dk-card]').count()) === 0, `${label}: /menu?offer=zone shows no offer products on ${PHASE}`, `${label}: zone products on ${PHASE}`)
       }
       await ctx.close()
     }
@@ -345,12 +382,14 @@ if (PHASE === 'nov1') {
   await page.waitForSelector('[data-admin-product=choco-chip-cookie-tin]')
   ok(`${label}: cookie tin added in Cookie Tins`)
 
-  // The Rajyotsava card in Offers
+  // The Rajyotsava note in Offers: display only, no Save / Turn on buttons
   await page.goto(`${BASE}/admin/offers`)
-  await page.waitForSelector('[data-admin-raj]')
-  check((await page.locator('[data-admin-raj]').getAttribute('data-admin-raj-status')) === 'live', `${label}: Offers shows the Rajyotsava card, Live`, `${label}: card status`)
+  await page.waitForSelector('[data-admin-raj-note]')
+  const note = await page.locator('[data-admin-raj-note]').innerText()
+  const buttons = await page.locator('[data-admin-raj] button, [data-admin-raj-save], [data-admin-raj-toggle]').count()
+  check(note.includes('Display-only offer, runs 1–30 Nov automatically.') && buttons === 0, `${label}: Offers shows “Display-only offer, runs 1–30 Nov automatically.”, no buttons`, `${label}: note ${JSON.stringify(note)}, buttons ${buttons}`)
   await audit(page, `${label} admin offers`)
-  await shot(page, 'admin-rajyotsava-card', true)
+  await shot(page, 'admin-rajyotsava-note', true)
 
   // The website: Cookie Tins tab and tile; the Truffle Box sheet with its 5 sizes; order 2 sizes
   const site = await newPage(ENGINES[0], [390, 844])
@@ -365,7 +404,7 @@ if (PHASE === 'nov1') {
   await p.goto(`${BASE}/menu?item=truffle-box`)
   await p.waitForSelector('[role=dialog] #ps-size')
   const sheetSizes = await p.locator('[role=dialog] #ps-size label').evaluateAll((els) => els.map((e) => e.innerText.replace(/\s+/g, ' ').trim()))
-  check(sheetSizes.length === 5 && /^100 g .*₹199 ₹100$/.test(sheetSizes[0]) && /^1 kg .*₹1,599 ₹800$/.test(sheetSizes[3]), `${site.label}: sheet shows the 5 sizes, each crossed out and at 50% (${sheetSizes.join(' / ')})`, `${site.label}: sheet sizes ${JSON.stringify(sheetSizes)}`)
+  check(sheetSizes.length === 5 && /^100 g .*₹199$/.test(sheetSizes[0]) && /^1 kg .*₹1,599$/.test(sheetSizes[3]) && !sheetSizes.some((x) => /₹100\b|₹800\b/.test(x)), `${site.label}: sheet shows the 5 sizes at their own prices, nothing crossed out (${sheetSizes.join(' / ')})`, `${site.label}: sheet sizes ${JSON.stringify(sheetSizes)}`)
   await shot(p, 'sheet-5-sizes')
   await p.locator('[role=dialog] #ps-size label').nth(0).click()
   await p.locator('[data-dk-add]').click()
@@ -383,6 +422,9 @@ if (PHASE === 'nov1') {
   await sleep(500)
   await p.goto(`${BASE}/cart`)
   await p.waitForSelector('[data-dk-continue]')
+  // the cart: 100 g ₹199 + 1 kg ₹1,599 + ragi walnut ₹700 = ₹2,498, nothing taken off
+  const cartText = await p.locator('main').innerText()
+  check(/₹2,498/.test(cartText) && !/−₹|Rajyotsava|₹1,250\b/.test(cartText), `${site.label}: cart total ₹2,498 = the menu prices, nothing taken off`, `${site.label}: cart ${cartText.slice(0, 600)}`)
   await shot(p, 'cart', true)
   await p.locator('[data-dk-continue]').click()
   await p.waitForURL(/\/checkout$/)
@@ -396,6 +438,8 @@ if (PHASE === 'nov1') {
   await p.locator('[data-dk-next]').click()
   await p.waitForURL(/\/review$/)
   await sleep(500)
+  const reviewText = await p.locator('main').innerText()
+  check(/₹2,498/.test(reviewText) && /₹2,598/.test(reviewText) && !/−₹|Rajyotsava/.test(reviewText), `${site.label}: checkout review: ₹2,498 + ₹100 courier = ₹2,598`, `${site.label}: review ${reviewText.slice(0, 800)}`)
   await shot(p, 'review', true)
   await p.locator('[data-dk-place]').click()
   await p.waitForURL(/\/pay\//, { timeout: 20000 })
@@ -403,56 +447,53 @@ if (PHASE === 'nov1') {
   check(!(await popup(p).count()), `${site.label}: no popup on the payment page`, `${site.label}: popup on Pay`)
   const tracked = await fetch(`${BASE}/api/order`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ code, phone: '9741012345' }) }).then((r) => r.json())
   const o = tracked.order
-  // 100 g ₹100 + 1 kg ₹800 + ragi walnut ₹350 = ₹1,250; courier for the 1 kg (xl) at full price ₹100
+  // 100 g ₹199 + 1 kg ₹1,599 + ragi walnut ₹700 = ₹2,498; courier for the 1 kg (xl) ₹100
   check(
-    o?.subtotal === 1250 && o.courier === 100 && o.total === 1350 && o.items.every((i) => i.offer?.label?.en === 'Rajyotsava 50% off' && i.regularUnitPrice > i.unitPrice),
-    `${site.label}: order ${code} placed at the server's offer prices: ₹1,250 + ₹100 courier = ₹1,350`,
+    o?.subtotal === 2498 && o.courier === 100 && o.total === 2598 && o.items.every((i) => !i.offer && i.regularUnitPrice === undefined),
+    `${site.label}: order ${code} charged by the server at the menu prices: ₹2,498 + ₹100 courier = ₹2,598`,
     `${site.label}: order ${JSON.stringify(o).slice(0, 500)}`,
   )
-  // Track Order shows the regular price, "Rajyotsava 50% off" and the price paid
+  // Track Order: the menu prices, no offer line, no saving
   await p.goto(`${BASE}/track?id=${code}`)
   await p.waitForSelector('#tr-phone')
   await p.fill('#tr-phone', '9741012345')
   await p.locator('[data-dk-track]').click()
-  await p.waitForSelector('[data-dk-order-saving]')
+  await p.waitForFunction(() => /₹2,598/.test(document.querySelector('main')?.innerText || ''))
   const trackText = await p.locator('main').innerText()
-  // regular ₹199 + ₹1,599 + ₹700 = ₹2,498; paid ₹1,250 (₹100 + ₹800 + ₹350, rounded to the rupee): saved ₹1,248
-  check(/Rajyotsava 50% off/.test(trackText) && /−₹1,248/.test(trackText) && /₹2,498/.test(trackText) && /₹1,350/.test(trackText), `${site.label}: Track Order shows the regular price ₹2,498, “Rajyotsava 50% off” −₹1,248 and the total ₹1,350`, `${site.label}: Track text ${trackText.slice(trackText.indexOf('Truffle'), trackText.indexOf('Truffle') + 600)}`)
+  check(/₹2,498/.test(trackText) && /₹2,598/.test(trackText) && !/Rajyotsava|−₹/.test(trackText) && !(await p.locator('[data-dk-order-saving]').count()), `${site.label}: Track Order shows ₹2,498 and the total ₹2,598, no “Rajyotsava 50% off”`, `${site.label}: Track text ${trackText.slice(trackText.indexOf('Truffle'), trackText.indexOf('Truffle') + 600)}`)
   await audit(p, `${site.label} track`)
   await shot(p, 'track-order', true)
   await site.ctx.close()
 
   // The admin: the order page and the packing slip
   await page.goto(`${BASE}/admin/orders/${code}`)
-  await page.waitForSelector('[data-admin-order-saving]')
+  await page.waitForFunction(() => /Truffle Box/.test(document.querySelector('main')?.innerText || ''))
   const detail = await page.locator('main').innerText()
-  check(/Rajyotsava 50% off/.test(detail) && /₹199 → ₹100 each/.test(detail) && /Items at the regular price/.test(detail), `${label}: admin order page shows each line's regular price, the offer and the price paid`, `${label}: admin order ${detail.slice(0, 400)}`)
+  check(/₹2,598/.test(detail) && !/Rajyotsava|Items at the regular price|→ ₹/.test(detail) && !(await page.locator('[data-admin-order-saving]').count()), `${label}: admin order page: the menu prices and ₹2,598, no offer line`, `${label}: admin order ${detail.slice(0, 600)}`)
   await shot(page, 'admin-order', true)
   await page.locator('[data-admin-slip]').click()
-  await page.waitForSelector('[data-admin-slip-saving]')
+  await page.waitForFunction(() => /IN THIS PARCEL/i.test(document.body.innerText))
+  await sleep(300)
   const slip = await page.locator('body').innerText()
-  check(/Rajyotsava 50% off/.test(slip) && /−₹1,248/.test(slip) && /₹2,498/.test(slip) && /₹1,350/.test(slip), `${label}: packing slip shows the regular price ₹2,498, “Rajyotsava 50% off” −₹1,248 and the total ₹1,350`, `${label}: slip ${slip.slice(slip.indexOf('IN THIS PARCEL'), slip.indexOf('IN THIS PARCEL') + 700)}`)
+  check(/₹2,598/.test(slip) && !/Rajyotsava|−₹/.test(slip) && !(await page.locator('[data-admin-slip-saving]').count()), `${label}: packing slip: ₹2,598, no “Rajyotsava 50% off”, no saving`, `${label}: slip ${slip.slice(0, 900)}`)
   await shot(page, 'packing-slip', true)
 
-  // Turn off this offer: popup, Offer Zone, flag and discount all stop at once
-  await page.goto(`${BASE}/admin/offers`)
-  await page.locator('[data-admin-raj-toggle]').click()
-  await page.waitForSelector('[data-admin-raj][data-admin-raj-status=off]')
-  ok(`${label}: “Turn off this offer” tapped`)
+  // The old database switch (what the old card's "Turn off this offer" did) changes nothing on the website now
+  const turnedOff = await act('saveRajyotsava', { active: false, startsOn: '2026-11-01', endsOn: '2026-11-30', percent: 50, drawing: false })
+  check(turnedOff.rajyotsava?.active === false, `${label}: the old Rajyotsava row switched off in the database`, `${label}: ${JSON.stringify(turnedOff.rajyotsava)}`)
   const offSite = await newPage(ENGINES[1], [390, 844])
   await offSite.page.goto(`${BASE}/`)
   await ready(offSite.page)
-  await sleep(1200)
+  await popupShown(offSite.page)
+  await sleep(600)
   const offState = await offSite.page.evaluate(() => ({ popup: !!document.querySelector('[data-dk-raj-popup]'), zone: !!document.querySelector('[data-dk-zone]'), flag: !!document.querySelector('[data-dk-bg=rajyotsava]'), banner: !!document.querySelector('[data-dk-raj-banner]') }))
-  check(!offState.popup && !offState.zone && !offState.flag && !offState.banner, `${offSite.label}: switched off: no popup, Offer Zone, flag or banner`, `${offSite.label}: after turning off ${JSON.stringify(offState)}`)
+  check(offState.popup && offState.zone && offState.flag && offState.banner, `${offSite.label}: the display still shows (it follows the config file only)`, `${offSite.label}: after the database switch ${JSON.stringify(offState)}`)
   await offSite.page.goto(`${BASE}/menu?item=pista-bar`)
   await offSite.page.waitForSelector('[data-dk-add]')
   const addText = await offSite.page.locator('[data-dk-add]').innerText()
-  check(/450/.test(addText), `${offSite.label}: switched off: the regular price (${addText.trim()})`, `${offSite.label}: price when off ${addText}`)
+  check(/450/.test(addText) && !/225/.test(addText), `${offSite.label}: Pista Bar at its menu price (${addText.trim()})`, `${offSite.label}: price ${addText}`)
   await offSite.ctx.close()
-  await page.locator('[data-admin-raj-toggle]').click()
-  await page.waitForSelector('[data-admin-raj][data-admin-raj-status=live]')
-  ok(`${label}: turned on again`)
+  await act('saveRajyotsava', { active: true, startsOn: '2026-11-01', endsOn: '2026-11-30', percent: 50, drawing: false })
   await ctx.close()
 }
 

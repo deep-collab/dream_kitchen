@@ -4,6 +4,7 @@ import { Btn, card, day, ErrorText, Field, formatINR, input, Loading, PageTitle,
 import { ImageIcon, InfoIcon, TagIcon } from '../components/icons'
 import { smallPhoto } from '../lib/productPhoto'
 import { OFFER_MAX } from '../lib/offers'
+import { rajyotsava as RAJYOTSAVA_DISPLAY } from '../config/rajyotsava'
 import { addDaysISO } from '../lib/dates'
 import { Counter } from './photos'
 import CropPhoto from './CropPhoto'
@@ -134,9 +135,7 @@ export default function Offers() {
   return (
     <div>
       <PageTitle>Offers</PageTitle>
-      {data.rajyotsava && (
-        <RajyotsavaCard offer={data.rajyotsava} onChanged={(next) => setData(next)} />
-      )}
+      <RajyotsavaNote />
       <PriceNote />
       <Btn
         tone="gold"
@@ -194,98 +193,35 @@ function PriceNote() {
   )
 }
 
-const RAJ_ERRORS = {
-  startsOn: 'Choose the start date.',
-  endsOn: { required: 'Choose the end date.', beforeStart: 'The end date is before the start date.', past: 'The end date has already passed. Choose today or a later day.' },
-  percent: 'Write a whole number from 1 to 90.',
-}
-const rajError = (fields, key) => {
-  const e = fields?.[key]
-  if (!e) return ''
-  const words = RAJ_ERRORS[key]
-  return typeof words === 'string' ? words : words[e] || Object.values(words)[0]
-}
-
 /**
- * Kannada Rajyotsava: its own card at the top of Offers. One switch ("Turn off this offer"), its
- * dates and its percent (every product on the website, online orders only; courier, class fees
- * and the name on the box are never discounted; the drawing add-on only if she ticks it). While it
- * is live the website shows its popup, the Offer Zone button, its banner and the faint flag; turning
- * it off stops all of that, and the discount, at once.
+ * Kannada Rajyotsava: a note at the top of Offers, nothing to change (28 Oct 2026). Hema lowered
+ * her menu prices by hand, so the website takes nothing off; on its dates it only shows the
+ * "50% OFF" badges, the popup, the Offer Zone button, the banner and the faint flag, by itself
+ * (src/config/rajyotsava.js). The old card's Save / Turn on controlled the discount: gone.
  */
-function RajyotsavaCard({ offer: o, onChanged }) {
-  const save = useSave()
-  const [form, setForm] = useState({ startsOn: o.startsOn, endsOn: o.endsOn, percent: String(o.percent), drawing: o.drawing })
-  const set = (patch) => setForm((f) => ({ ...f, ...patch }))
-  const [label, tone, meaning] = STATUS[o.status]
-  const fields = save.fields || {}
-  const send = (active, message) =>
-    save.run(async () => {
-      const r = await adminCall('saveRajyotsava', { active, startsOn: form.startsOn, endsOn: form.endsOn, percent: Number(form.percent), drawing: form.drawing })
-      if (r.ok) onChanged(r.data, message)
-      return r
-    }, message)
-  const pct = Number(form.percent) || o.percent
+function RajyotsavaNote() {
+  const raj = RAJYOTSAVA_DISPLAY
+  if (!raj.enabled) return null
   return (
     <section
       aria-labelledby="raj-title"
-      className={`${card} mt-4 border-[1.5px] ${o.status === 'live' ? 'border-[#1a6b3a]' : 'border-gold-mid'} bg-[linear-gradient(135deg,rgb(246_197_18/0.16),rgb(214_40_40/0.10)_60%,transparent)]`}
+      className={`${card} mt-4 border-[1.5px] border-gold-mid bg-[linear-gradient(135deg,rgb(246_197_18/0.16),rgb(214_40_40/0.10)_60%,transparent)]`}
       data-admin-raj
-      data-admin-raj-status={o.status}
+      data-admin-raj-note
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <Pill tone={tone}>{label}</Pill>
-        <span className="t-small text-brown-2">{meaning}</span>
-      </div>
-      <h2 id="raj-title" className="t-h3 mt-1 flex items-center gap-2">
+      <h2 id="raj-title" className="t-h3 flex items-center gap-2">
         <span aria-hidden="true" className="inline-flex h-6 w-6 shrink-0 flex-col overflow-hidden rounded-full border border-line">
           <span className="h-1/2 bg-[#f6c512]" />
           <span className="h-1/2 bg-[#d62828]" />
         </span>
-        Rajyotsava {o.percent}% off
+        Rajyotsava {raj.percent}% off
       </h2>
-      <p className="t-small mt-1 text-brown-2">
-        {o.percent}% off every product on the website (every section and size, ragi versions too), for online orders only. Courier charges, class fees{o.drawing ? '' : ' and the drawing add-on'} stay at full price{o.drawing ? ` (the drawing add-on is ${o.percent}% off too)` : ''}; the name on the box is free anyway. While it is on, the website shows the Rajyotsava popup, the “Offer Zone” button, the offer banner and a faint Karnataka flag behind the page.
+      <p className="mt-1 font-bold" data-admin-raj-text>
+        Display-only offer, runs {Number(raj.startsOn.slice(8))}–{Number(raj.endsOn.slice(8))} Nov automatically.
       </p>
-
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <Field label="Starts" error={rajError(fields, 'startsOn')}>
-          <input type="date" className={input} value={form.startsOn} onChange={(e) => set({ startsOn: e.target.value })} data-admin-raj-start />
-        </Field>
-        <Field label="Ends (included)" error={rajError(fields, 'endsOn')}>
-          <input type="date" className={input} value={form.endsOn} min={form.startsOn} onChange={(e) => set({ endsOn: e.target.value })} data-admin-raj-end />
-        </Field>
-      </div>
-      <Field label="Discount" hint="Prices are rounded to the nearest rupee." error={rajError(fields, 'percent')}>
-        <div className="flex items-center gap-2">
-          <input className={`${input} w-24`} inputMode="numeric" aria-label="Discount in percent" value={form.percent} onChange={(e) => set({ percent: e.target.value.replace(/\D/g, '').slice(0, 2) })} data-admin-raj-percent />
-          <span className="font-bold">% off</span>
-        </div>
-      </Field>
-      <label className="mt-2 flex min-h-12 items-start gap-3">
-        <input type="checkbox" className="mt-1 h-6 w-6 shrink-0 accent-ink" checked={form.drawing} onChange={(e) => set({ drawing: e.target.checked })} data-admin-raj-drawing />
-        <span>
-          Also take {pct}% off the drawing add-on <span className="text-brown-2">(normally {formatINR(450)}; off = full price)</span>
-        </span>
-      </label>
-      <p className="t-small mt-1 text-brown-2">Dates are Indian dates, both days included: {day(form.startsOn)} 12:00 AM to {day(form.endsOn)} 11:59 PM. Before and after, the normal prices come back by themselves.</p>
-
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <Btn onClick={() => send(o.active || !o.exists, 'Saved. The website has the new dates and discount.')} disabled={save.status === 'saving'} data-admin-raj-save>
-          Save
-        </Btn>
-        <Btn
-          tone={o.active ? 'danger' : 'gold'}
-          onClick={() => send(!o.active, o.active ? 'Turned off. No discount, popup, Offer Zone button or flag on the website now.' : 'Turned on. It shows on its dates.')}
-          disabled={save.status === 'saving'}
-          data-admin-raj-toggle
-        >
-          {o.active ? 'Turn off this offer' : 'Turn on this offer'}
-        </Btn>
-      </div>
-      <div className="mt-2">
-        <SaveMessage save={save} />
-      </div>
+      <p className="t-small mt-1 text-brown-2">
+        The website shows the “{raj.percent}% OFF” badges, the Rajyotsava popup, the “Offer Zone” button and a faint Karnataka flag from {day(raj.startsOn)} to {day(raj.endsOn)}. It does not take any money off: customers pay exactly the prices in Menu.
+      </p>
     </section>
   )
 }

@@ -194,18 +194,18 @@ the website, tap **Hide from menu**.
 
 ## 5. Offers: a banner on the website
 
-### Kannada Rajyotsava: 50% off everything (1 to 30 November)
+### Kannada Rajyotsava (1 to 30 November): display only
 
-At the top of **Offers** is its own card, **Rajyotsava 50% off**. It is already set up: every product on the website
-(every section and size, ragi versions too) is half price from 1 November 12:00 AM to 30 November 11:59 PM, for online
-orders. Prices are rounded to the nearest rupee. Courier charges, class fees and the drawing add-on stay at full price
-(tick **Also take 50% off the drawing add-on** if you want that too). While it is on, the website shows a Rajyotsava popup
-once per visit, an **Offer Zone 🎁** button at the top, a red-and-yellow banner on Home and a very faint Karnataka flag.
+You have already lowered your prices in **Menu** by hand, so the website takes **no money off**: customers pay exactly
+the prices you set in Menu (cart, checkout, the order, the packing slip, Track Order and the emails all show those prices).
 
-- **Turn off this offer**: everything above stops at once, and normal prices come back. **Turn on this offer** brings it back.
-- Change the **dates** or the **%**, then tap **Save**. Before and after the dates, normal prices come back by themselves.
-- Every order shows the regular price, "Rajyotsava 50% off" and the price paid: on the order page, the packing slip,
-  Track Order and the emails.
+At the top of **Offers** is a note: **"Display-only offer, runs 1–30 Nov automatically."** There is nothing to tap.
+From 1 November 12:00 AM to 30 November 11:59 PM the website shows by itself: a red **"50% OFF"** badge on every
+product, a Rajyotsava popup once per visit, an **Offer Zone 🎁** button at the top, a red-and-yellow banner on Home
+and a very faint Karnataka flag. Before 1 November and from 1 December none of it shows.
+
+- The website never changes your prices: if you want your old prices back after November, change them in **Menu** on 1 December.
+- To stop the badges and popup early, ask the developer (one switch, `enabled`, in `src/config/rajyotsava.js`).
 
 ### Your other offers
 

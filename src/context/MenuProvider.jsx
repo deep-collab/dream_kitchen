@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { categories as CATEGORIES, products as PRODUCTS } from '../config/shop'
 import { applyOverrides, applySettings, hasPrice } from '../lib/pricing'
-import { allLiveOffers, applyOfferPrices, cleanPagePhotos, istToday, MAX_LIVE_OFFERS, rajyotsavaLive } from '../lib/offers'
+import { allLiveOffers, applyOfferPrices, cleanPagePhotos, istToday, MAX_LIVE_OFFERS, rajyotsavaDisplay } from '../lib/offers'
 import { publicConfig } from '../lib/siteConfig'
 import { loadRemoteMenu } from '../services'
 
@@ -63,8 +63,10 @@ export function MenuProvider({ children }) {
 
   const value = useMemo(() => {
     // Hema's offers live today: their special prices are applied exactly as the server applies
-    // them (netlify/lib/catalog.mjs), so the cart shows the price that will be charged
-    const live = allLiveOffers(offerList, today)
+    // them (netlify/lib/catalog.mjs), so the cart shows the price that will be charged. Kannada
+    // Rajyotsava first, on its dates (src/config/rajyotsava.js): a badge on every product, no price change
+    const raj = rajyotsavaDisplay(today)
+    const live = [...(raj ? [raj] : []), ...allLiveOffers(offerList, today)]
     const all = applyOfferPrices(applyOverrides(PRODUCTS, remote?.overrides || []), live)
     const settings = applySettings(remote?.settings || {})
     // Every product customers see has a clear price: one without (e.g. "price coming soon") stays
@@ -82,11 +84,8 @@ export function MenuProvider({ children }) {
       // and the Customize tiles' photos she changed
       offers: live.slice(0, MAX_LIVE_OFFERS),
       allOffers: live,
-      // Kannada Rajyotsava (src/lib/offers.js RAJYOTSAVA): the offer while it is live, else null.
-      // `fresh`: known from /api/menu itself, not the phone's copy (the popup waits for that, so an
-      // offer Hema just turned off never pops up)
-      rajyotsava: rajyotsavaLive(live),
-      rajyotsavaFresh: remote !== undefined,
+      // Kannada Rajyotsava, display only (src/config/rajyotsava.js): on its dates, else null
+      rajyotsava: raj,
       today,
       // The developer options' settings (src/lib/siteConfig.js), defaults until /api/menu arrives
       config: publicConfig(remote?.config || {}),
@@ -109,11 +108,8 @@ export const useMenu = () => useContext(MenuContext).menu
 /** The offers to show now (src/lib/offers.js liveOffers), [] when none */
 export const useOffers = () => useContext(MenuContext).offers
 
-/** The Rajyotsava offer while it is live ({ ...offer, fresh }), else null */
-export function useRajyotsava() {
-  const { rajyotsava, rajyotsavaFresh } = useContext(MenuContext)
-  return rajyotsava ? { ...rajyotsava, percent: rajyotsava.deal.value, fresh: rajyotsavaFresh } : null
-}
+/** The Rajyotsava display offer on its dates ({ id, percent, startsOn, endsOn, flagOpacity }), else null */
+export const useRajyotsava = () => useContext(MenuContext).rajyotsava
 
 /** Every offer live today (for the menu's offer filter and badges), [] when none */
 export const useAllOffers = () => useContext(MenuContext).allOffers

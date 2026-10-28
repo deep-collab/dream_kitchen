@@ -365,7 +365,8 @@ try {
     await p.reload()
     await ready(p)
     await sleep(800)
-    check((await p.locator('[data-dk-offers]').count()) === 0, 'after every end date there is no banner at all', 'a banner shows after every end date')
+    // (10 days on is November: only Kannada Rajyotsava's display-only slide, from src/config/rajyotsava.js, may show)
+    check((await p.locator('[data-dk-offer]:not([data-dk-raj-banner])').count()) === 0, 'after every end date there is no banner of these offers', 'a banner shows after every end date')
     await c.close()
   }
 

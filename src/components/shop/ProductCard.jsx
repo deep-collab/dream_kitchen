@@ -1,6 +1,6 @@
 import { useI18n } from '../../i18n/I18nProvider'
 import { formatINR, fromPrice, hasPriceRange, isForSale } from '../../lib/pricing'
-import { RAJYOTSAVA, regularFrom } from '../../lib/offers'
+import { RAJYOTSAVA, rajyotsavaBadge, regularFrom } from '../../lib/offers'
 import { PlusIcon, TagIcon } from '../icons'
 import ProductPhoto from './ProductPhoto'
 import { useShopSheets } from './ShopSheets'
@@ -20,9 +20,9 @@ export default function ProductCard({ product, eager = false }) {
   const from = fromPrice(product)
   const was = forSale ? regularFrom(product) : null
   const price = product.soldOut ? t('menu.soldOut') : from == null ? t('menu.priceSoon') : hasPriceRange(product) ? t('menu.from', { price: formatINR(from) }) : formatINR(from)
-  const badge = product.offer ? (product.offer.badge ? pick(product.offer.badge) : t('menu.offerBadge')) : ''
-  // Kannada Rajyotsava's "50% OFF": Karnataka red, so it stands out on every card
+  // Kannada Rajyotsava's "50% OFF" (display only: the price is the menu price): Karnataka red, so it stands out on every card
   const festive = product.offer?.id === RAJYOTSAVA.id
+  const badge = festive ? rajyotsavaBadge(t) : product.offer ? (product.offer.badge ? pick(product.offer.badge) : t('menu.offerBadge')) : ''
 
   return (
     <article data-dk-card className="h-full">

@@ -24,7 +24,7 @@ export default function Hero() {
   const { config, today } = useSiteConfig()
   // The background behind the hero: the faint logo by default, the festival theme on its dates
   // (developer options), or the Karnataka flag while the Rajyotsava offer is live
-  const bg = festivalBackground(config.background, today, Boolean(useRajyotsava()))
+  const bg = festivalBackground(config.background, today, useRajyotsava())
   return (
     <section className="on-dark relative isolate overflow-hidden bg-ink text-cream">
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
